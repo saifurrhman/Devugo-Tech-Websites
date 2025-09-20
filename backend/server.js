@@ -7,7 +7,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" })); // Allow frontend requests
+app.use(cors({ origin: "http://localhost:3000", credentials: true })); // Allow frontend requests
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
@@ -18,6 +18,10 @@ mongoose.connect(process.env.MONGO_URI)
 app.get("/", (req, res) => {
   res.json({ message: "API is running 🚀" });
 });
+
+// Routes
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

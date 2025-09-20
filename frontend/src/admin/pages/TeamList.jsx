@@ -1,4 +1,16 @@
 import React from 'react';
+import AdminSidebar from '../../components/AdminSidebar';
+
 export default function TeamList(){
-  return <div>Team List (CRUD placeholder)</div>;
+  return (
+    <div className="admin-layout">
+      <AdminSidebar />
+      <main className="admin-content">
+        <h1>Team</h1>
+        <div className="card" style={{marginTop: '1rem'}}>
+          Team List (CRUD placeholder)
+        </div>
+      </main>
+    </div>
+  );
 }

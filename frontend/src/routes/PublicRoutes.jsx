@@ -19,6 +19,8 @@ import Contacts from '../admin/pages/Contacts';
 import Analytics from '../admin/pages/Analytics';
 import Login from '../admin/pages/Login';
 import Signup from '../admin/pages/Signup';
+import ResetPassword from '../admin/pages/ResetPassword';
+import ProtectedRoute from './ProtectedRoute';
 
 export default function PublicRoutes() {
   return (
@@ -35,15 +37,16 @@ export default function PublicRoutes() {
         {/* Admin routes (no auth guard yet) */}
         <Route path="/admin/login" element={<Login />} />
         <Route path="/admin/signup" element={<Signup />} />
-        <Route path="/admin" element={<Dashboard />} />
-        <Route path="/admin/portfolio" element={<PortfolioList />} />
-        <Route path="/admin/portfolio/:id" element={<PortfolioEdit />} />
-        <Route path="/admin/blog" element={<BlogList />} />
-        <Route path="/admin/blog/:id" element={<BlogEdit />} />
-        <Route path="/admin/team" element={<TeamList />} />
-        <Route path="/admin/team/:id" element={<TeamEdit />} />
-        <Route path="/admin/contacts" element={<Contacts />} />
-        <Route path="/admin/analytics" element={<Analytics />} />
+        <Route path="/admin/reset-password" element={<ResetPassword />} />
+        <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/admin/portfolio" element={<ProtectedRoute><PortfolioList /></ProtectedRoute>} />
+        <Route path="/admin/portfolio/:id" element={<ProtectedRoute><PortfolioEdit /></ProtectedRoute>} />
+        <Route path="/admin/blog" element={<ProtectedRoute><BlogList /></ProtectedRoute>} />
+        <Route path="/admin/blog/:id" element={<ProtectedRoute><BlogEdit /></ProtectedRoute>} />
+        <Route path="/admin/team" element={<ProtectedRoute><TeamList /></ProtectedRoute>} />
+        <Route path="/admin/team/:id" element={<ProtectedRoute><TeamEdit /></ProtectedRoute>} />
+        <Route path="/admin/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
+        <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

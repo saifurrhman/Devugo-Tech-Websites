@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { AuthAPI } from '../../lib/api';
 
 export default function Signup(){
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   function onChange(e){
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -14,11 +16,13 @@ export default function Signup(){
     setLoading(true);
     setMessage('');
     try {
-      // TODO: call backend signup endpoint when available
-      // await api('/auth/signup', { method: 'POST', body: JSON.stringify(form) });
-      setMessage('Signup placeholder success. Implement API next.');
+      const { user, token } = await AuthAPI.signup(form);
+      localStorage.setItem('adminToken', token);
+      localStorage.setItem('adminUser', JSON.stringify(user));
+      if (!localStorage.getItem('adminTheme')) localStorage.setItem('adminTheme','admin-dark');
+      window.location.assign('/admin');
     } catch (err) {
-      setMessage('Signup failed');
+      setMessage(err.message || 'Signup failed');
     } finally {
       setLoading(false);
     }
@@ -26,17 +30,42 @@ export default function Signup(){
 
   return (
     <div className="admin-auth center" style={{ minHeight: '70vh' }}>
-      <form onSubmit={onSubmit} className="card" style={{ width: 360 }}>
-        <h2 style={{ marginBottom: '.75rem' }}>Admin Signup</h2>
-        <p style={{ marginBottom: '1rem' }}>Create an admin account</p>
-        <div style={{ display: 'grid', gap: '.75rem' }}>
-          <input name="name" placeholder="Full Name" value={form.name} onChange={onChange} required />
-          <input name="email" type="email" placeholder="Email" value={form.email} onChange={onChange} required />
-          <input name="password" type="password" placeholder="Password" value={form.password} onChange={onChange} required />
-          <button className="btn" type="submit" disabled={loading}>{loading ? 'Creating...' : 'Create Account'}</button>
+      <form onSubmit={onSubmit} className="card auth-card">
+        <h2 style={{ marginBottom: '.5rem' }}>Admin Signup</h2>
+        <h3 className="auth-subtitle" style={{ marginBottom: '1rem' }}>Create an admin account</h3>
+        <div className="form-grid">
+          <label className="form-field">
+            <span className="form-label">Full Name</span>
+            <input name="name" placeholder="Devugo Admin" value={form.name} onChange={onChange} required />
+          </label>
+          <label className="form-field">
+            <span className="form-label">Email</span>
+            <input name="email" type="email" placeholder="you@company.com" value={form.email} onChange={onChange} required />
+          </label>
+          <label className="form-field">
+            <span className="form-label">Password</span>
+            <div className="password-field">
+              <input name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={onChange} required />
+              <button type="button" className="password-toggle" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?'Hide password':'Show password'}>
+                {showPassword ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.8"/>
+                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" strokeWidth="1.8"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/>
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" strokeWidth="1.8"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/>
+                  </svg>
+                )}
+              </button>
+            </div>
+          </label>
+          <button className="btn btn-primary" type="submit" disabled={loading}>{loading ? 'Creating...' : 'Create Account'}</button>
           {message && <div className="surface" style={{ padding: '.75rem', marginTop: '.25rem' }}>{message}</div>}
         </div>
-        <div style={{ marginTop: '.75rem' }}>
+        <div className="auth-footer">
           <a href="/admin/login">Already have an account? Login</a>
         </div>
       </form>

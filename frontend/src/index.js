@@ -5,6 +5,15 @@ import './styles/globals.css';
 import PublicRoutes from './routes/PublicRoutes';
 import reportWebVitals from './reportWebVitals';
 
+// Apply saved admin theme early (admin-light | admin-dark)
+try {
+  const saved = localStorage.getItem('adminTheme');
+  if (saved === 'admin-light' || saved === 'admin-dark') {
+    document.body.classList.remove('admin-light', 'admin-dark');
+    document.body.classList.add(saved);
+  }
+} catch (e) {}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
