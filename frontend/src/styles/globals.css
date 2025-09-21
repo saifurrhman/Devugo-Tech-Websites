@@ -24,6 +24,36 @@
   --admin-highlight-border: rgba(67,133,205,0.45);
 }
 
+/* Settings page polish */
+.tabs{display:flex;gap:.4rem;border-bottom:1px solid var(--admin-border);padding:.2rem}
+.tab{background:transparent;border:0;color:var(--admin-text);padding:.5rem .8rem;border-radius:8px;cursor:pointer;position:relative}
+.tab.active{color:var(--color-primary);font-weight:700}
+.tab.active::after{content:"";position:absolute;left:.6rem;right:.6rem;bottom:-1px;height:3px;border-radius:2px;background:var(--color-primary)}
+
+.grid.two{display:grid;grid-template-columns: 1.1fr 260px;gap:1.2rem;align-items:start}
+@media (max-width: 920px){.grid.two{grid-template-columns: 1fr}}
+
+.card .form-grid{max-width:720px}
+.settings-actions{display:flex;gap:.6rem;align-items:center;margin-top:.25rem}
+.settings-actions .surface{background:rgba(255,255,255,0.06);border:1px solid var(--admin-border);border-radius:10px;color:var(--admin-text)}
+
+/* Settings card theming */
+.settings-card{background:linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.04) 100%);border:1px solid var(--admin-border);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06), 0 10px 30px rgba(0,0,0,.18)}
+.settings-card .tabs{background:transparent}
+.settings-card .form-label{color:var(--admin-muted)}
+.settings-card .form-field input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff}
+.settings-card .form-field input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(67,133,205,.25)}
+.settings-card .card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18)}
+.settings-card .divider{height:1px;background:rgba(255,255,255,0.12);margin:.6rem 0}
+.btn-secondary{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.22);border-radius:10px;padding:.55rem .9rem}
+.btn-secondary:hover{background:rgba(255,255,255,0.16)}
+
+/* Light theme tweaks */
+body.admin-light .settings-card{background:linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);border:1px solid #e5e7eb}
+body.admin-light .settings-card .form-field input{background:#fff;border:1px solid #dbe1ea;color:#0f172a}
+body.admin-light .settings-card .card{background:#fff;border:1px solid #e5e7eb}
+body.admin-light .btn-secondary{background:#f1f5f9;color:#0f172a;border:1px solid #dbe1ea}
+
 /* Admin light theme overrides */
 body.admin-light{
   --admin-surface: rgba(0,0,0,0.04);
@@ -203,6 +233,49 @@ body.admin-dark .admin-layout .card{
     color:#ffffff;border:1px solid rgba(255,255,255,0.12);box-shadow:0 12px 28px rgba(0,0,0,.25);border-radius:18px}
   .mobile-menu a{color:#ffffff}
   .mobile-menu a:hover{background:rgba(255,255,255,0.12);color:#ffffff}
+
+  /* Admin responsive layout */
+  .grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem}
+  .grid.two{grid-template-columns:1fr}
+  .admin-topbar__inner{flex-wrap:wrap;gap:.6rem}
+  .admin-search{flex-basis:100%;max-width:100%}
+  .admin-topbar__actions{margin-left:auto}
+  /* Center admin content on tablet, tighten spacing */
+  .admin-content{max-width:960px;margin:0 auto;padding:.75rem}
+  .admin-content > .card{width:100%}
+  .admin-content > h1{font-size:1.55rem}
+}
+
+@media (max-width: 768px){
+  /* Keep two columns down to 480px for better use of space */
+  .grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+  .admin-layout{padding:.75rem}
+  /* Remove capsule styling and search on mobile to avoid the highlighted bar */
+  .admin-topbar{display:flex;justify-content:center}
+  .admin-topbar__inner{padding:0;border-radius:0;background:transparent;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;justify-content:center}
+  .admin-topbar__actions{margin:0 auto}
+  .admin-search{display:none}
+  .admin-search__input{padding:.55rem .9rem .55rem 2rem}
+  .icon-btn{padding:.45rem .5rem}
+  .admin-dropdown{right:.25rem;top:calc(100% + 8px);min-width:200px}
+  .admin-content{padding:.5rem;max-width:560px;margin:0 auto}
+  /* Ensure grid cards stretch within their columns */
+  .admin-content .grid .card{width:100%}
+  .admin-content > h1{ text-align:left; margin:.35rem 0 .25rem; font-size:1.35rem }
+  .admin-content .card{ margin-left:auto; margin-right:auto }
+}
+
+@media (max-width: 480px){
+  /* Stack to one column on very small devices */
+  .grid.three{grid-template-columns:1fr;gap:.75rem}
+}
+
+/* Utility visibility */
+.mobile-only{display:none}
+.desktop-only{display:inline-flex}
+@media (max-width:1024px){
+  .mobile-only{display:inline-flex}
+  .desktop-only{display:none}
 }
 
 /* ========================= */
@@ -210,6 +283,23 @@ body.admin-dark .admin-layout .card{
 /* ========================= */
 .admin-layout{display:grid;grid-template-columns:260px 1fr;gap:1rem;min-height:calc(100vh - 120px);padding:1rem}
 .admin-content{padding:1rem}
+
+/* Expand content width when sidebar is collapsed (desktop) */
+@media (min-width: 1025px){
+  .admin-layout:has(> .admin-sidebar.collapsed){
+    grid-template-columns:72px 1fr;
+  }
+}
+
+/* Admin page titles: larger and bolder */
+.admin-content > h1{
+  font-size:1.65rem;
+  font-weight:800;
+  letter-spacing:.2px;
+}
+
+/* Slightly larger card padding for readability */
+.admin-content .card{padding:1.15rem}
 
 .admin-sidebar{
   position:sticky;top:1rem;align-self:start;height:calc(100vh - 2rem);
@@ -224,12 +314,19 @@ body.admin-dark .admin-layout .card{
 .admin-sidebar__toggle{background:transparent;border:0;color:var(--admin-text);font-size:1.1rem;cursor:pointer;border-radius:8px;padding:.25rem .5rem}
 .admin-sidebar__toggle:hover{background:var(--admin-surface-strong)}
 
-.admin-sidebar__nav{display:flex;flex-direction:column;padding:.5rem}
+.admin-sidebar__nav{display:flex;flex-direction:column;padding:.5rem;flex:1}
 .admin-link{display:flex;align-items:center;gap:.6rem;color:var(--admin-muted);padding:.65rem .75rem;border-radius:10px;text-decoration:none}
 .admin-link:hover{background:var(--admin-surface-strong);color:var(--admin-text)}
 .admin-link.active{background:var(--admin-highlight);color:var(--admin-text);border:1px solid var(--admin-highlight-border)}
 .admin-link .icon{width:1.25rem;text-align:center}
 .admin-link .label{white-space:nowrap}
+
+/* Sidebar footer actions */
+.admin-sidebar__footer{margin-top:auto;padding:.6rem;border-top:1px solid var(--admin-border);display:grid;gap:.5rem}
+.sidebar-action{width:100%;display:flex;align-items:center;gap:.6rem;background:var(--admin-surface-strong);border:1px solid var(--admin-border);color:var(--admin-text);border-radius:10px;padding:.55rem .7rem;cursor:pointer;text-align:left}
+.sidebar-action:hover{background:var(--admin-surface)}
+.sidebar-action.danger{color:#ef4444;border-color:rgba(239,68,68,0.35);background:rgba(239,68,68,0.08)}
+.sidebar-action.danger:hover{background:rgba(239,68,68,0.12)}
 
 /* Collapsed variant */
 .admin-sidebar.collapsed{width:72px;grid-column:1 / span 1}
@@ -239,11 +336,17 @@ body.admin-dark .admin-layout .card{
 /* Responsive: off-canvas on small screens */
 @media (max-width: 1024px){
   .admin-layout{grid-template-columns:1fr}
-  .admin-sidebar{position:fixed;left:1rem;right:1rem;top:76px;height:auto;max-height:70vh;z-index:60}
+  /* Centered modal-style sidebar on mobile */
+  .admin-sidebar{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(1);width:min(420px, calc(100vw - 2rem));height:auto;max-height:80vh;z-index:60;transition:transform .22s ease, opacity .22s ease}
+  .admin-sidebar.open{transform:translate(-50%,-50%) scale(1);opacity:1}
+  .admin-sidebar.collapsed{transform:translate(-50%,-60%) scale(.98);opacity:0;pointer-events:none}
 }
 
-.admin-topbar{position:sticky;top:0;z-index:1;margin-bottom:1rem}
-.admin-topbar__inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--admin-surface);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--admin-border);border-radius:999px;padding:.5rem .75rem}
+/* Backdrop when sidebar is open on mobile */
+.admin-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:50}
+
+.admin-topbar{position:sticky;top:0;z-index:20;margin-bottom:1rem}
+.admin-topbar__inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--admin-surface);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--admin-border);border-radius:999px;padding:.5rem .75rem;overflow:visible}
 .admin-search{position:relative;flex:1;max-width:520px}
 .admin-search__icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);opacity:.9;color:var(--admin-text)}
 .admin-search__input{width:100%;padding:.6rem 1rem .6rem 2.2rem;border-radius:999px;border:1px solid var(--admin-border);background:var(--admin-surface-strong);color:var(--admin-text);outline:none}
@@ -251,9 +354,33 @@ body.admin-dark .admin-layout .card{
 .admin-topbar__actions{display:flex;align-items:center;gap:.5rem}
 .icon-btn{background:var(--admin-surface-strong);border:1px solid var(--admin-border);color:var(--admin-text);border-radius:12px;padding:.5rem .6rem;cursor:pointer}
 .icon-btn:hover{background:var(--admin-surface)}
+.icon-btn svg{display:block}
+.icon-btn{min-width:36px;min-height:36px}
 .avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.85)}
 .avatar img{display:block;width:100%;height:100%;object-fit:cover}
 
+/* Admin avatar chip + dropdown */
+.admin-avatar{position:relative}
+.admin-avatar-btn{display:flex;align-items:center;gap:.45rem;padding:.25rem .6rem .25rem .25rem;border-radius:999px;background:var(--admin-surface-strong);border:1px solid var(--admin-border);cursor:pointer;line-height:1}
+.admin-avatar-btn:hover{background:var(--admin-surface)}
+.avatar.avatar--sm{width:28px;height:28px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.85);display:inline-flex}
+.admin-avatar__label{color:var(--admin-text);font-weight:600;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-avatar .caret{display:inline-flex;margin-left:.15rem;opacity:.9;transition:transform .2s ease}
+.admin-avatar .caret.open{transform:rotate(180deg)}
+
+.admin-dropdown{position:absolute;right:0;top:calc(100% + 10px);min-width:240px;background:rgba(8,18,34,0.92);border:1px solid rgba(255,255,255,0.18);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.35);padding:.4rem;backdrop-filter:blur(14px);z-index:2000}
+.admin-dropdown__header{padding:.5rem .6rem .4rem .6rem;border-bottom:1px solid var(--admin-border);margin-bottom:.3rem}
+.admin-dropdown__header strong{color:#ffffff}
+.admin-dropdown__header .muted{display:block;color:rgba(255,255,255,0.8);font-size:.85rem}
+.admin-dropdown__item{width:100%;text-align:left;background:transparent;border:0;color:#ffffff;padding:.55rem .6rem;border-radius:8px;display:flex;align-items:center;gap:.5rem;text-decoration:none;cursor:pointer}
+.admin-dropdown__item:hover,
+.admin-dropdown__item:focus-visible{
+  background: rgba(67,133,205,0.22); /* primary blue tint */
+  color: #ffffff;
+  outline: none;
+}
+.admin-dropdown__item.danger{color:#ff6b6b}
+.admin-dropdown__item.danger:hover{background:rgba(239,68,68,0.18);color:#fff}
 /* Admin Auth Forms */
 .auth-card{width:380px;max-width:92vw;border-radius:16px;background:#ffffff;color:#0f172a;border:1px solid #e5e7eb;box-shadow:0 10px 30px rgba(0,0,0,.08)}
 .auth-card h1,.auth-card h2,.auth-card h3{color:#0f172a}

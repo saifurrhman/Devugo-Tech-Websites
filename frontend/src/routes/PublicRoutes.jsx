@@ -21,6 +21,7 @@ import Login from '../admin/pages/Login';
 import Signup from '../admin/pages/Signup';
 import ResetPassword from '../admin/pages/ResetPassword';
 import ProtectedRoute from './ProtectedRoute';
+import AdminProfile from '../admin/pages/AdminProfile';
 
 export default function PublicRoutes() {
   return (
@@ -38,6 +39,7 @@ export default function PublicRoutes() {
         <Route path="/admin/login" element={<Login />} />
         <Route path="/admin/signup" element={<Signup />} />
         <Route path="/admin/reset-password" element={<ResetPassword />} />
+        <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/admin/portfolio" element={<ProtectedRoute><PortfolioList /></ProtectedRoute>} />
         <Route path="/admin/portfolio/:id" element={<ProtectedRoute><PortfolioEdit /></ProtectedRoute>} />

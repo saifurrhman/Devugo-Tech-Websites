@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthAPI } from '../lib/api';
 
 export default function AdminTopbar(){
   // Simple auth check: show avatar only if adminUser exists in localStorage
@@ -19,6 +21,31 @@ export default function AdminTopbar(){
 
   const toggleTheme = () => setTheme(prev => (prev === 'admin-light' ? 'admin-dark' : 'admin-light'));
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    function onDocClick(e){
+      if(menuRef.current && !menuRef.current.contains(e.target)){
+        setMenuOpen(false);
+      }
+    }
+    function onKey(e){ if(e.key === 'Escape') setMenuOpen(false); }
+    document.addEventListener('click', onDocClick);
+    document.addEventListener('keydown', onKey);
+    return ()=>{
+      document.removeEventListener('click', onDocClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  },[]);
+
+  async function handleLogout(){
+    try{ await AuthAPI.logout(); }catch(_e){}
+    try{ localStorage.removeItem('adminUser'); localStorage.removeItem('adminToken'); }catch(_e){}
+    navigate('/admin/login');
+  }
+
   return (
     <div className="admin-topbar">
       <div className="admin-topbar__inner">
@@ -32,6 +59,20 @@ export default function AdminTopbar(){
           <input className="admin-search__input" placeholder="Search..." />
         </div>
         <div className="admin-topbar__actions">
+          {/* Mobile menu button to open/collapse sidebar */}
+          <button
+            className="icon-btn mobile-only"
+            title="Menu"
+            aria-label="Open sidebar"
+            onClick={()=>{
+              const ev = new CustomEvent('toggle-admin-sidebar');
+              window.dispatchEvent(ev);
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </button>
           <button className="icon-btn" title={theme === 'admin-light' ? 'Switch to dark' : 'Switch to light'} aria-label="Toggle theme" onClick={toggleTheme}>
             {theme === 'admin-light' ? (
               // Moon icon
@@ -59,11 +100,35 @@ export default function AdminTopbar(){
             </svg>
           </button>
           {adminUser && (
-            <div className="avatar" title={adminUser.name || 'Profile'}>
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="avatar" />
-              ) : (
-                <div className="center" style={{width:'100%',height:'100%',fontSize:12,fontWeight:700,color:'#061c39',background:'#fff'}}>{initials}</div>
+            <div className="admin-avatar" ref={menuRef} onMouseEnter={()=>setMenuOpen(true)}>
+              <button className="admin-avatar-btn" title={adminUser.name || 'Profile'} aria-haspopup="menu" aria-expanded={menuOpen} onClick={()=>setMenuOpen(v=>!v)} onKeyDown={(e)=>{ if(e.key==='Escape') setMenuOpen(false); }}>
+                <span className="avatar avatar--sm">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="avatar" />
+                  ) : (
+                    <div className="center" style={{width:'100%',height:'100%',fontSize:12,fontWeight:700,color:'#061c39',background:'#fff'}}>{initials}</div>
+                  )}
+                </span>
+                <span className="admin-avatar__label">{adminUser?.name || 'Admin'}</span>
+                <span className={`caret ${menuOpen?'open':''}`} aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+              </button>
+              {menuOpen && (
+                <div className="admin-dropdown" role="menu">
+                  <div className="admin-dropdown__header">
+                    <strong>{adminUser.name || 'Admin'}</strong>
+                    <span className="muted">{adminUser.email}</span>
+                  </div>
+                  <Link className="admin-dropdown__item" role="menuitem" to="/admin/profile" onClick={()=>setMenuOpen(false)}>
+                    <span>Manage profile</span>
+                  </Link>
+                  <button className="admin-dropdown__item danger" role="menuitem" onClick={handleLogout}>
+                    <span>Logout</span>
+                  </button>
+                </div>
               )}
             </div>
           )}

@@ -11,5 +11,7 @@ router.post('/reset', ctrl.resetPassword);
 // Protected
 router.get('/me', auth, ctrl.getMe);
 router.post('/logout', auth, ctrl.logout);
+router.patch('/me', auth, ctrl.updateMe);
+router.post('/change-password', auth, ctrl.changePassword);
 
 module.exports = router;

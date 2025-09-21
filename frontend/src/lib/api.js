@@ -23,4 +23,6 @@ export const AuthAPI = {
   me:   (token) => api('/api/auth/me', { method: 'GET', token }),
   logout: (token) => api('/api/auth/logout', { method: 'POST', token }),
   requestReset: (email) => api('/api/auth/reset-password', { method: 'POST', body: { email } }),
+  updateMe: (payload) => api('/api/auth/me', { method: 'PATCH', body: payload }),
+  changePassword: (payload) => api('/api/auth/change-password', { method: 'POST', body: payload }),
 };
