@@ -22,7 +22,45 @@
   --admin-muted: rgba(255,255,255,0.8);
   --admin-highlight: rgba(67,133,205,0.25);
   --admin-highlight-border: rgba(67,133,205,0.45);
+
+  /* Public site navbar defaults (dark site background -> light nav pill) */
+  --site-nav-bg: #ffffff;
+  --site-nav-link: #1f2937;
+  --site-nav-link-hover-bg: rgba(32,65,136,0.09);
+  --site-nav-link-hover: #0b1220;
+  --site-nav-logo: #000000;
 }
+
+/* ========================= */
+/* Public Site Themes        */
+/* ========================= */
+/* Dark is the default site theme (matches existing gradient) */
+body.site-dark{
+  color: var(--color-text);
+  background:
+    radial-gradient(1200px 600px at 50% -100px, rgba(67,133,205,0.18), rgba(6,28,57,0) 60%),
+    linear-gradient(180deg, #061c39 0%, #0b2647 50%, #081a30 100%);
+}
+/* Light theme overrides for the public site */
+body.site-light{
+  color:#0f172a;
+  background:#ffffff;
+  /* Light theme navbar variables */
+  --site-nav-bg: #0f172a;
+  --site-nav-link: #e5e7eb;
+  --site-nav-link-hover-bg: rgba(255,255,255,0.12);
+  --site-nav-link-hover: #ffffff;
+  --site-nav-logo: #ffffff;
+}
+/* Keep public navbar constant across themes */
+body .nav-inner{ background:#ffffff; }
+body .nav-center a{ color:#1f2937 }
+body .nav-center a:hover{ background:rgba(32,65,136,0.09); color:#0b1220 }
+body .navbar .logo{ color:#000 }
+body .mobile-toggle span{ background:#0e1220 }
+/* CTA stays the same */
+body.site-light .btn.cta-dark{ background:#ffffff; color:#0f172a; border-color:#ffffff }
+body.site-light .btn.cta-dark:hover{ background:#f9fafb; color:#0f172a }
 
 /* Settings page polish */
 .tabs{display:flex;gap:.4rem;border-bottom:1px solid var(--admin-border);padding:.2rem}
@@ -42,7 +80,76 @@
 .settings-card .tabs{background:transparent}
 .settings-card .form-label{color:var(--admin-muted)}
 .settings-card .form-field input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff}
-.settings-card .form-field input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(67,133,205,.25)}
+.settings-card .form-field input:focus,.form-field textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(67,133,205,.25)}
+
+/* Admin dark theme: improve readability of labels and fields */
+body.admin-dark .form-label,
+body:not(.admin-light) .form-label{color:#e6f0ff}
+body.admin-dark .form-field input,
+body.admin-dark .form-field textarea,
+body:not(.admin-light) .form-field input,
+body:not(.admin-light) .form-field textarea{
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.28);
+  color: #ffffff;
+}
+body.admin-dark .form-field input::placeholder,
+body.admin-dark .form-field textarea::placeholder,
+body:not(.admin-light) .form-field input::placeholder,
+body:not(.admin-light) .form-field textarea::placeholder{color: rgba(255,255,255,0.8)}
+
+/* Admin light theme stays clean */
+body.admin-light .form-label{color:#0f172a}
+body.admin-light .form-field input,
+body.admin-light .form-field textarea{background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a}
+body.admin-light .form-field input::placeholder,
+body.admin-light .form-field textarea::placeholder{color:#64748b}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:.4rem;border-radius:999px;padding:.35rem .65rem;font-size:.9rem}
+.chip-success{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);color:#22c55e}
+.chip-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#ef4444}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:.25rem .6rem;font-size:.8rem;font-weight:700;background:rgba(67,133,205,.16);color:#e6f0ff;border:1px solid rgba(67,133,205,.35)}
+
+/* Toolbar helper */
+.toolbar{margin-top:.25rem}
+@media(max-width:768px){
+  .toolbar{flex-wrap:wrap}
+  .toolbar h1{flex-basis:100%}
+}
+
+/* ========================= */
+/* Admin: Create Post Styles */
+/* ========================= */
+.page-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.08);border:1px solid var(--admin-border);border-radius:12px;padding:.6rem .8rem;margin-top:.25rem}
+.breadcrumbs{display:flex;align-items:center;gap:.5rem;color:var(--admin-muted)}
+.breadcrumbs strong{color:var(--admin-text)}
+.page-actions{display:flex;align-items:center;gap:.5rem}
+.page-title{color:var(--admin-text)}
+
+.section-card{background:rgba(255,255,255,0.06);border:1px solid var(--admin-border);border-radius:16px;padding:1rem}
+.section-card h3{margin:.25rem 0 .5rem;color:var(--admin-text)}
+
+/* Uploader */
+.uploader{display:flex;align-items:center;justify-content:center;border:2px dashed var(--admin-border);border-radius:14px;min-height:160px;background:rgba(255,255,255,0.04);cursor:pointer}
+.uploader-empty{display:flex;align-items:center;gap:.75rem;color:var(--admin-muted)}
+.uploader-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.12);border:1px solid var(--admin-border)}
+.uploader-preview{width:100%;max-height:320px;object-fit:cover;border-radius:12px}
+
+/* Editor */
+.editor-toolbar{display:flex;gap:.35rem;margin-bottom:.5rem}
+.editor-toolbar button{background:var(--admin-surface-strong);border:1px solid var(--admin-border);color:var(--admin-text);border-radius:8px;padding:.35rem .55rem;cursor:pointer}
+.editor-toolbar button:hover{background:var(--admin-surface)}
+
+/* Light admin theme variant */
+body.admin-light .page-bar{background:#ffffff;border:1px solid #e5e7eb}
+body.admin-light .breadcrumbs{color:#475569}
+body.admin-light .breadcrumbs strong{color:#0f172a}
+body.admin-light .section-card{background:#ffffff;border:1px solid #e5e7eb}
+body.admin-light .editor-toolbar button{background:#f8fafc;border:1px solid #e5e7eb;color:#0f172a}
+body.admin-light .uploader{background:#f8fafc;border-color:#e5e7eb}
 .settings-card .card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18)}
 .settings-card .divider{height:1px;background:rgba(255,255,255,0.12);margin:.6rem 0}
 .btn-secondary{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.22);border-radius:10px;padding:.55rem .9rem}
@@ -88,6 +195,18 @@ body{
     linear-gradient(180deg, #061c39 0%, #0b2647 50%, #081a30 100%);
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
+}
+
+/* Enforce site theme backgrounds after base body rule */
+html body.site-dark{
+  background:
+    radial-gradient(1200px 600px at 50% -100px, rgba(67,133,205,0.18), rgba(6,28,57,0) 60%),
+    linear-gradient(180deg, #061c39 0%, #0b2647 50%, #081a30 100%) !important;
+  color: var(--color-text);
+}
+html body.site-light{
+  background:#ffffff !important;
+  color:#0f172a;
 }
 
 /* Admin LIGHT mode: white background for admin pages */
@@ -147,7 +266,7 @@ body.admin-light p{
 /* Mobile toggle (hidden by default) */
 .mobile-toggle{display:none;position:relative;width:38px;height:38px;border:0;background:transparent;border-radius:10px}
 .mobile-toggle:hover{background:transparent}
-.mobile-toggle span{position:absolute;left:9px;right:9px;height:2px;background:#0e1220;border-radius:2px;transition:transform .2s ease,opacity .2s ease,top .2s ease}
+.mobile-toggle span{position:absolute;left:9px;right:9px;height:2px;background:var(--site-nav-logo);border-radius:2px;transition:transform .2s ease,opacity .2s ease,top .2s ease}
 .mobile-toggle span:nth-child(1){top:12px}
 .mobile-toggle span:nth-child(2){top:18px}
 .mobile-toggle span:nth-child(3){top:24px}
@@ -391,6 +510,7 @@ body.admin-dark .admin-layout .card{
 .form-field{display:grid;gap:.35rem}
 .form-label{font-size:.92rem;color:#0f172a;font-weight:600}
 .form-field input{padding:.8rem 1rem;border-radius:10px;border:1.5px solid #cbd5e1;background:#ffffff;color:#0f172a;outline:none;transition:border-color .15s, box-shadow .15s}
+.form-field textarea{padding:1rem;border-radius:10px;border:1.5px solid #cbd5e1;background:#ffffff;color:#0f172a;outline:none;transition:border-color .15s, box-shadow .15s;resize:vertical}
 .form-field input::placeholder{color:#64748b}
 .form-field input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(67,133,205,.25)}
 .auth-footer{margin-top:.9rem}

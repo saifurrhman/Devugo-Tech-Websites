@@ -43,6 +43,8 @@ app.get("/", (req, res) => {
 // Routes
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+const blogRoutes = require('./routes/blog');
+app.use('/api/blog', blogRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

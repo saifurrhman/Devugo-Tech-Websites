@@ -47,9 +47,9 @@ export default function AdminSidebar() {
       <div className="admin-sidebar__header">
         <strong>Admin</strong>
         <div style={{display:'flex',gap:'.35rem'}}>
-          <button className="admin-sidebar__toggle" title={theme==='admin-light'?'Switch to dark':'Switch to light'} aria-label="Toggle theme" onClick={()=>setTheme(t=>t==='admin-light'?'admin-dark':'admin-light')}>
+          {/* <button className="admin-sidebar__toggle" title={theme==='admin-light'?'Switch to dark':'Switch to light'} aria-label="Toggle theme" onClick={()=>setTheme(t=>t==='admin-light'?'admin-dark':'admin-light')}>
             {theme==='admin-light' ? '☾' : '☀'}
-          </button>
+          </button> */}
           <button className="admin-sidebar__toggle" onClick={toggle} aria-expanded={open} aria-label="Toggle sidebar">≡</button>
         </div>
       </div>

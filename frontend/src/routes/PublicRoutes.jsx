@@ -13,6 +13,7 @@ import PortfolioList from '../admin/pages/PortfolioList';
 import PortfolioEdit from '../admin/pages/PortfolioEdit';
 import BlogList from '../admin/pages/BlogList';
 import BlogEdit from '../admin/pages/BlogEdit';
+import AdminBlogCreate from '../admin/pages/AdminBlogCreate';
 import TeamList from '../admin/pages/TeamList';
 import TeamEdit from '../admin/pages/TeamEdit';
 import Contacts from '../admin/pages/Contacts';
@@ -44,6 +45,7 @@ export default function PublicRoutes() {
         <Route path="/admin/portfolio" element={<ProtectedRoute><PortfolioList /></ProtectedRoute>} />
         <Route path="/admin/portfolio/:id" element={<ProtectedRoute><PortfolioEdit /></ProtectedRoute>} />
         <Route path="/admin/blog" element={<ProtectedRoute><BlogList /></ProtectedRoute>} />
+        <Route path="/admin/blog/create" element={<ProtectedRoute><AdminBlogCreate /></ProtectedRoute>} />
         <Route path="/admin/blog/:id" element={<ProtectedRoute><BlogEdit /></ProtectedRoute>} />
         <Route path="/admin/team" element={<ProtectedRoute><TeamList /></ProtectedRoute>} />
         <Route path="/admin/team/:id" element={<ProtectedRoute><TeamEdit /></ProtectedRoute>} />

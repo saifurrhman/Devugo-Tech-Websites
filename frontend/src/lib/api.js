@@ -26,3 +26,11 @@ export const AuthAPI = {
   updateMe: (payload) => api('/api/auth/me', { method: 'PATCH', body: payload }),
   changePassword: (payload) => api('/api/auth/change-password', { method: 'POST', body: payload }),
 };
+
+export const BlogAPI = {
+  list: () => api('/api/blog', { method: 'GET' }),
+  get: (id) => api(`/api/blog/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/blog', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/blog/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/blog/${id}`, { method: 'DELETE' }),
+};
