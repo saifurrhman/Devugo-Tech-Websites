@@ -14,6 +14,8 @@ export default function AdminBlogCreate(){
     coverImage: '',
     tags: '',
     published: false,
+    seoTitle: '',
+    seoDescription: '',
   });
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -52,9 +54,9 @@ export default function AdminBlogCreate(){
   return (
     <div className="admin-layout">
       <AdminSidebar />
-      <main className="admin-content">
+      <main className="admin-content create-post">
         <AdminTopbar />
-        <div className="page-bar">
+        <div className="page-bar sticky">
           <div className="breadcrumbs">
             <span>Dashboard</span>
             <span>/</span>
@@ -69,6 +71,9 @@ export default function AdminBlogCreate(){
         </div>
 
         <h1 className="page-title" style={{marginTop:'.25rem'}}>Create a new post</h1>
+        <div className="greeting-card">
+          <span>Hello, Admin</span>
+        </div>
 
         {error && (<div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>)}
         {message && (<div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>)}
@@ -79,10 +84,12 @@ export default function AdminBlogCreate(){
             <div className="form-grid" style={{marginTop:'.75rem'}}>
               <label className="form-label">Post title</label>
               <input className="form-field" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} required />
+              <div className="hint">A clear, descriptive headline works best (50–70 characters).</div>
             </div>
             <div className="form-grid" style={{marginTop:'.75rem'}}>
               <label className="form-label">Short description</label>
               <input className="form-field" value={form.excerpt} onChange={e=>setForm(f=>({...f,excerpt:e.target.value}))} />
+              <div className="hint">1–2 lines to summarize the post. This may appear on the blog list.</div>
             </div>
           </section>
 
@@ -90,7 +97,11 @@ export default function AdminBlogCreate(){
             <h3>Post cover</h3>
             <div className="uploader" onClick={()=>document.getElementById('file-input').click()}>
               {form.coverImage ? (
-                <img src={form.coverImage} alt="cover" className="uploader-preview" />
+                <div className="uploader-has-image">
+                  <img src={form.coverImage} alt="cover" className="uploader-preview" />
+                  <button type="button" className="uploader-remove" onClick={(e)=>{ e.stopPropagation(); setForm(f=>({...f,coverImage:''})); }}>Remove photo</button>
+                  <span className="uploader-badge">900×400</span>
+                </div>
               ) : (
                 <div className="uploader-empty">
                   <div className="uploader-icon">⬆</div>
@@ -114,6 +125,7 @@ export default function AdminBlogCreate(){
                 <button type="button" onClick={()=>document.execCommand('insertUnorderedList',false)}>• List</button>
               </div>
               <textarea rows={10} className="form-field" value={form.content} onChange={e=>setForm(f=>({...f,content:e.target.value}))} placeholder="Write something..." />
+              <div className="hint">Use short paragraphs, subheadings, and bullets for readability.</div>
             </div>
           </section>
 
@@ -122,6 +134,17 @@ export default function AdminBlogCreate(){
             <div className="form-grid">
               <label className="form-label">Tags (comma separated)</label>
               <input className="form-field" value={form.tags} onChange={e=>setForm(f=>({...f,tags:e.target.value}))} placeholder="design, ux, product"/>
+              <div className="hint">Separate with commas. Example: design, ux, product</div>
+            </div>
+            <div className="form-grid" style={{marginTop:'.9rem'}}>
+              <label className="form-label">SEO title</label>
+              <input className="form-field" value={form.seoTitle} onChange={e=>setForm(f=>({...f,seoTitle:e.target.value}))} placeholder="SEO title"/>
+              <div className="hint">Keep it under 60 characters.</div>
+            </div>
+            <div className="form-grid" style={{marginTop:'.75rem'}}>
+              <label className="form-label">SEO description</label>
+              <input className="form-field" value={form.seoDescription} onChange={e=>setForm(f=>({...f,seoDescription:e.target.value}))} placeholder="SEO description"/>
+              <div className="hint">About 150–160 characters describing the post.</div>
             </div>
             <label style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'.75rem'}}>
               <input type="checkbox" checked={form.published} onChange={e=>setForm(f=>({...f,published:e.target.checked}))} />

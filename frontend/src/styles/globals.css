@@ -83,20 +83,18 @@ body.site-light .btn.cta-dark:hover{ background:#f9fafb; color:#0f172a }
 .settings-card .form-field input:focus,.form-field textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(67,133,205,.25)}
 
 /* Admin dark theme: improve readability of labels and fields */
-body.admin-dark .form-label,
-body:not(.admin-light) .form-label{color:#e6f0ff}
+/* Dark admin: use light cards for editing pages for best readability */
+body.admin-dark .section-card, body.admin-dark .page-bar{background:#ffffff;border:1px solid #e5e7eb}
+body.admin-dark .section-card h3, body.admin-dark .page-title, body.admin-dark .breadcrumbs strong{color:#0f172a}
+body.admin-dark .breadcrumbs{color:#475569}
+body.admin-dark .editor-toolbar button{background:#f8fafc;border:1px solid #e5e7eb;color:#0f172a}
+
+/* Fields remain high-contrast */
+body.admin-dark .form-label{color:#0f172a}
 body.admin-dark .form-field input,
-body.admin-dark .form-field textarea,
-body:not(.admin-light) .form-field input,
-body:not(.admin-light) .form-field textarea{
-  background: rgba(255,255,255,0.08);
-  border: 1.5px solid rgba(255,255,255,0.28);
-  color: #ffffff;
-}
+body.admin-dark .form-field textarea{background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a}
 body.admin-dark .form-field input::placeholder,
-body.admin-dark .form-field textarea::placeholder,
-body:not(.admin-light) .form-field input::placeholder,
-body:not(.admin-light) .form-field textarea::placeholder{color: rgba(255,255,255,0.8)}
+body.admin-dark .form-field textarea::placeholder{color:#64748b}
 
 /* Admin light theme stays clean */
 body.admin-light .form-label{color:#0f172a}
@@ -124,24 +122,68 @@ body.admin-light .form-field textarea::placeholder{color:#64748b}
 /* Admin: Create Post Styles */
 /* ========================= */
 .page-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.08);border:1px solid var(--admin-border);border-radius:12px;padding:.6rem .8rem;margin-top:.25rem}
+.page-bar.sticky{position:sticky;top:.25rem;z-index:101;backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0);box-shadow:none}
+/* Create-post: push sticky bar below AdminTopbar so it doesn't overlap */
+.create-post .page-bar.sticky{ top: 84px; }
+.create-post .page-bar.sticky + .page-title{ margin-top: 1rem; }
+/* Prevent anchor jumps/content being hidden behind sticky bars */
+.create-post{ scroll-padding-top: 110px; }
+/* Add a bit more space under the sticky header */
+.create-post .greeting-card{ margin-top: .75rem; }
+
+/* Mobile tweaks for create-post header */
+@media (max-width: 768px){
+  .create-post .page-bar{ flex-wrap: wrap; gap:.5rem; padding:.5rem .6rem; }
+  .create-post .breadcrumbs{ flex: 1 1 100%; order: 1; font-size:.95rem; opacity:.95 }
+  .create-post .page-actions{ flex: 1 1 100%; order: 2; display:flex; justify-content:flex-start; gap:.6rem; flex-wrap:nowrap }
+  .create-post .page-actions .btn{ padding:.65rem 1rem; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.08); font-size:.95rem }
+  .create-post .page-actions .btn-secondary{ padding:.6rem .9rem; border-radius:12px; font-size:.95rem }
+  .create-post .page-actions .btn.cta-dark,.create-post .page-actions .btn{ font-weight:700 }
+  .create-post .page-bar.sticky{ top: 66px; }
+  .create-post{ scroll-padding-top: 96px; }
+  /* Hide greeting stripe on mobile to prevent wrapping into the header area */
+  .create-post .greeting-card{ display:none }
+}
 .breadcrumbs{display:flex;align-items:center;gap:.5rem;color:var(--admin-muted)}
+.breadcrumbs{min-width:0}
+.breadcrumbs span, .breadcrumbs strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .breadcrumbs strong{color:var(--admin-text)}
 .page-actions{display:flex;align-items:center;gap:.5rem}
 .page-title{color:var(--admin-text)}
+.page-title{
+  background: linear-gradient(90deg, var(--color-primary) 0%, #8ab8ff 60%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-.section-card{background:rgba(255,255,255,0.06);border:1px solid var(--admin-border);border-radius:16px;padding:1rem}
+.greeting-card{margin-top:.5rem;background:rgba(255,255,255,0.06);border:1px solid var(--admin-border);border-radius:12px;padding:.75rem 1rem;color:var(--admin-text)}
+body.admin-light .greeting-card{background:#ffffff;border:1px solid #e5e7eb;color:#0f172a}
+
+.section-card{background:rgba(255,255,255,0.06);border:1px solid var(--admin-border);border-radius:16px;padding:1rem;position:relative}
+.section-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-top-left-radius:16px;border-bottom-left-radius:16px;background:linear-gradient(180deg,var(--color-primary),rgba(67,133,205,0))}
+.section-card:hover{box-shadow:0 12px 34px rgba(0,0,0,.18)}
 .section-card h3{margin:.25rem 0 .5rem;color:var(--admin-text)}
 
 /* Uploader */
 .uploader{display:flex;align-items:center;justify-content:center;border:2px dashed var(--admin-border);border-radius:14px;min-height:160px;background:rgba(255,255,255,0.04);cursor:pointer}
+.uploader:hover{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))}
+.uploader::after{content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;background:radial-gradient(400px 120px at 20% -40px, rgba(138,184,255,.15), rgba(0,0,0,0) 60%)}
 .uploader-empty{display:flex;align-items:center;gap:.75rem;color:var(--admin-muted)}
 .uploader-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.12);border:1px solid var(--admin-border)}
 .uploader-preview{width:100%;max-height:320px;object-fit:cover;border-radius:12px}
+.uploader-has-image{position:relative;width:100%}
+.uploader-remove{position:absolute;left:12px;bottom:12px;background:#ffffff;color:#0f172a;border:1px solid #e5e7eb;border-radius:999px;padding:.3rem .6rem;font-weight:600}
+.uploader-remove:hover{background:#f9fafb}
+.uploader-badge{position:absolute;right:12px;bottom:12px;background:#0f172a;color:#ffffff;border:1px solid rgba(0,0,0,.1);border-radius:999px;padding:.25rem .5rem;font-size:.8rem}
+body.admin-dark .uploader-remove{background:#ffffff;color:#0f172a}
+body.admin-light .uploader-badge{background:#0f172a;color:#fff}
 
 /* Editor */
 .editor-toolbar{display:flex;gap:.35rem;margin-bottom:.5rem}
-.editor-toolbar button{background:var(--admin-surface-strong);border:1px solid var(--admin-border);color:var(--admin-text);border-radius:8px;padding:.35rem .55rem;cursor:pointer}
+.editor-toolbar button{background:var(--admin-surface-strong);border:1px solid var(--admin-border);color:var(--admin-text);border-radius:999px;padding:.35rem .65rem;cursor:pointer;font-weight:700}
 .editor-toolbar button:hover{background:var(--admin-surface)}
+.editor-toolbar button:active{transform:translateY(1px)}
 
 /* Light admin theme variant */
 body.admin-light .page-bar{background:#ffffff;border:1px solid #e5e7eb}
@@ -150,6 +192,70 @@ body.admin-light .breadcrumbs strong{color:#0f172a}
 body.admin-light .section-card{background:#ffffff;border:1px solid #e5e7eb}
 body.admin-light .editor-toolbar button{background:#f8fafc;border:1px solid #e5e7eb;color:#0f172a}
 body.admin-light .uploader{background:#f8fafc;border-color:#e5e7eb}
+
+/* Checkbox alignment */
+.section-card input[type="checkbox"]{width:16px;height:16px;appearance:none;border:1.6px solid #cbd5e1;border-radius:4px;background:#fff;display:inline-grid;place-content:center}
+.section-card input[type="checkbox"]::before{content:"";width:10px;height:10px;transform:scale(0);transition:120ms transform ease-in-out;background:var(--color-primary);border-radius:2px}
+.section-card input[type="checkbox"]:checked::before{transform:scale(1)}
+body:not(.admin-light) .section-card input[type="checkbox"]{border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.06)}
+
+/* Create-post page: force white-card layout (same-as-reference) regardless of theme */
+.create-post .page-bar{background:transparent !important;border:0 !important;border-radius:0 !important;padding:.4rem 0 !important;margin-bottom:.25rem;border-bottom:1px solid rgba(15,23,42,0.08)}
+.create-post .page-title{
+  background: linear-gradient(90deg, var(--color-primary) 0%, #7c9fff 45%, #00d4ff 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+.create-post .greeting-card{background:#ffffff !important;border:1px solid #e5e7eb !important;color:#0f172a !important}
+.create-post .section-card{background:#ffffff !important;border:1px solid #e5e7eb !important;box-shadow:0 1px 0 rgba(0,0,0,.02);padding:1.2rem 1.25rem 1.1rem}
+.create-post .section-card h3{color:#0f172a}
+.create-post .editor-toolbar button{background:#f8fafc !important;border:1px solid #e5e7eb !important;color:#0f172a !important}
+.create-post .uploader{background:#f8fafc !important;border-color:#e5e7eb !important;padding:1rem}
+.create-post .uploader::after{display:none}
+.create-post .uploader-empty{color:#334155 !important; gap:1rem}
+.create-post .uploader-empty strong{color:#0f172a !important}
+.create-post .uploader-icon{background:#ffffff !important;border-color:#e5e7eb !important;color:#0f172a}
+.create-post .uploader .muted{color:#64748b !important}
+.create-post .uploader{border-style:dashed;border-width:2px}
+.create-post .uploader-remove{background:#ffffff !important;color:#0f172a !important;border:1px solid #e5e7eb !important}
+.create-post .uploader-badge{background:#334155 !important;color:#ffffff !important;border-color:transparent}
+.create-post .form-label{color:#0f172a !important}
+.create-post .form-field input,
+.create-post input.form-field,
+.create-post .form-field textarea,
+.create-post textarea.form-field{
+  background:#ffffff !important;
+  border:1.5px solid #cbd5e1 !important;
+  color:#0f172a !important;
+  font-size:.98rem;
+  line-height:1.4;
+  border-radius:12px;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.02);
+  padding: 0.95rem 1.1rem;
+}
+.create-post .form-field textarea,
+.create-post textarea.form-field{min-height:240px; padding:1.1rem 1.1rem}
+.create-post .form-field input:hover,
+.create-post input.form-field:hover,
+.create-post .form-field textarea:hover,
+.create-post textarea.form-field:hover{border-color:#b6c3d6 !important}
+.create-post .form-field input:focus,
+.create-post input.form-field:focus,
+.create-post .form-field textarea:focus,
+.create-post textarea.form-field:focus{border-color:var(--color-primary) !important; box-shadow:0 0 0 3px rgba(67,133,205,.25)}
+.create-post .form-field input::placeholder,
+.create-post input.form-field::placeholder,
+.create-post .form-field textarea::placeholder,
+.create-post textarea.form-field::placeholder{color:#64748b !important}
+
+/* Hints under fields: ensure readable */
+.create-post .hint{color:#6b7280; font-size:.85rem; margin-top:.25rem}
+
+/* Spacing & labels inside create-post */
+.create-post .form-grid{gap:.5rem}
+.create-post .form-label{font-weight:700; margin-bottom:.1rem}
 .settings-card .card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18)}
 .settings-card .divider{height:1px;background:rgba(255,255,255,0.12);margin:.6rem 0}
 .btn-secondary{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.22);border-radius:10px;padding:.55rem .9rem}
@@ -509,10 +615,11 @@ body.admin-dark .admin-layout .card{
 .form-grid{display:grid;gap:.9rem}
 .form-field{display:grid;gap:.35rem}
 .form-label{font-size:.92rem;color:#0f172a;font-weight:600}
-.form-field input{padding:.8rem 1rem;border-radius:10px;border:1.5px solid #cbd5e1;background:#ffffff;color:#0f172a;outline:none;transition:border-color .15s, box-shadow .15s}
-.form-field textarea{padding:1rem;border-radius:10px;border:1.5px solid #cbd5e1;background:#ffffff;color:#0f172a;outline:none;transition:border-color .15s, box-shadow .15s;resize:vertical}
-.form-field input::placeholder{color:#64748b}
-.form-field input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(67,133,205,.25)}
+input.form-field, textarea.form-field{width:100%;display:block}
+.form-field input{width:100%;padding:.85rem 1rem;border-radius:10px;border:1.5px solid #cbd5e1;background:#ffffff;color:#0f172a;outline:none;transition:border-color .15s, box-shadow .15s}
+.form-field textarea{width:100%;min-height:220px;padding:1rem;border-radius:10px;border:1.5px solid #cbd5e1;background:#ffffff;color:#0f172a;outline:none;transition:border-color .15s, box-shadow .15s;resize:vertical}
+.form-field input::placeholder,.form-field textarea::placeholder{color:#64748b}
+.form-field input:focus,.form-field textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(67,133,205,.25)}
 .auth-footer{margin-top:.9rem}
 .auth-footer a{color:var(--color-primary)}
 .auth-footer a:hover{color:var(--color-primary-600)}
