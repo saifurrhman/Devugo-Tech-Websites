@@ -2,7 +2,9 @@ const BlogPost = require('../models/BlogPost');
 
 exports.list = async (req, res) => {
   try{
-    const posts = await BlogPost.find({ published: true }).sort({ publishedAt: -1, createdAt: -1 });
+    const isAdminAll = (req.query.all === '1' || req.query.all === 'true') && (req.user || req.isAdmin); // basic check
+    const filter = isAdminAll ? {} : { published: true };
+    const posts = await BlogPost.find(filter).sort({ publishedAt: -1, createdAt: -1 });
     res.json({ posts });
   }catch(err){
     res.status(500).json({ error: 'Server error', details: err.message });

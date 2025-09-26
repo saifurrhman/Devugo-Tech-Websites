@@ -1,21 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { BlogAPI } from '../../lib/api';
 
 export default function BlogList(){
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
+  const [status, setStatus] = useState('all'); // all | published | drafts
 
   useEffect(()=>{
     let mounted = true;
     (async()=>{
       try{
-        // Using public list for now (published posts). We can switch to an admin endpoint later.
-        const { posts } = await BlogAPI.list();
+        // Admin view: load all (published + drafts)
+        const { posts } = await BlogAPI.listAll();
         if(mounted) setPosts(posts||[]);
       }catch(err){
         if(mounted) setError(err.message||'Failed to load posts');
@@ -28,12 +30,34 @@ export default function BlogList(){
 
   const filtered = useMemo(()=>{
     const term = q.trim().toLowerCase();
-    if(!term) return posts;
-    return posts.filter(p =>
+    let list = posts;
+    if (status === 'published') list = posts.filter(p=>!!p.published);
+    if (status === 'drafts') list = posts.filter(p=>!p.published);
+    if(!term) return list;
+    return list.filter(p =>
       (p.title||'').toLowerCase().includes(term) ||
       (p.excerpt||'').toLowerCase().includes(term)
     );
   },[q, posts]);
+
+  async function handleDelete(id){
+    if(!window.confirm('Delete this post?')) return;
+    try{
+      await BlogAPI.remove(id);
+      setPosts(prev=>prev.filter(p=>p._id!==id));
+    }catch(err){
+      alert(err.message||'Failed to delete');
+    }
+  }
+
+  async function togglePublish(p){
+    try{
+      const { post } = await BlogAPI.update(p._id, { published: !p.published });
+      setPosts(prev=>prev.map(x=>x._id===p._id? post : x));
+    }catch(err){
+      alert(err.message||'Failed to update');
+    }
+  }
 
   return (
     <div className="admin-layout">
@@ -52,6 +76,16 @@ export default function BlogList(){
               </span>
               <input className="admin-search__input" placeholder="Search posts..." value={q} onChange={e=>setQ(e.target.value)} />
             </div>
+            <select
+              className={`form-field filter-select status-${status}`}
+              value={status}
+              onChange={e=>setStatus(e.target.value)}
+              style={{padding:'.5rem .9rem', borderRadius:9999, fontWeight:700}}
+            >
+              <option value="all">All</option>
+              <option value="published">Published</option>
+              <option value="drafts">Drafts</option>
+            </select>
             <Link to="/admin/blog/create" className="btn">New Post</Link>
           </div>
         </div>
@@ -71,13 +105,18 @@ export default function BlogList(){
                   </div>
                   {p.excerpt && <p style={{margin:0}}>{p.excerpt}</p>}
                   {p.publishedAt && <small style={{opacity:.8}}>Published {new Date(p.publishedAt).toLocaleDateString()}</small>}
+                  <div style={{display:'flex',gap:'.4rem',marginTop:'.25rem'}}>
+                    <button className="btn-secondary" onClick={()=>navigate(`/admin/blog/${p._id}`)}>Edit</button>
+                    <button className="btn-secondary" onClick={()=>togglePublish(p)}>{p.published? 'Unpublish' : 'Publish'}</button>
+                    <button className="btn-secondary" onClick={()=>handleDelete(p._id)} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="card" style={{marginTop:'1rem',textAlign:'center',padding:'2rem'}}>
-              <h3 style={{marginTop:0}}>No posts yet</h3>
-              <p style={{opacity:.8,marginTop:'.25rem'}}>Create your first blog post to show on the public blog page.</p>
+              <h3 style={{marginTop:0}}>No Posts Yet</h3>
+              <p style={{opacity:.8,marginTop:'.25rem'}}>Create Your First Blog Post To Show On The Public Blog Page.</p>
               <Link to="/admin/blog/create" className="btn" style={{marginTop:'.5rem'}}>Create a Post</Link>
             </div>
           )

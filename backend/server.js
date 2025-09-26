@@ -14,10 +14,11 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ];
+const allowedOriginRegex = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/;
 app.use(cors({
   origin: function(origin, cb){
     if (!origin) return cb(null, true); // SSR or curl
-    if (allowedOrigins.includes(origin)) return cb(null, true);
+    if (allowedOrigins.includes(origin) || allowedOriginRegex.test(origin)) return cb(null, true);
     return cb(null, false);
   },
   credentials: true,
@@ -45,6 +46,8 @@ const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 const blogRoutes = require('./routes/blog');
 app.use('/api/blog', blogRoutes);
+const contactRoutes = require('./routes/contact');
+app.use('/api/contact', contactRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

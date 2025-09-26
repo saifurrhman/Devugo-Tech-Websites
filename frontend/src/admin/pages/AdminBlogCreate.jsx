@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { BlogAPI } from '../../lib/api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function AdminBlogCreate(){
   const navigate = useNavigate();
@@ -57,23 +57,18 @@ export default function AdminBlogCreate(){
       <main className="admin-content create-post">
         <AdminTopbar />
         <div className="page-bar sticky">
-          <div className="breadcrumbs">
-            <span>Dashboard</span>
+          <div className="breadcrumbs" aria-label="Breadcrumbs">
+            <Link to="/admin">Dashboard</Link>
             <span>/</span>
-            <span>Blog</span>
+            <Link to="/admin/blog">Blog</Link>
             <span>/</span>
-            <strong>Create</strong>
+            <strong className="active" aria-current="page">Create</strong>
           </div>
-          <div className="page-actions">
-            <button type="button" className="btn-secondary" onClick={()=>navigate('/admin/blog')}>Cancel</button>
-            <button type="button" className="btn" onClick={handleSubmit} disabled={saving}>{saving? 'Publishing…' : 'Publish changes'}</button>
-          </div>
+          
         </div>
 
-        <h1 className="page-title" style={{marginTop:'.25rem'}}>Create a new post</h1>
-        <div className="greeting-card">
-          <span>Hello, Admin</span>
-        </div>
+        <h1 className="page-title" style={{marginTop:'.25rem'}}>Create a New Post</h1>
+        
 
         {error && (<div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>)}
         {message && (<div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>)}

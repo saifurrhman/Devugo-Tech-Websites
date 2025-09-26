@@ -29,8 +29,14 @@ export const AuthAPI = {
 
 export const BlogAPI = {
   list: () => api('/api/blog', { method: 'GET' }),
+  listAll: () => api('/api/blog?all=1', { method: 'GET' }),
   get: (id) => api(`/api/blog/${id}`, { method: 'GET' }),
   create: (payload) => api('/api/blog', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/blog/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/blog/${id}`, { method: 'DELETE' }),
+};
+
+export const ContactAPI = {
+  create: (payload) => api('/api/contact', { method: 'POST', body: payload }),
+  list: () => api('/api/contact', { method: 'GET' }),
 };

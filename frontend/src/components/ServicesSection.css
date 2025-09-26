@@ -1,0 +1,21 @@
+/* Reveal animation for Services cards */
+.services-section .services-grid{ position:relative }
+.service-card{ opacity:0; transform:translateY(16px) scale(.98); will-change: transform, opacity; transition: opacity .45s cubic-bezier(.22,.61,.36,1), transform .45s cubic-bezier(.22,.61,.36,1) }
+.service-card.show{ opacity:1; transform:translateY(0) scale(1) }
+
+/* Slight stagger handled inline via style or JS; this CSS keeps hover effects intact */
+
+/* Optional: smooth container fade */
+.services-section{ animation: servicesIntro .4s ease-out 1 both }
+@keyframes servicesIntro{ from{ opacity:0; transform:translateY(6px) } to{ opacity:1; transform:translateY(0) } }
+
+/* Load more button appearance */
+.load-more-wrap{ display:flex; align-items:center; justify-content:center; gap:.75rem; flex-wrap:wrap; margin-top:1rem }
+.load-more-btn{ animation: lmPop .28s ease-out both }
+@keyframes lmPop{ from{ opacity:0; transform:translateY(10px) scale(.98) } to{ opacity:1; transform:translateY(0) scale(1) } }
+
+/* Progress hint */
+.progress-hint{ text-align:center; color:var(--color-muted); margin-top:0; font-weight:600; opacity:.9 }
+@media (max-width: 640px){
+  .progress-hint{ width:100% } /* wrap to next line on small screens */
+}

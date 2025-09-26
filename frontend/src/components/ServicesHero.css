@@ -1,0 +1,57 @@
+ /* Services page hero - beautiful, bold, and on brand */
+.services-hero{ position:relative; padding:4rem 0 2.5rem; overflow:hidden }
+.services-hero .container{ max-width:980px; margin:0 auto; padding:0 1rem; text-align:center }
+
+/* Ambient background glows */
+.services-hero::before,
+.services-hero::after{
+  content:""; position:absolute; inset:auto; pointer-events:none; filter:blur(26px); opacity:.55;
+}
+.services-hero::before{ width:780px; height:420px; left:-180px; top:-220px; background:radial-gradient(560px 280px at 30% 40%, rgba(67,133,205,.28), rgba(0,0,0,0) 60%) }
+.services-hero::after{ width:720px; height:360px; right:-160px; bottom:-200px; background:radial-gradient(520px 260px at 70% 60%, rgba(32,65,136,.25), rgba(0,0,0,0) 60%) }
+
+.services-hero__eyebrow{ display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .6rem; border-radius:999px; background:rgba(255,255,255,0.10); color:#e6f0ff; border:1px solid rgba(255,255,255,.14); font-weight:700; letter-spacing:.02em }
+.services-hero__eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:#46a0ff; display:inline-block }
+
+.services-hero__title{ font-size:3.25rem; line-height:1.05; font-weight:900; letter-spacing:-.015em; color:#ffffff; margin:.6rem auto .3rem; max-width:20ch }
+.services-hero__title{ position:relative }
+/* Gradient underline */
+.services-hero__title::after{
+  content:""; position:absolute; left:50%; transform:translateX(-50%); bottom:-10px; width:200px; height:3px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(67,133,205,.0), rgba(67,133,205,.75), rgba(67,133,205,.0));
+}
+.services-hero__sub{ color:var(--color-muted); max-width:62ch; font-size:1.05rem; margin:0 auto 1.1rem }
+
+.services-hero__actions{ display:flex; align-items:center; justify-content:center; gap:.6rem; margin-top:.2rem; flex-wrap:wrap }
+.services-hero__cta{ display:inline-flex; align-items:center; gap:.5rem; background:linear-gradient(180deg, #3f88d3, #204188); color:#ffffff; border:1px solid rgba(255,255,255,.9); border-radius:12px; padding:.7rem 1rem; font-weight:800; text-decoration:none; box-shadow:0 10px 24px rgba(67,133,205,.35); transition:transform .18s ease, box-shadow .18s ease, filter .18s ease, background .18s ease, color .18s ease, border-color .18s ease }
+.services-hero__cta:hover{ transform:translateY(-1px); box-shadow:0 14px 32px rgba(67,133,205,.35); background:#ffffff; color:#0f172a; border-color:#ffffff; filter:none }
+.services-hero__cta:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(67,133,205,.38), 0 14px 32px rgba(67,133,205,.45) }
+.services-hero__cta:active{ transform:translateY(0) }
+.services-hero__ghost{ display:inline-flex; align-items:center; gap:.5rem; background:transparent; color:#e6f0ff; border:1.5px solid rgba(255,255,255,.82); border-radius:12px; padding:.7rem 1rem; font-weight:800; text-decoration:none; transition:background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease }
+.services-hero__ghost:hover{ background:rgba(255,255,255,.10); border-color:#ffffff; color:#ffffff }
+.services-hero__ghost:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(67,133,205,.28) }
+.services-hero__ghost:active{ transform:translateY(0) }
+.services-hero__cta svg, .services-hero__ghost svg{ width:18px; height:18px }
+
+/* Decorative badges below */
+.services-hero__badges{ display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; margin-top:1rem }
+.badge{ display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .6rem; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); color:#e6f0ff; font-weight:700 }
+.badge svg{ width:14px; height:14px }
+
+@media (max-width: 1024px){
+  .services-hero{ padding:3rem 0 2rem }
+  .services-hero__title{ font-size:2.6rem }
+}
+@media (max-width: 640px){
+  .services-hero{ padding:2.2rem 0 1.6rem }
+  .services-hero__title{ font-size:2rem }
+}
+
+/* Entrance animations */
+.services-hero__eyebrow{ opacity:0; transform:translateY(6px); animation:fadeUp .45s ease-out .05s forwards }
+.services-hero__title{ opacity:0; transform:translateY(8px); animation:fadeUp .55s ease-out .12s forwards }
+.services-hero__sub{ opacity:0; transform:translateY(10px); animation:fadeUp .6s ease-out .2s forwards }
+.services-hero__actions{ opacity:0; transform:translateY(12px); animation:fadeUp .6s ease-out .28s forwards }
+.services-hero__badges{ opacity:0; transform:translateY(12px); animation:fadeUp .6s ease-out .36s forwards }
+
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(12px)} to{ opacity:1; transform:translateY(0)} }
