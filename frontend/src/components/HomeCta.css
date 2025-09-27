@@ -1,12 +1,27 @@
-.home-cta{ padding:2.4rem 0 0; }
+.home-cta{ padding:2.6rem 0 0; }
 .home-cta .container{ max-width:1140px; margin:0 auto; padding:0 1rem }
-.home-cta .cta-card{ background:linear-gradient(180deg,#2c84e3,#1e63bd); color:#ffffff; border-radius:24px; padding:1.8rem; text-align:center; box-shadow:0 12px 32px rgba(0,0,0,.26); border:1px solid rgba(255,255,255,.28) }
-.home-cta h2{ margin:0 0 .4rem; font-weight:900; font-size:1.8rem }
-.home-cta p{ margin:0 0 .8rem; color:#e6f0ff }
-.home-cta .btn.light{ background:#ffffff; color:#0f172a !important; -webkit-text-fill-color:#0f172a; border:1px solid rgba(255,255,255,.85); border-radius:999px; font-weight:800 }
-.home-cta .btn.light:hover{ background:#0b2647; color:#ffffff !important; -webkit-text-fill-color:#ffffff; border-color:#0b2647 }
+.home-cta .cta-card{ position:relative; overflow:hidden; background:linear-gradient(180deg,#2c84e3,#1e63bd); color:#ffffff; border-radius:26px; padding:2rem; text-align:center; border:1px solid rgba(255,255,255,.28); box-shadow:0 16px 40px rgba(0,0,0,.28); background-size:200% 200%; animation: ctaGradient 12s ease infinite }
+/* Gradient ring border */
+.home-cta .cta-card::before{ content:""; position:absolute; inset:-1px; border-radius:28px; padding:1px; background: linear-gradient(90deg, #8ab8ff, rgba(255,255,255,.6)); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none }
+/* Soft highlight */
+.home-cta .cta-card::after{ content:""; position:absolute; left:10%; right:10%; top:-40px; height:120px; background: radial-gradient(300px 120px at 50% 0, rgba(255,255,255,.35), rgba(255,255,255,0)); filter: blur(4px); pointer-events:none }
+.home-cta h2{ margin:0 0 .6rem; font-weight:900; font-size:2.1rem; letter-spacing:.2px }
+.home-cta p{ margin:0 0 1.1rem; color:#e6f0ff; font-size:1.06rem }
+.home-cta .btn.light{ display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:#ffffff; color:#0f172a !important; -webkit-text-fill-color:#0f172a; border:1px solid rgba(255,255,255,.85); border-radius:999px; font-weight:900; padding:1rem 1.35rem; box-shadow:0 8px 22px rgba(0,0,0,.18); font-size:1.02rem }
+.home-cta .btn.light:hover{ background:#0b2647; color:#ffffff !important; -webkit-text-fill-color:#ffffff; border-color:#0b2647; transform:translateY(-1px); box-shadow:0 12px 28px rgba(11,38,71,.45) }
+.home-cta .btn.light:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(255,255,255,.8), 0 0 0 6px rgba(32,65,136,.45) }
+.home-cta .btn.light:active{ transform:translateY(0) }
+
+@keyframes ctaGradient{
+  0%{ background-position: 0% 0% }
+  50%{ background-position: 100% 100% }
+  100%{ background-position: 0% 0% }
+}
 
 @media (max-width: 640px){
-  .home-cta .cta-card{ border-radius:18px; padding:1.2rem }
-  .home-cta h2{ font-size:1.4rem }
+  .home-cta .cta-card{ border-radius:20px; padding:1.3rem }
+  .home-cta h2{ font-size:1.7rem }
+  .home-cta p{ font-size:1.02rem }
+  .home-cta .btn.light{ padding:.95rem 1.15rem; font-size:1rem }
+  .home-cta .btn.light{ width:100% }
 }
