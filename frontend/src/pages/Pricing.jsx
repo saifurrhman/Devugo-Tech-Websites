@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PricingQuoteModal from '../components/PricingQuoteModal';
 import './Pricing.css';
+import { PricingAPI } from '../lib/api';
 
-const CARDS = [
+const STATIC_CARDS = [
   { title: 'CX + CRO Audit', price: '$1,500',
     desc: 'Fix critical areas of your website to improve conversions.',
     features: ['x5 Critical redesigned sections','10+ page audit report','Figma source file','Loom walkthrough','Desktop + Mobile design','On‑page SEO & copy review'],
@@ -47,6 +48,8 @@ const CARDS = [
 
 export default function Pricing(){
   const [open, setOpen] = useState(false);
+  const [cards, setCards] = useState(STATIC_CARDS);
+  const [loading, setLoading] = useState(true);
 
   useEffect(()=>{
     const els = Array.from(document.querySelectorAll('.pricing-page .card'));
@@ -56,6 +59,32 @@ export default function Pricing(){
     els.forEach(el=> io.observe(el));
     return ()=> io.disconnect();
   }, []);
+
+  // Fetch dynamic plans
+  useEffect(()=>{
+    let mounted = true;
+    (async()=>{
+      try{
+        const { items } = await PricingAPI.list();
+        if(mounted && Array.isArray(items) && items.length){
+          const mapped = items
+            .filter(p=>p.published!==false)
+            .sort((a,b)=> (a.order||0) - (b.order||0))
+            .map(p => ({
+              title: p.name,
+              price: p.priceMonthly ? `$${p.priceMonthly}` : '$0',
+              desc: p.recommended ? 'Recommended plan' : '',
+              features: p.features || [],
+              tags: ['All'],
+              highlight: !!p.recommended,
+            }));
+          if(mapped.length) setCards(mapped);
+        }
+      }catch(_e){ /* fallback to static */ }
+      finally{ if(mounted) setLoading(false); }
+    })();
+    return ()=>{ mounted=false };
+  },[]);
 
   const pills = ['All','AI Call Agent','AI Assistant','Custom CRM','Custom Software','Shopify','Wix','Webflow','AI Development','Mobile Apps'];
   const [selected, setSelected] = useState('All');
@@ -67,7 +96,7 @@ export default function Pricing(){
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  const filtered = CARDS.filter(c => (selected==='All') || (c.tags?.includes(selected)));
+  const filtered = useMemo(()=> cards.filter(c => (selected==='All') || (c.tags?.includes(selected))), [cards, selected]);
 
   // Ensure newly filtered cards are visible (bypass IO delay)
   useEffect(()=>{
@@ -109,7 +138,7 @@ export default function Pricing(){
             ))}
 
             {/* Last two special cards (swapped order) */}
-            <article className="card special alt" style={{transitionDelay:`${CARDS.length*60}ms`}}>
+            <article className="card special alt" style={{transitionDelay:`${cards.length*60}ms`}}>
               <h3>Maintenance & Support</h3>
               <p className="desc">Keep your product running smoothly with monthly support and improvements.</p>
               <ul className="features">
@@ -120,7 +149,7 @@ export default function Pricing(){
               </ul>
               <button className="btn cta-dark" onClick={()=>setOpen(true)}>Contact sales</button>
             </article>
-            <article className="card special" style={{transitionDelay:`${(CARDS.length+1)*60}ms`}}>
+            <article className="card special" style={{transitionDelay:`${(cards.length+1)*60}ms`}}>
               <div className="special-art" aria-hidden="true" />
               <h3>Need a Custom Quote?</h3>
               <p className="desc">Tell us what you want to build — we’ll tailor a plan to your scope.</p>

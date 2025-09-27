@@ -4,5 +4,6 @@ const requireAdmin = require('../middlewares/auth');
 
 router.post('/events', ctrl.capture);
 router.get('/metrics', requireAdmin, ctrl.metrics);
+router.get('/summary', ctrl.summary);
 
 module.exports = router;

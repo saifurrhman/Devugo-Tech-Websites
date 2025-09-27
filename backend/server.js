@@ -48,6 +48,18 @@ const blogRoutes = require('./routes/blog');
 app.use('/api/blog', blogRoutes);
 const contactRoutes = require('./routes/contact');
 app.use('/api/contact', contactRoutes);
+const analyticsRoutes = require('./routes/analytics');
+app.use('/api/analytics', analyticsRoutes);
+const uploadRoutes = require('./routes/upload');
+app.use('/api/upload', uploadRoutes);
+const serviceRoutes = require('./routes/services');
+app.use('/api/services', serviceRoutes);
+const pricingRoutes = require('./routes/pricing');
+app.use('/api/pricing', pricingRoutes);
+const portfolioRoutes = require('./routes/portfolio');
+app.use('/api/portfolio', portfolioRoutes);
+const teamRoutes = require('./routes/team');
+app.use('/api/team', teamRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

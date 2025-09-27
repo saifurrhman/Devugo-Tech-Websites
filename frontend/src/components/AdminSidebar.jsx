@@ -77,14 +77,6 @@ export default function AdminSidebar() {
             </svg>
           </span><span className="label">Pricing</span>
         </NavLink>
-        <NavLink to="/admin/completed" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
-          <span className="icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 7 10 17l-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <rect x="3" y="3" width="18" height="18" rx="3" ry="3" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-            </svg>
-          </span><span className="label">Completed</span>
-        </NavLink>
         <NavLink to="/admin/portfolio" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
           <span className="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { BlogAPI } from '../../lib/api';
+import { BlogAPI, UploadAPI } from '../../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function AdminBlogCreate(){
@@ -19,6 +19,8 @@ export default function AdminBlogCreate(){
   });
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [shareToSocial, setShareToSocial] = useState(false);
+  const editorRef = useRef(null);
 
   async function handleSubmit(e){
     e.preventDefault();
@@ -47,7 +49,17 @@ export default function AdminBlogCreate(){
     const file = e.target.files?.[0];
     if(!file) return;
     const reader = new FileReader();
-    reader.onload = () => setForm(f=>({...f, coverImage: reader.result }));
+    reader.onload = async () => {
+      try{
+        const dataUrl = reader.result;
+        // call backend upload API to get a hosted URL
+        const { url } = await UploadAPI.image(dataUrl, file.name);
+        setForm(f=>({...f, coverImage: url }));
+        setMessage('Cover image uploaded');
+      }catch(err){
+        setError(err.message || 'Failed to upload image');
+      }
+    };
     reader.readAsDataURL(file);
   }
 
@@ -118,9 +130,20 @@ export default function AdminBlogCreate(){
                 <button type="button" onClick={()=>document.execCommand('italic',false)}>I</button>
                 <button type="button" onClick={()=>document.execCommand('underline',false)}>U</button>
                 <button type="button" onClick={()=>document.execCommand('insertUnorderedList',false)}>• List</button>
+                <button type="button" onClick={()=>document.execCommand('formatBlock', false, 'h2')}>H2</button>
+                <button type="button" onClick={()=>document.execCommand('formatBlock', false, 'h3')}>H3</button>
               </div>
-              <textarea rows={10} className="form-field" value={form.content} onChange={e=>setForm(f=>({...f,content:e.target.value}))} placeholder="Write something..." />
-              <div className="hint">Use short paragraphs, subheadings, and bullets for readability.</div>
+              <div
+                ref={editorRef}
+                className="form-field"
+                style={{minHeight:180}}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={(e)=> setForm(f=>({...f, content: e.currentTarget.innerHTML}))}
+                dangerouslySetInnerHTML={{ __html: form.content }}
+                aria-label="Post content editor"
+              />
+              <div className="hint">Use headings, lists, and emphasis to format your post.</div>
             </div>
           </section>
 
@@ -144,6 +167,10 @@ export default function AdminBlogCreate(){
             <label style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'.75rem'}}>
               <input type="checkbox" checked={form.published} onChange={e=>setForm(f=>({...f,published:e.target.checked}))} />
               Publish immediately
+            </label>
+            <label style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'.5rem'}}>
+              <input type="checkbox" checked={shareToSocial} onChange={e=>setShareToSocial(e.target.checked)} />
+              Also share on social media
             </label>
           </section>
 

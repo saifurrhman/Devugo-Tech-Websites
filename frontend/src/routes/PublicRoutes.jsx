@@ -28,6 +28,8 @@ import AdminProfile from '../admin/pages/AdminProfile';
 import ServicesList from '../admin/pages/ServicesList';
 import ServiceEdit from '../admin/pages/ServiceEdit';
 import PricingPlans from '../admin/pages/PricingPlans';
+import Leads from '../admin/pages/Leads';
+import LeadEdit from '../admin/pages/LeadEdit';
 
 export default function PublicRoutes() {
   return (
@@ -58,6 +60,8 @@ export default function PublicRoutes() {
         <Route path="/admin/team/:id" element={<ProtectedRoute><TeamEdit /></ProtectedRoute>} />
         <Route path="/admin/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
         <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/admin/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
+        <Route path="/admin/leads/:id" element={<ProtectedRoute><LeadEdit /></ProtectedRoute>} />
         <Route path="/admin/services" element={<ProtectedRoute><ServicesList /></ProtectedRoute>} />
         <Route path="/admin/services/:id" element={<ProtectedRoute><ServiceEdit /></ProtectedRoute>} />
         <Route path="/admin/pricing" element={<ProtectedRoute><PricingPlans /></ProtectedRoute>} />

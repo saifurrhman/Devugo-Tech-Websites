@@ -11,7 +11,7 @@
   --color-muted: rgba(254,250,250,0.75); /* muted text (derived) */
   --color-primary-600:#204188; /* hover state for primary */
 
-  --radius:12px;
+  --radius:14px;
   --shadow:0 10px 20px rgba(0,0,0,.2),0 6px 6px rgba(0,0,0,.15);
 
   /* Admin Theme (defaults to dark) */
@@ -210,13 +210,13 @@ body:not(.admin-light) .top-crumb{color:#ffffff;opacity:.95}
 .greeting-card{margin-top:.5rem;background:rgba(255,255,255,0.06);border:1px solid var(--admin-border);border-radius:12px;padding:.75rem 1rem;color:var(--admin-text)}
 body.admin-light .greeting-card{background:#ffffff;border:1px solid #e5e7eb;color:#0f172a}
 
-.section-card{background:rgba(255,255,255,0.06);border:1px solid var(--admin-border);border-radius:16px;padding:1rem;position:relative}
-.section-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-top-left-radius:16px;border-bottom-left-radius:16px;background:linear-gradient(180deg,var(--color-primary),rgba(67,133,205,0))}
-.section-card:hover{box-shadow:0 12px 34px rgba(0,0,0,.18)}
+.section-card{background:rgba(255,255,255,0.06);border:1px solid var(--admin-border);border-radius:18px;padding:1rem;position:relative}
+.section-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-top-left-radius:18px;border-bottom-left-radius:18px;background:linear-gradient(180deg,var(--color-primary),rgba(67,133,205,0))}
+.section-card:hover{box-shadow:0 14px 38px rgba(0,0,0,.20)}
 .section-card h3{margin:.25rem 0 .5rem;color:var(--admin-text)}
 
 /* Uploader */
-.uploader{display:flex;align-items:center;justify-content:center;border:2px dashed var(--admin-border);border-radius:14px;min-height:160px;background:rgba(255,255,255,0.04);cursor:pointer}
+.uploader{display:flex;align-items:center;justify-content:center;border:2px dashed var(--admin-border);border-radius:16px;min-height:160px;background:rgba(255,255,255,0.04);cursor:pointer}
 .uploader:hover{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))}
 .uploader::after{content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;background:radial-gradient(400px 120px at 20% -40px, rgba(138,184,255,.15), rgba(0,0,0,0) 60%)}
 .uploader-empty{display:flex;align-items:center;gap:.75rem;color:var(--admin-muted)}
@@ -260,15 +260,15 @@ body:not(.admin-light) .section-card input[type="checkbox"]{border-color:rgba(25
   font-weight: 800;
 }
 
-/* Dark admin theme: force white text for header and breadcrumbs on create page */
+/* Create-post uses white cards; ensure dark text for readable contrast even in admin-dark */
 body.admin-dark .create-post .breadcrumbs a,
-body:not(.admin-light) .create-post .breadcrumbs a{ color:#e5e7eb !important }
+body:not(.admin-light) .create-post .breadcrumbs a{ color:#475569 !important }
 body.admin-dark .create-post .breadcrumbs a:hover,
-body:not(.admin-light) .create-post .breadcrumbs a:hover{ color:#ffffff !important }
+body:not(.admin-light) .create-post .breadcrumbs a:hover{ color:#0b1220 !important }
 body.admin-dark .create-post .breadcrumbs .active,
-body:not(.admin-light) .create-post .breadcrumbs .active{ color:#ffffff !important }
+body:not(.admin-light) .create-post .breadcrumbs .active{ color:#0f172a !important }
 body.admin-dark .create-post .page-title,
-body:not(.admin-light) .create-post .page-title{ color:#ffffff !important; -webkit-text-fill-color:#ffffff !important }
+body:not(.admin-light) .create-post .page-title{ color:#0f172a !important; -webkit-text-fill-color:#0f172a !important }
 .create-post .greeting-card{background:#ffffff !important;border:1px solid #e5e7eb !important;color:#0f172a !important}
 .create-post .section-card{background:#ffffff !important;border:1px solid #e5e7eb !important;box-shadow:0 1px 0 rgba(0,0,0,.02);padding:1.2rem 1.25rem 1.1rem}
 .create-post .section-card h3{color:#0f172a}
@@ -292,12 +292,12 @@ body:not(.admin-light) .create-post .page-title{ color:#ffffff !important; -webk
   color:#0f172a !important;
   font-size:.98rem;
   line-height:1.4;
-  border-radius:12px;
+  border-radius:14px;
   box-shadow: inset 0 1px 0 rgba(0,0,0,.02);
-  padding: 0.95rem 1.1rem;
+  padding: 1rem 1.15rem;
 }
 .create-post .form-field textarea,
-.create-post textarea.form-field{min-height:240px; padding:1.1rem 1.1rem}
+.create-post textarea.form-field{min-height:240px; padding:1.15rem 1.15rem}
 .create-post .form-field input:hover,
 .create-post input.form-field:hover,
 .create-post .form-field textarea:hover,
@@ -312,7 +312,7 @@ body:not(.admin-light) .create-post .page-title{ color:#ffffff !important; -webk
 .create-post textarea.form-field::placeholder{color:#64748b !important}
 
 /* Hints under fields: ensure readable */
-.create-post .hint{color:#6b7280; font-size:.85rem; margin-top:.25rem}
+.create-post .hint{color:#475569; font-size:.9rem; margin-top:.3rem}
 
 /* Spacing & labels inside create-post */
 .create-post .form-grid{gap:.5rem}

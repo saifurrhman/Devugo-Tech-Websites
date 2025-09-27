@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ServiceInquiryModal from './ServiceInquiryModal';
 import './ServicesSection.css';
+import { ServiceAPI } from '../lib/api';
 
-const services = [
+const STATIC_SERVICES = [
   { title: 'UX CRO Audit', desc: 'Detailed UX and CRO audits to uncover conversion barriers, optimize user flows, and enhance engagement.' },
   { title: 'UX UI Design', desc: 'Clean designs for websites, web apps, mobile apps, and SaaS products that enhance user experience and drive conversions.' },
   { title: 'Web Development', desc: 'Robust web development for scalable, high–performing websites and applications tailored to your business needs.' },
@@ -24,6 +25,8 @@ const services = [
 export default function ServicesSection({ variant }){
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [services, setServices] = useState(STATIC_SERVICES);
+  const [loading, setLoading] = useState(true);
   // Show 3 on mobile, 6 on larger screens
   const [initialCount, setInitialCount] = useState(6);
   const [visibleCount, setVisibleCount] = useState(6);
@@ -40,6 +43,26 @@ export default function ServicesSection({ variant }){
     setInitialCount(init);
     setVisibleCount(init);
   }, []);
+
+  // Fetch dynamic services
+  useEffect(()=>{
+    let mounted = true;
+    (async()=>{
+      try{
+        const { items } = await ServiceAPI.list();
+        if(mounted && Array.isArray(items) && items.length){
+          // map to expected shape
+          const mapped = items.filter(s=>s.published!==false).sort((a,b)=> (a.order||0) - (b.order||0)).map(s=>({
+            title: s.title,
+            desc: s.description,
+          }));
+          if(mapped.length) setServices(mapped);
+        }
+      }catch(_e){ /* fallback to static */ }
+      finally{ if(mounted) setLoading(false); }
+    })();
+    return ()=>{ mounted=false };
+  },[]);
 
   useEffect(()=>{
     const els = Array.from(gridRef.current?.querySelectorAll('.service-card') || []);

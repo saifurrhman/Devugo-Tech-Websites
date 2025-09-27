@@ -40,3 +40,43 @@ export const ContactAPI = {
   create: (payload) => api('/api/contact', { method: 'POST', body: payload }),
   list: () => api('/api/contact', { method: 'GET' }),
 };
+
+export const AnalyticsAPI = {
+  summary: () => api('/api/analytics/summary', { method: 'GET' }),
+};
+
+export const UploadAPI = {
+  image: (dataUrl, filename) => api('/api/upload/image', { method: 'POST', body: { dataUrl, filename } }),
+};
+
+export const ServiceAPI = {
+  list: () => api('/api/services', { method: 'GET' }),
+  get: (id) => api(`/api/services/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/services', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/services/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/services/${id}`, { method: 'DELETE' }),
+};
+
+export const PricingAPI = {
+  list: () => api('/api/pricing', { method: 'GET' }),
+  get: (id) => api(`/api/pricing/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/pricing', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/pricing/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/pricing/${id}`, { method: 'DELETE' }),
+};
+
+export const PortfolioAPI = {
+  list: () => api('/api/portfolio', { method: 'GET' }),
+  get: (id) => api(`/api/portfolio/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/portfolio', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/portfolio/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/portfolio/${id}`, { method: 'DELETE' }),
+};
+
+export const TeamAPI = {
+  list: () => api('/api/team', { method: 'GET' }),
+  get: (id) => api(`/api/team/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/team', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/team/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/team/${id}`, { method: 'DELETE' }),
+};
