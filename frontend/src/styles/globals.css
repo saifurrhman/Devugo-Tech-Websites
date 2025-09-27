@@ -145,7 +145,8 @@ body.admin-light .toolbar select.form-field.filter-select.status-drafts{
 .chip-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#ef4444}
 
 /* Badge */
-.badge{display:inline-flex;align-items:center;border-radius:999px;padding:.25rem .6rem;font-size:.8rem;font-weight:700;background:rgba(67,133,205,.16);color:#e6f0ff;border:1px solid rgba(67,133,205,.35)}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:.25rem .6rem;font-size:.8rem;font-weight:700;background:rgba(67,133,205,.16);color:#0b1220;border:1px solid rgba(67,133,205,.35)}
+body.admin-dark .badge{ color:#e6f0ff }
 
 /* Toolbar helper */
 .toolbar{margin-top:.25rem}
@@ -189,9 +190,18 @@ body.admin-light .toolbar select.form-field.filter-select.status-drafts{
 .breadcrumbs span, .breadcrumbs strong, .breadcrumbs a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .breadcrumbs strong,.breadcrumbs .active{color:var(--admin-text);font-weight:800}
 /* Dark admin: stronger contrast for breadcrumbs inside create page */
-.create-post .breadcrumbs a{color:#0f172a}
-.create-post .breadcrumbs a:hover{color:#111827}
-.create-post .breadcrumbs .active{color:#0f172a}
+/* Theme-adaptive breadcrumbs inside create pages */
+body.admin-light .create-post .breadcrumbs a,
+body.admin-light .create-post .breadcrumbs span{ color:#334155 !important }
+body.admin-light .create-post .breadcrumbs a:hover{ color:#0b1220 !important }
+body.admin-light .create-post .breadcrumbs .active,
+body.admin-light .create-post .breadcrumbs strong{ color:#0f172a !important; font-weight:800 }
+
+body.admin-dark .create-post .breadcrumbs a,
+body.admin-dark .create-post .breadcrumbs span{ color:#e5e7eb !important }
+body.admin-dark .create-post .breadcrumbs a:hover{ color:#ffffff !important }
+body.admin-dark .create-post .breadcrumbs .active,
+body.admin-dark .create-post .breadcrumbs strong{ color:#ffffff !important; font-weight:800 }
 .page-actions{display:flex;align-items:center;gap:.5rem}
 .page-title{color:var(--admin-text)}
 .page-title{
@@ -251,13 +261,20 @@ body:not(.admin-light) .section-card input[type="checkbox"]{border-color:rgba(25
 
 /* Create-post page: force white-card layout (same-as-reference) regardless of theme */
 .create-post .page-bar{background:transparent !important;border:0 !important;border-radius:0 !important;padding:.4rem 0 !important;margin-bottom:.25rem;border-bottom:1px solid rgba(15,23,42,0.08)}
+/* Theme-adaptive page titles on create pages */
 .create-post .page-title{
   background: none !important;
   -webkit-background-clip: initial !important;
   background-clip: initial !important;
-  color: #0f172a !important;
-  -webkit-text-fill-color: initial !important;
   font-weight: 800;
+}
+body.admin-light .create-post .page-title{
+  color:#0f172a !important;
+  -webkit-text-fill-color:#0f172a !important;
+}
+body.admin-dark .create-post .page-title{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
 }
 
 /* Create-post uses white cards; ensure dark text for readable contrast even in admin-dark */
@@ -271,7 +288,28 @@ body.admin-dark .create-post .page-title,
 body:not(.admin-light) .create-post .page-title{ color:#0f172a !important; -webkit-text-fill-color:#0f172a !important }
 .create-post .greeting-card{background:#ffffff !important;border:1px solid #e5e7eb !important;color:#0f172a !important}
 .create-post .section-card{background:#ffffff !important;border:1px solid #e5e7eb !important;box-shadow:0 1px 0 rgba(0,0,0,.02);padding:1.2rem 1.25rem 1.1rem}
+.create-post .section-card{ color:#0f172a }
 .create-post .section-card h3{color:#0f172a}
+.create-post .section-card p,
+.create-post .section-card small,
+.create-post .section-card span,
+.create-post .section-card li,
+.create-post .section-card strong{ color:#0f172a }
+/* Dark theme: explicitly force helper/hint/labels fully visible on white cards */
+body.admin-dark .create-post .section-card .hint,
+body.admin-dark .create-post .section-card label,
+body.admin-dark .create-post aside.section-card label,
+body.admin-dark .create-post aside.section-card h4,
+body.admin-dark .create-post aside.section-card .card,
+body.admin-dark .create-post aside.section-card .card strong,
+body.admin-dark .create-post aside.section-card .muted,
+body.admin-dark .create-post .section-card p,
+body.admin-dark .create-post .section-card small,
+body.admin-dark .create-post .section-card span,
+body.admin-dark .create-post .section-card strong{
+  color:#0f172a !important;
+  opacity:1 !important;
+}
 .create-post .editor-toolbar button{background:#f8fafc !important;border:1px solid #e5e7eb !important;color:#0f172a !important}
 .create-post .uploader{background:#f8fafc !important;border-color:#e5e7eb !important;padding:1rem}
 .create-post .uploader::after{display:none}
@@ -348,6 +386,44 @@ body:not(.admin-light) .create-post .page-title{ color:#0f172a !important; -webk
   box-shadow: inset 0 1px 0 rgba(0,0,0,.02) !important;
 }
 .create-post .section-card textarea{ min-height: 220px !important; }
+.create-post .section-card .form-field{ width:100% !important; display:block !important; }
+.create-post aside.section-card label{ color:#0f172a !important; font-weight:600 }
+.create-post aside.section-card .muted{ color:#64748b !important }
+.create-post aside.section-card h4{ color:#0f172a !important }
+/* Sidebar Preview card should be white with dark text */
+.create-post aside.section-card .card{
+  background:#ffffff !important;
+  border:1px solid #e5e7eb !important;
+  color:#0f172a !important;
+}
+.create-post aside.section-card .card strong{ color:#0f172a !important }
+.create-post aside.section-card .badge{ 
+  background:rgba(67,133,205,.12) !important;
+  border:1px solid #cfe0f8 !important;
+  color:#0b1220 !important;
+}
+/* Dark theme: inputs inside the white sidebar card must look like light inputs */
+body.admin-dark .create-post aside.section-card input.form-field,
+body.admin-dark .create-post aside.section-card textarea.form-field,
+body.admin-dark .create-post aside.section-card .ux-input{
+  background:#ffffff !important;
+  color:#0f172a !important;
+  border:1.5px solid #cbd5e1 !important;
+}
+body.admin-dark .create-post aside.section-card input.form-field::placeholder,
+body.admin-dark .create-post aside.section-card textarea.form-field::placeholder,
+body.admin-dark .create-post aside.section-card .ux-input::placeholder{
+  color:#334155 !important;
+}
+/* Upload button inside white sidebar card in dark theme */
+body.admin-dark .create-post aside.section-card .btn-secondary{
+  background:#f1f5f9 !important;
+  color:#0f172a !important;
+  border:1px solid #dbe1ea !important;
+}
+body.admin-dark .create-post aside.section-card .btn-secondary:hover{
+  background:#e9eef5 !important;
+}
 .create-post .section-card input::placeholder,
 .create-post .section-card textarea::placeholder{ color:#334155 !important }
 .create-post .section-card input:focus,
@@ -365,6 +441,61 @@ body.admin-light .settings-card{background:linear-gradient(180deg, #ffffff 0%, #
 body.admin-light .settings-card .form-field input{background:#fff;border:1px solid #dbe1ea;color:#0f172a}
 body.admin-light .settings-card .card{background:#fff;border:1px solid #e5e7eb}
 body.admin-light .btn-secondary{background:#f1f5f9;color:#0f172a;border:1px solid #dbe1ea}
+
+/* Sticky bottom action bar on edit pages */
+.bottom-actions{ position:sticky; bottom:0; left:0; right:0; padding:.65rem 0; margin-top:1rem; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.75) 40%, rgba(255,255,255,.95) 100%); border-top:1px solid #e5e7eb; backdrop-filter:saturate(1.1) blur(6px); -webkit-backdrop-filter:saturate(1.1) blur(6px); z-index:90 }
+body.admin-dark .bottom-actions{ background:linear-gradient(180deg, rgba(11,38,71,0) 0%, rgba(11,38,71,.8) 50%, rgba(11,38,71,.95) 100%); border-top:1px solid rgba(255,255,255,0.12) }
+.btn.lg{ padding:.85rem 1.2rem; border-radius:14px; font-weight:800 }
+.btn-secondary.lg{ padding:.8rem 1.1rem; border-radius:14px; font-weight:700 }
+
+/* AdminSidebar active states */
+.admin-sidebar .admin-link.active{ border:1px solid transparent; border-radius:12px }
+body.admin-light .admin-sidebar .admin-link{ color:#334155 }
+body.admin-light .admin-sidebar .admin-link .label{ color:#334155 }
+body.admin-light .admin-sidebar .admin-link.active{ background:#ffffff; border-color:#e5e7eb; box-shadow:0 6px 16px rgba(0,0,0,.06) }
+body.admin-light .admin-sidebar .admin-link.active .label{ color:#0f172a; font-weight:800 }
+
+body.admin-dark .admin-sidebar .admin-link{ color:#cbd5e1 }
+body.admin-dark .admin-sidebar .admin-link .label{ color:#e2e8f0 }
+body.admin-dark .admin-sidebar .admin-link.active{ background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18) }
+body.admin-dark .admin-sidebar .admin-link.active .label{ color:#ffffff; font-weight:800 }
+
+/* ========================= */
+/* Global hardening for inputs*/
+/* Applies everywhere to ensure visible text and rounded fields */
+input.form-field,
+textarea.form-field,
+.ux-input{
+  background:#ffffff !important;
+  color:#0b1220 !important;
+  border:1.6px solid #d0d7e2 !important;
+  border-radius:20px !important;
+  padding:1rem 1.15rem !important;
+  min-height:46px !important;
+  font-size:1rem !important;
+  line-height:1.45 !important;
+  caret-color:#0b1220 !important;
+  outline:none !important;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.02) !important;
+  box-sizing:border-box !important;
+}
+textarea.form-field.ux-input,
+textarea.form-field,
+textarea.ux-input{ min-height:220px !important; }
+input.form-field::placeholder,
+textarea.form-field::placeholder,
+.ux-input::placeholder{ color:#334155 !important }
+input.form-field:focus,
+textarea.form-field:focus,
+.ux-input:focus{ border-color: var(--color-primary) !important; box-shadow:0 0 0 3px rgba(67,133,205,.28) !important }
+/* Autofill fix globally */
+input.form-field:-webkit-autofill,
+textarea.form-field:-webkit-autofill,
+.ux-input:-webkit-autofill{
+  -webkit-text-fill-color:#0b1220 !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
 
 /* Admin light theme overrides */
 body.admin-light{

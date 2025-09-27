@@ -10,7 +10,7 @@ export default function Contacts(){
         <AdminTopbar />
         <h1>Contacts</h1>
         <div className="card" style={{marginTop: '1rem'}}>
-          Contacts Submissions (placeholder)
+          Contacts Submissions 
         </div>
       </main>
     </div>

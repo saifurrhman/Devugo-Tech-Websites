@@ -1,8 +1,10 @@
 const PricingPlan = require('../models/PricingPlan');
 
-exports.list = async (_req, res) => {
+exports.list = async (req, res) => {
   try{
-    const items = await PricingPlan.find({}).sort({ order: 1, createdAt: -1 });
+    const filter = {};
+    if (req.query.service) filter.service = req.query.service;
+    const items = await PricingPlan.find(filter).sort({ order: 1, createdAt: -1 });
     res.json({ items });
   }catch(err){ res.status(500).json({ error: 'Server error', details: err.message }); }
 };
@@ -17,9 +19,9 @@ exports.get = async (req, res) => {
 
 exports.create = async (req, res) => {
   try{
-    const { name, features = [], priceMonthly = 0, priceYearly = 0, recommended = false, published = true, order = 0 } = req.body || {};
+    const { name, features = [], priceMonthly = 0, priceYearly = 0, recommended = false, published = true, order = 0, service = null } = req.body || {};
     const slug = (name||'').toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
-    const item = await PricingPlan.create({ name, slug, features, priceMonthly, priceYearly, recommended: !!recommended, published: !!published, order });
+    const item = await PricingPlan.create({ name, slug, features, priceMonthly, priceYearly, recommended: !!recommended, published: !!published, order, service });
     res.status(201).json({ item });
   }catch(err){ res.status(500).json({ error: 'Server error', details: err.message }); }
 };

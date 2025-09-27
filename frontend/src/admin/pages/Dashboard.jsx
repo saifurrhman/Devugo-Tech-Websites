@@ -67,7 +67,7 @@ export default function Dashboard() {
     return ()=>{ mounted=false };
   },[]);
 
-  const totals = summary?.totals || { visitors: 0, pageviews: 0, contacts: 0, conversions: 0, blogs: 0, leads: 0, emailsSent: 0, socialPosts: 0 };
+  const totals = summary?.totals || { visitors: 0, pageviews: 0, contacts: 0, conversions: 0, blogs: 0, leads: 0, services: 0, pricing: 0, portfolio: 0, team: 0, emailsSent: 0, socialPosts: 0 };
   const contactsTotal = contactsCount != null ? contactsCount : totals.contacts;
   const last7 = summary?.last7 || { visitors: [], contacts: [] };
   const recent = summary?.recent || {};
@@ -88,9 +88,15 @@ export default function Dashboard() {
           <StatCard label="Conversions" value={totals.conversions.toLocaleString()} sub="Leads / Goals" />
         </div>
 
+        <div className="grid" style={{display:'grid',gridTemplateColumns:'repeat(6, minmax(0,1fr))',gap:'1rem',marginTop:'1rem'}}>
+          <StatCard label="Blogs" value={Number(totals.blogs||0).toLocaleString()} />
+          <StatCard label="Leads" value={Number(totals.leads||contactsTotal||0).toLocaleString()} />
+          <StatCard label="Services" value={Number(totals.services||0).toLocaleString()} />
+          <StatCard label="Pricing Plans" value={Number(totals.pricing||0).toLocaleString()} />
+          <StatCard label="Portfolio Items" value={Number(totals.portfolio||0).toLocaleString()} />
+          <StatCard label="Team Members" value={Number(totals.team||0).toLocaleString()} />
+        </div>
         <div className="grid" style={{display:'grid',gridTemplateColumns:'repeat(4, minmax(0,1fr))',gap:'1rem',marginTop:'1rem'}}>
-          <StatCard label="Total Blogs" value={Number(totals.blogs||0).toLocaleString()} />
-          <StatCard label="Total Leads" value={Number(totals.leads||contactsTotal||0).toLocaleString()} />
           <StatCard label="Email Sent" value={Number(totals.emailsSent||0).toLocaleString()} />
           <StatCard label="Social Posts" value={Number(totals.socialPosts||0).toLocaleString()} />
         </div>
@@ -128,6 +134,15 @@ export default function Dashboard() {
                   <small className="muted">{new Date(recent.blog.publishedAt).toLocaleString()}</small></div>
                 ) : (
                   <div className="muted">No blog posts yet</div>
+                )}
+              </li>
+              <li>
+                <div className="muted" style={{fontSize:'.85rem'}}>Last portfolio update</div>
+                {recent.portfolio ? (
+                  <div><strong>{recent.portfolio.title}</strong><br/>
+                  <small className="muted">{new Date(recent.portfolio.updatedAt).toLocaleString()}</small></div>
+                ) : (
+                  <div className="muted">No portfolio items yet</div>
                 )}
               </li>
               <li>

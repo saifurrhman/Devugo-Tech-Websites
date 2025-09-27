@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { ServiceAPI } from '../../lib/api';
+import { ServiceAPI, PricingAPI } from '../../lib/api';
 
 export default function ServiceEdit(){
   const { id } = useParams();
@@ -15,6 +15,8 @@ export default function ServiceEdit(){
   const [form, setForm] = useState({
     title: '', slug: '', description: '', features: '', icon: '', published: true, order: 0,
   });
+  const [plans, setPlans] = useState([]);
+  const [selectedPlans, setSelectedPlans] = useState([]); // array of plan ids
 
   useEffect(()=>{
     if (isNew) return;
@@ -22,7 +24,10 @@ export default function ServiceEdit(){
     (async()=>{
       setLoading(true); setError('');
       try{
-        const { item } = await ServiceAPI.get(id);
+        const [{ item }, { items: allPlans }] = await Promise.all([
+          ServiceAPI.get(id),
+          PricingAPI.list(),
+        ]);
         if(!mounted) return;
         setForm({
           title: item.title || '',
@@ -33,6 +38,12 @@ export default function ServiceEdit(){
           published: !!item.published,
           order: item.order ?? 0,
         });
+        setPlans(allPlans||[]);
+        const preselected = (item.pricingRelations||[]).map(String);
+        // also include any plans that already point to this service
+        const also = (allPlans||[]).filter(p=>String(p.service||'')===String(id)).map(p=>String(p._id));
+        const merged = Array.from(new Set([ ...preselected, ...also ]));
+        setSelectedPlans(merged);
       }catch(err){ if(mounted) setError(err.message||'Failed to load service'); }
       finally{ if(mounted) setLoading(false); }
     })();
@@ -55,16 +66,36 @@ export default function ServiceEdit(){
         icon: form.icon,
         published: !!form.published,
         order: Number(form.order)||0,
+        pricingRelations: selectedPlans,
       };
       if (isNew){
-        await ServiceAPI.create(payload);
+        const { item } = await ServiceAPI.create(payload);
+        // assign plans to this new service
+        await syncPlanLinks(item._id, [], selectedPlans);
         navigate('/admin/services');
       } else {
-        await ServiceAPI.update(id, payload);
+        const before = selectedPlansBefore;
+        const { item } = await ServiceAPI.update(id, payload);
+        await syncPlanLinks(item._id, before, selectedPlans);
         setMessage('Saved');
       }
     }catch(err){ setError(err.message||'Failed to save'); }
     finally{ setSaving(false); }
+  }
+
+  // Keep a snapshot of preselected for diffing on save
+  const [selectedPlansBefore, setSelectedPlansBefore] = useState([]);
+  useEffect(()=>{ if (selectedPlans.length && !selectedPlansBefore.length) setSelectedPlansBefore(selectedPlans); },[selectedPlans]);
+
+  async function syncPlanLinks(serviceId, beforeIds, afterIds){
+    const beforeSet = new Set((beforeIds||[]).map(String));
+    const afterSet = new Set((afterIds||[]).map(String));
+    const toAdd = Array.from(afterSet).filter(id=>!beforeSet.has(id));
+    const toRemove = Array.from(beforeSet).filter(id=>!afterSet.has(id));
+    // Assign service on added plans
+    await Promise.all(toAdd.map(pid => PricingAPI.update(pid, { service: serviceId })));
+    // Unassign service on removed plans (only if they currently point to this service)
+    await Promise.all(toRemove.map(pid => PricingAPI.update(pid, { service: null })));
   }
 
   async function handleDelete(){
@@ -104,19 +135,10 @@ export default function ServiceEdit(){
           </div>
         </div>
 
-        <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.75rem',marginTop:'.25rem'}}>
-          <h1 className="page-title" style={{margin:0}}>
-            {isNew ? 'Create Service' : 'Edit Service'}
-            <span className="badge" style={{marginLeft:'.6rem'}}>{form.published ? 'Published' : 'Draft'}</span>
-          </h1>
-          <div style={{display:'flex',gap:'.5rem'}}>
-            {!isNew && (
-              <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
-            )}
-            <button type="button" className="btn-secondary" onClick={()=>navigate('/admin/services')}>Back</button>
-            <button type="button" className="btn" onClick={handleSave} disabled={saving}>{saving? 'Saving…':'Save'}</button>
-          </div>
-        </div>
+        <h1 className="page-title" style={{marginTop:'.25rem'}}>
+          {isNew ? 'Create Service' : 'Edit Service'}
+          <span className="badge" style={{marginLeft:'.6rem'}}>{form.published ? 'Published' : 'Draft'}</span>
+        </h1>
         {error && <div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>}
         {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
 
@@ -127,17 +149,17 @@ export default function ServiceEdit(){
                 <h3>Basic details</h3>
                 <div className="form-grid" style={{marginTop:'.75rem'}}>
                   <label className="form-label">Title</label>
-                  <input className="form-field" placeholder="e.g., UX UI Design" value={form.title} onChange={e=>syncSlug(e.target.value)} required minLength={3} />
+                  <input className="form-field ux-input" placeholder="e.g., UX UI Design" value={form.title} onChange={e=>syncSlug(e.target.value)} required minLength={3} />
                   <div className="hint">Keep it short and action‑oriented (e.g., "UX UI Design").</div>
                 </div>
                 <div className="form-grid" style={{marginTop:'.75rem'}}>
                   <label className="form-label">Slug</label>
-                  <input className="form-field" placeholder="service-slug" value={form.slug} onChange={e=>setForm(f=>({...f,slug:e.target.value}))} aria-describedby="slug-hint" />
+                  <input className="form-field ux-input" placeholder="service-slug" value={form.slug} onChange={e=>setForm(f=>({...f,slug:e.target.value}))} aria-describedby="slug-hint" />
                   <div className="hint">Auto‑generated from title. You can customize it.</div>
                 </div>
                 <div className="form-grid" style={{marginTop:'.75rem'}}>
                   <label className="form-label">Short Description</label>
-                  <textarea className="form-field" rows={4} placeholder="1–2 sentences that summarize the service" value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} />
+                  <textarea className="form-field ux-input" rows={4} placeholder="1–2 sentences that summarize the service" value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} />
                   <div className="hint" id="slug-hint">1–2 sentences that summarize the service.</div>
                 </div>
               </section>
@@ -146,7 +168,7 @@ export default function ServiceEdit(){
                 <h3>Content</h3>
                 <div className="form-grid">
                   <label className="form-label">Features (comma separated)</label>
-                  <input className="form-field" placeholder="feature one, feature two" value={form.features} onChange={e=>setForm(f=>({...f,features:e.target.value}))} aria-label="Service features" />
+                  <input className="form-field ux-input" placeholder="feature one, feature two" value={form.features} onChange={e=>setForm(f=>({...f,features:e.target.value}))} aria-label="Service features" />
                   <div className="hint">Separate with commas. Example: strategy workshop, prototypes, design system</div>
                 </div>
               </section>
@@ -156,7 +178,7 @@ export default function ServiceEdit(){
               <h3>Settings</h3>
               <div className="form-grid" style={{marginTop:'.5rem'}}>
                 <label className="form-label">Icon URL</label>
-                <input className="form-field" placeholder="https://cdn.example.com/icon.png" value={form.icon} onChange={e=>setForm(f=>({...f,icon:e.target.value}))} />
+                <input className="form-field ux-input" placeholder="https://cdn.example.com/icon.png" value={form.icon} onChange={e=>setForm(f=>({...f,icon:e.target.value}))} />
                 {form.icon && (
                   <div className="preview" style={{marginTop:'.5rem',display:'flex',alignItems:'center',gap:'.5rem'}}>
                     <img src={form.icon} alt="icon preview" style={{width:36,height:36,borderRadius:8,objectFit:'cover'}}/>
@@ -166,7 +188,7 @@ export default function ServiceEdit(){
               </div>
               <div className="form-grid" style={{marginTop:'.75rem'}}>
                 <label className="form-label">Order</label>
-                <input type="number" className="form-field" value={form.order} onChange={e=>setForm(f=>({...f,order:e.target.value}))} />
+                <input type="number" className="form-field ux-input" value={form.order} onChange={e=>setForm(f=>({...f,order:e.target.value}))} />
               </div>
               <label style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'.75rem'}}>
                 <input type="checkbox" checked={form.published} onChange={e=>setForm(f=>({...f,published:e.target.checked}))} />
@@ -189,11 +211,41 @@ export default function ServiceEdit(){
                   )}
                 </div>
               </div>
+
+              <div className="divider" style={{margin:'1rem 0'}}/>
+              <div>
+                <h4 style={{margin:'0 0 .4rem'}}>Related Pricing Plans</h4>
+                {!plans.length && <div className="muted">No plans yet. Create plans first in Pricing.</div>}
+                {!!plans.length && (
+                  <div style={{display:'grid',gap:'.35rem'}}>
+                    {plans.map(p => (
+                      <label key={p._id} style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+                        <input
+                          type="checkbox"
+                          checked={selectedPlans.includes(p._id)}
+                          onChange={e=>{
+                            const checked = e.target.checked;
+                            setSelectedPlans(prev => checked ? Array.from(new Set([...prev, p._id])) : prev.filter(id=>id!==p._id));
+                          }}
+                        />
+                        <span>{p.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
             </aside>
           </div>
 
-          {/* Bottom spacer to avoid overlap on short pages */}
-          <div style={{height:'1rem'}} />
+          <div className="bottom-actions">
+            <div className="container" style={{display:'flex',justifyContent:'space-between',gap:'.75rem'}}>
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/services')}>Back</button>
+              <div style={{display:'flex',gap:'.6rem'}}>
+                {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
+                <button type="submit" className="btn lg" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+              </div>
+            </div>
+          </div>
         </form>
       </main>
     </div>

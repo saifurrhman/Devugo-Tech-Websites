@@ -9,6 +9,8 @@ const ServiceSchema = new mongoose.Schema(
     icon: String,
     published: { type: Boolean, default: true },
     order: { type: Number, default: 0 },
+    // Option B: link many plans to a service
+    pricingRelations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PricingPlan' }],
   },
   { timestamps: true }
 );

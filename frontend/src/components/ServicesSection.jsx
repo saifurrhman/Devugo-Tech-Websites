@@ -52,10 +52,14 @@ export default function ServicesSection({ variant }){
         const { items } = await ServiceAPI.list();
         if(mounted && Array.isArray(items) && items.length){
           // map to expected shape
-          const mapped = items.filter(s=>s.published!==false).sort((a,b)=> (a.order||0) - (b.order||0)).map(s=>({
-            title: s.title,
-            desc: s.description,
-          }));
+          const mapped = items
+            .filter(s=>s.published!==false)
+            .sort((a,b)=> (a.order||0) - (b.order||0))
+            .map(s=>({
+              title: s.title,
+              desc: s.description,
+              slug: s.slug,
+            }));
           if(mapped.length) setServices(mapped);
         }
       }catch(_e){ /* fallback to static */ }
@@ -121,7 +125,10 @@ export default function ServicesSection({ variant }){
             <article
               className="service-card"
               key={i}
-              onClick={()=>{ if(!isHome){ openInquiry(s) } else { window.location.href = '/services#services'; } }}
+              onClick={()=>{
+                if (s.slug) { window.location.href = `/services/${s.slug}`; return; }
+                if(!isHome){ openInquiry(s) } else { window.location.href = '/services#services'; }
+              }}
               role={isHome ? 'link' : 'button'}
               tabIndex={0}
               onKeyDown={(e)=>{
@@ -140,12 +147,12 @@ export default function ServicesSection({ variant }){
                   View on Services
                 </a>
               ) : (
-                <span className="service-link" aria-label={`Inquire about ${s.title}`}>
+                <a href={s.slug ? `/services/${s.slug}` : '/services#services'} className="service-link" aria-label={`Learn more about ${s.title}`} onClick={(e)=>e.stopPropagation()}>
                   <span className="icon" aria-hidden>
                     <svg viewBox="0 0 24 24"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </span>
                   Learn More
-                </span>
+                </a>
               )}
             </article>
           ))}

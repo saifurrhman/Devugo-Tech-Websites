@@ -1,6 +1,10 @@
-// Placeholder analytics controller
+// Analytics controller
 const BlogPost = require('../models/BlogPost');
 const Contact = require('../models/Contact');
+const Service = require('../models/Service');
+const PricingPlan = require('../models/PricingPlan');
+const Portfolio = require('../models/Portfolio');
+const TeamMember = require('../models/TeamMember');
 
 exports.capture = async (req, res) => res.status(202).json({ received: true });
 exports.metrics = async (req, res) => res.json({ traffic: [], attribution: [] });
@@ -8,11 +12,26 @@ exports.metrics = async (req, res) => res.json({ traffic: [], attribution: [] })
 // Dashboard summary: totals and recent activities
 exports.summary = async (_req, res) => {
   try {
-    const [totalBlogs, totalLeads, lastBlog, lastLead] = await Promise.all([
+    const [
+      totalBlogs,
+      totalLeads,
+      lastBlog,
+      lastLead,
+      totalServices,
+      totalPricing,
+      totalPortfolio,
+      totalTeam,
+      lastPortfolio
+    ] = await Promise.all([
       BlogPost.countDocuments({}),
       Contact.countDocuments({}),
       BlogPost.findOne({}).sort({ publishedAt: -1, createdAt: -1 }),
       Contact.findOne({}).sort({ createdAt: -1 }),
+      Service.countDocuments({}),
+      PricingPlan.countDocuments({}),
+      Portfolio.countDocuments({}),
+      TeamMember.countDocuments({}),
+      Portfolio.findOne({}).sort({ updatedAt: -1, createdAt: -1 })
     ]);
 
     // Placeholders for emails and social posts until those modules exist
@@ -39,6 +58,10 @@ exports.summary = async (_req, res) => {
         // New metrics
         blogs: totalBlogs,
         leads: totalLeads,
+        services: totalServices,
+        pricing: totalPricing,
+        portfolio: totalPortfolio,
+        team: totalTeam,
         emailsSent: totalEmailsSent,
         socialPosts: totalSocialPosts,
       },
@@ -55,6 +78,11 @@ exports.summary = async (_req, res) => {
           name: lastLead.name,
           email: lastLead.email,
           createdAt: lastLead.createdAt,
+        } : null,
+        portfolio: lastPortfolio ? {
+          id: lastPortfolio._id,
+          title: lastPortfolio.title,
+          updatedAt: lastPortfolio.updatedAt,
         } : null,
         email: lastEmailCampaign,
         social: lastSocialPost,

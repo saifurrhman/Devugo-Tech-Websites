@@ -9,6 +9,8 @@ export default function PortfolioList(){
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const total = items.length;
+  const featured = items.filter(i=>!!i.featured).length;
 
   useEffect(()=>{
     let mounted = true;
@@ -38,6 +40,13 @@ export default function PortfolioList(){
           <h1 style={{margin:0}}>Portfolio</h1>
           <Link to="/admin/portfolio/new" className="btn">Add Project</Link>
         </div>
+        {/* Totals strip */}
+        {!loading && !error && (
+          <div className="card" style={{marginTop:'.75rem', padding:'.5rem 1rem', display:'flex', gap:'.6rem', alignItems:'center'}}>
+            <span className="badge">Total: {total}</span>
+            <span className="badge">Featured: {featured}</span>
+          </div>
+        )}
         {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
         {!loading && !error && (

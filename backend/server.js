@@ -31,7 +31,6 @@ app.options(/.*/, cors());
 
 app.use(cookieParser());
 
-// MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Atlas connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err.message));
@@ -39,6 +38,14 @@ mongoose.connect(process.env.MONGO_URI)
 // Default API route
 app.get("/", (req, res) => {
   res.json({ message: "API is running 🚀" });
+});
+
+// Health check: report MongoDB connection state
+// 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+app.get('/api/health', (_req, res) => {
+  const state = mongoose.connection.readyState;
+  const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+  res.json({ dbState: state, dbStateText: states[state] || 'unknown' });
 });
 
 // Routes

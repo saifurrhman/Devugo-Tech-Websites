@@ -10,7 +10,7 @@ export default function AdminTopbar(){
   const avatarUrl = adminUser?.avatar;
 
   // Theme state (admin-light | admin-dark)
-  const [theme, setTheme] = useState(() => localStorage.getItem('adminTheme') || 'admin-dark');
+  const [theme, setTheme] = useState(() => localStorage.getItem('adminTheme') || 'admin-light');
 
   useEffect(() => {
     // Apply theme class to body

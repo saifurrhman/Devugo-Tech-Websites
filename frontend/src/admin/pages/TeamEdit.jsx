@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
-import { TeamAPI } from '../../lib/api';
+import AdminTopbar from '../../components/AdminTopbar';
+import { TeamAPI, UploadAPI } from '../../lib/api';
 
 export default function TeamEdit(){
   const { id } = useParams();
@@ -14,6 +15,25 @@ export default function TeamEdit(){
   const [form, setForm] = useState({
     name: '', role: '', bio: '', avatar: '', socials: { linkedin:'', twitter:'', github:'', website:'' }
   });
+  const [avatarOk, setAvatarOk] = useState(true);
+
+  async function onAvatarFileChange(e){
+    const file = e.target.files?.[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try{
+        const dataUrl = reader.result;
+        const { url } = await UploadAPI.image(dataUrl, file.name);
+        setAvatarOk(true);
+        setForm(f=>({...f, avatar:url }));
+        setMessage('Avatar uploaded');
+      }catch(err){
+        setError(err.message || 'Failed to upload avatar');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
 
   useEffect(()=>{
     if (isNew) return;
@@ -65,7 +85,8 @@ export default function TeamEdit(){
     return (
       <div className="admin-layout">
         <AdminSidebar />
-        <main className="admin-content">
+        <main className="admin-content create-post">
+          <AdminTopbar />
           <div className="card" style={{marginTop:'1rem'}}>Loading…</div>
         </main>
       </div>
@@ -75,42 +96,99 @@ export default function TeamEdit(){
   return (
     <div className="admin-layout">
       <AdminSidebar />
-      <main className="admin-content">
-        <h1>{isNew? 'Add Member' : 'Edit Member'}</h1>
+      <main className="admin-content create-post">
+        <AdminTopbar />
+
+        <div className="page-bar sticky">
+          <div className="breadcrumbs" aria-label="Breadcrumbs">
+            <Link to="/admin">Dashboard</Link>
+            <span>/</span>
+            <Link to="/admin/team">Team</Link>
+            <span>/</span>
+            <strong className="active" aria-current="page">{isNew ? 'Create' : 'Edit'}</strong>
+          </div>
+        </div>
+
+        <h1 className="page-title" style={{marginTop:'.25rem'}}>{isNew? 'Add Member' : 'Edit Member'}</h1>
         {error && <div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>}
         {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
-        <form onSubmit={handleSave} className="card" style={{marginTop:'1rem'}}>
-          <div className="form-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
-            <label className="form-label">Name
-              <input className="form-field" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} required />
-            </label>
-            <label className="form-label">Role
-              <input className="form-field" value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))} />
-            </label>
-            <label className="form-label" style={{gridColumn:'1 / -1'}}>Bio
-              <textarea className="form-field" rows={4} value={form.bio} onChange={e=>setForm(f=>({...f,bio:e.target.value}))} />
-            </label>
-            <label className="form-label">Avatar URL
-              <input className="form-field" value={form.avatar} onChange={e=>setForm(f=>({...f,avatar:e.target.value}))} placeholder="https://..." />
-            </label>
-            <label className="form-label">LinkedIn
-              <input className="form-field" value={form.socials.linkedin} onChange={e=>setForm(f=>({...f,socials:{...f.socials, linkedin:e.target.value}}))} placeholder="https://linkedin.com/in/..." />
-            </label>
-            <label className="form-label">Twitter/X
-              <input className="form-field" value={form.socials.twitter} onChange={e=>setForm(f=>({...f,socials:{...f.socials, twitter:e.target.value}}))} placeholder="https://x.com/..." />
-            </label>
-            <label className="form-label">GitHub
-              <input className="form-field" value={form.socials.github} onChange={e=>setForm(f=>({...f,socials:{...f.socials, github:e.target.value}}))} placeholder="https://github.com/..." />
-            </label>
-            <label className="form-label">Website
-              <input className="form-field" value={form.socials.website} onChange={e=>setForm(f=>({...f,socials:{...f.socials, website:e.target.value}}))} placeholder="https://..." />
-            </label>
+
+        <form onSubmit={handleSave} style={{marginTop:'1rem'}}>
+          <div className="grid two" style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) 320px',gap:'1rem'}}>
+            <div className="stack" style={{display:'grid',gap:'1rem'}}>
+              <section className="section-card">
+                <h3>Basic details</h3>
+                <div className="form-grid" style={{marginTop:'.75rem'}}>
+                  <label className="form-label">Name</label>
+                  <input className="form-field ux-input" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="e.g., Jane Doe" required />
+                </div>
+                <div className="form-grid" style={{marginTop:'.75rem'}}>
+                  <label className="form-label">Role</label>
+                  <input className="form-field ux-input" value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))} placeholder="e.g., Senior Designer" />
+                </div>
+                <div className="form-grid" style={{marginTop:'.75rem'}}>
+                  <label className="form-label">Bio</label>
+                  <textarea className="form-field ux-input" rows={5} value={form.bio} onChange={e=>setForm(f=>({...f,bio:e.target.value}))} placeholder="A short intro about this member" />
+                </div>
+              </section>
+            </div>
+            <aside className="section-card" aria-label="Sidebar settings">
+              <h3>Profile</h3>
+              <div className="form-grid" style={{marginTop:'.5rem'}}>
+                <label className="form-label">Avatar URL</label>
+                <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
+                  <input className="form-field ux-input" value={form.avatar} onChange={e=>{ setAvatarOk(true); setForm(f=>({...f,avatar:e.target.value})); }} placeholder="https://..." style={{flex:1}} />
+                  <input id="avatar-file" type="file" accept="image/*" onChange={onAvatarFileChange} style={{display:'none'}} />
+                  <button type="button" className="btn-secondary" onClick={()=>document.getElementById('avatar-file').click()}>Upload image</button>
+                </div>
+                {(form.avatar || form.name) && (
+                  <div className="preview" style={{marginTop:'.6rem',display:'flex',alignItems:'center',gap:'.6rem'}}>
+                    <div className="avatar-preview">
+                      {form.avatar && avatarOk ? (
+                        <img src={form.avatar} alt="avatar preview" onError={()=>setAvatarOk(false)} style={{width:56,height:56,borderRadius:'50%',objectFit:'cover'}} />
+                      ) : (
+                        <div className="avatar-fallback" style={{width:56,height:56,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',background:'#eef2f7',color:'#0f172a',fontWeight:800}}>
+                          {(form.name||'').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <small className="muted">Preview</small>
+                      {!/^https?:\/\/.*\.(png|jpe?g|webp|gif)(\?.*)?$/i.test(form.avatar||'') && form.avatar && (
+                        <div className="hint" style={{marginTop:'.15rem'}}>Use a direct image URL ending in .png, .jpg, .jpeg, .webp, or .gif</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="divider" style={{margin:'1rem 0'}}/>
+              <h4 style={{margin:'0 0 .4rem'}}>Social links</h4>
+              <div className="form-grid">
+                <label className="form-label">LinkedIn</label>
+                <input className="form-field ux-input" value={form.socials.linkedin} onChange={e=>setForm(f=>({...f,socials:{...f.socials, linkedin:e.target.value}}))} placeholder="https://linkedin.com/in/..." />
+              </div>
+              <div className="form-grid" style={{marginTop:'.6rem'}}>
+                <label className="form-label">Twitter/X</label>
+                <input className="form-field ux-input" value={form.socials.twitter} onChange={e=>setForm(f=>({...f,socials:{...f.socials, twitter:e.target.value}}))} placeholder="https://x.com/..." />
+              </div>
+              <div className="form-grid" style={{marginTop:'.6rem'}}>
+                <label className="form-label">GitHub</label>
+                <input className="form-field ux-input" value={form.socials.github} onChange={e=>setForm(f=>({...f,socials:{...f.socials, github:e.target.value}}))} placeholder="https://github.com/..." />
+              </div>
+              <div className="form-grid" style={{marginTop:'.6rem'}}>
+                <label className="form-label">Website</label>
+                <input className="form-field ux-input" value={form.socials.website} onChange={e=>setForm(f=>({...f,socials:{...f.socials, website:e.target.value}}))} placeholder="https://..." />
+              </div>
+            </aside>
           </div>
-          <div className="settings-actions" style={{display:'flex',justifyContent:'space-between',gap:'.5rem'}}>
-            <button type="button" className="btn-secondary" onClick={()=>navigate('/admin/team')}>Back</button>
-            <div style={{display:'flex',gap:'.5rem'}}>
-              {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
-              <button type="submit" className="btn" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+
+          <div className="bottom-actions">
+            <div className="container" style={{display:'flex',justifyContent:'space-between',gap:'.75rem'}}>
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/team')}>Back</button>
+              <div style={{display:'flex',gap:'.6rem'}}>
+                {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
+                <button type="submit" className="btn lg" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+              </div>
             </div>
           </div>
         </form>

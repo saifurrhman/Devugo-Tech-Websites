@@ -10,6 +10,7 @@ export default function ServicesList(){
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
+  const publishedCount = useMemo(()=> items.filter(s=>s.published!==false).length, [items]);
 
   useEffect(()=>{
     let mounted = true;
@@ -58,6 +59,14 @@ export default function ServicesList(){
             <Link to="/admin/services/new" className="btn">Add Service</Link>
           </div>
         </div>
+
+        {/* Totals strip */}
+        {!loading && !error && (
+          <div className="card" style={{marginTop:'.75rem', padding:'.5rem 1rem', display:'flex', gap:'.6rem', alignItems:'center'}}>
+            <span className="badge">Total: {items.length}</span>
+            <span className="badge">Published: {publishedCount}</span>
+          </div>
+        )}
 
         {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}

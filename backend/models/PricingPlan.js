@@ -10,6 +10,8 @@ const PricingPlanSchema = new mongoose.Schema(
     recommended: { type: Boolean, default: false },
     published: { type: Boolean, default: true },
     order: { type: Number, default: 0 },
+    // Option A: single Service per plan (optional)
+    service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', index: true, default: null },
   },
   { timestamps: true }
 );

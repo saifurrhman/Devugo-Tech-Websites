@@ -9,6 +9,7 @@ export default function TeamList(){
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const total = items.length;
 
   useEffect(()=>{
     let mounted = true;
@@ -38,6 +39,13 @@ export default function TeamList(){
           <h1 style={{margin:0}}>Team</h1>
           <Link to="/admin/team/new" className="btn">Add Member</Link>
         </div>
+
+        {/* Totals strip */}
+        {!loading && !error && (
+          <div className="card" style={{marginTop:'.75rem', padding:'.5rem 1rem', display:'flex', gap:'.6rem', alignItems:'center'}}>
+            <span className="badge">Total: {total}</span>
+          </div>
+        )}
         {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
         {!loading && !error && (
