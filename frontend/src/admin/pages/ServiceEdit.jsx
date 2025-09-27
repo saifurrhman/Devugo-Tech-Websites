@@ -104,68 +104,96 @@ export default function ServiceEdit(){
           </div>
         </div>
 
-        <h1 className="page-title" style={{marginTop:'.25rem'}}>{isNew ? 'Create Service' : 'Edit Service'}</h1>
+        <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.75rem',marginTop:'.25rem'}}>
+          <h1 className="page-title" style={{margin:0}}>
+            {isNew ? 'Create Service' : 'Edit Service'}
+            <span className="badge" style={{marginLeft:'.6rem'}}>{form.published ? 'Published' : 'Draft'}</span>
+          </h1>
+          <div style={{display:'flex',gap:'.5rem'}}>
+            {!isNew && (
+              <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
+            )}
+            <button type="button" className="btn-secondary" onClick={()=>navigate('/admin/services')}>Back</button>
+            <button type="button" className="btn" onClick={handleSave} disabled={saving}>{saving? 'Saving…':'Save'}</button>
+          </div>
+        </div>
         {error && <div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>}
         {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
 
-        <form onSubmit={handleSave} style={{marginTop:'1rem', display:'grid', gap:'1rem'}}>
-          <section className="section-card">
-            <h3>Basic details</h3>
-            <div className="form-grid" style={{marginTop:'.75rem'}}>
-              <label className="form-label">Title</label>
-              <input className="form-field" placeholder="e.g., UX UI Design" value={form.title} onChange={e=>syncSlug(e.target.value)} required minLength={3} />
-              <div className="hint">Keep it short and action‑oriented (e.g., "UX UI Design").</div>
-            </div>
-            <div className="form-grid" style={{marginTop:'.75rem'}}>
-              <label className="form-label">Slug</label>
-              <input className="form-field" placeholder="service-slug" value={form.slug} onChange={e=>setForm(f=>({...f,slug:e.target.value}))} aria-describedby="slug-hint" />
-              <div className="hint">Auto‑generated from title. You can customize it.</div>
-            </div>
-            <div className="form-grid" style={{marginTop:'.75rem'}}>
-              <label className="form-label">Short Description</label>
-              <textarea className="form-field" rows={4} placeholder="1–2 sentences that summarize the service" value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} />
-              <div className="hint" id="slug-hint">1–2 sentences that summarize the service.</div>
-            </div>
-          </section>
-
-          <section className="section-card">
-            <h3>Content</h3>
-            <div className="form-grid">
-              <label className="form-label">Features (comma separated)</label>
-              <input className="form-field" placeholder="feature one, feature two" value={form.features} onChange={e=>setForm(f=>({...f,features:e.target.value}))} aria-label="Service features" />
-              <div className="hint">Separate with commas. Example: strategy workshop, prototypes, design system</div>
-            </div>
-          </section>
-
-          <section className="section-card">
-            <h3>Settings</h3>
-            <div className="form-grid" style={{marginTop:'.5rem'}}>
-              <label className="form-label">Icon URL</label>
-              <input className="form-field" placeholder="https://cdn.example.com/icon.png" value={form.icon} onChange={e=>setForm(f=>({...f,icon:e.target.value}))} />
-              {form.icon && (
-                <div className="preview" style={{marginTop:'.5rem',display:'flex',alignItems:'center',gap:'.5rem'}}>
-                  <img src={form.icon} alt="icon preview" style={{width:36,height:36,borderRadius:8,objectFit:'cover'}}/>
-                  <small className="muted">Preview</small>
+        <form onSubmit={handleSave} style={{marginTop:'1rem'}}>
+          <div className="grid two" style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) 320px',gap:'1rem'}}>
+            <div className="stack" style={{display:'grid',gap:'1rem'}}>
+              <section className="section-card">
+                <h3>Basic details</h3>
+                <div className="form-grid" style={{marginTop:'.75rem'}}>
+                  <label className="form-label">Title</label>
+                  <input className="form-field" placeholder="e.g., UX UI Design" value={form.title} onChange={e=>syncSlug(e.target.value)} required minLength={3} />
+                  <div className="hint">Keep it short and action‑oriented (e.g., "UX UI Design").</div>
                 </div>
-              )}
-            </div>
-            <div className="form-grid" style={{marginTop:'.75rem'}}>
-              <label className="form-label">Order</label>
-              <input type="number" className="form-field" value={form.order} onChange={e=>setForm(f=>({...f,order:e.target.value}))} />
-            </div>
-            <label style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'.75rem'}}>
-              <input type="checkbox" checked={form.published} onChange={e=>setForm(f=>({...f,published:e.target.checked}))} />
-              Published
-            </label>
-          </section>
+                <div className="form-grid" style={{marginTop:'.75rem'}}>
+                  <label className="form-label">Slug</label>
+                  <input className="form-field" placeholder="service-slug" value={form.slug} onChange={e=>setForm(f=>({...f,slug:e.target.value}))} aria-describedby="slug-hint" />
+                  <div className="hint">Auto‑generated from title. You can customize it.</div>
+                </div>
+                <div className="form-grid" style={{marginTop:'.75rem'}}>
+                  <label className="form-label">Short Description</label>
+                  <textarea className="form-field" rows={4} placeholder="1–2 sentences that summarize the service" value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} />
+                  <div className="hint" id="slug-hint">1–2 sentences that summarize the service.</div>
+                </div>
+              </section>
 
-          <div className="settings-actions" style={{display:'flex',justifyContent:'space-between',gap:'.5rem'}}>
-            <button type="button" className="btn-secondary" onClick={()=>navigate('/admin/services')}>Back</button>
-            <div style={{display:'flex',gap:'.5rem'}}>
-              {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
-              <button type="submit" className="btn" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+              <section className="section-card">
+                <h3>Content</h3>
+                <div className="form-grid">
+                  <label className="form-label">Features (comma separated)</label>
+                  <input className="form-field" placeholder="feature one, feature two" value={form.features} onChange={e=>setForm(f=>({...f,features:e.target.value}))} aria-label="Service features" />
+                  <div className="hint">Separate with commas. Example: strategy workshop, prototypes, design system</div>
+                </div>
+              </section>
             </div>
+
+            <aside className="section-card" aria-label="Sidebar settings">
+              <h3>Settings</h3>
+              <div className="form-grid" style={{marginTop:'.5rem'}}>
+                <label className="form-label">Icon URL</label>
+                <input className="form-field" placeholder="https://cdn.example.com/icon.png" value={form.icon} onChange={e=>setForm(f=>({...f,icon:e.target.value}))} />
+                {form.icon && (
+                  <div className="preview" style={{marginTop:'.5rem',display:'flex',alignItems:'center',gap:'.5rem'}}>
+                    <img src={form.icon} alt="icon preview" style={{width:36,height:36,borderRadius:8,objectFit:'cover'}}/>
+                    <small className="muted">Preview</small>
+                  </div>
+                )}
+              </div>
+              <div className="form-grid" style={{marginTop:'.75rem'}}>
+                <label className="form-label">Order</label>
+                <input type="number" className="form-field" value={form.order} onChange={e=>setForm(f=>({...f,order:e.target.value}))} />
+              </div>
+              <label style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'.75rem'}}>
+                <input type="checkbox" checked={form.published} onChange={e=>setForm(f=>({...f,published:e.target.checked}))} />
+                Published
+              </label>
+
+              <div className="divider" style={{margin:'1rem 0'}}/>
+              <div>
+                <h4 style={{margin:'0 0 .25rem 0'}}>Preview</h4>
+                <div className="card" style={{padding:'.75rem'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'.6rem'}}>
+                    {form.icon && <img src={form.icon} alt="" style={{width:28,height:28,borderRadius:6,objectFit:'cover'}}/>}
+                    <strong>{form.title || 'Service title'}</strong>
+                  </div>
+                  <p style={{margin:'.5rem 0 0 0', opacity:.9}}>{form.description || 'Short description will appear here.'}</p>
+                  {form.features && (
+                    <ul style={{margin:'.5rem 0 0 1rem'}}>
+                      {form.features.split(',').map((f,i)=>f.trim() && <li key={i}>{f.trim()}</li>)}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </aside>
           </div>
+
+          {/* Bottom spacer to avoid overlap on short pages */}
+          <div style={{height:'1rem'}} />
         </form>
       </main>
     </div>

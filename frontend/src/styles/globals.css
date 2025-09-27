@@ -288,35 +288,73 @@ body:not(.admin-light) .create-post .page-title{ color:#0f172a !important; -webk
 .create-post .form-field textarea,
 .create-post textarea.form-field{
   background:#ffffff !important;
-  border:1.5px solid #cbd5e1 !important;
-  color:#0f172a !important;
-  font-size:.98rem;
+  border:1.5px solid #d0d7e2 !important;
+  color:#0b1220 !important;
+  font-size:1rem;
   line-height:1.4;
-  border-radius:14px;
+  border-radius:18px;
   box-shadow: inset 0 1px 0 rgba(0,0,0,.02);
   padding: 1rem 1.15rem;
+  min-height: 44px;
+  caret-color:#0b1220;
 }
 .create-post .form-field textarea,
-.create-post textarea.form-field{min-height:240px; padding:1.15rem 1.15rem}
+.create-post textarea.form-field{min-height:220px; padding:1.15rem 1.15rem; font-size:1rem; color:#0b1220}
 .create-post .form-field input:hover,
 .create-post input.form-field:hover,
 .create-post .form-field textarea:hover,
-.create-post textarea.form-field:hover{border-color:#b6c3d6 !important}
+.create-post textarea.form-field:hover{border-color:#b8c2d1 !important}
 .create-post .form-field input:focus,
 .create-post input.form-field:focus,
 .create-post .form-field textarea:focus,
-.create-post textarea.form-field:focus{border-color:var(--color-primary) !important; box-shadow:0 0 0 3px rgba(67,133,205,.25)}
+.create-post textarea.form-field:focus{border-color:var(--color-primary) !important; box-shadow:0 0 0 3px rgba(67,133,205,.28)}
 .create-post .form-field input::placeholder,
 .create-post input.form-field::placeholder,
 .create-post .form-field textarea::placeholder,
-.create-post textarea.form-field::placeholder{color:#64748b !important}
+.create-post textarea.form-field::placeholder{color:#334155 !important}
+
+/* Autofill states (Chrome/Safari) – keep text dark and background white) */
+.create-post input.form-field:-webkit-autofill,
+.create-post .form-field input:-webkit-autofill,
+.create-post textarea.form-field:-webkit-autofill{
+  -webkit-text-fill-color:#0b1220 !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
 
 /* Hints under fields: ensure readable */
 .create-post .hint{color:#475569; font-size:.9rem; margin-top:.3rem}
 
 /* Spacing & labels inside create-post */
 .create-post .form-grid{gap:.5rem}
-.create-post .form-label{font-weight:700; margin-bottom:.1rem}
+.create-post .form-label{font-weight:800; margin-bottom:.1rem; color:#0f172a !important; font-size:.95rem}
+
+/* Strong override for all text-like inputs in create-post cards */
+.create-post .section-card input[type="text"],
+.create-post .section-card input[type="number"],
+.create-post .section-card input[type="email"],
+.create-post .section-card input[type="url"],
+.create-post .section-card textarea{
+  background:#ffffff !important;
+  color:#0b1220 !important;
+  border:1.6px solid #d0d7e2 !important;
+  border-radius:20px !important;
+  padding: 1rem 1.15rem !important;
+  min-height: 46px !important;
+  font-size:1rem !important;
+  line-height:1.45 !important;
+  caret-color:#0b1220 !important;
+  outline: none !important;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.02) !important;
+}
+.create-post .section-card textarea{ min-height: 220px !important; }
+.create-post .section-card input::placeholder,
+.create-post .section-card textarea::placeholder{ color:#334155 !important }
+.create-post .section-card input:focus,
+.create-post .section-card textarea:focus{
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(67,133,205,.28) !important;
+}
 .settings-card .card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18)}
 .settings-card .divider{height:1px;background:rgba(255,255,255,0.12);margin:.6rem 0}
 .btn-secondary{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.22);border-radius:10px;padding:.55rem .9rem}
