@@ -62,6 +62,29 @@ export default function AdminSidebar() {
             </svg>
           </span><span className="label">Dashboard</span>
         </NavLink>
+        <NavLink to="/admin/services" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
+          <span className="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </span><span className="label">Services</span>
+        </NavLink>
+        <NavLink to="/admin/pricing" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
+          <span className="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M7 10h10M7 14h6" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </span><span className="label">Pricing</span>
+        </NavLink>
+        <NavLink to="/admin/completed" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
+          <span className="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 7 10 17l-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="3" y="3" width="18" height="18" rx="3" ry="3" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+            </svg>
+          </span><span className="label">Completed</span>
+        </NavLink>
         <NavLink to="/admin/portfolio" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
           <span className="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

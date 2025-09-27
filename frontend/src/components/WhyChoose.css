@@ -1,0 +1,33 @@
+.why-wrap{ position:relative; padding:0; margin:0 }
+/* Stage is tall to allow scroll growth */
+.why-stage{ height:160vh; position:relative }
+/* Sticky card that grows as you scroll */
+.why-sticky{ position:sticky; top:8px; background:linear-gradient(180deg, rgba(67,133,205,.18), rgba(67,133,205,.12)); border:1px solid rgba(255,255,255,.14); border-radius:28px; transform:scale(.94); transition: border-radius .2s ease; will-change:transform }
+.why-sticky::after{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; box-shadow:inset 0 1px 0 rgba(255,255,255,.06) }
+.why-sticky .container{ max-width:1140px; margin:0 auto; padding:2rem 1rem 2.2rem }
+
+/* Header */
+.why-head h2{ color:#fff; font-weight:900; font-size:2.1rem; margin:0 0 .35rem }
+.why-head .why-sub{ color:var(--color-muted); max-width:70ch; margin:0 auto }
+
+/* Features */
+.why-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; margin-top:1.1rem }
+.why-card{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:1.1rem; color:#e6f0ff; text-align:center; animation: whyPop .45s ease both }
+.why-card p{ color:#cfe3ff; margin:0 }
+.why-icon{ display:grid; place-items:center; width:60px; height:60px; margin:0 auto .25rem; border-radius:14px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.22); color:#fff; animation: iconFloat 3s ease-in-out infinite }
+.why-icon svg{ width:42px; height:42px }
+.why-icon svg path, .why-icon svg circle, .why-icon svg rect{ stroke: currentColor; stroke-dasharray: 120; stroke-dashoffset: 120; animation: iconDraw 1.2s ease forwards var(--d, 0ms) }
+
+@keyframes whyPop{ from{ opacity:0; transform:translateY(12px) scale(.98) } to{ opacity:1; transform:translateY(0) scale(1) } }
+@keyframes iconFloat{ 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-6px) } }
+@keyframes iconDraw{ to{ stroke-dashoffset: 0 } }
+
+/* Responsive */
+@media (max-width: 1024px){
+}
+@media (max-width: 640px){
+  .why-stage{ height: 140vh }
+  .why-sticky .container{ padding:1.4rem 1rem 1.6rem }
+  .why-head h2{ font-size:1.8rem }
+  .why-grid{ grid-template-columns: 1fr }
+}

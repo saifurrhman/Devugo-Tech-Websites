@@ -25,6 +25,9 @@ import Signup from '../admin/pages/Signup';
 import ResetPassword from '../admin/pages/ResetPassword';
 import ProtectedRoute from './ProtectedRoute';
 import AdminProfile from '../admin/pages/AdminProfile';
+import ServicesList from '../admin/pages/ServicesList';
+import ServiceEdit from '../admin/pages/ServiceEdit';
+import PricingPlans from '../admin/pages/PricingPlans';
 
 export default function PublicRoutes() {
   return (
@@ -55,6 +58,9 @@ export default function PublicRoutes() {
         <Route path="/admin/team/:id" element={<ProtectedRoute><TeamEdit /></ProtectedRoute>} />
         <Route path="/admin/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
         <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/admin/services" element={<ProtectedRoute><ServicesList /></ProtectedRoute>} />
+        <Route path="/admin/services/:id" element={<ProtectedRoute><ServiceEdit /></ProtectedRoute>} />
+        <Route path="/admin/pricing" element={<ProtectedRoute><PricingPlans /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
