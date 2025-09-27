@@ -1,0 +1,91 @@
+/* About Page (7 sections) */
+.about-page{ padding:0 0 2.6rem }
+
+.about-hero{ padding:3rem 0 2rem; position:relative }
+.about-hero .container{ max-width:1140px; margin:0 auto; padding:0 1rem; text-align:center }
+.about-hero .eyebrow{ display:inline-flex; gap:.4rem; align-items:center; padding:.35rem .6rem; border:1px solid rgba(255,255,255,.18); border-radius:999px; color:#e6f0ff; background:rgba(255,255,255,.06); font-weight:800 }
+.about-hero .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:#46a0ff; display:inline-block }
+.about-hero h1{ color:#fff; font-weight:900; font-size:2.6rem; margin:.8rem 0 .45rem }
+.about-hero .sub{ color:var(--color-muted); max-width:68ch; margin:0 auto .8rem }
+.about-hero .actions{ display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap }
+
+.about-mission{ padding:1.8rem 0 2.2rem }
+.about-mission .container{ max-width:1040px; margin:0 auto; padding:0 1rem }
+.about-mission .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:1rem }
+.about-mission .block{ background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:1.25rem; color:#e6f0ff }
+.about-mission h2{ color:#fff; margin:0 0 .45rem; font-size:1.4rem }
+.about-mission p{ color:#cfe3ff; margin:0 }
+
+.about-values{ padding:1.6rem 0 2.2rem }
+.about-values .container{ max-width:1140px; margin:0 auto; padding:0 1rem }
+.about-values h2{ color:#fff; font-weight:900; text-align:center; margin:0 0 .5rem; font-size:1.6rem }
+.about-values .intro{ color:var(--color-muted); text-align:center; max-width:68ch; margin:0 auto .9rem }
+.about-values .values-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:1.1rem }
+.about-values .value{ background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:1.2rem; opacity:1; transform:none }
+.about-values .value h3{ margin:.1rem 0 .35rem; color:#fff; font-size:1.25rem }
+.about-values .value p{ margin:0; color:#cfe3ff }
+
+.about-stats{ padding:1.2rem 0 2rem }
+.about-stats .container{ max-width:1040px; margin:0 auto; padding:0 1rem }
+.about-stats .stats-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem }
+.about-stats .stat{ text-align:center; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:1.2rem }
+.about-stats .stat strong{ font-size:1.8rem; color:#fff; display:block }
+.about-stats .stat span{ color:#cfe3ff; font-size:1.02rem }
+
+.about-process{ padding:1.6rem 0 2.4rem }
+.about-process .container{ max-width:1140px; margin:0 auto; padding:0 1rem }
+.about-process h2{ color:#fff; font-weight:900; text-align:center; margin:0 0 1rem; font-size:1.6rem }
+.about-process .steps{ display:grid; grid-template-columns: repeat(2, 1fr); gap:1.1rem }
+.about-process .step{ background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:1.2rem; display:flex; gap:.9rem; align-items:flex-start }
+.about-process .step .num{ display:inline-grid; place-items:center; width:36px; height:36px; border-radius:10px; background:#3f88d3; color:#fff; font-weight:900 }
+.about-process .step h3{ margin:.1rem 0 .15rem; color:#fff; font-size:1.15rem }
+.about-process .step p{ margin:0; color:#cfe3ff; font-size:1.02rem }
+
+.about-team{ padding:1.6rem 0 2.2rem }
+.about-team .container{ max-width:1040px; margin:0 auto; padding:0 1rem }
+.about-team .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:1rem }
+.about-team .block{ background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:1.25rem; color:#e6f0ff }
+.about-team .badge-list{ list-style:none; padding:0; margin:0; display:grid; gap:.4rem }
+.about-team .badge-list li{ display:inline-flex; align-items:center; gap:.4rem; padding:.5rem .7rem; border-radius:999px; border:1px solid rgba(255,255,255,0.14); color:#cfe3ff; width:fit-content; font-size:1.02rem }
+
+.about-cta{ padding:2.2rem 0 3rem }
+.about-cta .container{ max-width:1040px; margin:0 auto; padding:0 1rem; text-align:center }
+.about-cta h2{ color:#fff; font-weight:900; margin:0 0 .5rem; font-size:1.6rem }
+.about-cta .sub{ color:var(--color-muted); margin:0 0 .8rem }
+
+/* Reveal utility */
+.reveal{ opacity:0; transform:translateY(14px) scale(.98); transition: opacity .45s ease, transform .45s ease }
+.reveal.show{ opacity:1; transform:translateY(0) scale(1) }
+
+@media (max-width: 1024px){
+  .about-values .values-grid{ grid-template-columns: 1fr 1fr }
+  .about-stats .stats-grid{ grid-template-columns: 1fr 1fr }
+  .about-process .steps{ grid-template-columns: 1fr 1fr }
+  .about-mission .grid2, .about-team .grid2{ grid-template-columns: 1fr }
+}
+@media (max-width: 640px){
+  .about-hero{ padding:2.4rem 0 1.6rem }
+  .about-hero h1{ font-size:2.2rem }
+  .about-hero .actions{ gap:.5rem; flex-direction:column; align-items:stretch }
+  .about-hero .actions .btn{ width:100% }
+
+  /* Cards and grids: single column for readability */
+  .about-mission .grid2{ grid-template-columns: 1fr }
+  .about-values .values-grid{ grid-template-columns: 1fr }
+  .about-process .steps{ grid-template-columns: 1fr }
+  .about-team .grid2{ grid-template-columns: 1fr }
+
+  /* Comfortable padding on small screens */
+  .about-mission .block,
+  .about-values .value,
+  .about-process .step,
+  .about-team .block{ padding:1rem }
+
+  /* Stats: two columns on small phones */
+  .about-stats .stats-grid{ grid-template-columns: 1fr 1fr }
+}
+
+@media (max-width: 360px){
+  /* Ultra-small screens: stack stats */
+  .about-stats .stats-grid{ grid-template-columns: 1fr }
+}

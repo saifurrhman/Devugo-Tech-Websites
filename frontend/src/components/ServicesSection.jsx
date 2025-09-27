@@ -21,7 +21,7 @@ const services = [
   { title: 'Mobile Apps Development', desc: 'Native and cross‑platform apps with smooth UX, performance, and app‑store readiness.' },
 ];
 
-export default function ServicesSection(){
+export default function ServicesSection({ variant }){
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
   // Show 3 on mobile, 6 on larger screens
@@ -84,28 +84,50 @@ export default function ServicesSection(){
     els.forEach((el, idx)=>{ if (idx >= initialCount) el.classList.remove('show'); });
   }
 
+  const isHome = variant === 'home';
+
   return (
-    <section className="services-section" aria-labelledby="services-title">
+    <section id="services" className="services-section" aria-labelledby="services-title">
       <div className="container">
         <div className="services-head">
           <h2 id="services-title" className="services-title">Services</h2>
           <p className="services-sub">From initial design to ongoing management, our team delivers tailored solutions that enhance user experience, boost conversions, and drive growth.</p>
         </div>
         <div ref={gridRef} className="services-grid">
-          {services.slice(0, visibleCount).map((s, i) => (
-            <article className="service-card" key={i} onClick={()=>openInquiry(s)} role="button" tabIndex={0} onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' '){ openInquiry(s); } }}>
+          {(isHome ? services.slice(0,6) : services.slice(0, visibleCount)).map((s, i) => (
+            <article
+              className="service-card"
+              key={i}
+              onClick={()=>{ if(!isHome){ openInquiry(s) } else { window.location.href = '/services#services'; } }}
+              role={isHome ? 'link' : 'button'}
+              tabIndex={0}
+              onKeyDown={(e)=>{
+                if(e.key==='Enter' || e.key===' '){
+                  if(!isHome){ openInquiry(s) } else { window.location.href = '/services#services'; }
+                }
+              }}
+            >
               <h3 className="service-title">{s.title}</h3>
               <p className="service-desc">{s.desc}</p>
-              <span className="service-link" aria-label={`Inquire about ${s.title}`}>
-                <span className="icon" aria-hidden>
-                  <svg viewBox="0 0 24 24"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              {isHome ? (
+                <a href="/services#services" className="service-link" aria-label={`View ${s.title} on Services page`} onClick={(e)=>e.stopPropagation()}>
+                  <span className="icon" aria-hidden>
+                    <svg viewBox="0 0 24 24"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  View on Services
+                </a>
+              ) : (
+                <span className="service-link" aria-label={`Inquire about ${s.title}`}>
+                  <span className="icon" aria-hidden>
+                    <svg viewBox="0 0 24 24"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  Learn More
                 </span>
-                Learn More
-              </span>
+              )}
             </article>
           ))}
         </div>
-        {services.length > visibleCount ? (
+        {!isHome && services.length > visibleCount ? (
           <div className="load-more-wrap">
             <button className="btn cta-dark load-more-btn" onClick={loadMore}>
               <span style={{display:'inline-flex',alignItems:'center',gap:'.4rem'}}>
@@ -117,7 +139,7 @@ export default function ServicesSection(){
             </button>
             <div className="progress-hint">{`${visibleCount} of ${services.length} shown`}</div>
           </div>
-        ) : services.length > initialCount ? (
+        ) : !isHome && services.length > initialCount ? (
           <div className="load-more-wrap">
             <button className="btn cta-dark load-more-btn" onClick={showLess}>
               <span style={{display:'inline-flex',alignItems:'center',gap:'.4rem'}}>
@@ -131,7 +153,9 @@ export default function ServicesSection(){
           </div>
         ) : null}
       </div>
-      <ServiceInquiryModal open={open} onClose={()=>setOpen(false)} service={selected} />
+      {!isHome && (
+        <ServiceInquiryModal open={open} onClose={()=>setOpen(false)} service={selected} />
+      )}
     </section>
   );
 }

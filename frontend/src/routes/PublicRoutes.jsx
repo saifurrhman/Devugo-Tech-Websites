@@ -8,6 +8,8 @@ import Team from '../pages/Team';
 import Blog from '../pages/Blog';
 import Contact from '../pages/Contact';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
+import Solutions from '../pages/Solutions';
+import Pricing from '../pages/Pricing';
 import Dashboard from '../admin/pages/Dashboard';
 import PortfolioList from '../admin/pages/PortfolioList';
 import PortfolioEdit from '../admin/pages/PortfolioEdit';
@@ -36,6 +38,8 @@ export default function PublicRoutes() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/solutions" element={<Solutions />} />
+        <Route path="/pricing" element={<Pricing />} />
         {/* Admin routes (no auth guard yet) */}
         <Route path="/admin/login" element={<Login />} />
         <Route path="/admin/signup" element={<Signup />} />

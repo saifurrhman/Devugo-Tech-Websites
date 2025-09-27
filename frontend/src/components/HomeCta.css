@@ -1,0 +1,12 @@
+.home-cta{ padding:2.4rem 0 0; }
+.home-cta .container{ max-width:1140px; margin:0 auto; padding:0 1rem }
+.home-cta .cta-card{ background:linear-gradient(180deg,#2c84e3,#1e63bd); color:#ffffff; border-radius:24px; padding:1.8rem; text-align:center; box-shadow:0 12px 32px rgba(0,0,0,.26); border:1px solid rgba(255,255,255,.28) }
+.home-cta h2{ margin:0 0 .4rem; font-weight:900; font-size:1.8rem }
+.home-cta p{ margin:0 0 .8rem; color:#e6f0ff }
+.home-cta .btn.light{ background:#ffffff; color:#0f172a !important; -webkit-text-fill-color:#0f172a; border:1px solid rgba(255,255,255,.85); border-radius:999px; font-weight:800 }
+.home-cta .btn.light:hover{ background:#0b2647; color:#ffffff !important; -webkit-text-fill-color:#ffffff; border-color:#0b2647 }
+
+@media (max-width: 640px){
+  .home-cta .cta-card{ border-radius:18px; padding:1.2rem }
+  .home-cta h2{ font-size:1.4rem }
+}

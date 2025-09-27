@@ -17,11 +17,8 @@ export default function Navbar() {
             <Link to="/" onClick={close}>Home</Link>
             <Link to="/about" onClick={close}>About</Link>
             <Link to="/services" onClick={close}>Services</Link>
-            {/* <div className="dropdown">
-              <button className="dropbtn">Solutions ▾</button>
-            </div> */}
-            <Link to="/privacy-policy" onClick={close}>Privacy</Link>
-            <Link to="/team" onClick={close}>Careers</Link>
+            <Link to="/solutions" onClick={close}>Solutions</Link>
+            <Link to="/pricing" onClick={close}>Pricing</Link>
             <Link to="/contact" onClick={close}>Contact</Link>
           </div>
           <div className="nav-right">
@@ -38,8 +35,8 @@ export default function Navbar() {
           <Link to="/" onClick={close}>Home</Link>
           <Link to="/about" onClick={close}>About</Link>
           <Link to="/services" onClick={close}>Services</Link>
-          <Link to="/privacy-policy" onClick={close}>Privacy</Link>
-          <Link to="/team" onClick={close}>Careers</Link>
+          <Link to="/solutions" onClick={close}>Solutions</Link>
+          <Link to="/pricing" onClick={close}>Pricing</Link>
           <Link to="/contact" onClick={close}>Contact</Link>
           <Link to="/contact" className="btn cta-dark" onClick={close} style={{ width: '100%', textAlign: 'center' }}>FREE CRO AUDIT</Link>
           {/* Social icons */}

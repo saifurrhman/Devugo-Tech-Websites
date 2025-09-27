@@ -1,0 +1,37 @@
+.pricing-home{ padding:2.6rem 0 3rem }
+.pricing-home .container{ max-width:1140px; margin:0 auto; padding:0 1rem }
+.pricing-head{ text-align:center; margin-bottom:1rem }
+.pricing-head h2{ color:#fff; font-weight:900; font-size:1.8rem; margin:0 0 .35rem }
+.pricing-head .muted{ color:var(--color-muted) }
+
+.pricing-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem }
+.price-card{ background:transparent; border:1px solid rgba(255,255,255,0.24); border-radius:14px; padding:1rem; color:#e6f0ff; display:flex; flex-direction:column; opacity:0; transform:translateY(14px) scale(.98); transition: opacity .45s ease, transform .45s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease }
+.price-card.show{ opacity:1; transform:translateY(0) scale(1) }
+.price-card.highlight{ border-color:#5aa0ea; box-shadow:0 12px 30px rgba(67,133,205,.18) }
+.price-card:hover{ box-shadow:0 12px 30px rgba(67,133,205,.20); border-color:#8ab8ff; background:rgba(255,255,255,0.04) }
+.price-title{ margin:0 0 .35rem; font-size:1.2rem; font-weight:900; color:#ffffff }
+.price-blurb{ margin:0 0 .6rem; color:#cfe3ff }
+.price-amount{ font-size:1.6rem; font-weight:900; color:#ffffff; margin:.15rem 0 .5rem }
+.price-features{ list-style:none; padding:0; margin:0 0 .8rem; display:grid; gap:.35rem; color:#cfe3ff }
+.price-features li::before{ content:"✓"; margin-right:.4rem; color:#56a1f0 }
+.price-card .btn,
+.price-card .btn.cta-dark{ margin-top:auto; background:#ffffff !important; color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; border:1px solid #cbd5e1 !important; border-radius:999px; font-weight:800; font-size:1rem; padding:.8rem 1.15rem }
+.price-card .btn:hover,
+.price-card .btn.cta-dark:hover{ background:#204188 !important; color:#ffffff !important; -webkit-text-fill-color:#ffffff !important; border-color:#204188 !important }
+.price-card .btn.cta-dark:visited{ color:#0f172a !important; -webkit-text-fill-color:#0f172a !important }
+.price-card .btn:active,
+.price-card .btn.cta-dark:active{ transform:translateY(0); filter:saturate(1.02) }
+.price-card .btn:focus-visible,
+.price-card .btn.cta-dark:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(67,133,205,.35) }
+
+.price-card.custom{ background:transparent; border-style:dashed; align-items:flex-start; justify-content:flex-end; background-repeat:no-repeat }
+.price-card.custom .custom-graphic{ width:100%; height:100px; background:radial-gradient(140px 60px at 30% 10%, rgba(67,133,205,.22), rgba(0,0,0,0)); border-radius:12px; margin-bottom:.6rem }
+
+.pricing-actions{ display:flex; justify-content:center; margin-top:1rem }
+
+@media (max-width: 1024px){
+  .pricing-grid{ grid-template-columns: 1fr 1fr }
+}
+@media (max-width: 640px){
+  .pricing-grid{ grid-template-columns: 1fr }
+}
