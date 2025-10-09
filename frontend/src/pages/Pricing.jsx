@@ -5,159 +5,323 @@ import PricingQuoteModal from '../components/PricingQuoteModal';
 import './Pricing.css';
 import { PricingAPI } from '../lib/api';
 
-const STATIC_CARDS = [
-  { title: 'CX + CRO Audit', price: '$1,500',
-    desc: 'Fix critical areas of your website to improve conversions.',
-    features: ['x5 Critical redesigned sections','10+ page audit report','Figma source file','Loom walkthrough','Desktop + Mobile design','On‑page SEO & copy review'],
-    tags: ['All','Website','Audit'] },
-  { title: 'UX UI Design', price: '$2,000',
-    desc: 'Modern design for your website, app, or SaaS product.',
-    features: ['Up to 5 pages / screens','Wireframes','Desktop + Mobile responsive','UI design system','Figma source file','Unlimited revisions'], highlight:true,
-    tags: ['All','Website','App','Design'] },
-  { title: 'No/Low‑Code Dev', price: '$2,500+',
-    desc: 'Websites built in Webflow, Wix, or Shopify with speed.',
-    features: ['Up to 5 pages','Componentized','CMS integration','Interactions/animations','Fully responsive','Unlimited revisions'],
-    tags: ['All','Shopify','Wix','Webflow','Website'] },
-
-  { title: 'Web Development', price: '$3,500+',
-    desc: 'Full‑stack web development for scalable, high‑performing apps.',
-    features: ['Modern stack (React/Next)','API integration','Auth & dashboards','Accessibility & SEO','Analytics setup','Deployment & docs'],
-    tags: ['All','Custom Software','Website'] },
-  { title: 'AI Call Agent', price: '$1,800+',
-    desc: 'Voice AI that answers calls, books, and qualifies leads 24/7.',
-    features: ['Custom voice + knowledge','Calendar/CRM integration','Call logs & transcripts','Warm transfers','Usage analytics','Go live in days'],
-    tags: ['All','AI Call Agent','AI'] },
-  { title: 'Mobile Apps Dev', price: '$5,000+',
-    desc: 'iOS/Android or cross‑platform apps with smooth UX and performance.',
-    features: ['React Native stack','Auth + push notifications','Offline support','App store readiness','Analytics & crash reports','Support & updates'],
-    tags: ['All','Mobile Apps','App'] },
-
-  { title: 'Custom CRM System', price: '$4,500+',
-    desc: 'Tailored pipelines, automations, and reporting for your team.',
-    features: ['Lead pipelines','Custom fields','Automations','Role permissions','Dashboards','Integrations'],
-    tags: ['All','Custom CRM'] },
-  { title: 'AI Assistant', price: '$1,400+',
-    desc: 'LLM‑powered chat/email assistants trained on your KB and tone.',
-    features: ['KB ingestion','Tone & style controls','Ticketing integration','Analytics','Data export','Brand safe responses'],
-    tags: ['All','AI Assistant','AI'] },
-  { title: 'AI Automation Bundle', price: '$2,200+',
-    desc: 'Connect your tools and remove manual work with smart workflows.',
-    features: ['Data extraction','Summaries & routing','Trigger actions','Human in loop','Audit trail','SLA alerts'],
-    tags: ['All','AI Development','AI'] },
-];
-
 export default function Pricing(){
   const [open, setOpen] = useState(false);
-  const [cards, setCards] = useState(STATIC_CARDS);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState('All');
 
+  // Animate cards on scroll
   useEffect(()=>{
-    const els = Array.from(document.querySelectorAll('.pricing-page .card'));
+    const els = Array.from(document.querySelectorAll('.pricing-page .pricing-card'));
     const io = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); } });
+      entries.forEach(e=>{ 
+        if(e.isIntersecting){ 
+          e.target.classList.add('show'); 
+          io.unobserve(e.target); 
+        } 
+      });
     }, { threshold: .12, rootMargin: '0px 0px -8% 0px' });
     els.forEach(el=> io.observe(el));
     return ()=> io.disconnect();
-  }, []);
+  }, [plans]);
 
-  // Fetch dynamic plans
+  // Fetch pricing plans from API
   useEffect(()=>{
     let mounted = true;
     (async()=>{
+      setLoading(true);
       try{
         const { items } = await PricingAPI.list();
         if(mounted && Array.isArray(items) && items.length){
-          const mapped = items
-            .filter(p=>p.published!==false)
-            .sort((a,b)=> (a.order||0) - (b.order||0))
-            .map(p => ({
-              title: p.name,
-              price: p.priceMonthly ? `$${p.priceMonthly}` : '$0',
-              desc: p.recommended ? 'Recommended plan' : '',
-              features: p.features || [],
-              tags: ['All'],
-              highlight: !!p.recommended,
-            }));
-          if(mapped.length) setCards(mapped);
+          const published = items
+            .filter(p => p.published !== false)
+            .sort((a,b) => (a.order || 0) - (b.order || 0));
+          setPlans(published);
         }
-      }catch(_e){ /* fallback to static */ }
-      finally{ if(mounted) setLoading(false); }
+      }catch(err){ 
+        console.error('Failed to load pricing:', err);
+      }
+      finally{ 
+        if(mounted) setLoading(false); 
+      }
     })();
     return ()=>{ mounted=false };
   },[]);
 
-  const pills = ['All','AI Call Agent','AI Assistant','Custom CRM','Custom Software','Shopify','Wix','Webflow','AI Development','Mobile Apps'];
-  const [selected, setSelected] = useState('All');
+  // Service filter pills
+  const pills = ['All', 'Subscription', 'One-Time', 'Custom'];
 
   function onSelect(p){
     setSelected(p);
-    // smooth scroll to grid
     const el = document.getElementById('grid');
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  const filtered = useMemo(()=> cards.filter(c => (selected==='All') || (c.tags?.includes(selected))), [cards, selected]);
+  // Filter plans by type
+  const filtered = useMemo(()=> {
+    if (selected === 'All') return plans;
+    const typeMap = {
+      'Subscription': 'subscription',
+      'One-Time': 'one-time',
+      'Custom': 'custom'
+    };
+    return plans.filter(p => p.planType === typeMap[selected]);
+  }, [plans, selected]);
 
-  // Ensure newly filtered cards are visible (bypass IO delay)
+  // Show cards immediately when filter changes
   useEffect(()=>{
-    const cards = document.querySelectorAll('.pricing-page #grid .card');
+    const cards = document.querySelectorAll('.pricing-page #grid .pricing-card');
     cards.forEach(c => c.classList.add('show'));
   }, [selected]);
+
+  function formatPrice(plan) {
+    if (plan.planType === 'custom') {
+      return 'Custom Quote';
+    }
+    if (plan.planType === 'one-time') {
+      return `$${plan.priceOneTime || 0}`;
+    }
+    // subscription
+    if (plan.priceMonthly) {
+      return `$${plan.priceMonthly}/mo`;
+    }
+    if (plan.priceYearly) {
+      return `$${plan.priceYearly}/yr`;
+    }
+    return 'Contact Us';
+  }
+
+  function getPricingSubtext(plan) {
+    if (plan.planType === 'custom') return 'Get a tailored quote';
+    if (plan.planType === 'one-time') return 'One-time setup fee';
+    if (plan.priceYearly && plan.priceMonthly) {
+      return `or $${plan.priceYearly}/year`;
+    }
+    return '';
+  }
 
   return (
     <>
       <Navbar />
       <main className="pricing-page">
+        {/* Hero Section */}
         <section className="price-hero" aria-labelledby="price-hero-title">
           <div className="container">
-            <h1 id="price-hero-title">Transparent pricing for every service</h1>
-            <p className="lead">Pick a package or request a custom quote. Prices are scoped to ship fast with quality.</p>
+            <h1 id="price-hero-title">Simple, Transparent Pricing</h1>
+            <p className="lead">
+              Choose the perfect plan for your needs. All plans include premium support and regular updates.
+            </p>
             <div className="actions">
-              <a href="#grid" className="btn">Explore packages</a>
+              <a href="#grid" className="btn">View Plans</a>
+              <button className="btn-secondary" onClick={()=>setOpen(true)}>
+                Get Custom Quote
+              </button>
             </div>
-            <div className="pills" aria-label="Services">
+            
+            {/* Filter Pills */}
+            <div className="pills" aria-label="Filter plans">
               {pills.map((p,i)=> (
-                <button key={i} type="button" onClick={()=>onSelect(p)} className={`pill ${selected===p?'active':''}`}>{p}</button>
+                <button 
+                  key={i} 
+                  type="button" 
+                  onClick={()=>onSelect(p)} 
+                  className={`pill ${selected===p?'active':''}`}
+                >
+                  {p}
+                </button>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="grid" className="price-grid" aria-label="Pricing options">
+        {/* Pricing Grid */}
+        <section id="grid" className="price-grid" aria-label="Pricing plans">
           <div className="container grid">
-            {filtered.map((c,i)=> (
-              <article key={`${c.title}-${i}`} className={`card ${c.highlight?'highlight':''}`} style={{transitionDelay:`${i*60}ms`}}>
-                <h3>{c.title}</h3>
-                <p className="desc">{c.desc}</p>
-                <div className="amount">{c.price}</div>
-                <ul className="features">
-                  {c.features.map((f,j)=>(<li key={j}>{f}</li>))}
-                </ul>
-                <button className="btn cta-dark" onClick={()=>setOpen(true)}>Get started</button>
-              </article>
-            ))}
+            {loading ? (
+              <div style={{
+                gridColumn: '1 / -1',
+                textAlign: 'center',
+                padding: '4rem 2rem',
+                color: '#6b7280'
+              }}>
+                <div style={{fontSize: '2rem', marginBottom: '1rem'}}>⏳</div>
+                <p>Loading pricing plans...</p>
+              </div>
+            ) : filtered.length === 0 ? (
+              <div style={{
+                gridColumn: '1 / -1',
+                textAlign: 'center',
+                padding: '4rem 2rem'
+              }}>
+                <div style={{fontSize: '3rem', marginBottom: '1rem'}}>📋</div>
+                <h3 style={{marginBottom: '.5rem'}}>No Plans Available</h3>
+                <p style={{color: '#6b7280', marginBottom: '1.5rem'}}>
+                  {selected === 'All' 
+                    ? 'No pricing plans are currently available.' 
+                    : `No ${selected.toLowerCase()} plans available.`}
+                </p>
+                <button className="btn" onClick={()=>setOpen(true)}>
+                  Request Custom Quote
+                </button>
+              </div>
+            ) : (
+              filtered.map((plan, i) => (
+                <article 
+                  key={plan._id || i} 
+                  className={`pricing-card ${plan.recommended ? 'highlight' : ''}`}
+                  style={{transitionDelay: `${i * 60}ms`}}
+                >
+                  {plan.recommended && (
+                    <div className="recommended-badge">
+                      ⭐ Recommended
+                    </div>
+                  )}
+                  
+                  <div className="card-header">
+                    <h3>{plan.name}</h3>
+                    <div className="price-wrapper">
+                      <div className="amount">{formatPrice(plan)}</div>
+                      {getPricingSubtext(plan) && (
+                        <div className="price-subtext">{getPricingSubtext(plan)}</div>
+                      )}
+                    </div>
+                  </div>
 
-            {/* Last two special cards (swapped order) */}
-            <article className="card special alt" style={{transitionDelay:`${cards.length*60}ms`}}>
-              <h3>Maintenance & Support</h3>
-              <p className="desc">Keep your product running smoothly with monthly support and improvements.</p>
-              <ul className="features">
-                <li>Bug fixes & patches</li>
-                <li>Performance checks</li>
-                <li>Minor enhancements</li>
-                <li>Monthly report</li>
-              </ul>
-              <button className="btn cta-dark" onClick={()=>setOpen(true)}>Contact sales</button>
-            </article>
-            <article className="card special" style={{transitionDelay:`${(cards.length+1)*60}ms`}}>
-              <div className="special-art" aria-hidden="true" />
-              <h3>Need a Custom Quote?</h3>
-              <p className="desc">Tell us what you want to build — we’ll tailor a plan to your scope.</p>
-              <button className="btn cta-dark" onClick={()=>setOpen(true)}>Get started →</button>
-            </article>
+                  {plan.features && plan.features.length > 0 && (
+                    <ul className="features">
+                      {plan.features.map((feature, j) => (
+                        <li key={j}>
+                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{flexShrink: 0}}>
+                            <circle cx="10" cy="10" r="9" fill="#10b981" opacity="0.1"/>
+                            <path d="M6 10l2.5 2.5L14 7" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <button 
+                    className="btn cta-dark" 
+                    onClick={()=>setOpen(true)}
+                    style={{marginTop: 'auto'}}
+                  >
+                    {plan.planType === 'custom' ? 'Get Quote' : 'Get Started'}
+                  </button>
+                </article>
+              ))
+            )}
+
+            {/* Additional CTAs */}
+            {!loading && filtered.length > 0 && (
+              <>
+                <article className="pricing-card special" style={{transitionDelay: `${filtered.length * 60}ms`}}>
+                  <div className="special-icon" style={{fontSize: '3rem', marginBottom: '1rem'}}>
+                    🛠️
+                  </div>
+                  <h3>Maintenance & Support</h3>
+                  <p className="desc">
+                    Keep your product running smoothly with ongoing support, updates, and improvements.
+                  </p>
+                  <ul className="features" style={{marginTop: '1.5rem', marginBottom: '1.5rem'}}>
+                    <li>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="9" fill="#6366f1" opacity="0.1"/>
+                        <path d="M6 10l2.5 2.5L14 7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Bug fixes & patches</span>
+                    </li>
+                    <li>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="9" fill="#6366f1" opacity="0.1"/>
+                        <path d="M6 10l2.5 2.5L14 7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Performance monitoring</span>
+                    </li>
+                    <li>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="9" fill="#6366f1" opacity="0.1"/>
+                        <path d="M6 10l2.5 2.5L14 7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Monthly reports</span>
+                    </li>
+                  </ul>
+                  <button className="btn cta-dark" onClick={()=>setOpen(true)}>
+                    Contact Sales
+                  </button>
+                </article>
+
+                <article className="pricing-card special alt" style={{transitionDelay: `${(filtered.length + 1) * 60}ms`}}>
+                  <div className="special-art" aria-hidden="true">
+                    <div style={{fontSize: '3rem', marginBottom: '1rem'}}>💬</div>
+                  </div>
+                  <h3>Need Something Custom?</h3>
+                  <p className="desc">
+                    Have unique requirements? Let's discuss a tailored solution that fits your exact needs.
+                  </p>
+                  <button className="btn cta-dark" onClick={()=>setOpen(true)} style={{marginTop: '2rem'}}>
+                    Get Custom Quote →
+                  </button>
+                </article>
+              </>
+            )}
           </div>
         </section>
+
+        {/* Features Comparison (Optional) */}
+        {!loading && plans.length > 0 && (
+          <section className="pricing-features" style={{padding: '4rem 0', background: '#f9fafb'}}>
+            <div className="container">
+              <div style={{textAlign: 'center', marginBottom: '3rem'}}>
+                <h2 style={{fontSize: '2rem', marginBottom: '.5rem'}}>Why Choose Our Services?</h2>
+                <p style={{color: '#6b7280', maxWidth: '600px', margin: '0 auto'}}>
+                  Every plan includes our commitment to quality, transparency, and exceptional support.
+                </p>
+              </div>
+              
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '2rem'
+              }}>
+                <div style={{textAlign: 'center'}}>
+                  <div style={{fontSize: '2.5rem', marginBottom: '1rem'}}>⚡</div>
+                  <h3 style={{fontSize: '1.125rem', marginBottom: '.5rem'}}>Fast Delivery</h3>
+                  <p style={{color: '#6b7280', fontSize: '.875rem'}}>
+                    Quick turnaround times without compromising quality
+                  </p>
+                </div>
+                
+                <div style={{textAlign: 'center'}}>
+                  <div style={{fontSize: '2.5rem', marginBottom: '1rem'}}>🎯</div>
+                  <h3 style={{fontSize: '1.125rem', marginBottom: '.5rem'}}>Quality First</h3>
+                  <p style={{color: '#6b7280', fontSize: '.875rem'}}>
+                    Premium code, design, and user experience in every project
+                  </p>
+                </div>
+                
+                <div style={{textAlign: 'center'}}>
+                  <div style={{fontSize: '2.5rem', marginBottom: '1rem'}}>💬</div>
+                  <h3 style={{fontSize: '1.125rem', marginBottom: '.5rem'}}>Dedicated Support</h3>
+                  <p style={{color: '#6b7280', fontSize: '.875rem'}}>
+                    Direct communication and ongoing assistance
+                  </p>
+                </div>
+                
+                <div style={{textAlign: 'center'}}>
+                  <div style={{fontSize: '2.5rem', marginBottom: '1rem'}}>🔒</div>
+                  <h3 style={{fontSize: '1.125rem', marginBottom: '.5rem'}}>Secure & Scalable</h3>
+                  <p style={{color: '#6b7280', fontSize: '.875rem'}}>
+                    Built with best practices and future growth in mind
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
+      
       <PricingQuoteModal open={open} onClose={()=>setOpen(false)} />
       <Footer />
     </>

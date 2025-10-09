@@ -5,6 +5,7 @@ import About from '../pages/About';
 import Services from '../pages/Services';
 import ServiceDetail from '../pages/ServiceDetail';
 import Portfolio from '../pages/Portfolio';
+import PortfolioDetail from '../pages/PortfolioDetail';
 import Team from '../pages/Team';
 import Blog from '../pages/Blog';
 import Contact from '../pages/Contact';
@@ -41,6 +42,7 @@ export default function PublicRoutes() {
         <Route path="/services" element={<Services />} />
         <Route path="/services/:slug" element={<ServiceDetail />} />
         <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/portfolio/:slug" element={<PortfolioDetail />} />
         <Route path="/team" element={<Team />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/contact" element={<Contact />} />

@@ -1,42 +1,81 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ServiceAPI } from '../../lib/api';
+import { API_BASE } from '../../lib/api';
 
-export default function ServicesList(){
+export default function ServicesList() {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
-  const publishedCount = useMemo(()=> items.filter(s=>s.published!==false).length, [items]);
+  const publishedCount = useMemo(() => items.filter(s => s.published !== false).length, [items]);
 
-  useEffect(()=>{
-    let mounted = true;
-    (async()=>{
-      setLoading(true); setError('');
-      try{
-        const { items } = await ServiceAPI.list();
-        if(mounted) setItems(items||[]);
-      }catch(err){ if(mounted) setError(err.message||'Failed to load services'); }
-      finally{ if(mounted) setLoading(false); }
-    })();
-    return ()=>{ mounted=false };
-  },[]);
+  async function fetchServices() {
+    setLoading(true);
+    setError('');
+    try {
+      console.log('[ServicesList] 🔵 Fetching services...');
+      const res = await ServiceAPI.list();
+      
+      console.log('[ServicesList] 📦 Response:', res);
+      
+      let data = [];
+      
+      // Handle different response formats
+      if (Array.isArray(res)) {
+        data = res;
+      } else if (res && typeof res === 'object') {
+        if (res.items && Array.isArray(res.items)) {
+          data = res.items;
+        } else if (res.data && Array.isArray(res.data)) {
+          data = res.data;
+        }
+      }
+      
+      console.log('[ServicesList] ✅ Final data:', data.length, 'items');
+      setItems(data);
+      
+    } catch (err) {
+      console.error('[ServicesList] ❌ Error:', err);
+      setError(err.message || 'Failed to load services');
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  const filtered = useMemo(()=>{
+  const didFetchRef = useRef(false);
+  useEffect(() => {
+    if (!didFetchRef.current) {
+      didFetchRef.current = true;
+      fetchServices();
+    }
+    
+    const onUpdated = () => fetchServices();
+    window.addEventListener('services:updated', onUpdated);
+    return () => window.removeEventListener('services:updated', onUpdated);
+  }, []);
+
+  const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
-    if(!term) return items;
-    return items.filter(s => (s.title||'').toLowerCase().includes(term) || (s.description||'').toLowerCase().includes(term));
-  },[q, items]);
+    if (!term) return items;
+    return items.filter(s => 
+      (s.title || '').toLowerCase().includes(term) || 
+      (s.description || '').toLowerCase().includes(term)
+    );
+  }, [q, items]);
 
-  async function handleDelete(id){
-    if(!window.confirm('Delete this service?')) return;
-    try{
+  async function handleDelete(id) {
+    if (!window.confirm('Delete this service?')) return;
+    try {
       await ServiceAPI.remove(id);
-      setItems(prev=>prev.filter(s=>s._id!==id));
-    }catch(err){ alert(err.message||'Failed to delete'); }
+      setItems(prev => prev.filter(s => s._id !== id));
+    } catch (err) { 
+      alert(err.message || 'Failed to delete'); 
+    }
   }
 
   return (
@@ -45,19 +84,8 @@ export default function ServicesList(){
       <main className="admin-content">
         <AdminTopbar />
         <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem'}}>
-          <h1 style={{margin:0}}>Services</h1>
-          <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
-            <div className="admin-search" style={{maxWidth:280}}>
-              <span className="admin-search__icon" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8"/>
-                  <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                </svg>
-              </span>
-              <input className="admin-search__input" placeholder="Search services..." value={q} onChange={e=>setQ(e.target.value)} />
-            </div>
-            <Link to="/admin/services/new" className="btn">Add Service</Link>
-          </div>
+          <h1>Services</h1>
+          <Link to="/admin/services/new" className="btn">Add Service</Link>
         </div>
 
         {/* Totals strip */}
@@ -69,36 +97,31 @@ export default function ServicesList(){
         )}
 
         {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+        
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
 
         {!loading && !error && (
           filtered.length ? (
-            <div className="card" style={{marginTop:'1rem'}}>
-              <div className="table" role="table">
-                <div className="table-row head" role="row">
-                  <div role="columnheader">Title</div>
-                  <div role="columnheader">Published</div>
-                  <div role="columnheader">Order</div>
-                  <div role="columnheader">Actions</div>
-                </div>
-                {filtered.map(s => (
-                  <div className="table-row" role="row" key={s._id}>
-                    <div role="cell">{s.title}</div>
-                    <div role="cell"><span className="badge">{s.published? 'Yes':'No'}</span></div>
-                    <div role="cell">{s.order ?? 0}</div>
-                    <div role="cell" style={{display:'flex',gap:'.4rem'}}>
-                      <button className="btn-secondary" onClick={()=>navigate(`/admin/services/${s._id}`)}>Edit</button>
-                      <button className="btn-secondary" onClick={()=>handleDelete(s._id)} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
-                    </div>
+            <div className="grid three" style={{marginTop:'1rem'}}>
+              {filtered.map(s => (
+                <div className="card" key={s._id} style={{display:'grid',gap:'.5rem'}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem'}}>
+                    <h3 style={{margin:0}}>{s.title || 'Untitled Service'}</h3>
+                    <span className="badge">{s.published === true ? 'Published' : 'Draft'}</span>
                   </div>
-                ))}
-              </div>
+                  {s.description && <p style={{margin:0}}>{s.description}</p>}
+                  <div style={{display:'flex',gap:'.4rem',marginTop:'.25rem'}}>
+                    <button className="btn-secondary" onClick={()=>navigate(`/admin/services/${s._id}`)}>Edit</button>
+                    <button className="btn-secondary" onClick={()=>handleDelete(s._id)} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="card" style={{marginTop:'1rem',textAlign:'center',padding:'2rem'}}>
               <h3 style={{marginTop:0}}>No Services Yet</h3>
               <p style={{opacity:.8,marginTop:'.25rem'}}>Add your first service to display on the public site.</p>
-              <Link to="/admin/services/new" className="btn" style={{marginTop:'.5rem'}}>Add a Service</Link>
+              <Link to="/admin/services/new" className="btn" style={{marginTop:'.5rem'}}>Add Service</Link>
             </div>
           )
         )}

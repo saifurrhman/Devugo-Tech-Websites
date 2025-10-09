@@ -72,11 +72,15 @@ export default function ServiceEdit(){
         const { item } = await ServiceAPI.create(payload);
         // assign plans to this new service
         await syncPlanLinks(item._id, [], selectedPlans);
+        // Notify lists to refresh
+        try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}
         navigate('/admin/services');
       } else {
         const before = selectedPlansBefore;
         const { item } = await ServiceAPI.update(id, payload);
         await syncPlanLinks(item._id, before, selectedPlans);
+        // Notify lists to refresh
+        try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}
         setMessage('Saved');
       }
     }catch(err){ setError(err.message||'Failed to save'); }
@@ -102,7 +106,7 @@ export default function ServiceEdit(){
     if (isNew) return;
     if(!window.confirm('Delete this service?')) return;
     setSaving(true); setError(''); setMessage('');
-    try{ await ServiceAPI.remove(id); navigate('/admin/services'); }
+    try{ await ServiceAPI.remove(id); try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}; navigate('/admin/services'); }
     catch(err){ setError(err.message||'Failed to delete'); }
     finally{ setSaving(false); }
   }
@@ -122,7 +126,7 @@ export default function ServiceEdit(){
   return (
     <div className="admin-layout">
       <AdminSidebar />
-      <main className="admin-content">
+      <main className="admin-content create-post">
         <AdminTopbar />
 
         <div className="page-bar sticky">

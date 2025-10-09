@@ -139,8 +139,12 @@ export default function AdminBlogCreate(){
                 style={{minHeight:180}}
                 contentEditable
                 suppressContentEditableWarning
-                onInput={(e)=> setForm(f=>({...f, content: e.currentTarget.innerHTML}))}
-                dangerouslySetInnerHTML={{ __html: form.content }}
+                onInput={(e)=>{
+                  // Guard against null currentTarget in edge cases
+                  const html = e.currentTarget?.innerHTML ?? e.target?.innerHTML ?? editorRef.current?.innerHTML ?? '';
+                  setForm(f=>({...f, content: html }));
+                }}
+                dangerouslySetInnerHTML={{ __html: form.content || '' }}
                 aria-label="Post content editor"
               />
               <div className="hint">Use headings, lists, and emphasis to format your post.</div>

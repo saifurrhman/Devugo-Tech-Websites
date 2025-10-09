@@ -36,7 +36,7 @@ export default function TeamList(){
       <main className="admin-content">
         <AdminTopbar />
         <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem'}}>
-          <h1 style={{margin:0}}>Team</h1>
+          <h1>Team</h1>
           <Link to="/admin/team/new" className="btn">Add Member</Link>
         </div>
 

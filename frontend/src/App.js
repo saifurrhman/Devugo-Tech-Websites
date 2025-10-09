@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE } from "./lib/api";
 
 function App() {
   const [message, setMessage] = useState("Loading...");
 
   useEffect(() => {
-    fetch("http://localhost:5000/") // backend API endpoint
+    fetch(`${API_BASE}/`) // backend API endpoint (auto-detected host)
       .then((res) => res.json())    // convert response to JSON
       .then((data) => setMessage(data.message)) // set state
       .catch((err) => setMessage("Error connecting to backend 😢"));

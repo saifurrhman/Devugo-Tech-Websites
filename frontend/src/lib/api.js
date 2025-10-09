@@ -1,19 +1,52 @@
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+// Prefer env, otherwise auto-detect backend at same host on port 5000
+const __DEFAULT_API_BASE__ = (typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:5000`
+  : 'http://localhost:5000');
+export const API_BASE = process.env.REACT_APP_API_BASE || __DEFAULT_API_BASE__;
+
+// ✅ Helper to get token from localStorage (supports admin token)
+function getToken() {
+  // Prefer explicit admin token, then fall back to general keys
+  return (
+    localStorage.getItem('adminToken') ||
+    localStorage.getItem('token') ||
+    localStorage.getItem('authToken')
+  );
+}
 
 export async function api(path, { method = 'GET', body, token } = {}){
   const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  
+  // ✅ Auto-attach token if not provided
+  const authToken = token || getToken();
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`;
+  }
+  
+  console.log(`📡 API: ${method} ${path}`, { hasToken: !!authToken });
+  
   const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
     credentials: 'include',
   });
+  
+  // Handle 204 No Content (DELETE responses)
+  if (res.status === 204) {
+    console.log(`✅ API: ${method} ${path} - No Content`);
+    return {};
+  }
+  
   const data = await res.json().catch(()=>({}));
+  
   if (!res.ok) {
+    console.error(`❌ API: ${method} ${path}`, { status: res.status, error: data });
     const message = data?.error || data?.message || `Request failed (${res.status})`;
     throw new Error(message);
   }
+  
+  console.log(`✅ API: ${method} ${path}`, data);
   return data;
 }
 
@@ -49,8 +82,14 @@ export const UploadAPI = {
   image: (dataUrl, filename) => api('/api/upload/image', { method: 'POST', body: { dataUrl, filename } }),
 };
 
+// ✅ FIXED: ServiceAPI with auto-token
 export const ServiceAPI = {
-  list: () => api('/api/services', { method: 'GET' }),
+  // Admin: all services (draft + published)
+  list: () => api('/api/services', { method: 'GET' }), // ✅ Token auto-attach hoga
+  
+  // Public: published-only
+  listPublic: () => api('/api/services/public', { method: 'GET' }),
+  
   get: (id) => api(`/api/services/${id}`, { method: 'GET' }),
   create: (payload) => api('/api/services', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/services/${id}`, { method: 'PUT', body: payload }),

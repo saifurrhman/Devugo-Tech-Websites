@@ -65,7 +65,7 @@ export default function BlogList(){
       <main className="admin-content">
         <AdminTopbar />
         <div className="toolbar" style={{display:'flex',gap:'.6rem',alignItems:'center',justifyContent:'space-between'}}>
-          <h1 style={{margin:0}}>Blog</h1>
+          <h1>Blog</h1>
           <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
             <div className="admin-search" style={{maxWidth:280}}>
               <span className="admin-search__icon" aria-hidden="true">

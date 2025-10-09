@@ -1,7 +1,8 @@
+
 import React, { useEffect, useMemo, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { AnalyticsAPI, ContactAPI } from '../../lib/api';
+import { AnalyticsAPI, ContactAPI, ServiceAPI, PricingAPI, PortfolioAPI, TeamAPI, BlogAPI } from '../../lib/api';
 
 function StatCard({ label, value, sub }){
   return (
@@ -34,6 +35,8 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [summary, setSummary] = useState(null);
   const [contactsCount, setContactsCount] = useState(null);
+  const [activeTab, setActiveTab] = useState('services');
+  const [tabData, setTabData] = useState({}); // { services: [], pricing: [], portfolio: [], blog: [], team: [], contacts: [] }
 
   useEffect(()=>{
     let mounted = true;
@@ -71,6 +74,30 @@ export default function Dashboard() {
   const contactsTotal = contactsCount != null ? contactsCount : totals.contacts;
   const last7 = summary?.last7 || { visitors: [], contacts: [] };
   const recent = summary?.recent || {};
+
+  // Lazy-load tab data on demand
+  useEffect(()=>{
+    let mounted = true;
+    async function loadTab(key){
+      try{
+        if (tabData[key]) return; // already loaded
+        let items = [];
+        if (key === 'services'){ const res = await ServiceAPI.list(); items = (res.items||[]).sort((a,b)=> new Date(b.updatedAt||b.createdAt) - new Date(a.updatedAt||a.createdAt)); }
+        if (key === 'pricing'){ const res = await PricingAPI.list(); items = (res.items||[]).sort((a,b)=> new Date(b.updatedAt||b.createdAt) - new Date(a.updatedAt||a.createdAt)); }
+        if (key === 'portfolio'){ const res = await PortfolioAPI.list(); items = (res.items||[]).sort((a,b)=> new Date(b.updatedAt||b.createdAt) - new Date(a.updatedAt||a.createdAt)); }
+        if (key === 'blog'){
+          const res = await BlogAPI.list();
+          items = (res.items || res.posts || res || []);
+          items = items.sort((a,b)=> new Date(b.updatedAt||b.createdAt||b.publishedAt) - new Date(a.updatedAt||a.createdAt||a.publishedAt));
+        }
+        if (key === 'team'){ const res = await TeamAPI.list(); items = (res.members||[]).sort((a,b)=> new Date(b.updatedAt||b.createdAt) - new Date(a.updatedAt||a.createdAt)); }
+        if (key === 'contacts'){ const res = await ContactAPI.list(); items = (Array.isArray(res)? res : (res.items||[])).sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)); }
+        if(mounted) setTabData(prev=>({ ...prev, [key]: items.slice(0,5) }));
+      }catch(_e){ /* ignore */ }
+    }
+    loadTab(activeTab);
+    return ()=>{ mounted=false };
+  }, [activeTab, tabData]);
 
   return (
     <div className="admin-layout">
@@ -182,7 +209,50 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* Modules Activity Tabs */}
+        <div className="card" style={{padding:'1rem', marginTop:'1rem'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem',flexWrap:'wrap'}}>
+            <strong>Modules Activity</strong>
+            <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap'}}>
+              {['services','pricing','portfolio','blog','team','contacts'].map(key => (
+                <button key={key} className={`btn-secondary${activeTab===key? ' active':''}`} onClick={()=>setActiveTab(key)}>{key[0].toUpperCase()+key.slice(1)}</button>
+              ))}
+            </div>
+          </div>
+          <div className="divider" style={{margin:'.5rem 0'}}></div>
+          <div>
+            {activeTab==='services' && <ActivityList items={tabData.services} type="service" />}
+            {activeTab==='pricing' && <ActivityList items={tabData.pricing} type="pricing" />}
+            {activeTab==='portfolio' && <ActivityList items={tabData.portfolio} type="portfolio" />}
+            {activeTab==='blog' && <ActivityList items={tabData.blog} type="blog" />}
+            {activeTab==='team' && <ActivityList items={tabData.team} type="team" />}
+            {activeTab==='contacts' && <ActivityList items={tabData.contacts} type="contact" />}
+          </div>
+        </div>
       </main>
     </div>
+  );
+}
+
+function ActivityList({ items=[], type }){
+  if(!items || !items.length) return <div className="muted">No recent items.</div>;
+  return (
+    <ul style={{listStyle:'none', padding:0, margin:0, display:'grid', gap:'.5rem'}}>
+      {items.map((it, idx)=>{
+        const title = it.title || it.name || it.subject || it.email || 'Untitled';
+        const date = it.updatedAt || it.createdAt || it.publishedAt;
+        const right = type==='pricing' ? `$${it.priceMonthly||0}/mo` : (type==='blog' ? (it.published? 'Published':'Draft') : (type==='service'? (it.published? 'Published':'Draft') : undefined));
+        return (
+          <li key={it._id||idx} style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',gap:'.5rem',borderBottom:'1px solid var(--admin-border)',paddingBottom:'.35rem'}}>
+            <div style={{minWidth:0}}>
+              <strong style={{display:'block',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</strong>
+              {date && <small className="muted">{new Date(date).toLocaleString()}</small>}
+            </div>
+            {right && <span className="badge">{right}</span>}
+          </li>
+        );
+      })}
+    </ul>
   );
 }

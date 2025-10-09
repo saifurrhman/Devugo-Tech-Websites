@@ -16,9 +16,9 @@ export default function Signup(){
     setLoading(true);
     setMessage('');
     try {
-      const { user, token } = await AuthAPI.signup(form);
-      localStorage.setItem('adminToken', token);
-      localStorage.setItem('adminUser', JSON.stringify(user));
+      const data = await AuthAPI.signup(form);
+      const user = data?.user;
+      if (user) localStorage.setItem('adminUser', JSON.stringify(user));
       if (!localStorage.getItem('adminTheme')) localStorage.setItem('adminTheme','admin-dark');
       window.location.assign('/admin');
     } catch (err) {
@@ -29,46 +29,83 @@ export default function Signup(){
   }
 
   return (
-    <div className="admin-auth center" style={{ minHeight: '70vh' }}>
-      <form onSubmit={onSubmit} className="card auth-card">
-        <h2 style={{ marginBottom: '.5rem' }}>Admin Signup</h2>
-        <h3 className="auth-subtitle" style={{ marginBottom: '1rem' }}>Create an admin account</h3>
-        <div className="form-grid">
-          <label className="form-field">
-            <span className="form-label">Full Name</span>
-            <input name="name" placeholder="Devugo Admin" value={form.name} onChange={onChange} required />
-          </label>
-          <label className="form-field">
-            <span className="form-label">Email</span>
-            <input name="email" type="email" placeholder="you@company.com" value={form.email} onChange={onChange} required />
-          </label>
-          <label className="form-field">
-            <span className="form-label">Password</span>
-            <div className="password-field">
-              <input name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={onChange} required />
-              <button type="button" className="password-toggle" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?'Hide password':'Show password'}>
-                {showPassword ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.8"/>
-                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" strokeWidth="1.8"/>
-                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/>
-                  </svg>
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" strokeWidth="1.8"/>
-                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/>
-                  </svg>
-                )}
-              </button>
+    <div
+      className="flex items-center justify-center min-h-screen relative overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #0E2F4A 0%, #0B3B63 60%, #07253F 100%)' }}
+    >
+      {/* Background accents */}
+      <div className="absolute top-20 left-20 w-64 h-64 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-32 right-32 w-96 h-96 bg-blue-400 rounded-full opacity-15 animate-pulse" style={{animationDelay: '1s'}}></div>
+      <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-blue-600 rounded-full opacity-25 animate-pulse" style={{animationDelay: '0.5s'}}></div>
+
+      <div className="flex w-full max-w-6xl mx-4 bg-white rounded-3xl shadow-2xl overflow-hidden relative z-10 animate-fadeIn">
+        {/* Left welcome */}
+        <div
+          className="hidden lg:flex lg:w-1/2 p-12 flex-col justify-center relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #0E2F4A 0%, #0B3B63 60%, #07253F 100%)' }}
+        >
+          <div className="absolute top-16 left-16 w-40 h-40 bg-blue-500 rounded-3xl opacity-20 transform rotate-12 animate-float"></div>
+          <div className="absolute bottom-32 left-20 w-72 h-72 bg-blue-400 rounded-full opacity-15 animate-float" style={{animationDelay: '1s'}}></div>
+          <div className="relative z-10">
+
+            <div className="mb-8">
+               <div className="inline-flex items-center justify-center w-36 h-36 rounded-2xl p-2 mb-6 shadow-xl ring-1 ring-gray-200 bg-white hover:scale-105 transition-transform duration-300">
+                 <div className="w-full h-full rounded-xl flex items-center justify-center p-2">
+                   <img src="/Devugo Tech.png" alt="Devugo Tech" className="h-24 w-auto object-contain select-none" />
+                 </div>
+               </div>
+               <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">Create Account</h1>
+              <div className="w-20 h-1 bg-white opacity-50 mb-6 rounded-full"></div>
             </div>
-          </label>
-          <button className="btn btn-primary" type="submit" disabled={loading}>{loading ? 'Creating...' : 'Create Account'}</button>
-          {message && <div className="surface" style={{ padding: '.75rem', marginTop: '.25rem' }}>{message}</div>}
+            <p className="text-blue-100 leading-relaxed text-lg">Join Devugo Tech Admin to manage portfolio, blog, pricing, and more.</p>
+          </div>
         </div>
-        <div className="auth-footer">
-          <a href="/admin/login">Already have an account? Login</a>
+
+        {/* Right form */}
+        <div className="w-full lg:w-1/2 p-12 flex flex-col justify-center relative" style={{ background: 'linear-gradient(135deg, #F8FAFF 0%, #FFFFFF 100%)' }}>
+          <div className="absolute -right-32 bottom-0 w-80 h-80 bg-blue-400 rounded-full opacity-5"></div>
+          <div className="relative z-10 max-w-md mx-auto w-full">
+             <div className="text-center mb-6">
+              
+              </div>
+             <h2 className="text-4xl font-bold text-gray-900 mb-3">Sign Up</h2>
+            <p className="text-gray-500 mb-8">Create your administrator account</p>
+
+            <form onSubmit={onSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                <input name="name" placeholder="Devugo Admin" value={form.name} onChange={onChange} required className="w-full px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                <input name="email" type="email" placeholder="you@company.com" value={form.email} onChange={onChange} required className="w-full px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                <div className="relative">
+                  <input name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={onChange} required className="w-full pr-20 px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
+                  <button type="button" onClick={()=>setShowPassword(v=>!v)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-blue-600 font-semibold text-sm">{showPassword ? 'HIDE' : 'SHOW'}</button>
+                </div>
+              </div>
+              <button
+                className="w-full text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl hover:brightness-110"
+                style={{ background: 'linear-gradient(90deg, #0A65CC 0%, #083B8A 100%)' }}
+                type="submit"
+                disabled={loading}
+              >{loading ? 'Creating...' : 'Create Account'}</button>
+              {message && <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg">{message}</div>}
+            </form>
+            <p className="text-center text-sm text-gray-600 mt-6 pt-4 border-t border-gray-200">Already have an account? <a href="/admin/login" className="text-blue-600 hover:text-blue-800 font-bold hover:underline">Login</a></p>
+          </div>
         </div>
-      </form>
+      </div>
+
+      <style jsx>{`
+        @keyframes float { 0%, 100% { transform: translateY(0px) rotate(12deg); } 50% { transform: translateY(-20px) rotate(12deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
+      `}</style>
     </div>
   );
 }

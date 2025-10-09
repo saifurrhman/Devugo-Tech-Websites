@@ -105,7 +105,7 @@ export default function BlogEdit(){
     return (
       <div className="admin-layout">
         <AdminSidebar />
-        <main className="admin-content">
+        <main className="admin-content create-post">
           <AdminTopbar />
           <div className="card" style={{marginTop:'1rem'}}>Loading…</div>
         </main>
@@ -116,7 +116,7 @@ export default function BlogEdit(){
   return (
     <div className="admin-layout">
       <AdminSidebar />
-      <main className="admin-content">
+      <main className="admin-content create-post">
         <AdminTopbar />
         <div className="page-bar sticky">
           <div className="breadcrumbs" aria-label="Breadcrumbs">
@@ -187,8 +187,11 @@ export default function BlogEdit(){
                 style={{minHeight:180}}
                 contentEditable
                 suppressContentEditableWarning
-                onInput={(e)=> setForm(f=>({...f, content: e.currentTarget.innerHTML}))}
-                dangerouslySetInnerHTML={{ __html: form.content }}
+                onInput={(e)=>{
+                  const html = e.currentTarget?.innerHTML ?? e.target?.innerHTML ?? editorRef.current?.innerHTML ?? '';
+                  setForm(f=>({...f, content: html }));
+                }}
+                dangerouslySetInnerHTML={{ __html: form.content || '' }}
                 aria-label="Post content editor"
               />
               <div className="hint">Use headings, lists, and emphasis to format your post.</div>

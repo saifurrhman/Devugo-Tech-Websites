@@ -156,6 +156,33 @@ body.admin-dark .badge{ color:#e6f0ff }
 }
 
 /* ========================= */
+/* Admin layout responsiveness*/
+/* ========================= */
+.admin-layout{ display:grid; grid-template-columns: 260px minmax(0,1fr); gap:1rem; }
+.admin-content{ min-width:0 }
+@media (max-width: 1100px){
+  .admin-layout{ grid-template-columns: 220px minmax(0,1fr); }
+}
+@media (max-width: 920px){
+  /* Collapse sidebar */
+  .admin-layout{ grid-template-columns: 1fr; }
+  .admin-sidebar{ position:sticky; top:8px; z-index:20; background: var(--admin-surface); border:1px solid var(--admin-border); border-radius:14px; padding:.35rem; overflow:auto; }
+  .admin-sidebar .admin-link{ padding:.55rem .6rem; border-radius:10px; }
+  .admin-content{ min-width:0 }
+  /* Make top bar stick to top for mobile */
+  .admin-content > .toolbar:first-of-type{ position:sticky; top:8px; z-index:19; background:rgba(11,38,71,.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border:1px solid var(--admin-border); border-radius:12px; padding:.5rem .6rem; }
+}
+@media (max-width: 640px){
+  /* Compact paddings and make controls fill width */
+  .admin-layout{ gap:.6rem; }
+  .admin-content .toolbar{ gap:.4rem }
+  .admin-content .toolbar .admin-search{ flex: 1 1 auto; min-width: 40%; }
+  .admin-content .toolbar .btn, .admin-content .toolbar .btn-secondary{ padding:.55rem .8rem; border-radius:12px }
+  /* Compact list items */
+  .admin-content .card ul > li{ padding:.45rem .6rem !important; }
+}
+
+/* ========================= */
 /* Admin: Create Post Styles */
 /* ========================= */
 .page-bar{display:flex;align-items:center;justify-content:space-between;background:transparent;border:0;border-radius:12px;padding:.25rem 0;margin-top:.25rem}
@@ -278,14 +305,14 @@ body.admin-dark .create-post .page-title{
 }
 
 /* Create-post uses white cards; ensure dark text for readable contrast even in admin-dark */
+/* Create pages live on dark background outside the white cards.
+   Keep text inside cards dark (rules below), but make header/breadcrumbs light in dark mode for contrast. */
 body.admin-dark .create-post .breadcrumbs a,
-body:not(.admin-light) .create-post .breadcrumbs a{ color:#475569 !important }
-body.admin-dark .create-post .breadcrumbs a:hover,
-body:not(.admin-light) .create-post .breadcrumbs a:hover{ color:#0b1220 !important }
+body.admin-dark .create-post .breadcrumbs span{ color:#e5e7eb !important }
+body.admin-dark .create-post .breadcrumbs a:hover{ color:#ffffff !important }
 body.admin-dark .create-post .breadcrumbs .active,
-body:not(.admin-light) .create-post .breadcrumbs .active{ color:#0f172a !important }
-body.admin-dark .create-post .page-title,
-body:not(.admin-light) .create-post .page-title{ color:#0f172a !important; -webkit-text-fill-color:#0f172a !important }
+body.admin-dark .create-post .breadcrumbs strong{ color:#ffffff !important }
+body.admin-dark .create-post .page-title{ color:#ffffff !important; -webkit-text-fill-color:#ffffff !important }
 .create-post .greeting-card{background:#ffffff !important;border:1px solid #e5e7eb !important;color:#0f172a !important}
 .create-post .section-card{background:#ffffff !important;border:1px solid #e5e7eb !important;box-shadow:0 1px 0 rgba(0,0,0,.02);padding:1.2rem 1.25rem 1.1rem}
 .create-post .section-card{ color:#0f172a }
@@ -565,7 +592,18 @@ body.admin-light p{
   color:#475569;
 }
 
-.container{max-width:1140px;margin:0 auto;padding:0 1rem}
+/* Admin light: ensure readable text across common UI blocks */
+body.admin-light .admin-content{ color:#0f172a }
+body.admin-light .card{ color:#0f172a }
+body.admin-light .card .muted{ color:#475569 }
+/* So badges don't look washed out on white */
+body.admin-light .badge{
+  background: rgba(67,133,205,.12) !important;
+  border: 1px solid #cfe0f8 !important;
+  color: #0b1220 !important;
+}
+
+.container{max-width:1240px;margin:0 auto;padding:0 1.25rem}
 
 /* Navbar */
 .navbar{
@@ -576,24 +614,41 @@ body.admin-light p{
 
   position:sticky;top:0;z-index:50;
 }
+/* Elevate the inner pill when scrolled */
+.navbar.scrolled .nav-inner{ box-shadow:0 12px 28px rgba(0,0,0,.22); }
 .navbar .logo{font-weight:800;letter-spacing:.5px;color:#000;font-size:1.1rem;background:transparent}
 
 /* Inner pill container like the reference */
 .nav-inner{
   display:flex;align-items:center;justify-content:space-between;
-  gap:1rem;
-  padding:.5rem .75rem;
+  gap:1.1rem;
+  padding:.75rem 1rem; /* more x padding */
   background:#ffffff;
   border-radius:999px;
   box-shadow:0 8px 24px rgba(0,0,0,.16);
 }
-.nav-left{padding:.25rem .75rem}
-.nav-center{display:flex;gap:1.25rem;align-items:center;justify-content:center;flex:1}
+.nav-left{padding:.35rem 1rem}
+.nav-center{display:flex;gap:1.6rem;align-items:center;justify-content:center;flex:1}
 .nav-right{display:flex;align-items:center;gap:.5rem;padding:.25rem .25rem}
 
 /* Center links */
-.nav-center a{color:#1f2937;font-weight:500;padding:.5rem .75rem;border-radius:999px}
+.nav-center a{color:#1f2937;font-weight:500;padding:.6rem .9rem;border-radius:999px}
 .nav-center a:hover{background:rgba(32,65,136,0.09);color:#0b1220}
+/* Active route highlight (NavLink adds .active) */
+.nav-center a.active{background:rgba(32,65,136,0.12);color:#0b1220;font-weight:800}
+
+/* Dropdown (desktop) */
+.dropdown{ position: relative; }
+.dropdown > a{ display:inline-flex; align-items:center; gap:.35rem }
+.dropdown .dropdown-menu{
+  position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%);
+  background:#ffffff; border:1px solid #e5e7eb; border-radius:12px;
+  box-shadow:0 16px 42px rgba(0,0,0,.18);
+  padding:.4rem; display:none; min-width:220px; z-index:40;
+}
+.dropdown.open .dropdown-menu{ display:block }
+.dropdown .dropdown-menu a{ display:block; color:#0f172a; padding:.55rem .75rem; border-radius:10px }
+.dropdown .dropdown-menu a:hover{ background:#f1f5f9; color:#0b1220 }
 
 /* Mobile toggle (hidden by default) */
 .mobile-toggle{display:none;position:relative;width:38px;height:38px;border:0;background:transparent;border-radius:10px}
@@ -624,13 +679,31 @@ body.admin-light p{
 .mobile-menu.open{opacity:1; transform: translate(-50%, 0); max-height:70vh; pointer-events:auto}
 .mobile-menu a{display:block;color:#ffffff;padding:.65rem .85rem;border-radius:12px}
 .mobile-menu a:hover{background:rgba(255,255,255,0.12);color:#ffffff}
+/* Active item in mobile menu */
+.mobile-menu a.active{background:rgba(255,255,255,0.18);color:#ffffff;font-weight:800}
 /* nicer CTA inside the mobile menu */
 .mobile-menu .btn, .mobile-menu .cta{display:block;width:100%;text-align:center;margin-top:.5rem;background:rgba(255,255,255,0.12);color:#ffffff;border:1px solid rgba(255,255,255,0.28);border-radius:999px;padding:.7rem 1rem;font-weight:800;letter-spacing:.02em}
 .mobile-menu .btn:hover, .mobile-menu .cta:hover{background:rgba(255,255,255,0.18)}
+
+/* Mobile collapsible submenu */
+.mobile-collapsible{ display:flex; align-items:center; justify-content:space-between; width:100%; color:#ffffff; padding:.65rem .85rem; border-radius:12px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.28) }
+.mobile-collapsible:hover{ background:rgba(255,255,255,0.18) }
+.mobile-collapsible .rot{ transform:rotate(180deg); transition:transform .18s ease }
+.mobile-submenu{ display:none; padding:.25rem 0 .25rem .25rem }
+.mobile-submenu a{ display:block; color:#ffffff; padding:.55rem .85rem; border-radius:10px }
+.mobile-submenu a:hover{ background:rgba(255,255,255,0.12) }
+.mobile-submenu.open{ display:block }
 }
 /* Desktop: never show the mobile dropdown */
 @media (min-width: 1025px){
   .mobile-menu{ display:none !important }
+}
+
+/* XL screens: expand container and spacing a bit more */
+@media (min-width: 1280px){
+  .container{ max-width: 1320px; }
+  .nav-center{ gap: 2rem; }
+  .nav-inner{ padding:.85rem 1.25rem; }
 }
 /* Larger social icons in mobile menu */
 .mobile-menu .social-row{justify-content:center; gap:.65rem}
@@ -1263,24 +1336,35 @@ body.admin-dark .admin-layout .card{
 .admin-content .card{padding:1.15rem}
 
 .admin-sidebar{
-  position:sticky;top:1rem;align-self:start;height:calc(100vh - 2rem);
+  position:sticky;top:.5rem;align-self:start;height:calc(100vh - 1rem);
   border-radius:16px;overflow:hidden;
-  background:var(--admin-surface);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  background:linear-gradient(180deg, var(--admin-surface-strong) 0%, var(--admin-surface) 100%);
+  backdrop-filter:saturate(1.05) blur(8px);-webkit-backdrop-filter:saturate(1.05) blur(8px);
   border:1px solid var(--admin-border);
   box-shadow:0 12px 28px rgba(0,0,0,.20);
   display:flex;flex-direction:column;
 }
-.admin-sidebar__header{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;border-bottom:1px solid var(--admin-border);color:var(--admin-text)}
+.admin-sidebar__header{display:flex;align-items:center;justify-content:space-between;padding:.55rem .8rem;border-bottom:1px solid var(--admin-border);color:var(--admin-text)}
+.admin-sidebar__header .brand{display:flex;align-items:center;gap:.55rem;min-width:0;color:inherit;text-decoration:none}
+.admin-sidebar__header .brand:hover{opacity:.95}
+/* Logo: keep aspect ratio, smaller, no cropping */
+.admin-sidebar__header .brand-logo{display:block;height:34px;width:auto;max-width:42px;object-fit:contain;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.admin-sidebar__header .brand-text{display:flex;flex-direction:column;line-height:1;min-width:0;overflow:hidden}
+.admin-sidebar__header .brand-text span{font-weight:800;font-size:.98rem;color:var(--admin-text);white-space:nowrap;letter-spacing:.1px;overflow:hidden;text-overflow:ellipsis}
+.admin-sidebar__header .brand-text .sub{font-size:.72rem;color:var(--admin-muted);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width: 420px){
+  /* On narrow screens, hide sub text to prevent wrapping */
+  .admin-sidebar__header .brand-text .sub{display:none}
+}
 .admin-sidebar__toggle{background:transparent;border:0;color:var(--admin-text);font-size:1.1rem;cursor:pointer;border-radius:8px;padding:.25rem .5rem}
 .admin-sidebar__toggle:hover{background:var(--admin-surface-strong)}
 
-.admin-sidebar__nav{display:flex;flex-direction:column;padding:.5rem;flex:1}
-.admin-link{display:flex;align-items:center;gap:.6rem;color:var(--admin-muted);padding:.65rem .75rem;border-radius:10px;text-decoration:none}
+.admin-sidebar__nav{display:flex;flex-direction:column;padding:.45rem;flex:1}
+.admin-link{display:flex;align-items:center;gap:.6rem;color:var(--admin-text);padding:.6rem .75rem;border-radius:10px;text-decoration:none}
 .admin-link:hover{background:var(--admin-surface-strong);color:var(--admin-text)}
 .admin-link.active{background:var(--admin-highlight);color:var(--admin-text);border:1px solid var(--admin-highlight-border)}
 .admin-link .icon{width:1.25rem;text-align:center}
-.admin-link .label{white-space:nowrap}
+.admin-link .label{white-space:nowrap;color:var(--admin-text);font-weight:600}
 
 /* Sidebar footer actions */
 .admin-sidebar__footer{margin-top:auto;padding:.6rem;border-top:1px solid var(--admin-border);display:grid;gap:.5rem}
@@ -1293,6 +1377,9 @@ body.admin-dark .admin-layout .card{
 .admin-sidebar.collapsed{width:72px;grid-column:1 / span 1}
 .admin-sidebar.collapsed .label{display:none}
 .admin-sidebar.collapsed .admin-sidebar__header strong{display:none}
+/* Hide brand text when collapsed and center the logo */
+.admin-sidebar.collapsed .brand-text{display:none}
+.admin-sidebar.collapsed .admin-sidebar__header{justify-content:center}
 
 /* Responsive: off-canvas on small screens */
 @media (max-width: 1024px){
@@ -1343,13 +1430,22 @@ body.admin-dark .admin-layout .card{
 .admin-dropdown__item.danger{color:#ff6b6b}
 .admin-dropdown__item.danger:hover{background:rgba(239,68,68,0.18);color:#fff}
 /* Admin Auth Forms */
-.auth-card{width:380px;max-width:92vw;border-radius:16px;background:#ffffff;color:#0f172a;border:1px solid #e5e7eb;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.auth-card{width:380px;max-width:92vw;border-radius:16px;background:#ffffff;color:#0f172a;border:1px solid #e5e7eb;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:1.5rem;}
 .auth-card h1,.auth-card h2,.auth-card h3{color:#0f172a}
 .auth-card p{color:#475569}
 .auth-card .form-label{color:#0f172a}
 .auth-card .auth-subtitle{color:#0f172a;font-weight:700}
-.form-grid{display:grid;gap:.9rem}
+.card.auth-card{ /* reinforce against any later .card overrides */
+  background:#ffffff !important;
+  color:#0f172a !important;
+  border:1px solid #e5e7eb !important;
+}
+.form-grid{display:grid;gap:.9rem;margin-bottom:1rem}
 .form-field{display:grid;gap:.35rem}
+.form-field input{padding:.6rem;border-radius:8px;border:1px solid #e5e7eb;background:#f8fafc}
+.btn{padding:.6rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:#1e40af;color:white}
+.btn-primary:hover{background:#1e3a8a}
 .form-label{font-size:.92rem;color:#0f172a;font-weight:600}
 input.form-field, textarea.form-field{width:100%;display:block}
 .form-field input{width:100%;padding:.85rem 1rem;border-radius:10px;border:1.5px solid #cbd5e1;background:#ffffff;color:#0f172a;outline:none;transition:border-color .15s, box-shadow .15s}
@@ -1399,8 +1495,20 @@ body.admin-light .toolbar select.form-field.filter-select option{background:#fff
 .password-toggle{position:absolute;right:.4rem;top:50%;transform:translateY(-50%);background:#f1f5f9;border:1px solid #e5e7eb;color:#475569;border-radius:8px;padding:.3rem;cursor:pointer;z-index:1}
 .password-toggle:hover{background:#e2e8f0}
 
+/* Center utility class */
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Animated background for admin auth pages */
-.admin-auth{position:relative}
+.admin-auth{
+  position:relative;
+  background-color: #001e3c;
+  min-height: 100vh;
+  width: 100%;
+}
 .admin-auth::before{
   content:"";
   position:fixed; /* cover viewport */

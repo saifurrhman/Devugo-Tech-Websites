@@ -14,7 +14,17 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ];
-const allowedOriginRegex = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/;
+// Allow configuring extra origins via env, e.g. CORS_ORIGINS="https://admin.example.com,https://www.example.com"
+// Support both CORS_ORIGINS (comma-separated) and CORS_ORIGIN (single or comma-separated)
+const extraOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
+if (extraOrigins) {
+  extraOrigins
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .forEach(o => allowedOrigins.push(o));
+}
+const allowedOriginRegex = /^(https?:\/\/)(localhost|127\.0\.0\.1)(:\d+)?$/;
 app.use(cors({
   origin: function(origin, cb){
     if (!origin) return cb(null, true); // SSR or curl
@@ -40,12 +50,33 @@ app.get("/", (req, res) => {
   res.json({ message: "API is running 🚀" });
 });
 
-// Health check: report MongoDB connection state
+// Health check: report MongoDB connection state and quick totals for debugging
 // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', async (_req, res) => {
   const state = mongoose.connection.readyState;
   const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
-  res.json({ dbState: state, dbStateText: states[state] || 'unknown' });
+  const info = {
+    dbState: state,
+    dbStateText: states[state] || 'unknown',
+    dbName: mongoose.connection.name,
+    host: mongoose.connection.host,
+  };
+  try{
+    const Service = require('./models/Service');
+    const PricingPlan = require('./models/PricingPlan');
+    const Portfolio = require('./models/Portfolio');
+    const TeamMember = require('./models/TeamMember');
+    const BlogPost = require('./models/BlogPost');
+    const [services, pricing, portfolio, team, blogs] = await Promise.all([
+      Service.countDocuments({}),
+      PricingPlan.countDocuments({}),
+      Portfolio.countDocuments({}),
+      TeamMember.countDocuments({}),
+      BlogPost.countDocuments({}),
+    ]);
+    info.totals = { services, pricing, portfolio, team, blogs };
+  }catch(_e){ /* ignore in health */ }
+  res.json(info);
 });
 
 // Routes

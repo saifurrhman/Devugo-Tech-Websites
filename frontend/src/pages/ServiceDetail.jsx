@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { ServiceAPI, PricingAPI, api } from '../lib/api';
+import { api } from '../lib/api';
 
 export default function ServiceDetail(){
   const { slug } = useParams();
@@ -16,13 +16,13 @@ export default function ServiceDetail(){
     (async()=>{
       setLoading(true); setError('');
       try{
-        const { items } = await ServiceAPI.list();
-        const found = (items||[]).find(s => (s.slug||'') === slug);
+        // Fetch single published service by slug via public endpoint
+        const { item: found } = await api(`/api/services/slug/${slug}`, { method:'GET' });
         if (!found) throw new Error('Service not found');
         if(mounted) setService(found);
         // Load related pricing if available
         try{
-          const { items: planItems } = await api(`/api/pricing?service=${found._id}`, { method:'GET' });
+          const { items: planItems } = await api(`/api/pricing?service=${found._id}&published=1`, { method:'GET' });
           if(mounted) setPlans(planItems||[]);
         }catch(_e){ if(mounted) setPlans([]); }
       }catch(err){ if(mounted) setError(err.message||'Failed to load service'); }

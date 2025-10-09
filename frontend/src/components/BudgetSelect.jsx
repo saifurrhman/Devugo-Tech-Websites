@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+  import React, { useState, useRef, useEffect } from 'react';
 
 export default function BudgetSelect({ value, onChange, placeholder = 'Select a range', name = 'budget' }){
   const [open, setOpen] = useState(false);

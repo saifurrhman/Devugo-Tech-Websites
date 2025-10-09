@@ -37,7 +37,7 @@ export default function PortfolioList(){
       <main className="admin-content">
         <AdminTopbar />
         <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem'}}>
-          <h1 style={{margin:0}}>Portfolio</h1>
+          <h1>Portfolio</h1>
           <Link to="/admin/portfolio/new" className="btn">Add Project</Link>
         </div>
         {/* Totals strip */}

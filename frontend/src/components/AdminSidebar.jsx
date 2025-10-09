@@ -39,17 +39,19 @@ export default function AdminSidebar() {
     try{ localStorage.removeItem('adminUser'); localStorage.removeItem('adminToken'); }catch(_e){}
     navigate('/admin/login');
   }
-
   return (
     <>
     {isMobile && open && <div className="admin-backdrop" onClick={()=>setOpen(false)} aria-hidden="true"></div>}
     <aside className={`admin-sidebar ${open ? 'open' : 'collapsed'}`} aria-label="Admin sidebar navigation">
       <div className="admin-sidebar__header">
-        <strong>Admin</strong>
+        <NavLink to="/admin" className="brand" aria-label="Go to Admin dashboard" title="Devugo Tech">
+          <img className="brand-logo" src="/Devugo Tech.png" alt="Devugo Tech Logo" />
+          <div className="brand-text">
+            <span>Devugo</span>
+            <small className="sub">Tech Solutions</small>
+          </div>
+        </NavLink>
         <div style={{display:'flex',gap:'.35rem'}}>
-          {/* <button className="admin-sidebar__toggle" title={theme==='admin-light'?'Switch to dark':'Switch to light'} aria-label="Toggle theme" onClick={()=>setTheme(t=>t==='admin-light'?'admin-dark':'admin-light')}>
-            {theme==='admin-light' ? '☾' : '☀'}
-          </button> */}
           <button className="admin-sidebar__toggle" onClick={toggle} aria-expanded={open} aria-label="Toggle sidebar">≡</button>
         </div>
       </div>
