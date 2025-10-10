@@ -7,6 +7,7 @@ const PortfolioSchema = new mongoose.Schema(
     description: String,
     thumbnails: [String],
     tags: [String],
+    techStack: [String],
     url: String,
     client: String,
     featured: { type: Boolean, default: false },

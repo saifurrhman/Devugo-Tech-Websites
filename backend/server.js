@@ -98,6 +98,12 @@ const portfolioRoutes = require('./routes/portfolio');
 app.use('/api/portfolio', portfolioRoutes);
 const teamRoutes = require('./routes/team');
 app.use('/api/team', teamRoutes);
+// Portfolio Categories
+const portfolioCategoryRoutes = require('./routes/portfolioCategories');
+app.use('/api/portfolio-categories', portfolioCategoryRoutes);
+// Tech Stack
+const techStackRoutes = require('./routes/techStack');
+app.use('/api/tech-stack', techStackRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

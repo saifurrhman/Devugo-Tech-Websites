@@ -32,6 +32,8 @@ import ServiceEdit from '../admin/pages/ServiceEdit';
 import PricingPlans from '../admin/pages/PricingPlans';
 import Leads from '../admin/pages/Leads';
 import LeadEdit from '../admin/pages/LeadEdit';
+import PortfolioCategories from '../admin/pages/PortfolioCategories';
+import TechStack from '../admin/pages/TechStack';
 
 export default function PublicRoutes() {
   return (
@@ -69,6 +71,8 @@ export default function PublicRoutes() {
         <Route path="/admin/services" element={<ProtectedRoute><ServicesList /></ProtectedRoute>} />
         <Route path="/admin/services/:id" element={<ProtectedRoute><ServiceEdit /></ProtectedRoute>} />
         <Route path="/admin/pricing" element={<ProtectedRoute><PricingPlans /></ProtectedRoute>} />
+        <Route path="/admin/portfolio-categories" element={<ProtectedRoute><PortfolioCategories /></ProtectedRoute>} />
+        <Route path="/admin/tech-stack" element={<ProtectedRoute><TechStack /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

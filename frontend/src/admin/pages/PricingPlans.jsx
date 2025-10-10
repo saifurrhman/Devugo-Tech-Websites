@@ -44,7 +44,7 @@ function PlanForm({ initial, onCancel, onSave }){
     <form onSubmit={handleSubmit} className="card" style={{marginTop:'1rem', padding: '1.5rem'}}>
       {error && <div style={{marginBottom:'.5rem',padding:'.75rem',background:'#fee2e2',color:'#991b1b',borderRadius:'6px',fontSize:'.875rem'}}>{error}</div>}
       
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
         <label style={{display:'flex',flexDirection:'column',gap:'.35rem'}}>
           <span style={{fontWeight:500,fontSize:'.875rem'}}>Plan Name</span>
           <input 
@@ -315,7 +315,7 @@ export default function PricingPlans(){
       <main className="admin-content" style={{padding:'1.5rem'}}>
         <AdminTopbar />
         
-        <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem'}}>
+        <div className="toolbar flex flex-wrap items-center justify-between gap-2 sm:gap-3" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem'}}>
           <h1 style={{margin:0}}>Pricing Plans</h1>
           <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
             <div className="admin-search" style={{maxWidth:280}}>
@@ -355,7 +355,7 @@ export default function PricingPlans(){
 
         {!loading && !error && !showForm && !editItem && (
           filtered.length ? (
-            <div className="grid three" style={{marginTop:'1rem'}}>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" style={{marginTop:'1rem'}}>
               {filtered.map(p => (
                 <div className="card" key={p._id} style={{display:'grid',gap:'.5rem'}}>
                   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem'}}>

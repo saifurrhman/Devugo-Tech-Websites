@@ -5,13 +5,14 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
   const location = useLocation();
 
   const toggle = () => setOpen((v) => !v);
   const close = () => setOpen(false);
 
   // Close mobile menu on route change
-  useEffect(() => { setOpen(false); setSolutionsOpen(false); }, [location.pathname]);
+  useEffect(() => { setOpen(false); setSolutionsOpen(false); setServicesOpen(false); }, [location.pathname]);
 
   // Elevate navbar on scroll
   useEffect(() => {
@@ -31,7 +32,26 @@ export default function Navbar() {
           <div className="nav-center">
             <NavLink to="/" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Home</NavLink>
             <NavLink to="/about" onClick={close} className={({isActive})=> isActive? 'active': undefined}>About</NavLink>
-            <NavLink to="/services" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Services</NavLink>
+            {/* Services with dropdown (desktop) */}
+            <div
+              className={`dropdown${servicesOpen ? ' open' : ''}`}
+              onMouseEnter={()=>setServicesOpen(true)}
+              onMouseLeave={()=>setServicesOpen(false)}
+            >
+              <NavLink
+                to="/services"
+                onClick={close}
+                className={({isActive})=> isActive? 'active': undefined}
+                aria-haspopup="true"
+                aria-expanded={servicesOpen}
+              >
+                Services
+              </NavLink>
+              <div className="dropdown-menu" role="menu">
+                <Link to="/solutions" role="menuitem" onClick={close}>Solutions</Link>
+                <Link to="/pricing" role="menuitem" onClick={close}>Pricing</Link>
+              </div>
+            </div>
             {/* Solutions with dropdown (desktop) */}
             <div
               className={`dropdown${solutionsOpen ? ' open' : ''}`}
@@ -54,7 +74,6 @@ export default function Navbar() {
                 <Link to="/solutions#landing" role="menuitem" onClick={close}>Landing Pages</Link>
               </div>
             </div>
-            <NavLink to="/pricing" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Pricing</NavLink>
             <NavLink to="/portfolio" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Portfolio</NavLink>
             <NavLink to="/team" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Team</NavLink>
             <NavLink to="/contact" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Contact</NavLink>
@@ -72,7 +91,22 @@ export default function Navbar() {
         <div className={`mobile-menu ${open ? 'open' : ''}`} aria-hidden={!open}>
           <NavLink to="/" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Home</NavLink>
           <NavLink to="/about" onClick={close} className={({isActive})=> isActive? 'active': undefined}>About</NavLink>
-          <NavLink to="/services" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Services</NavLink>
+          
+          {/* Mobile: Services collapsible */}
+          <button
+            className="mobile-collapsible"
+            aria-expanded={servicesOpen}
+            onClick={()=>setServicesOpen(v=>!v)}
+          >
+            <span>Services</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" className={servicesOpen? 'rot': ''}><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2"/></svg>
+          </button>
+          <div className={`mobile-submenu ${servicesOpen? 'open':''}`}> 
+            <Link to="/services" onClick={close}>All Services</Link>
+            <Link to="/solutions" onClick={close}>Solutions</Link>
+            <Link to="/pricing" onClick={close}>Pricing</Link>
+          </div>
+          
           {/* Mobile: Solutions collapsible */}
           <button
             className="mobile-collapsible"
@@ -88,7 +122,6 @@ export default function Navbar() {
             <Link to="/solutions#saas" onClick={close}>SaaS</Link>
             <Link to="/solutions#landing" onClick={close}>Landing Pages</Link>
           </div>
-          <NavLink to="/pricing" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Pricing</NavLink>
           <NavLink to="/portfolio" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Portfolio</NavLink>
           <NavLink to="/team" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Team</NavLink>
           <NavLink to="/contact" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Contact</NavLink>

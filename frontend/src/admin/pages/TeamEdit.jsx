@@ -114,7 +114,7 @@ export default function TeamEdit(){
         {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
 
         <form onSubmit={handleSave} style={{marginTop:'1rem'}}>
-          <div className="grid two" style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) 320px',gap:'1rem'}}>
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-4">
             <div className="stack" style={{display:'grid',gap:'1rem'}}>
               <section className="section-card">
                 <h3>Basic details</h3>
@@ -183,9 +183,9 @@ export default function TeamEdit(){
           </div>
 
           <div className="bottom-actions">
-            <div className="container" style={{display:'flex',justifyContent:'space-between',gap:'.75rem'}}>
-              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/team')}>Back</button>
-              <div style={{display:'flex',gap:'.6rem'}}>
+            <div className="container flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
+              <button type="button" className="btn-secondary lg order-2 sm:order-1" onClick={()=>navigate('/admin/team')}>Back</button>
+              <div className="flex gap-2 sm:gap-3 order-1 sm:order-2">
                 {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
                 <button type="submit" className="btn lg" disabled={saving}>{saving? 'Saving…':'Save'}</button>
               </div>

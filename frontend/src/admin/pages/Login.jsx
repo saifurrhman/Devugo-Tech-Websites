@@ -57,12 +57,8 @@ export default function Login(){
           <div className="relative z-10">
             {/* Company Logo */}
             <div className="mb-8">
-               <div className="inline-flex items-center justify-center w-36 h-36 rounded-2xl p-2 mb-6 shadow-xl ring-1 ring-gray-200 bg-white hover:scale-105 transition-transform duration-300">
-                 <div className="w-full h-full rounded-xl flex items-center justify-center p-2">
-                   <img src="/Devugo Tech.png" alt="Devugo Tech" className="h-24 w-auto object-contain select-none" />
-                 </div>
-               </div>
-                <h1 className="text-6xl font-bold text-white mb-4 tracking-tight">WELCOME</h1>
+
+              <h1 className="text-6xl font-bold text-white mb-4 tracking-tight">WELCOME</h1>
               <div className="w-20 h-1 bg-white opacity-50 mb-6 rounded-full"></div>
             </div>
             
@@ -103,7 +99,7 @@ export default function Login(){
           <div className="relative z-10 max-w-md mx-auto w-full">
             {/* Brand Logo (all screens) */}
             <div className="text-center mb-6">
-              
+              <img src="/assets/Devugo%20Tech.png" alt="Devugo Tech" className="h-10 w-auto mx-auto drop-shadow" />
             </div>
 
             <h2 className="text-4xl font-bold text-gray-900 mb-3">Sign In</h2>

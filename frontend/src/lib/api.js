@@ -76,6 +76,15 @@ export const ContactAPI = {
 
 export const AnalyticsAPI = {
   summary: () => api('/api/analytics/summary', { method: 'GET' }),
+  summaryRange: ({ range, from, to } = {}) => {
+    const params = new URLSearchParams();
+    if (range) params.set('range', String(range));
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const q = params.toString();
+    const path = '/api/analytics/summary' + (q ? `?${q}` : '');
+    return api(path, { method: 'GET' });
+  },
 };
 
 export const UploadAPI = {
@@ -110,6 +119,22 @@ export const PortfolioAPI = {
   create: (payload) => api('/api/portfolio', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/portfolio/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/portfolio/${id}`, { method: 'DELETE' }),
+};
+
+export const PortfolioCategoryAPI = {
+  list: () => api('/api/portfolio-categories', { method: 'GET' }),
+  get: (id) => api(`/api/portfolio-categories/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/portfolio-categories', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/portfolio-categories/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/portfolio-categories/${id}`, { method: 'DELETE' }),
+};
+
+export const TechStackAPI = {
+  list: () => api('/api/tech-stack', { method: 'GET' }),
+  get: (id) => api(`/api/tech-stack/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/tech-stack', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/tech-stack/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/tech-stack/${id}`, { method: 'DELETE' }),
 };
 
 export const TeamAPI = {

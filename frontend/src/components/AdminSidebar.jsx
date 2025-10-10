@@ -18,18 +18,32 @@ export default function AdminSidebar() {
 
   // Responsive: collapse on small screens by default
   useEffect(()=>{
-    const mq = window.matchMedia('(max-width: 1024px)');
+    const mq = window.matchMedia('(max-width: 920px)');
     const apply = () => {
       const mobile = mq.matches;
       setIsMobile(mobile);
       setOpen(!mobile); // open on desktop, collapsed on mobile
     };
     apply();
-    mq.addEventListener?.('change', apply);
+    
+    // Use the standard event listener pattern for better compatibility
+    const handleMediaChange = (e) => apply();
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handleMediaChange);
+    } else if (mq.addListener) {
+      // Fallback for older browsers
+      mq.addListener(handleMediaChange);
+    }
+    
     const onToggle = () => setOpen(v => !v);
     window.addEventListener('toggle-admin-sidebar', onToggle);
+    
     return () => {
-      mq.removeEventListener?.('change', apply);
+      if (mq.removeEventListener) {
+        mq.removeEventListener('change', handleMediaChange);
+      } else if (mq.removeListener) {
+        mq.removeListener(handleMediaChange);
+      }
       window.removeEventListener('toggle-admin-sidebar', onToggle);
     };
   },[]);
@@ -52,7 +66,7 @@ export default function AdminSidebar() {
           </div>
         </NavLink>
         <div style={{display:'flex',gap:'.35rem'}}>
-          <button className="admin-sidebar__toggle" onClick={toggle} aria-expanded={open} aria-label="Toggle sidebar">≡</button>
+          <button className="admin-sidebar__toggle" onClick={toggle} aria-expanded={open} aria-label="Toggle sidebar" style={{fontSize: '24px', padding: '4px 8px'}}>≡</button>
         </div>
       </div>
 
