@@ -1,15 +1,14 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
-import ServicesSection from '../components/ServicesSection';
 import PortfolioCategories from '../components/PortfolioCategories';
-import PricingSection from '../components/PricingSection';
 import HomeCta from '../components/HomeCta';
 import HomeFaq from '../components/HomeFaq';
 import WhyChoose from '../components/WhyChoose';
 import Footer from '../components/Footer';
 import SocialFloating from '../components/SocialFloating';
 import HomePortfolio from '../components/HomePortfolio';
+import ReviewsSection from '../components/ReviewsSection';
 
 export default function Home() {
   return (
@@ -19,11 +18,10 @@ export default function Home() {
       <Hero />
       <PortfolioCategories />
       <HomePortfolio limit={6} />
-      <ServicesSection variant="home" />
       <WhyChoose />
-      <PricingSection showCustom={false} />
       <HomeFaq />
       <HomeCta />
+      <ReviewsSection title="What clients say" subtitle="Real feedback from our partners" limit={6} featuredOnly={false} mode="carousel" />
       <Footer />
     </>
   );

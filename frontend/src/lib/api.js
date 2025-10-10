@@ -14,6 +14,17 @@ function getToken() {
   );
 }
 
+// Small helper to build query string from params object
+function buildQuery(params = {}){
+  const entries = Object.entries(params).filter(([,v]) => v !== undefined && v !== null && v !== '');
+  if (!entries.length) return '';
+  const qs = new URLSearchParams();
+  for (const [k,v] of entries){
+    qs.set(k, String(v));
+  }
+  return `?${qs.toString()}`;
+}
+
 export async function api(path, { method = 'GET', body, token } = {}){
   const headers = { 'Content-Type': 'application/json' };
   
@@ -135,6 +146,14 @@ export const TechStackAPI = {
   create: (payload) => api('/api/tech-stack', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/tech-stack/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/tech-stack/${id}`, { method: 'DELETE' }),
+};
+
+export const ClientReviewAPI = {
+  list: (params={}) => api('/api/reviews' + buildQuery(params), { method: 'GET' }),
+  get: (id) => api(`/api/reviews/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/reviews', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/reviews/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/reviews/${id}`, { method: 'DELETE' }),
 };
 
 export const TeamAPI = {

@@ -41,6 +41,7 @@ export default function PortfolioList(){
           <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
             <Link to="/admin/portfolio-categories" className="btn-secondary">Portfolio Categories</Link>
             <Link to="/admin/tech-stack" className="btn-secondary">Tech Stack</Link>
+            <Link to="/admin/reviews" className="btn-secondary">Reviews</Link>
             <Link to="/admin/portfolio/new" className="btn">Add Project</Link>
           </div>
         </div>

@@ -34,6 +34,8 @@ import Leads from '../admin/pages/Leads';
 import LeadEdit from '../admin/pages/LeadEdit';
 import PortfolioCategories from '../admin/pages/PortfolioCategories';
 import TechStack from '../admin/pages/TechStack';
+import ReviewsList from '../admin/pages/ReviewsList';
+import ReviewEdit from '../admin/pages/ReviewEdit';
 
 export default function PublicRoutes() {
   return (
@@ -73,6 +75,8 @@ export default function PublicRoutes() {
         <Route path="/admin/pricing" element={<ProtectedRoute><PricingPlans /></ProtectedRoute>} />
         <Route path="/admin/portfolio-categories" element={<ProtectedRoute><PortfolioCategories /></ProtectedRoute>} />
         <Route path="/admin/tech-stack" element={<ProtectedRoute><TechStack /></ProtectedRoute>} />
+        <Route path="/admin/reviews" element={<ProtectedRoute><ReviewsList /></ProtectedRoute>} />
+        <Route path="/admin/reviews/:id" element={<ProtectedRoute><ReviewEdit /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

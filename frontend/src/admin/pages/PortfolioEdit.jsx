@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { PortfolioAPI, UploadAPI, PortfolioCategoryAPI } from '../../lib/api';
+import { PortfolioAPI, UploadAPI, PortfolioCategoryAPI, TechStackAPI } from '../../lib/api';
 export default function PortfolioEdit(){
   const { id } = useParams();
   const isNew = id === 'new' || !id;
@@ -21,6 +21,7 @@ export default function PortfolioEdit(){
     featured: false,
   });
   const [categories, setCategories] = useState([]);
+  const [techOptions, setTechOptions] = useState([]);
 
   useEffect(()=>{
     if (isNew) return;
@@ -56,6 +57,18 @@ export default function PortfolioEdit(){
       }catch(_e){}
     })();
     return ()=>{ mounted = false };
+  },[]);
+
+  // Load tech stack options for selection chips
+  useEffect(()=>{
+    let mounted = true;
+    (async()=>{
+      try{
+        const { items } = await TechStackAPI.list();
+        if(mounted) setTechOptions(items||[]);
+      }catch(_e){}
+    })();
+    return ()=>{ mounted=false };
   },[]);
 
   async function onFiles(e){
@@ -168,7 +181,29 @@ export default function PortfolioEdit(){
               </section>
 
               <section className="section-card">
-                <h3>Tech stack</h3>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.6rem',flexWrap:'wrap'}}>
+                  <h3 style={{margin:0}}>Tech stack</h3>
+                  <Link to="/admin/tech-stack" className="btn-secondary">Manage Tech Stack</Link>
+                </div>
+                {!!techOptions.length && (
+                  <div className="quick-links" style={{marginTop:'.5rem'}}>
+                    <div className="ql-wrap">
+                      {techOptions.map(opt => {
+                        const name = String(opt.name||'');
+                        const active = (form.techStack||[]).map(x=>String(x).toLowerCase()).includes(name.toLowerCase());
+                        return (
+                          <button type="button" key={opt._id||name} className={`ql ${active? 'active':''}`} onClick={()=>{
+                            setForm(f=>{
+                              const has = (f.techStack||[]).some(x=>String(x).toLowerCase()===name.toLowerCase());
+                              const next = has ? (f.techStack||[]).filter(x=>String(x).toLowerCase()!==name.toLowerCase()) : [ ...(f.techStack||[]), name ];
+                              return { ...f, techStack: next };
+                            });
+                          }}>{name}</button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Technologies (comma separated)</label>
                   <input className="form-field ux-input" value={(form.techStack||[]).join(', ')} onChange={e=>setForm(f=>({...f,techStack:e.target.value.split(',').map(s=>s.trim()).filter(Boolean)}))} placeholder="React, Node.js, Tailwind, MongoDB" />

@@ -101,6 +101,14 @@ export default function AdminSidebar() {
             </svg>
           </span><span className="label">Portfolio</span>
         </NavLink>
+        <NavLink to="/admin/reviews" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
+          <span className="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 5h16v12H7l-3 3V5z" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M8 9h8M8 13h6" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </span><span className="label">Reviews</span>
+        </NavLink>
         <NavLink to="/admin/blog" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
           <span className="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { PortfolioAPI } from '../lib/api';
 import { useLocation } from 'react-router-dom';
+import ReviewsSection from '../components/ReviewsSection';
 import PortfolioCategories from '../components/PortfolioCategories';
 
 export default function Portfolio() {
@@ -71,6 +72,7 @@ export default function Portfolio() {
           )
         )}
       </main>
+      <ReviewsSection title="Client reviews" subtitle="What our clients say about working with us" featuredOnly={false} mode="carousel" />
       <Footer />
     </>
   );

@@ -104,6 +104,9 @@ app.use('/api/portfolio-categories', portfolioCategoryRoutes);
 // Tech Stack
 const techStackRoutes = require('./routes/techStack');
 app.use('/api/tech-stack', techStackRoutes);
+// Client Reviews
+const reviewRoutes = require('./routes/reviews');
+app.use('/api/reviews', reviewRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

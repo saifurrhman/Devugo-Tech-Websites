@@ -948,6 +948,46 @@ body.site-dark .tech-badge, body.admin-dark .tech-badge{ border-color:rgba(255,2
   border-top:0; /* avoid hard seam */
   margin-top:3rem;
 }
+
+/* ========================= */
+/* Reviews Grid               */
+/* ========================= */
+.reviews-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:1.25rem }
+.review-card{ background:rgba(255,255,255,0.9); color:#0f172a; border:1px solid #cbd5e1; border-radius:12px; padding:1.15rem; box-shadow:0 4px 10px rgba(0,0,0,.08); transition:transform .18s ease, box-shadow .18s ease }
+.review-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.12) }
+.review-head{ display:flex; align-items:center; justify-content:space-between; gap:.8rem }
+.review-person{ display:flex; align-items:center; gap:.6rem }
+.review-avatar{ width:42px; height:42px; border-radius:999px; object-fit:cover; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; font-weight:800 }
+.review-avatar.placeholder{ color:#0f172a }
+.review-name{ font-weight:900 }
+.review-meta{ color:#64748b; font-weight:700 }
+.review-stars{ font-weight:900; letter-spacing:.08em; color:#facc15 }
+body.site-dark .review-stars, body.admin-dark .review-stars{ color:#fde047 }
+.review-summary{ margin:.7rem 0 0; color:#0f172a }
+@media (max-width: 1024px){
+  .reviews-grid{ grid-template-columns: 1fr }
+}
+
+/* Reviews carousel */
+.reviews-carousel{ position:relative; overflow:hidden; margin-top:1rem }
+.reviews-track{ display:flex; gap:1rem; align-items:stretch; width:max-content; animation: reviewsScroll 40s linear infinite }
+.reviews-carousel:hover .reviews-track, .reviews-carousel.paused .reviews-track{ animation-play-state: paused }
+.reviews-arrow{ position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:999px; border:1px solid rgba(255,255,255,0.5); background:rgba(15,23,42,0.3); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter: blur(4px) }
+.reviews-arrow.left{ left:0.25rem }
+.reviews-arrow.right{ right:0.25rem }
+.reviews-arrow{ z-index:2 }
+.reviews-arrow:hover{ background:rgba(15,23,42,0.5) }
+.review-card.rc{ min-width: 360px }
+@keyframes reviewsScroll{
+  from{ transform: translateX(0) }
+  to{ transform: translateX(-50%) }
+}
+
+@media (max-width: 640px){
+  .reviews-arrow{ width:32px; height:32px }
+  .reviews-arrow.left{ left:0.25rem }
+  .reviews-arrow.right{ right:0.25rem }
+}
 .footer a{color:var(--color-muted)}
 .footer a:hover{color:#fff}
 
