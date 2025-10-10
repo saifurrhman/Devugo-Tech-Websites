@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ClientReviewAPI } from '../lib/api';
 
-export default function ReviewsSection({ title = 'Client reviews', subtitle = 'What our clients say about working with us', limit = 9, featuredOnly = true, mode = 'grid' /* 'grid' | 'carousel' */ }){
+export default function ReviewsSection({ title = 'Client reviews', subtitle = 'What our clients say about working with us', limit = 9, featuredOnly = true, mode = 'grid' /* 'grid' | 'carousel' */, showArrows = true }){
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -69,12 +69,16 @@ export default function ReviewsSection({ title = 'Client reviews', subtitle = 'W
               </article>
             ))}
           </div>
+          {showArrows && (
           <button type="button" className="reviews-arrow left" aria-label="Previous" onClick={()=>pauseAndScroll(-360)}>
             <svg viewBox="0 0 24 24" width="20" height="20"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
+          )}
+          {showArrows && (
           <button type="button" className="reviews-arrow right" aria-label="Next" onClick={()=>pauseAndScroll(360)}>
             <svg viewBox="0 0 24 24" width="20" height="20"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
+          )}
         </div>
       </section>
     );

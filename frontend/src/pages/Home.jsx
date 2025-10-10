@@ -21,7 +21,7 @@ export default function Home() {
       <WhyChoose />
       <HomeFaq />
       <HomeCta />
-      <ReviewsSection title="What clients say" subtitle="Real feedback from our partners" limit={6} featuredOnly={false} mode="carousel" />
+      <ReviewsSection title="What clients say" subtitle="Real feedback from our partners" limit={6} featuredOnly={false} mode="carousel" showArrows={false} />
       <Footer />
     </>
   );
