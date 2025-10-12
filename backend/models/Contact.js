@@ -8,6 +8,7 @@ const ContactSchema = new mongoose.Schema({
   website: { type: String, trim: true },
   budget: { type: String, trim: true },
   message: { type: String, required: true, trim: true },
+  source: { type: String, trim: true },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Contact', ContactSchema);

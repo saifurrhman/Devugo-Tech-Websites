@@ -72,12 +72,22 @@ export const AuthAPI = {
 };
 
 export const BlogAPI = {
-  list: () => api('/api/blog', { method: 'GET' }),
-  listAll: () => api('/api/blog?all=1', { method: 'GET' }),
+  list: (params = {}) => api('/api/blog' + buildQuery(params), { method: 'GET' }),
+  listAll: (params = {}) => api('/api/blog' + buildQuery({ ...params, all: 1 }), { method: 'GET' }),
   get: (id) => api(`/api/blog/${id}`, { method: 'GET' }),
+  getBySlug: (slug) => api(`/api/blog/slug` /* fallback path not present */, { method: 'GET' })
+    .catch(()=> api('/api/blog' + buildQuery({ slug }), { method: 'GET' })),
   create: (payload) => api('/api/blog', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/blog/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/blog/${id}`, { method: 'DELETE' }),
+};
+
+export const BlogCategoryAPI = {
+  list: () => api('/api/blog-categories', { method: 'GET' }),
+  get: (id) => api(`/api/blog-categories/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/blog-categories', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/blog-categories/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/blog-categories/${id}`, { method: 'DELETE' }),
 };
 
 export const ContactAPI = {
@@ -156,10 +166,28 @@ export const ClientReviewAPI = {
   remove: (id) => api(`/api/reviews/${id}`, { method: 'DELETE' }),
 };
 
+export const ClientFaqAPI = {
+  list: (params={}) => api('/api/faqs' + buildQuery(params), { method: 'GET' }),
+  get: (id) => api(`/api/faqs/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/faqs', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/faqs/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/faqs/${id}`, { method: 'DELETE' }),
+};
+
 export const TeamAPI = {
   list: () => api('/api/team', { method: 'GET' }),
   get: (id) => api(`/api/team/${id}`, { method: 'GET' }),
   create: (payload) => api('/api/team', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/team/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/team/${id}`, { method: 'DELETE' }),
+};
+
+// Forms Config API
+export const FormAPI = {
+  getPublic: (key) => api(`/api/forms/public/${key}`, { method: 'GET' }),
+  list: () => api('/api/forms', { method: 'GET' }),
+  get: (id) => api(`/api/forms/${id}`, { method: 'GET' }),
+  create: (payload) => api('/api/forms', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/forms/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/forms/${id}`, { method: 'DELETE' }),
 };

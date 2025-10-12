@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { TeamAPI } from '../lib/api';
+import PageHero from '../components/PageHero';
 
 export default function Team() {
   const [items, setItems] = useState([]);
@@ -24,8 +25,14 @@ export default function Team() {
   return (
     <>
       <Navbar />
+      <PageHero
+        eyebrow="Our Team"
+        title="Small, senior, focused"
+        subtitle="Meet the team shipping premium websites and apps with craftsmanship and speed."
+        primary={{ href:'/contact', label:'Work with us' }}
+        secondary={{ href:'/portfolio', label:'View work' }}
+      />
       <main className="container">
-        <h1>Our Team</h1>
         {loading && <p>Loading…</p>}
         {error && <p style={{color:'#ef4444'}}>{error}</p>}
         {!loading && !error && (

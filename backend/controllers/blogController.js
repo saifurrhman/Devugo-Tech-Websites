@@ -3,9 +3,25 @@ const BlogPost = require('../models/BlogPost');
 exports.list = async (req, res) => {
   try{
     const isAdminAll = (req.query.all === '1' || req.query.all === 'true') && (req.user || req.isAdmin); // basic check
+    const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+    const limit = Math.min(Math.max(parseInt(req.query.limit || '9', 10), 1), 50);
+    const categorySlug = req.query.category;
+
     const filter = isAdminAll ? {} : { published: true };
-    const posts = await BlogPost.find(filter).sort({ publishedAt: -1, createdAt: -1 });
-    res.json({ posts });
+    if (categorySlug) {
+      // filter posts by category slug
+      const BlogCategory = require('../models/BlogCategory');
+      const cat = await BlogCategory.findOne({ slug: categorySlug });
+      if (cat) filter.categories = cat._id; else filter.categories = null; // no results if missing
+    }
+
+    const total = await BlogPost.countDocuments(filter);
+    const posts = await BlogPost.find(filter)
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate('categories');
+    res.json({ posts, page, total, pages: Math.ceil(total / limit) });
   }catch(err){
     res.status(500).json({ error: 'Server error', details: err.message });
   }
@@ -16,8 +32,8 @@ exports.get = async (req, res) => {
     const { id } = req.params;
     const { slug } = req.query;
     const post = slug
-      ? await BlogPost.findOne({ slug })
-      : await BlogPost.findById(id);
+      ? await BlogPost.findOne({ slug }).populate('categories')
+      : await BlogPost.findById(id).populate('categories');
     if(!post) return res.status(404).json({ error: 'Not found' });
     res.json({ post });
   }catch(err){

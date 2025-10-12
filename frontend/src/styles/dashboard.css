@@ -20,27 +20,11 @@
   }
   
   /* ===== Segmented Navigation Buttons ===== */
-.seg{ display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; justify-content: center; margin-bottom: 1rem; }
-.seg-btn{ background: var(--admin-surface); color: var(--admin-text); border:1px solid var(--admin-border); border-radius:999px; padding:.4rem .75rem; font-weight:700; cursor:pointer }
-.seg-btn{ min-height:36px; line-height:1 }
-.seg-btn:hover{ background: var(--admin-surface-strong) }
-.seg-btn.active{ background: rgba(67,133,205,.16); border-color: var(--admin-highlight-border); color:#e6f0ff }
-
-/* ===== Admin Button Styles ===== */
-.btn, .btn-primary, .btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 100px;
-  min-height: 44px;
-  padding: 0.75rem 1.25rem;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-  margin: 0.5rem 0;
-}
+  .seg{ display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; justify-content: center; margin-bottom: 1rem; }
+  .seg-btn{ background: var(--admin-surface); color: var(--admin-text); border:1px solid var(--admin-border); border-radius:999px; padding:.4rem .75rem; font-weight:700; cursor:pointer }
+  .seg-btn{ min-height:36px; line-height:1 }
+  .seg-btn:hover{ background: var(--admin-surface-strong) }
+  .seg-btn.active{ background: rgba(67,133,205,.16); border-color: var(--admin-highlight-border); color:#e6f0ff }
   
   @media (max-width: 640px) {
     .admin-content {
@@ -69,53 +53,6 @@
     }
     .seg-btn {
       white-space: nowrap;
-    }
-    
-    /* Mobile button styles */
-    .btn, .btn-primary, .btn-secondary, button[type="submit"], button[type="button"] {
-      width: 100%;
-      min-height: 48px;
-      margin: 0.5rem 0;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border-radius: 8px;
-    }
-    
-    /* Fix for Save and Back buttons (generic wrapper) */
-    .page-actions {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      gap: 0.5rem;
-    }
-    
-    .page-actions button, .page-actions .btn, .page-actions a {
-      width: 100%;
-      margin: 0.25rem 0;
-      justify-content: center;
-    }
-
-    /* Fix for Save and Back buttons used in edit pages */
-    .bottom-actions .container {
-      display: flex;
-      flex-direction: column-reverse; /* show primary actions (Save/Delete) above Back */
-      width: 100%;
-      gap: 0.5rem;
-    }
-    .bottom-actions .container > * {
-      width: 100%;
-    }
-    .bottom-actions .container .flex {
-      width: 100%;
-      display: flex;
-      flex-direction: column; /* stack Save and Delete */
-      gap: 0.5rem;
-    }
-    .bottom-actions .container button,
-    .bottom-actions .container a,
-    .bottom-actions .container .btn {
-      width: 100%;
-      justify-content: center;
     }
   }
   

@@ -5,6 +5,7 @@ import { PortfolioAPI } from '../lib/api';
 import { useLocation } from 'react-router-dom';
 import ReviewsSection from '../components/ReviewsSection';
 import PortfolioCategories from '../components/PortfolioCategories';
+import PageHero from '../components/PageHero';
 
 export default function Portfolio() {
   const [items, setItems] = useState([]);
@@ -35,6 +36,13 @@ export default function Portfolio() {
   return (
     <>
       <Navbar />
+      <PageHero
+        eyebrow="Portfolio"
+        title="Work we’re proud of"
+        subtitle="Case studies, websites, and products we’ve shipped for clients."
+        primary={{ href:'/contact', label:'Start a project' }}
+        secondary={{ href:'/services', label:'Explore services' }}
+      />
       <main className="container">
         <PortfolioCategories showHeader={false} />
         <h1 style={{marginTop:'1rem'}}>Portfolio{tag? ` — ${tag}`:''}</h1>

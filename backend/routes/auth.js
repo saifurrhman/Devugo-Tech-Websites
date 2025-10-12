@@ -1,17 +1,20 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/authController');
-const auth = require('../middleware/auth');
+const { requireAuth, requireRole } = require('../middlewares/auth');
 
 // Public
-router.post('/signup', ctrl.signup);
 router.post('/login', ctrl.login);
+router.post('/refresh', ctrl.refresh);
 router.post('/reset-password', ctrl.requestPasswordReset);
 router.post('/reset', ctrl.resetPassword);
 
-// Protected
-router.get('/me', auth, ctrl.getMe);
-router.post('/logout', auth, ctrl.logout);
-router.patch('/me', auth, ctrl.updateMe);
-router.post('/change-password', auth, ctrl.changePassword);
+// Admin/editor create users (unless ALLOW_PUBLIC_SIGNUP=true)
+router.post('/register', requireAuth, requireRole('admin','editor'), ctrl.signup);
+
+// Authenticated
+router.get('/me', requireAuth, ctrl.getMe);
+router.post('/logout', requireAuth, ctrl.logout);
+router.patch('/me', requireAuth, ctrl.updateMe);
+router.post('/change-password', requireAuth, ctrl.changePassword);
 
 module.exports = router;

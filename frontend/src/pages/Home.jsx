@@ -17,7 +17,7 @@ export default function Home() {
       <SocialFloating />
       <Hero />
       <PortfolioCategories />
-      <HomePortfolio limit={6} />
+      <HomePortfolio limit={6} mode="carousel" />
       <WhyChoose />
       <HomeFaq />
       <HomeCta />

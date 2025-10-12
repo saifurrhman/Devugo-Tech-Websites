@@ -2,32 +2,46 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-function signToken(user) {
-  return jwt.sign({ id: user._id, email: user.email, name: user.name }, process.env.JWT_SECRET, {
-    expiresIn: '7d',
-  });
+const ACCESS_TTL = process.env.JWT_ACCESS_TTL || '15m';
+const REFRESH_TTL = process.env.JWT_REFRESH_TTL || '7d';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || JWT_SECRET + '-refresh';
+
+function signAccess(user){
+  return jwt.sign({ id: user._id, email: user.email, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: ACCESS_TTL });
+}
+function signRefresh(user){
+  return jwt.sign({ id: user._id }, REFRESH_SECRET, { expiresIn: REFRESH_TTL });
+}
+function setAuthCookies(res, { accessToken, refreshToken }){
+  const prod = process.env.NODE_ENV === 'production';
+  res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'lax', secure: prod, maxAge: 15 * 60 * 1000 });
+  res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'lax', secure: prod, maxAge: 7 * 24 * 60 * 60 * 1000 });
 }
 
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body || {};
     if (!name || !email || !password) return res.status(400).json({ error: 'Missing fields' });
 
-    const existing = await User.findOne({ email: email.toLowerCase() });
+    // Admin-only signup unless explicitly allowed
+    const allowPublic = String(process.env.ALLOW_PUBLIC_SIGNUP || 'false').toLowerCase() === 'true';
+    if (!allowPublic) {
+      if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'editor')) {
+        return res.status(403).json({ error: 'Signup restricted' });
+      }
+    }
+
+    const existing = await User.findOne({ email: String(email).toLowerCase() });
     if (existing) return res.status(409).json({ error: 'Email already registered' });
 
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email: email.toLowerCase(), password: hash });
-    const token = signToken(user);
-    res
-      .cookie('token', token, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
-      .status(201)
-      .json({ user: { id: user._id, name: user.name, email: user.email } });
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await User.create({ name, email: String(email).toLowerCase(), passwordHash, role: role || 'author' });
+
+    const accessToken = signAccess(user);
+    const refreshToken = signRefresh(user);
+    setAuthCookies(res, { accessToken, refreshToken });
+    res.status(201).json({ user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (err) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
@@ -43,7 +57,7 @@ exports.updateMe = async (req, res) => {
     if (email) updates.email = email.toLowerCase();
     if (typeof phone === 'string') updates.phone = phone;
     if (typeof avatar === 'string') updates.avatar = avatar;
-    const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select('-password');
+    const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select('-passwordHash');
     res.json({ user });
   }catch(err){
     res.status(500).json({ error: 'Server error', details: err.message });
@@ -54,19 +68,15 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Missing credentials' });
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ email: String(email).toLowerCase() });
     if (!user) return res.status(401).json({ error: 'Invalid email or password' });
-    const ok = await bcrypt.compare(password, user.password);
+    const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) return res.status(401).json({ error: 'Invalid email or password' });
-    const token = signToken(user);
-    res
-      .cookie('token', token, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
-      .json({ user: { id: user._id, name: user.name, email: user.email } });
+    user.lastLogin = new Date(); await user.save();
+    const accessToken = signAccess(user);
+    const refreshToken = signRefresh(user);
+    setAuthCookies(res, { accessToken, refreshToken });
+    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (err) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
@@ -76,7 +86,7 @@ exports.getMe = async (req, res) => {
   try {
     // req.user populated by auth middleware
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select('-passwordHash');
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json({ user });
   } catch (err) {
@@ -85,7 +95,9 @@ exports.getMe = async (req, res) => {
 };
 
 exports.logout = async (_req, res) => {
-  res.clearCookie('token', { sameSite: 'lax', secure: process.env.NODE_ENV === 'production' });
+  const prod = process.env.NODE_ENV === 'production';
+  res.clearCookie('accessToken', { sameSite: 'lax', secure: prod });
+  res.clearCookie('refreshToken', { sameSite: 'lax', secure: prod });
   res.json({ message: 'Logged out' });
 };
 
@@ -106,13 +118,29 @@ exports.changePassword = async (req, res) => {
     if(!currentPassword || !newPassword) return res.status(400).json({ error: 'Missing fields' });
     const user = await User.findById(req.user.id);
     if(!user) return res.status(404).json({ error: 'User not found' });
-    const ok = await bcrypt.compare(currentPassword, user.password);
+    const ok = await bcrypt.compare(currentPassword, user.passwordHash);
     if(!ok) return res.status(400).json({ error: 'Current password is incorrect' });
-    user.password = await bcrypt.hash(newPassword, 10);
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
     await user.save();
     res.json({ message: 'Password updated' });
   }catch(err){
     res.status(500).json({ error: 'Server error', details: err.message });
+  }
+};
+
+exports.refresh = async (req, res) => {
+  try{
+    const token = req.cookies && req.cookies.refreshToken;
+    if(!token) return res.status(401).json({ error: 'Unauthorized' });
+    const payload = jwt.verify(token, REFRESH_SECRET);
+    const user = await User.findById(payload.id);
+    if(!user) return res.status(401).json({ error: 'Unauthorized' });
+    const accessToken = signAccess(user);
+    const prod = process.env.NODE_ENV === 'production';
+    res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'lax', secure: prod, maxAge: 15 * 60 * 1000 });
+    res.json({ ok: true });
+  }catch(err){
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 };
 

@@ -5,11 +5,11 @@ const Contact = require('../models/Contact');
 // Create contact submission
 router.post('/', async (req, res) => {
   try {
-    const { name, email, company, phone, website, budget, message } = req.body;
+    const { name, email, company, phone, website, budget, message, source } = req.body;
     if (!name || !email || !message) {
       return res.status(400).json({ error: 'Name, email and message are required' });
     }
-    const created = await Contact.create({ name, email, company, phone, website, budget, message });
+    const created = await Contact.create({ name, email, company, phone, website, budget, message, source });
     return res.status(201).json({ message: 'Submitted', contact: created });
   } catch (err) {
     console.error('Contact create error:', err.message);

@@ -204,6 +204,9 @@ export default function Dashboard() {
   const [recentFeed, setRecentFeed] = useState([]);
   const [legendVisitors, setLegendVisitors] = useState({ current: true, previous: true });
   const [legendContacts, setLegendContacts] = useState({ current: true, previous: true });
+  // Submissions widget state
+  const [subs, setSubs] = useState({ items: [], totals: { today: 0, last7: 0, last30: 0 } });
+  const [toast, setToast] = useState(null); // {title, sub}
 
   useEffect(()=>{
     let mounted = true;
@@ -300,6 +303,54 @@ export default function Dashboard() {
     })();
     return ()=>{ mounted=false };
   },[range, from, to]);
+
+  // Submissions widget loader + lightweight polling for new items
+  useEffect(()=>{
+    let mounted = true;
+    let lastSeenId = null;
+    function computeTotals(list){
+      const now = Date.now();
+      const day = 24*60*60*1000;
+      const startToday = new Date(); startToday.setHours(0,0,0,0);
+      const t0 = startToday.getTime();
+      const t7 = now - 7*day;
+      const t30 = now - 30*day;
+      const today = list.filter(x=> new Date(x.createdAt||0).getTime() >= t0).length;
+      const last7 = list.filter(x=> new Date(x.createdAt||0).getTime() >= t7).length;
+      const last30 = list.filter(x=> new Date(x.createdAt||0).getTime() >= t30).length;
+      return { today, last7, last30 };
+    }
+    async function loadOnce(){
+      try{
+        const res = await ContactAPI.list();
+        const arr = Array.isArray(res) ? res : (res.items||[]);
+        const items = (arr||[]).sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+        if(!mounted) return;
+        setSubs({ items: items.slice(0,5), totals: computeTotals(arr) });
+        lastSeenId = items[0]?._id || items[0]?.id || null;
+      }catch(_e){ /* ignore */ }
+    }
+    async function poll(){
+      try{
+        const res = await ContactAPI.list();
+        const arr = Array.isArray(res) ? res : (res.items||[]);
+        const items = (arr||[]).sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+        if(!mounted) return;
+        // New submission toast
+        const newest = items[0];
+        const newestId = newest?._id || newest?.id || null;
+        if(lastSeenId && newestId && newestId !== lastSeenId){
+          setToast({ title: 'New submission received', sub: `${newest.name||newest.email||'Contact'} • ${new Date(newest.createdAt).toLocaleString()}` });
+          setTimeout(()=> setToast(null), 4000);
+        }
+        lastSeenId = newestId || lastSeenId;
+        setSubs({ items: items.slice(0,5), totals: computeTotals(arr) });
+      }catch(_e){ /* ignore */ }
+    }
+    loadOnce();
+    const id = setInterval(poll, 30000);
+    return ()=>{ mounted=false; clearInterval(id); };
+  },[]);
 
   const totals = {
     visitors: 0, pageviews: 0, contacts: 0, conversions: 0, blogs: 0, leads: 0, services: 0, pricing: 0, portfolio: 0, team: 0, emailsSent: 0, socialPosts: 0,
@@ -676,6 +727,15 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+      {/* Toast */}
+      {toast && (
+        <div style={{position:'fixed', right:'16px', bottom:'16px', zIndex:9999}}>
+          <div className="card" style={{background:'rgba(15,23,42,0.92)', color:'#fff', border:'1px solid rgba(255,255,255,0.18)', padding:'.75rem 1rem', borderRadius:'12px', boxShadow:'0 10px 26px rgba(0,0,0,.35)'}}>
+            <strong style={{display:'block'}}>{toast.title}</strong>
+            <small className="muted" style={{color:'#cbd5e1'}}>{toast.sub}</small>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

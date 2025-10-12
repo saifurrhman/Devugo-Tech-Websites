@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './HomeFaq.css';
-
-const QA = [
-  { q: 'How does the process look like?', a: "We'll send you an onboarding form; after completing it you'll be invited to a Slack workspace for communication. We'll also schedule check-ins so we stay aligned." },
-  { q: 'What\'s included in your UX/CRO Audit?', a: 'Redesigned sections, a 10+ page report, and a Loom walkthrough with clear next steps.' },
-  { q: 'How long does it take to build a custom website or SaaS platform?', a: 'Typical projects ship in 7–30 days depending on scope and integrations.' },
-  { q: 'Do you offer support after launch?', a: 'Yes. We provide maintenance and improvement plans with monthly reports.' },
-  { q: 'What platforms do you work with?', a: 'React/Next.js for web apps, React Native for mobile. Shopify, Webflow, and Wix for platforms.' },
-  { q: 'How many revisions do I get?', a: 'We iterate until it meets the agreed scope and quality. We move fast with clear feedback cycles.' },
-];
+import { ClientFaqAPI } from '../lib/api';
 
 export default function HomeFaq(){
   const [open, setOpen] = useState(0);
+  const [items, setItems] = useState([]);
+
+  useEffect(()=>{
+    let mounted = true;
+    (async()=>{
+      try{
+        const { items } = await ClientFaqAPI.list({ published: true, limit: 6 });
+        if(mounted){
+          const mapped = Array.isArray(items) ? items
+            .sort((a,b)=> (a.order||0) - (b.order||0))
+            .slice(0, 6)
+            .map(i=>({ q: i.question, a: i.answer })) : [];
+          setItems(mapped);
+        }
+      }catch(_e){ setItems([]); }
+    })();
+    return ()=>{ mounted=false };
+  },[]);
+  if (!items.length) return null;
   return (
     <section className="home-faq" aria-labelledby="faq-title">
       <div className="container">
@@ -20,7 +31,7 @@ export default function HomeFaq(){
           <p>Got questions? We've got answers. Explore our FAQs to find solutions to common queries. Need something specific? <a href="mailto:hello@devugo.tech">hello@devugo.tech</a></p>
         </div>
         <div className="faq-right">
-          {QA.map((item, i)=> (
+          {items.map((item, i)=> (
             <div key={i} className={`faq-item ${open===i ? 'open' : ''}`}>
               <button className="faq-q" aria-expanded={open===i} onClick={()=> setOpen(open===i ? -1 : i)}>
                 <span className="q-text">{item.q}</span>

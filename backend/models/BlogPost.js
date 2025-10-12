@@ -9,6 +9,7 @@ const BlogPostSchema = new mongoose.Schema(
     coverImage: String,
     featuredImage: String,
     galleryImages: [String],
+    categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogCategory' }],
     featured: { type: Boolean, default: false },
     tags: [String],
     seo: {

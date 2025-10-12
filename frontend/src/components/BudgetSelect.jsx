@@ -1,16 +1,19 @@
   import React, { useState, useRef, useEffect } from 'react';
 
-export default function BudgetSelect({ value, onChange, placeholder = 'Select a range', name = 'budget' }){
+export default function BudgetSelect({ value, onChange, placeholder = 'Select a range', name = 'budget', options: optionsProp }){
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
 
-  const options = [
+  const defaultOptions = [
     { value: '<2k', label: 'Less than $2,000' },
     { value: '2k-5k', label: '$2,000 – $5,000' },
     { value: '5k-10k', label: '$5,000 – $10,000' },
     { value: '>10k', label: 'More than $10,000' },
   ];
+  const options = Array.isArray(optionsProp) && optionsProp.length
+    ? optionsProp.map(o=> ({ value: o.value || o.label, label: o.label || String(o.value) }))
+    : defaultOptions;
 
   function selectOption(val){
     onChange({ target: { name, value: val } });

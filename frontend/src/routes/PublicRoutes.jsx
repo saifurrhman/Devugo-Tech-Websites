@@ -33,9 +33,15 @@ import PricingPlans from '../admin/pages/PricingPlans';
 import Leads from '../admin/pages/Leads';
 import LeadEdit from '../admin/pages/LeadEdit';
 import PortfolioCategories from '../admin/pages/PortfolioCategories';
+import BlogCategories from '../admin/pages/BlogCategories';
 import TechStack from '../admin/pages/TechStack';
 import ReviewsList from '../admin/pages/ReviewsList';
 import ReviewEdit from '../admin/pages/ReviewEdit';
+import FAQsList from '../admin/pages/FAQsList';
+import FAQEdit from '../admin/pages/FAQEdit';
+import Forms from '../admin/pages/Forms';
+import Faq from '../pages/Faq';
+import SocialLinks from '../admin/pages/SocialLinks';
 
 export default function PublicRoutes() {
   return (
@@ -46,6 +52,7 @@ export default function PublicRoutes() {
         <Route path="/services" element={<Services />} />
         <Route path="/services/:slug" element={<ServiceDetail />} />
         <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/faq" element={<Faq />} />
         <Route path="/portfolio/:slug" element={<PortfolioDetail />} />
         <Route path="/team" element={<Team />} />
         <Route path="/blog" element={<Blog />} />
@@ -74,9 +81,14 @@ export default function PublicRoutes() {
         <Route path="/admin/services/:id" element={<ProtectedRoute><ServiceEdit /></ProtectedRoute>} />
         <Route path="/admin/pricing" element={<ProtectedRoute><PricingPlans /></ProtectedRoute>} />
         <Route path="/admin/portfolio-categories" element={<ProtectedRoute><PortfolioCategories /></ProtectedRoute>} />
+        <Route path="/admin/blog/categories" element={<ProtectedRoute><BlogCategories /></ProtectedRoute>} />
         <Route path="/admin/tech-stack" element={<ProtectedRoute><TechStack /></ProtectedRoute>} />
         <Route path="/admin/reviews" element={<ProtectedRoute><ReviewsList /></ProtectedRoute>} />
         <Route path="/admin/reviews/:id" element={<ProtectedRoute><ReviewEdit /></ProtectedRoute>} />
+        <Route path="/admin/faqs" element={<ProtectedRoute><FAQsList /></ProtectedRoute>} />
+        <Route path="/admin/faqs/:id" element={<ProtectedRoute><FAQEdit /></ProtectedRoute>} />
+        <Route path="/admin/forms" element={<ProtectedRoute><Forms /></ProtectedRoute>} />
+        <Route path="/admin/social-links" element={<ProtectedRoute><SocialLinks /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

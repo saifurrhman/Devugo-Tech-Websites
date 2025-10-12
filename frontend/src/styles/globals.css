@@ -216,14 +216,10 @@ body.admin-light .tone-amber{ background: linear-gradient(180deg, #ffffff 0%, #f
 /* Quick links */
 .quick-links{ border-radius:14px }
 .quick-links .ql-wrap{ display:flex; gap:.5rem; flex-wrap:wrap }
-.quick-links .ql{ display:inline-flex; align-items:center; padding:.45rem .75rem; border-radius:999px; border:1px solid var(--admin-border); background: var(--admin-surface); color: var(--admin-text); font-weight:700; cursor:pointer; user-select:none }
+.quick-links .ql{ display:inline-flex; align-items:center; padding:.45rem .75rem; border-radius:999px; border:1px solid var(--admin-border); background: var(--admin-surface); color: var(--admin-text); font-weight:700 }
 .quick-links .ql:hover{ background: var(--admin-surface-strong) }
 body.admin-light .quick-links .ql{ background:#f8fafc; border-color:#e5e7eb; color:#0f172a }
 body.admin-light .quick-links .ql:hover{ background:#f1f5f9 }
-/* In create/edit white cards, force high-contrast chips */
-.create-post .quick-links .ql{ background:#f8fafc !important; border-color:#e5e7eb !important; color:#0f172a !important }
-.create-post .quick-links .ql:hover{ background:#eef2f7 !important }
-.create-post .quick-links .ql.active{ background:#e7f0fd !important; border-color:#cfe0f8 !important; color:#0b1220 !important }
 
 /* Segmented range control */
 .seg{ display:flex; align-items:center; gap:.4rem; flex-wrap:wrap }
@@ -546,6 +542,20 @@ body.admin-dark .create-post .section-card strong{
 .create-post aside.section-card label{ color:#0f172a !important; font-weight:600 }
 .create-post aside.section-card .muted{ color:#64748b !important }
 .create-post aside.section-card h4{ color:#0f172a !important }
+/* Editor contentEditable field should also be dark-on-white */
+.create-post .editor .form-field[contenteditable="true"]{
+  background:#ffffff !important;
+  color:#0b1220 !important;
+  border:1.5px solid #d0d7e2 !important;
+  border-radius:18px !important;
+  padding:1rem 1.15rem !important;
+  min-height:220px !important;
+  line-height:1.5 !important;
+  caret-color:#0b1220 !important;
+}
+.create-post .editor .form-field[contenteditable="true"] *{
+  color:#0b1220 !important;
+}
 /* Sidebar Preview card should be white with dark text */
 .create-post aside.section-card .card{
   background:#ffffff !important;
@@ -591,28 +601,6 @@ body.admin-dark .create-post aside.section-card .btn-secondary:hover{
 .settings-card .divider{height:1px;background:rgba(255,255,255,0.12);margin:.6rem 0}
 .btn-secondary{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.22);border-radius:10px;padding:.55rem .9rem}
 .btn-secondary:hover{background:rgba(255,255,255,0.16)}
-/* Ensure anchor buttons keep white text on dark backgrounds */
-a.btn-secondary{ color:#ffffff !important; text-decoration:none }
-a.btn-secondary:hover{ color:#ffffff !important }
-a.btn-secondary:visited{ color:#ffffff !important }
-a.btn-secondary:focus{ color:#ffffff !important }
-
-/* In admin edit pages (white cards), use dark text for secondary buttons */
-body.admin-dark .create-post .section-card .btn-secondary,
-body.admin-light .create-post .section-card .btn-secondary,
-body.admin-dark .create-post .section-card a.btn-secondary,
-body.admin-light .create-post .section-card a.btn-secondary{
-  background:#f1f5f9 !important;
-  color:#0f172a !important;
-  border:1px solid #dbe1ea !important;
-}
-body.admin-dark .create-post .section-card .btn-secondary:hover,
-body.admin-light .create-post .section-card .btn-secondary:hover,
-body.admin-dark .create-post .section-card a.btn-secondary:hover,
-body.admin-light .create-post .section-card a.btn-secondary:hover{
-  background:#e9eef5 !important;
-  color:#0f172a !important;
-}
 
 /* Light theme tweaks */
 body.admin-light .settings-card{background:linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);border:1px solid #e5e7eb}
@@ -625,6 +613,21 @@ body.admin-light .btn-secondary{background:#f1f5f9;color:#0f172a;border:1px soli
 body.admin-dark .bottom-actions{ background:linear-gradient(180deg, rgba(11,38,71,0) 0%, rgba(11,38,71,.8) 50%, rgba(11,38,71,.95) 100%); border-top:1px solid rgba(255,255,255,0.12) }
 .btn.lg{ padding:.85rem 1.2rem; border-radius:14px; font-weight:800 }
 .btn-secondary.lg{ padding:.8rem 1.1rem; border-radius:14px; font-weight:700 }
+
+/* Improve link visibility in admin lists/tables for both themes */
+body.admin-dark .admin-content table a,
+body.admin-dark .admin-content .card a{ color:#9ec3ff; text-decoration:none; border-bottom:1px dotted rgba(158,195,255,.45) }
+body.admin-dark .admin-content table a:hover,
+body.admin-dark .admin-content .card a:hover{ color:#ffffff; text-decoration:underline; border-bottom-color:transparent }
+body.admin-dark .admin-content table a:focus-visible,
+body.admin-dark .admin-content .card a:focus-visible{ outline:2px solid rgba(158,195,255,.55); outline-offset:2px; border-bottom-color:transparent }
+
+body.admin-light .admin-content table a,
+body.admin-light .admin-content .card a{ color:#0b5ed7; text-decoration:none; border-bottom:1px dotted rgba(11,94,215,.35) }
+body.admin-light .admin-content table a:hover,
+body.admin-light .admin-content .card a:hover{ color:#0848aa; text-decoration:underline; border-bottom-color:transparent }
+body.admin-light .admin-content table a:focus-visible,
+body.admin-light .admin-content .card a:focus-visible{ outline:2px solid rgba(11,94,215,.45); outline-offset:2px; border-bottom-color:transparent }
 
 /* AdminSidebar active states */
 .admin-sidebar .admin-link.active{ border:1px solid transparent; border-radius:12px }
@@ -641,6 +644,10 @@ body.admin-dark .admin-sidebar .admin-link.active .label{ color:#ffffff; font-we
 /* ========================= */
 /* Global hardening for inputs*/
 /* Applies everywhere to ensure visible text and rounded fields */
+/* Preset social names inside admin Social Links quick select */
+body.admin-dark .admin-content .card .ql-name{ color:#e2e8f0; font-weight:700 }
+body.admin-light .admin-content .card .ql-name{ color:#0f172a; font-weight:700 }
+
 input.form-field,
 textarea.form-field,
 .ux-input{
@@ -762,9 +769,8 @@ body.admin-light .badge{
   /* Inherit the page gradient by keeping navbar transparent */
   background: transparent;
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+
   position:sticky;top:0;z-index:50;
-  width: 100%;
 }
 /* Elevate the inner pill when scrolled */
 .navbar.scrolled .nav-inner{ box-shadow:0 12px 28px rgba(0,0,0,.22); }
@@ -778,8 +784,6 @@ body.admin-light .badge{
   background:#ffffff;
   border-radius:999px;
   box-shadow:0 8px 24px rgba(0,0,0,.16);
-  width: 100%;
-  max-width: 100%;
 }
 .nav-left{padding:.35rem 1rem}
 .nav-center{display:flex;gap:1.6rem;align-items:center;justify-content:center;flex:1}
@@ -795,17 +799,12 @@ body.admin-light .badge{
 .dropdown{ position: relative; }
 .dropdown > a{ display:inline-flex; align-items:center; gap:.35rem }
 .dropdown .dropdown-menu{
-  position:absolute; top:calc(100% + 38px); left:50%; transform:translate(-50%, -6px);
-  background:#ffffff; border:1px solid #e5e7eb; border-radius:14px;
-  box-shadow:0 18px 44px rgba(0,0,0,.18);
-  padding:.55rem; display:none; min-width:240px; z-index:40;
+  position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%);
+  background:#ffffff; border:1px solid #e5e7eb; border-radius:12px;
+  box-shadow:0 16px 42px rgba(0,0,0,.18);
+  padding:.4rem; display:none; min-width:220px; z-index:40;
 }
-.dropdown .dropdown-menu::before{
-  content:""; position:absolute; top:-12px; left:50%; transform:translateX(-50%);
-  width:14px; height:14px; background:#ffffff; border-left:1px solid #e5e7eb; border-top:1px solid #e5e7eb;
-  transform-origin:center; rotate:45deg; border-top-left-radius:3px;
-}
-.dropdown.open .dropdown-menu{ display:block; transform:translate(-50%, 0) }
+.dropdown.open .dropdown-menu{ display:block }
 .dropdown .dropdown-menu a{ display:block; color:#0f172a; padding:.55rem .75rem; border-radius:10px }
 .dropdown .dropdown-menu a:hover{ background:#f1f5f9; color:#0b1220 }
 
@@ -822,25 +821,21 @@ body.admin-light .badge{
 
 /* Mobile menu (glass + smooth slide/fade; always rendered) */
 @media (max-width: 1024px){
-.mobile-toggle{display:block;}
-.nav-center{display:none;}
-.nav-right .btn{display:none;}
-.mobile-menu{display:block;padding:1.2rem 1.15rem;border-radius:18px;
-  /* Glassy, semi-transparent dark card */
-  background: rgba(6,28,57,0.58);
-  border:1px solid rgba(255,255,255,0.16);
+.mobile-menu{display:block;padding:.75rem;border-radius:16px;
+  background: rgba(8,18,34,0.82);
+  border:1px solid rgba(255,255,255,0.14);
   color:#ffffff;
-  backdrop-filter: saturate(120%) blur(18px); -webkit-backdrop-filter: saturate(120%) blur(18px);
-  box-shadow:0 18px 44px rgba(0,0,0,.34);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow:0 14px 36px rgba(0,0,0,.32);
   /* Overlay on top: fixed below navbar */
   position:fixed; left:50%; transform: translate(-50%, -8px);
-  top:96px; width:min(560px, 92vw); z-index:100;
+  top:72px; width:min(560px, 92vw); z-index:100;
   /* animation state (closed by default) */
   opacity:0; max-height:0; overflow:hidden; pointer-events:none;
   transition: opacity .22s ease, transform .22s ease, max-height .26s ease;
 }
 .mobile-menu.open{opacity:1; transform: translate(-50%, 0); max-height:70vh; pointer-events:auto}
-.mobile-menu a{display:block;color:#ffffff;padding:.85rem 1rem;border-radius:12px;text-align:left;font-size:1.05rem;margin-bottom:.35rem}
+.mobile-menu a{display:block;color:#ffffff;padding:.65rem .85rem;border-radius:12px}
 .mobile-menu a:hover{background:rgba(255,255,255,0.12);color:#ffffff}
 /* Active item in mobile menu */
 .mobile-menu a.active{background:rgba(255,255,255,0.18);color:#ffffff;font-weight:800}
@@ -849,51 +844,17 @@ body.admin-light .badge{
 .mobile-menu .btn:hover, .mobile-menu .cta:hover{background:rgba(255,255,255,0.18)}
 
 /* Mobile collapsible submenu */
-.mobile-collapsible{ display:flex; align-items:center; justify-content:space-between; width:100%; color:#ffffff; padding:.8rem 1rem; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06)); border:1px solid rgba(255,255,255,0.26); margin:.45rem 0; box-shadow:0 8px 20px rgba(0,0,0,.18) }
-.mobile-collapsible span{ font-weight:800 }
-.mobile-collapsible svg{ opacity:.9 }
-.mobile-collapsible + .mobile-collapsible{ margin-top:.5rem }
+.mobile-collapsible{ display:flex; align-items:center; justify-content:space-between; width:100%; color:#ffffff; padding:.65rem .85rem; border-radius:12px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.28) }
 .mobile-collapsible:hover{ background:rgba(255,255,255,0.18) }
 .mobile-collapsible .rot{ transform:rotate(180deg); transition:transform .18s ease }
-.mobile-submenu{ display:none; padding:.75rem .75rem .8rem; margin-top:.45rem; background:linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05)); border:1px solid rgba(255,255,255,0.24); border-radius:16px; box-shadow:0 10px 24px rgba(0,0,0,.22); backdrop-filter:saturate(120%) blur(10px); -webkit-backdrop-filter:saturate(120%) blur(10px) }
-.mobile-submenu a{ display:block; color:#ffffff; padding:.6rem .9rem; border-radius:12px }
+.mobile-submenu{ display:none; padding:.25rem 0 .25rem .25rem }
+.mobile-submenu a{ display:block; color:#ffffff; padding:.55rem .85rem; border-radius:10px }
 .mobile-submenu a:hover{ background:rgba(255,255,255,0.12) }
 .mobile-submenu.open{ display:block }
-/* Submenu item spacing like cards list */
-.mobile-submenu a + a{ margin-top:.2rem; padding-top:.5rem; border-top:1px solid rgba(255,255,255,0.12) }
 }
 /* Desktop: never show the mobile dropdown */
 @media (min-width: 1025px){
   .mobile-menu{ display:none !important }
-}
-
-/* Mobile screens: optimize navbar for small devices */
-@media (max-width: 640px){
-  .navbar {
-    padding: 0.5rem 0;
-  }
-  .nav-inner {
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
-  }
-  .nav-left {
-    padding: 0.25rem 0.5rem;
-  }
-  .nav-right {
-    padding: 0.25rem 0.5rem;
-  }
-  .navbar .logo {
-    font-size: 1rem;
-  }
-  .mobile-menu {
-    top: 60px;
-    width: 100%;
-    border-radius: 0;
-    max-height: calc(100vh - 60px);
-  }
-  .mobile-menu.open {
-    max-height: calc(100vh - 60px);
-  }
 }
 
 /* XL screens: expand container and spacing a bit more */
@@ -907,86 +868,12 @@ body.admin-light .badge{
 .mobile-menu .social-btn{width:52px;height:52px}
 .mobile-menu .social-btn svg{width:24px;height:24px}
 
-/* ========================= */
-/* Portfolio Categories (Home)
-   Clean choices under Hero   */
-/* ========================= */
-.pf-cat{ margin-top: 1.75rem; margin-bottom: 1.1rem; text-align:center }
-.pf-cat-head{ display:flex; align-items:baseline; justify-content:center; gap:.6rem; flex-wrap:wrap; padding:0 .25rem }
-.pf-cat-title{ margin:0; font-size: clamp(1.2rem, 1.2rem + .6vw, 1.7rem); font-weight:800 }
-.pf-cat-sub{ margin:.1rem 0 0; color: var(--color-muted); font-size:1rem }
-.pf-cat-wrap{ display:flex; flex-wrap:nowrap; gap:.3rem; margin-top:.6rem; justify-content:center; padding:.1rem }
-/* Ensure chips size nicely to avoid overflow */
-.pf-cat-wrap .pf-chip{ white-space:nowrap }
-.pf-chip{ display:inline-flex; align-items:center; gap:.3rem; padding:.45rem .65rem; border-radius:999px; border:1px solid rgba(15,23,42,0.08); background:#ffffff; color:#0f172a !important; font-weight:700; letter-spacing:0; text-transform:capitalize; box-shadow:0 6px 16px rgba(0,0,0,.08); font-size:clamp(11px, .8vw, 13px) }
-.pf-chip:hover{ background:#f8fafc; color:#0f172a !important; box-shadow:0 8px 18px rgba(0,0,0,.10); transform:translateY(-1px) }
-.pf-chip:active{ transform:translateY(0); box-shadow:0 4px 10px rgba(0,0,0,.08) }
-.pf-chip-all{ background:#ffffff; border-style:solid; color:#0f172a !important; border-color:rgba(15,23,42,0.08); box-shadow:0 6px 16px rgba(0,0,0,.08) }
-/* Light theme readability */
-body.site-light .pf-chip{ background:#ffffff; color:#0f172a; border:1px solid #e5e7eb }
-body.site-light .pf-chip:hover{ background:#f8fafc }
-
-/* Center the whole section under wide screens */
-.container .pf-cat{ max-width: 100%; margin-left:auto; margin-right:auto }
-
-/* Tech stack badges under portfolio cards */
-.tech-badges{ display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.5rem }
-.tech-badge{ display:inline-flex; align-items:center; padding:.32rem .6rem; border-radius:999px; border:1px solid #e5e7eb; background:#ffffff; color:#0f172a; font-weight:700; font-size:.78rem }
-body.site-dark .tech-badge, body.admin-dark .tech-badge{ border-color:rgba(255,255,255,0.18); background:rgba(255,255,255,0.10); color:#ffffff }
-
-@media (max-width: 640px){
-  .pf-cat{ margin-top: .9rem }
-  .pf-cat-wrap{ gap:.35rem; justify-content:center; flex-wrap:wrap; }
-  .pf-chip{ padding:.45rem .7rem; font-size:13px }
-  .pf-chip{ padding:.55rem .85rem; font-weight:800 }
-}
-
 /* Footer */
 .footer{
   padding:2rem 0;
   background:transparent; /* inherit page gradient */
   border-top:0; /* avoid hard seam */
   margin-top:3rem;
-}
-
-/* ========================= */
-/* Reviews Grid               */
-/* ========================= */
-.reviews-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:1.25rem }
-.review-card{ background:rgba(255,255,255,0.9); color:#0f172a; border:1px solid #cbd5e1; border-radius:12px; padding:1.15rem; box-shadow:0 4px 10px rgba(0,0,0,.08); transition:transform .18s ease, box-shadow .18s ease }
-.review-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.12) }
-.review-head{ display:flex; align-items:center; justify-content:space-between; gap:.8rem }
-.review-person{ display:flex; align-items:center; gap:.6rem }
-.review-avatar{ width:42px; height:42px; border-radius:999px; object-fit:cover; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; font-weight:800 }
-.review-avatar.placeholder{ color:#0f172a }
-.review-name{ font-weight:900 }
-.review-meta{ color:#64748b; font-weight:700 }
-.review-stars{ font-weight:900; letter-spacing:.08em; color:#facc15 }
-body.site-dark .review-stars, body.admin-dark .review-stars{ color:#fde047 }
-.review-summary{ margin:.7rem 0 0; color:#0f172a }
-@media (max-width: 1024px){
-  .reviews-grid{ grid-template-columns: 1fr }
-}
-
-/* Reviews carousel */
-.reviews-carousel{ position:relative; overflow:hidden; margin-top:1rem }
-.reviews-track{ display:flex; gap:1rem; align-items:stretch; width:max-content; animation: reviewsScroll 40s linear infinite }
-.reviews-carousel:hover .reviews-track, .reviews-carousel.paused .reviews-track{ animation-play-state: paused }
-.reviews-arrow{ position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:999px; border:1px solid rgba(255,255,255,0.5); background:rgba(15,23,42,0.3); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter: blur(4px) }
-.reviews-arrow.left{ left:0.25rem }
-.reviews-arrow.right{ right:0.25rem }
-.reviews-arrow{ z-index:2 }
-.reviews-arrow:hover{ background:rgba(15,23,42,0.5) }
-.review-card.rc{ min-width: 360px }
-@keyframes reviewsScroll{
-  from{ transform: translateX(0) }
-  to{ transform: translateX(-50%) }
-}
-
-@media (max-width: 640px){
-  .reviews-arrow{ width:32px; height:32px }
-  .reviews-arrow.left{ left:0.25rem }
-  .reviews-arrow.right{ right:0.25rem }
 }
 .footer a{color:var(--color-muted)}
 .footer a:hover{color:#fff}
@@ -1109,13 +996,10 @@ body.site-dark .review-stars, body.admin-dark .review-stars{ color:#fde047 }
   /* Slightly smaller hamburger bars on mobile */
   .mobile-toggle{ width:34px !important; height:34px !important; }
   body .mobile-toggle span{ background:#061c39 !important; }
-  /* Mobile dropdown: glassy dark card on very small screens */
-  .mobile-menu{ background:rgba(11,38,71,0.68) !important; box-shadow:0 18px 44px rgba(0,0,0,.36) !important; border:1px solid rgba(255,255,255,0.18) !important; border-radius:18px !important; top:90px !important; backdrop-filter:saturate(120%) blur(18px) !important; -webkit-backdrop-filter:saturate(120%) blur(18px) !important; padding:1.05rem !important; }
-  .mobile-menu a{ color:#ffffff !important; }
-  .mobile-menu a:hover{ background:rgba(255,255,255,0.12) !important; color:#ffffff !important; }
-  .mobile-menu .mobile-collapsible{ color:#ffffff !important; background:rgba(255,255,255,0.12) !important; border-color:rgba(255,255,255,0.28) !important; }
-  .mobile-menu .mobile-collapsible:hover{ background:rgba(255,255,255,0.18) !important; }
-  .mobile-menu .mobile-submenu a{ color:#ffffff !important; }
+  /* Mobile dropdown: white card */
+  .mobile-menu{ background:#ffffff !important; box-shadow:0 12px 28px rgba(0,0,0,.18) !important; border:1px solid rgba(0,0,0,.06) !important; border-radius:16px !important; top:90px !important; }
+  .mobile-menu a{ color:#1f2937 !important; }
+  .mobile-menu a:hover{ background:rgba(32,65,136,0.08) !important; color:#0b1220 !important; }
   /* Footer: inherit page background; keep spacing */
   .site-footer{padding:2.2rem 1rem; background:transparent !important; box-shadow:none !important}
   /* Disable footer overlap utility on mobile */

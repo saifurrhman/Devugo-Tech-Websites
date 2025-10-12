@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { BlogAPI, UploadAPI } from '../../lib/api';
+import { BlogAPI, UploadAPI, BlogCategoryAPI } from '../../lib/api';
 
 export default function BlogEdit(){
   const { id } = useParams();
@@ -19,16 +19,21 @@ export default function BlogEdit(){
     excerpt: '',
     content: '',
     coverImage: '',
+    featuredImage: '',
+    galleryImages: [],
+    categories: [],
     tags: '',
     published: false,
     publishedAt: null,
   });
+  const [categories, setCategories] = useState([]);
 
   useEffect(()=>{
     let mounted = true;
     (async()=>{
       setLoading(true); setError('');
       try{
+        const cats = await BlogCategoryAPI.list().catch(()=>({items:[]}));
         const { post } = await BlogAPI.get(id);
         if(!mounted) return;
         setForm({
@@ -36,10 +41,14 @@ export default function BlogEdit(){
           excerpt: post.excerpt || '',
           content: post.content || '',
           coverImage: post.coverImage || '',
+          featuredImage: post.featuredImage || '',
+          galleryImages: post.galleryImages || [],
+          categories: (post.categories||[]).map(c=>c._id||c),
           tags: (post.tags||[]).join(', '),
           published: !!post.published,
           publishedAt: post.publishedAt || null,
         });
+        setCategories(cats.items||[]);
       }catch(err){
         if(mounted) setError(err.message || 'Failed to load post');
       }finally{
@@ -48,6 +57,37 @@ export default function BlogEdit(){
     })();
     return ()=>{ mounted = false };
   },[id]);
+
+  function exec(cmd, val){
+    const el = editorRef.current; if(!el) return;
+    if (!el.innerHTML || el.innerHTML === '' || el.innerHTML === '<br>'){
+      el.innerHTML = '<p><br></p>';
+    }
+    const sel = window.getSelection && window.getSelection();
+    if (sel && (!sel.anchorNode || !el.contains(sel.anchorNode))){
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    el.focus();
+    document.execCommand(cmd,false,val);
+    setForm(f=>({...f,content:el.innerHTML}));
+  }
+  function setBlock(tag){ const t = String(tag||'').toUpperCase(); exec('formatBlock', t); }
+  function insertLink(){ const url = window.prompt('Enter URL (https://...)'); if(!url) return; exec('createLink', url); }
+  function clearFormats(){ exec('removeFormat'); }
+  async function uploadAndSet(field){
+    const input = document.createElement('input'); input.type='file'; input.accept='image/*';
+    input.onchange = async (ev)=>{ const file=ev.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=async ()=>{ const { url } = await UploadAPI.image(reader.result, file.name); setForm(f=>({...f,[field]:url})); }; reader.readAsDataURL(file); };
+    input.click();
+  }
+  async function uploadAndInsertToContent(){
+    const input = document.createElement('input'); input.type='file'; input.accept='image/*';
+    input.onchange = async (ev)=>{ const file=ev.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=async ()=>{ const { url } = await UploadAPI.image(reader.result, file.name); const el=editorRef.current; if(el){ el.focus(); document.execCommand('insertHTML', false, `<img src="${url}" alt="" />`); setForm(f=>({...f,content:el.innerHTML})); } }; reader.readAsDataURL(file); };
+    input.click();
+  }
 
   async function handleSave(e){
     e?.preventDefault?.();
@@ -58,6 +98,9 @@ export default function BlogEdit(){
         excerpt: form.excerpt,
         content: form.content,
         coverImage: form.coverImage,
+        featuredImage: form.featuredImage,
+        galleryImages: form.galleryImages,
+        categories: form.categories,
         tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean),
         published: form.published,
       };
@@ -149,6 +192,44 @@ export default function BlogEdit(){
           </section>
 
           <section className="section-card">
+            <h3>Featured image</h3>
+            <div className="uploader" onClick={()=>uploadAndSet('featuredImage')}>
+              {form.featuredImage ? (
+                <div className="uploader-has-image">
+                  <img src={form.featuredImage} alt="featured" className="uploader-preview" />
+                  <button type="button" className="uploader-remove" onClick={(e)=>{ e.stopPropagation(); setForm(f=>({...f,featuredImage:''})); }}>Remove photo</button>
+                  <span className="uploader-badge">1200×630</span>
+                </div>
+              ) : (
+                <div className="uploader-empty">
+                  <div className="uploader-icon">⬆</div>
+                  <div>
+                    <strong>Click to upload</strong> or drag and drop
+                    <div className="muted">SVG, JPG, PNG, or GIF (recommended 1200×630)</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="section-card">
+            <h3>Gallery</h3>
+            <div style={{display:'flex',flexWrap:'wrap',gap:'.6rem'}}>
+              {form.galleryImages.map((g,i)=>(
+                <div key={i} className="card" style={{padding:'.25rem',borderRadius:'12px',position:'relative'}}>
+                  <img src={g} alt="gallery" style={{width:160,height:100,objectFit:'cover',borderRadius:'8px'}} />
+                  <button type="button" className="uploader-remove" onClick={()=>setForm(f=>({...f,galleryImages:f.galleryImages.filter((_,x)=>x!==i)}))} style={{left:6,bottom:6}}>Remove</button>
+                </div>
+              ))}
+              <button type="button" className="btn-secondary" onClick={async()=>{
+                const input=document.createElement('input'); input.type='file'; input.accept='image/*';
+                input.onchange=async(ev)=>{ const file=ev.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=async()=>{ const { url } = await UploadAPI.image(reader.result, file.name); setForm(f=>({...f, galleryImages:[...f.galleryImages, url]})); }; reader.readAsDataURL(file); };
+                input.click();
+              }}>Add image</button>
+            </div>
+          </section>
+
+          <section className="section-card">
             <h3>Post cover</h3>
             <div className="uploader" onClick={()=>document.getElementById('file-input-edit').click()}>
               {form.coverImage ? (
@@ -174,12 +255,28 @@ export default function BlogEdit(){
             <h3>Content</h3>
             <div className="editor" style={{marginTop:'.5rem'}}>
               <div className="editor-toolbar">
-                <button type="button" onClick={()=>document.execCommand('bold',false)}>B</button>
-                <button type="button" onClick={()=>document.execCommand('italic',false)}>I</button>
-                <button type="button" onClick={()=>document.execCommand('underline',false)}>U</button>
-                <button type="button" onClick={()=>document.execCommand('insertUnorderedList',false)}>• List</button>
-                <button type="button" onClick={()=>document.execCommand('formatBlock', false, 'h2')}>H2</button>
-                <button type="button" onClick={()=>document.execCommand('formatBlock', false, 'h3')}>H3</button>
+                <button type="button" onClick={()=>setBlock('p')}>P</button>
+                <button type="button" onClick={()=>setBlock('h1')}>H1</button>
+                <button type="button" onClick={()=>setBlock('h2')}>H2</button>
+                <button type="button" onClick={()=>setBlock('h3')}>H3</button>
+                <button type="button" onClick={()=>setBlock('h4')}>H4</button>
+                <button type="button" onClick={()=>setBlock('h5')}>H5</button>
+                <button type="button" onClick={()=>exec('bold')}>B</button>
+                <button type="button" onClick={()=>exec('italic')}>I</button>
+                <button type="button" onClick={()=>exec('underline')}>U</button>
+                <button type="button" onClick={()=>exec('insertOrderedList')}>1.</button>
+                <button type="button" onClick={()=>exec('insertUnorderedList')}>•</button>
+                <button type="button" onClick={()=>setBlock('blockquote')}>❝</button>
+                <button type="button" onClick={()=>setBlock('pre')}>{'{ }'}</button>
+                <button type="button" onClick={()=>exec('justifyLeft')}>⟸</button>
+                <button type="button" onClick={()=>exec('justifyCenter')}>⟺</button>
+                <button type="button" onClick={()=>exec('justifyRight')}>⟹</button>
+                <button type="button" onClick={insertLink}>Link</button>
+                <button type="button" onClick={()=>exec('unlink')}>Unlink</button>
+                <button type="button" onClick={()=>exec('undo')}>Undo</button>
+                <button type="button" onClick={()=>exec('redo')}>Redo</button>
+                <button type="button" onClick={clearFormats}>Clear</button>
+                <button type="button" onClick={uploadAndInsertToContent}>+ Image</button>
               </div>
               <div
                 ref={editorRef}
@@ -195,6 +292,23 @@ export default function BlogEdit(){
                 aria-label="Post content editor"
               />
               <div className="hint">Use headings, lists, and emphasis to format your post.</div>
+            </div>
+          </section>
+
+          <section className="section-card">
+            <h3>Categories</h3>
+            <div style={{display:'flex',flexWrap:'wrap',gap:'.5rem'}}>
+              {categories.map(cat=>{
+                const checked = form.categories.includes(cat._id);
+                return (
+                  <label key={cat._id} className="chip" style={{cursor:'pointer'}}>
+                    <input type="checkbox" checked={checked} onChange={(e)=>{
+                      const v=e.target.checked; setForm(f=>({ ...f, categories: v ? [...f.categories, cat._id] : f.categories.filter(id=>id!==cat._id) }));
+                    }} style={{marginRight:'.4rem'}} />
+                    {cat.name}
+                  </label>
+                );
+              })}
             </div>
           </section>
 

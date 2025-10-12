@@ -109,6 +109,30 @@ export default function AdminSidebar() {
             </svg>
           </span><span className="label">Reviews</span>
         </NavLink>
+        <NavLink to="/admin/faqs" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
+          <span className="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6h16v12H4z" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M8 10h8M8 14h6" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </span><span className="label">FAQs</span>
+        </NavLink>
+        <NavLink to="/admin/forms" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
+          <span className="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M7 9h10M7 13h8M7 17h6" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </span><span className="label">Forms</span>
+        </NavLink>
+        <NavLink to="/admin/social-links" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
+          <span className="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.43" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.33-1.33" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </span><span className="label">Social Links</span>
+        </NavLink>
         <NavLink to="/admin/blog" className={({isActive})=>`admin-link ${isActive?'active':''}`}>
           <span className="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

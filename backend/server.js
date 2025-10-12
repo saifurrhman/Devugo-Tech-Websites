@@ -107,6 +107,18 @@ app.use('/api/tech-stack', techStackRoutes);
 // Client Reviews
 const reviewRoutes = require('./routes/reviews');
 app.use('/api/reviews', reviewRoutes);
+// FAQs
+const faqRoutes = require('./routes/faqs');
+app.use('/api/faqs', faqRoutes);
+// Forms (public + admin)
+const formRoutes = require('./routes/forms');
+app.use('/api/forms', formRoutes);
+// Blog Categories
+const blogCategoryRoutes = require('./routes/blogCategories');
+app.use('/api/blog-categories', blogCategoryRoutes);
+// Social Links
+const socialLinkRoutes = require('./routes/socialLinks');
+app.use('/api/social-links', socialLinkRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

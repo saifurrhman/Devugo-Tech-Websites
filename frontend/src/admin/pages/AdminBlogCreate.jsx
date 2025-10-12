@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { BlogAPI, UploadAPI } from '../../lib/api';
+import { BlogAPI, UploadAPI, BlogCategoryAPI } from '../../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function AdminBlogCreate(){
@@ -12,6 +12,9 @@ export default function AdminBlogCreate(){
     excerpt: '',
     content: '',
     coverImage: '',
+    featuredImage: '',
+    galleryImages: [],
+    categories: [],
     tags: '',
     published: false,
     seoTitle: '',
@@ -21,6 +24,13 @@ export default function AdminBlogCreate(){
   const [message, setMessage] = useState('');
   const [shareToSocial, setShareToSocial] = useState(false);
   const editorRef = useRef(null);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(()=>{
+    (async()=>{
+      try{ const { items } = await BlogCategoryAPI.list(); setCategories(items||[]); }catch(_e){}
+    })();
+  },[]);
 
   async function handleSubmit(e){
     e.preventDefault();
@@ -31,8 +41,12 @@ export default function AdminBlogCreate(){
         excerpt: form.excerpt,
         content: form.content,
         coverImage: form.coverImage,
+        featuredImage: form.featuredImage,
+        galleryImages: form.galleryImages,
+        categories: form.categories,
         tags: form.tags.split(',').map(t=>t.trim()).filter(Boolean),
         published: form.published,
+        seo: { metaTitle: form.seoTitle, metaDescription: form.seoDescription },
       };
       const { post } = await BlogAPI.create(payload);
       setMessage('Post created');
@@ -43,6 +57,98 @@ export default function AdminBlogCreate(){
     }finally{
       setSaving(false);
     }
+
+  async function handleAddCategory(){
+    const name = window.prompt('New category name');
+    if(!name) return;
+    try{
+      const { item } = await BlogCategoryAPI.create({ name });
+      setCategories(prev => [...prev, item]);
+      setForm(f=>({ ...f, categories: [...new Set([...(f.categories||[]), item._id])] }));
+    }catch(err){
+      alert(err.message || 'Failed to create category');
+    }
+  }
+
+
+  function exec(cmd, val){
+    const el = editorRef.current;
+    if (!el) return;
+    // Ensure editor has at least one paragraph and caret inside
+    if (!el.innerHTML || el.innerHTML === '' || el.innerHTML === '<br>' ){
+      el.innerHTML = '<p><br></p>';
+    }
+    // Place caret at end if selection is outside
+    const sel = window.getSelection && window.getSelection();
+    if (sel && (!sel.anchorNode || !el.contains(sel.anchorNode))){
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    el.focus();
+    document.execCommand(cmd, false, val);
+    setForm(f=>({ ...f, content: el.innerHTML }));
+  }
+
+  function setBlock(tag){
+    const t = String(tag||'').toUpperCase();
+    exec('formatBlock', t);
+  }
+
+  function insertLink(){
+    const url = window.prompt('Enter URL (https://...)');
+    if(!url) return;
+    exec('createLink', url);
+  }
+
+  function clearFormats(){
+    exec('removeFormat');
+  }
+
+  async function uploadAndSet(field){
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (ev)=>{
+      const file = ev.target.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = reader.result;
+        const { url } = await UploadAPI.image(dataUrl, file.name);
+        setForm(f=>({ ...f, [field]: url }));
+        setMessage(`${field} uploaded`);
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  async function uploadAndInsertToContent(){
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (ev)=>{
+      const file = ev.target.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = reader.result;
+        const { url } = await UploadAPI.image(dataUrl, file.name);
+        // insert <img> at caret
+        const img = `<img src="${url}" alt="" />`;
+        const current = editorRef.current;
+        if (current) {
+          current.focus();
+          document.execCommand('insertHTML', false, img);
+          setForm(f=>({ ...f, content: current.innerHTML }));
+        }
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
   }
 
   function onFileChange(e){
@@ -101,6 +207,73 @@ export default function AdminBlogCreate(){
           </section>
 
           <section className="section-card">
+            <h3>Featured image</h3>
+            <div className="uploader" onClick={()=>uploadAndSet('featuredImage')}>
+              {form.featuredImage ? (
+                <div className="uploader-has-image">
+                  <img src={form.featuredImage} alt="featured" className="uploader-preview" />
+                  <button type="button" className="uploader-remove" onClick={(e)=>{ e.stopPropagation(); setForm(f=>({...f,featuredImage:''})); }}>Remove photo</button>
+                  <span className="uploader-badge">1200×630</span>
+                </div>
+              ) : (
+                <div className="uploader-empty">
+                  <div className="uploader-icon">⬆</div>
+                  <div>
+                    <strong>Click to upload</strong> or drag and drop
+                    <div className="muted">SVG, JPG, PNG, or GIF (recommended 1200×630)</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="section-card">
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <h3>Categories</h3>
+              <button type="button" className="btn-secondary" onClick={handleAddCategory}>New Category</button>
+            </div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:'.5rem'}}>
+              {categories.map(cat=>{
+                const checked = form.categories.includes(cat._id);
+                return (
+                  <label key={cat._id} className="chip" style={{cursor:'pointer'}}>
+                    <input type="checkbox" checked={checked} onChange={e=>setForm(f=>({...f,categories:e.target.checked? [...new Set([...(f.categories||[]), cat._id])]: f.categories.filter(x=>x!==cat._id)}))} />
+                    <span>{cat.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="section-card">
+            <h3>Gallery</h3>
+            <div style={{display:'flex',flexWrap:'wrap',gap:'.6rem'}}>
+              {form.galleryImages.map((g,i)=>(
+                <div key={i} className="card" style={{padding:'.25rem',borderRadius:'12px',position:'relative'}}>
+                  <img src={g} alt="gallery" style={{width:160,height:100,objectFit:'cover',borderRadius:'8px'}} />
+                  <button type="button" className="uploader-remove" onClick={()=>setForm(f=>({...f,galleryImages:f.galleryImages.filter((_,x)=>x!==i)}))} style={{left:6,bottom:6}}>Remove</button>
+                </div>
+              ))}
+              <button type="button" className="btn-secondary" onClick={async()=>{
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = async (ev)=>{
+                  const file = ev.target.files?.[0]; if(!file) return;
+                  const reader = new FileReader();
+                  reader.onload = async ()=>{
+                    const dataUrl = reader.result;
+                    const { url } = await UploadAPI.image(dataUrl, file.name);
+                    setForm(f=>({...f, galleryImages:[...f.galleryImages, url]}));
+                  };
+                  reader.readAsDataURL(file);
+                };
+                input.click();
+              }}>Add image</button>
+            </div>
+          </section>
+
+          <section className="section-card">
             <h3>Post cover</h3>
             <div className="uploader" onClick={()=>document.getElementById('file-input').click()}>
               {form.coverImage ? (
@@ -126,12 +299,28 @@ export default function AdminBlogCreate(){
             <h3>Content</h3>
             <div className="editor" style={{marginTop:'.5rem'}}>
               <div className="editor-toolbar">
-                <button type="button" onClick={()=>document.execCommand('bold',false)}>B</button>
-                <button type="button" onClick={()=>document.execCommand('italic',false)}>I</button>
-                <button type="button" onClick={()=>document.execCommand('underline',false)}>U</button>
-                <button type="button" onClick={()=>document.execCommand('insertUnorderedList',false)}>• List</button>
-                <button type="button" onClick={()=>document.execCommand('formatBlock', false, 'h2')}>H2</button>
-                <button type="button" onClick={()=>document.execCommand('formatBlock', false, 'h3')}>H3</button>
+                <button type="button" onClick={()=>setBlock('p')}>P</button>
+                <button type="button" onClick={()=>setBlock('h1')}>H1</button>
+                <button type="button" onClick={()=>setBlock('h2')}>H2</button>
+                <button type="button" onClick={()=>setBlock('h3')}>H3</button>
+                <button type="button" onClick={()=>setBlock('h4')}>H4</button>
+                <button type="button" onClick={()=>setBlock('h5')}>H5</button>
+                <button type="button" onClick={()=>exec('bold')}>B</button>
+                <button type="button" onClick={()=>exec('italic')}>I</button>
+                <button type="button" onClick={()=>exec('underline')}>U</button>
+                <button type="button" onClick={()=>exec('insertOrderedList')}>1.</button>
+                <button type="button" onClick={()=>exec('insertUnorderedList')}>•</button>
+                <button type="button" onClick={()=>setBlock('blockquote')}>❝</button>
+                <button type="button" onClick={()=>setBlock('pre')}>{'{ }'}</button>
+                <button type="button" onClick={()=>exec('justifyLeft')}>⟸</button>
+                <button type="button" onClick={()=>exec('justifyCenter')}>⟺</button>
+                <button type="button" onClick={()=>exec('justifyRight')}>⟹</button>
+                <button type="button" onClick={insertLink}>Link</button>
+                <button type="button" onClick={()=>exec('unlink')}>Unlink</button>
+                <button type="button" onClick={()=>exec('undo')}>Undo</button>
+                <button type="button" onClick={()=>exec('redo')}>Redo</button>
+                <button type="button" onClick={clearFormats}>Clear</button>
+                <button type="button" onClick={uploadAndInsertToContent}>+ Image</button>
               </div>
               <div
                 ref={editorRef}
@@ -187,3 +376,5 @@ export default function AdminBlogCreate(){
     </div>
   );
 }
+
+// EOF
