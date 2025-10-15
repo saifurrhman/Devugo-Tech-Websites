@@ -40,8 +40,8 @@ export default function Solutions(){
           <h1 id="sol-title">Purpose‑built solutions that ship fast</h1>
           <p className="sub">From idea to launch — we craft high‑performing experiences for AI, e‑commerce, and SaaS with a focus on speed, quality, and results.</p>
           <div className="actions">
-            <a className="btn primary" href="#packages">Explore packages</a>
-            <a className="btn ghost" href="/contact">Get a quote</a>
+            <a className="btn" href="#packages">Explore packages</a>
+            <a className="btn outline" href="/contact">Get a quote</a>
           </div>
         </div>
       </section>
@@ -83,8 +83,8 @@ export default function Solutions(){
             <div className="step"><span className="num">3</span><span>Integrate & launch</span></div>
           </div>
           <div className="actions center">
-            <a className="btn primary" href="/contact">Start AI project</a>
-            <a className="btn ghost" href="/services#services">See related services</a>
+            <a className="btn" href="/contact">Start AI project</a>
+            <a className="btn outline" href="/services#services">See related services</a>
           </div>
         </div>
       </section>
@@ -99,8 +99,8 @@ export default function Solutions(){
             <div className="feature"><h3>Wix</h3><p>Beautiful sites with custom components and SEO best practices.</p></div>
           </div>
           <div className="actions center">
-            <a className="btn primary" href="/contact">Launch my site</a>
-            <a className="btn ghost" href="/portfolio">View work</a>
+            <a className="btn" href="/contact">Launch my site</a>
+            <a className="btn outline" href="/portfolio">View work</a>
           </div>
         </div>
       </section>
@@ -115,8 +115,8 @@ export default function Solutions(){
             <div className="feature"><h3>Integrations</h3><p>Connect your tools and data sources to streamline operations.</p></div>
           </div>
           <div className="actions center">
-            <a className="btn primary" href="/contact">Plan my build</a>
-            <a className="btn ghost" href="/services#services">Browse services</a>
+            <a className="btn" href="/contact">Plan my build</a>
+            <a className="btn outline" href="/services#services">Browse services</a>
           </div>
         </div>
       </section>
@@ -125,7 +125,7 @@ export default function Solutions(){
         <div className="container">
           <h2 id="cta-title">Have a project in mind?</h2>
           <p>We’ll help you scope it quickly and provide a plan that matches your timelines and budget.</p>
-          <a className="btn primary big" href="/contact">Start a project</a>
+          <a className="btn lg" href="/contact">Start a project</a>
         </div>
       </section>
       <Footer />

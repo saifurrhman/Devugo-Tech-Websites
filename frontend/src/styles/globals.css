@@ -1371,12 +1371,33 @@ select::-ms-expand{ display:none }
   .select-menu{ top:calc(100% + 6px) }
 }
 /* Buttons */
-.btn{display:inline-flex;align-items:center;gap:.45rem;background:linear-gradient(180deg,#2c84e3,#1e63bd);color:#ffffff !important;-webkit-text-fill-color:#ffffff;text-decoration:none;padding:.65rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,.85);box-shadow:0 6px 18px rgba(18,42,84,.35), inset 0 1px 0 rgba(255,255,255,.22);font-weight:800;letter-spacing:.01em;transition:transform .18s ease, filter .18s ease, box-shadow .18s ease}
-.btn:hover{transform:translateY(-1px);filter:saturate(1.04);box-shadow:0 10px 26px rgba(18,42,84,.42), inset 0 1px 0 rgba(255,255,255,.26)}
-.btn:active{transform:translateY(0)}
+/* Solid primary CTA (site dark blue scheme) */
+.btn{display:inline-flex;align-items:center;gap:.45rem;background:linear-gradient(180deg,#1f5fb3,#184b8e);color:#ffffff !important;-webkit-text-fill-color:#ffffff;text-decoration:none;padding:.68rem 1.05rem;border-radius:999px;border:1px solid rgba(255,255,255,.78);box-shadow:0 6px 18px rgba(11,38,71,.38), inset 0 1px 0 rgba(255,255,255,.22);font-weight:900;letter-spacing:.01em;transition:transform .18s ease, filter .18s ease, box-shadow .18s ease;will-change:transform,box-shadow}
+.btn:hover{transform:translateY(-1px);filter:saturate(1.05);box-shadow:0 12px 28px rgba(11,38,71,.48), inset 0 1px 0 rgba(255,255,255,.26)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(67,133,205,.35), 0 10px 26px rgba(11,38,71,.42)}
+/* Arrow/plus icon support */
+.btn .icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28)}
+.btn .icon svg{display:block;width:12px;height:12px;fill:currentColor}
+.btn .icon.arrow{transform:translateX(0);transition:transform .18s ease}
+.btn:hover .icon.arrow{transform:translateX(2px)}
 /* Ghost/outline button */
-.btn.outline,.btn.ghost{background:transparent;color:#ffffff !important;-webkit-text-fill-color:#ffffff;border:1px solid rgba(255,255,255,.75);box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
-.btn.outline:hover,.btn.ghost:hover{background:rgba(255,255,255,.08)}
+/* Outline/Ghost – slimmer visual border and smoother hover */
+.btn.outline,.btn.ghost{background:transparent;color:#ffffff !important;-webkit-text-fill-color:#ffffff;border:1px solid rgba(255,255,255,.48);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.btn.outline:hover,.btn.ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.58);transform:translateY(-1px)}
+/* Light variant (on dark gradient cards) */
+.btn.outline.light{border-color:#ffffff;color:#ffffff !important;-webkit-text-fill-color:#ffffff}
+.btn.outline.light:hover{background:rgba(255,255,255,.12);border-color:#ffffff}
+
+/* Button sizes */
+.btn.sm{padding:.5rem .85rem;font-size:.9rem}
+.btn.lg{padding:.9rem 1.25rem;font-size:1.02rem}
+
+/* Chip-style buttons as seen under CTAs (fast delivery etc.) */
+.chip-btn{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.08);color:#e6f0ff;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:.5rem .8rem;font-weight:800}
+.chip-btn .dot{width:6px;height:6px;border-radius:999px;background:#22c55e;display:inline-block}
+.chip-btn .star{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22)}
+.chip-btn:hover{background:rgba(255,255,255,.12)}
 
 /* Dark CTA button like reference */
 .btn.cta-dark{

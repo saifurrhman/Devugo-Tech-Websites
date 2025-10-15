@@ -154,7 +154,6 @@ export default function Pricing(){
                 textAlign: 'center',
                 padding: '4rem 2rem'
               }}>
-                <div style={{fontSize: '3rem', marginBottom: '1rem'}}>📋</div>
                 <h3 style={{marginBottom: '.5rem'}}>No Plans Available</h3>
                 <p style={{color: '#6b7280', marginBottom: '1.5rem'}}>
                   {selected === 'All' 

@@ -167,7 +167,8 @@ export default function Navbar() {
                 </a>
               ))}
             </div>
-          )}
+          )}Ready to make your business standout?
+
         </div>
       </div>
     </nav>
