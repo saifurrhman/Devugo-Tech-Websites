@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { BlogCategoryAPI } from '../../lib/api';
@@ -9,6 +10,7 @@ export default function BlogCategories(){
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
   const [saving, setSaving] = useState(false);
+  const [newName, setNewName] = useState('');
 
   async function load(){
     setLoading(true); setError('');
@@ -26,12 +28,13 @@ export default function BlogCategories(){
   },[q, items]);
 
   async function addCategory(){
-    const name = window.prompt('Category name');
+    const name = newName.trim();
     if(!name) return;
     setSaving(true);
     try{
       const { item } = await BlogCategoryAPI.create({ name });
       setItems(prev=>[...prev, item]);
+      setNewName('');
     }catch(err){ alert(err.message||'Failed to create'); }
     finally{ setSaving(false); }
   }
@@ -48,7 +51,7 @@ export default function BlogCategories(){
   }
 
   async function removeCategory(cat){
-    if(!window.confirm(`Delete category "${cat.name}"?`)) return;
+    if(!window.confirm(`Delete category \"${cat.name}\"?`)) return;
     setSaving(true);
     try{
       await BlogCategoryAPI.remove(cat._id);
@@ -65,17 +68,20 @@ export default function BlogCategories(){
 
         <div className="toolbar" style={{display:'flex',gap:'.6rem',alignItems:'center',justifyContent:'space-between'}}>
           <h1>Blog Categories</h1>
-          <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
-            <div className="admin-search" style={{maxWidth:280}}>
-              <span className="admin-search__icon" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8"/>
-                  <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                </svg>
-              </span>
-              <input className="admin-search__input" placeholder="Search categories..." value={q} onChange={e=>setQ(e.target.value)} />
-            </div>
-            <button className="btn" onClick={addCategory} disabled={saving}>New Category</button>
+          <Link to="/admin/blog" className="btn-secondary">Back to Blog</Link>
+        </div>
+
+        <div className="section-card" style={{marginTop:'.6rem'}}>
+          <label className="form-label">Category name</label>
+          <input
+            className="form-field"
+            placeholder="e.g. Tutorials"
+            value={newName}
+            onChange={e=>setNewName(e.target.value)}
+          />
+          <div style={{display:'flex',alignItems:'center',gap:'.6rem',marginTop:'.6rem'}}>
+            <button className="btn" onClick={addCategory} disabled={saving || !newName.trim()}>Add Category</button>
+            <span className="badge">Total: {items.length}</span>
           </div>
         </div>
 

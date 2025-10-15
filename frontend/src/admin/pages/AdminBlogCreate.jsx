@@ -57,6 +57,7 @@ export default function AdminBlogCreate(){
     }finally{
       setSaving(false);
     }
+  }
 
   async function handleAddCategory(){
     const name = window.prompt('New category name');
@@ -228,8 +229,8 @@ export default function AdminBlogCreate(){
           </section>
 
           <section className="section-card">
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <h3>Categories</h3>
+            <h3>Categories</h3>
+            <div style={{display:'flex',justifyContent:'flex-end',marginTop:'.5rem'}}>
               <button type="button" className="btn-secondary" onClick={handleAddCategory}>New Category</button>
             </div>
             <div style={{display:'flex',flexWrap:'wrap',gap:'.5rem'}}>

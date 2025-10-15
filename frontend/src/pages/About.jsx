@@ -1,9 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './About.css';
+import { TeamAPI } from '../lib/api';
 
 export default function About() {
+  const [team, setTeam] = useState([]);
+  const [teamLoading, setTeamLoading] = useState(true);
+  const [teamError, setTeamError] = useState('');
   useEffect(()=>{
     const els = Array.from(document.querySelectorAll('.about-page .reveal'));
     const io = new IntersectionObserver((entries)=>{
@@ -12,6 +16,20 @@ export default function About() {
     els.forEach(el=> io.observe(el));
     return ()=> io.disconnect();
   }, []);
+
+  // Load a subset of team members for About page showcase
+  useEffect(()=>{
+    let mounted = true;
+    (async()=>{
+      setTeamLoading(true); setTeamError('');
+      try{
+        const { members } = await TeamAPI.list();
+        if(mounted) setTeam((members||[]).slice(0,6));
+      }catch(err){ if(mounted) setTeamError(err.message||'Failed to load team'); }
+      finally{ if(mounted) setTeamLoading(false); }
+    })();
+    return ()=>{ mounted = false };
+  },[]);
 
   const values = [
     { title:'Ownership', desc:'We act like partners. Clear scope, clear timelines, reliable delivery.' },
@@ -121,6 +139,36 @@ export default function About() {
                 <li>Platforms (Shopify/Webflow/Wix)</li>
                 <li>CRM & Integrations</li>
               </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* 6b. Team grid (About page) */}
+        <section className="about-team-grid" aria-labelledby="team-grid-title">
+          <div className="container">
+            <h2 id="team-grid-title" className="reveal">Meet the team</h2>
+            {teamLoading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+            {teamError && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{teamError}</div>}
+            {!teamLoading && !teamError && (
+              team.length ? (
+                <div className="grid three" style={{marginTop:'1rem'}}>
+                  {team.map(m => (
+                    <article key={m._id} className="card reveal" style={{display:'grid',gap:'.5rem'}}>
+                      {m.avatar && <img src={m.avatar} alt={m.name} style={{width:'100%',borderRadius:'12px'}} />}
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.5rem'}}>
+                        <h3 style={{margin:0}}>{m.name}</h3>
+                        <span className="badge">{m.role||'Member'}</span>
+                      </div>
+                      {m.bio && <p style={{margin:0}}>{m.bio}</p>}
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="card" style={{marginTop:'1rem'}}>No team members yet.</div>
+              )
+            )}
+            <div style={{marginTop:'1.25rem'}}>
+              <a className="btn" href="/team">View full team</a>
             </div>
           </div>
         </section>

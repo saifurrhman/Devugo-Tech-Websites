@@ -86,6 +86,7 @@ export default function BlogList(){
               <option value="published">Published</option>
               <option value="drafts">Drafts</option>
             </select>
+            <Link to="/admin/blog/categories" className="btn-secondary">Blog Categories</Link>
             <Link to="/admin/blog/create" className="btn">New Post</Link>
           </div>
         </div>
