@@ -45,7 +45,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Atlas connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err.message));
 
-// Default API route
+// Default API routeD
 app.get("/", (req, res) => {
   res.json({ message: "API is running 🚀" });
 });
