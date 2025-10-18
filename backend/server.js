@@ -13,6 +13,9 @@ app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  'https://devugo-tech-websites.vercel.app',
+  'https://devugo-tech-websites-git-main.vercel.app',
+  'https://devugo-tech-websites-*.vercel.app',
 ];
 // Allow configuring extra origins via env, e.g. CORS_ORIGINS="https://admin.example.com,https://www.example.com"
 // Support both CORS_ORIGINS (comma-separated) and CORS_ORIGIN (single or comma-separated)
