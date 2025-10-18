@@ -9,7 +9,8 @@ router.post('/reset-password', ctrl.requestPasswordReset);
 router.post('/reset', ctrl.resetPassword);
 
 // Admin/editor create users (unless ALLOW_PUBLIC_SIGNUP=true)
-router.post('/register', requireAuth, requireRole('admin','editor'), ctrl.signup);
+// Modified to allow public signup
+router.post('/register', ctrl.signup);
 
 // Authenticated
 router.get('/me', requireAuth, ctrl.getMe);

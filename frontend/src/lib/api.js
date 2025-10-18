@@ -62,7 +62,7 @@ export async function api(path, { method = 'GET', body, token } = {}){
 }
 
 export const AuthAPI = {
-  signup: (payload) => api('/api/auth/signup', { method: 'POST', body: payload }),
+  signup: (payload) => api('/api/auth/register', { method: 'POST', body: payload }),
   login: (payload) => api('/api/auth/login', { method: 'POST', body: payload }),
   me:   (token) => api('/api/auth/me', { method: 'GET', token }),
   logout: (token) => api('/api/auth/logout', { method: 'POST', token }),
