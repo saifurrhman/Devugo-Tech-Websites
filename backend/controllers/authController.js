@@ -67,17 +67,52 @@ exports.updateMe = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Missing credentials' });
+    
+    console.log('📥 Login attempt:', email);
+    
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Missing credentials' });
+    }
+    
     const user = await User.findOne({ email: String(email).toLowerCase() });
-    if (!user) return res.status(401).json({ error: 'Invalid email or password' });
+    
+    if (!user) {
+      console.log('❌ User not found:', email);
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    
     const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return res.status(401).json({ error: 'Invalid email or password' });
-    user.lastLogin = new Date(); await user.save();
+    
+    if (!ok) {
+      console.log('❌ Invalid password for:', email);
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    
+    user.lastLogin = new Date();
+    await user.save();
+    
     const accessToken = signAccess(user);
     const refreshToken = signRefresh(user);
+    
     setAuthCookies(res, { accessToken, refreshToken });
-    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    
+    console.log('✅ Login successful:', email);
+    
+    // ✅ IMPORTANT: Also send token in response
+    res.json({ 
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role 
+      },
+      token: accessToken,
+      refreshToken: refreshToken
+    });
+    
   } catch (err) {
+    console.error('❌ Login Error:', err.message);
+    console.error('Full Stack:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
