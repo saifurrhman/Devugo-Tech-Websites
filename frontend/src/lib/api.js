@@ -1,8 +1,6 @@
-// Prefer env, otherwise use production backend URL or auto-detect
+// Prefer env, otherwise auto-detect backend at same host on port 5000
 const __DEFAULT_API_BASE__ = (typeof window !== 'undefined'
-  ? (window.location.hostname.includes('vercel.app') 
-     ? 'https://devugo-tech-websites-backend.vercel.app' 
-     : `${window.location.protocol}//${window.location.hostname}:5000`)
+  ? `${window.location.protocol}//${window.location.hostname}:5000`
   : 'http://localhost:5000');
 export const API_BASE = process.env.REACT_APP_API_BASE || __DEFAULT_API_BASE__;
 
@@ -64,7 +62,7 @@ export async function api(path, { method = 'GET', body, token } = {}){
 }
 
 export const AuthAPI = {
-  signup: (payload) => api('/api/auth/register', { method: 'POST', body: payload }),
+  signup: (payload) => api('/api/auth/signup', { method: 'POST', body: payload }),
   login: (payload) => api('/api/auth/login', { method: 'POST', body: payload }),
   me:   (token) => api('/api/auth/me', { method: 'GET', token }),
   logout: (token) => api('/api/auth/logout', { method: 'POST', token }),

@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
 
 const app = express();
 
@@ -13,9 +14,6 @@ app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'https://devugo-tech-websites.vercel.app',
-  'https://devugo-tech-websites-git-main.vercel.app',
-  'https://devugo-tech-websites-*.vercel.app',
 ];
 // Allow configuring extra origins via env, e.g. CORS_ORIGINS="https://admin.example.com,https://www.example.com"
 // Support both CORS_ORIGINS (comma-separated) and CORS_ORIGIN (single or comma-separated)
@@ -40,9 +38,20 @@ app.use(cors({
 }));
 
 // Handle preflight requests (fixed version)
-app.options(/.*/, cors());
+app.use(function(req, res, next) {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    return res.status(200).send();
+  }
+  next();
+});
 
 app.use(cookieParser());
+
+// Initialize Passport
+require('./config/passport')();
+app.use(passport.initialize());
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Atlas connected"))

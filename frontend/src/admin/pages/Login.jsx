@@ -204,8 +204,8 @@ export default function Login(){
 
               {/* Sign in with other options */}
               <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
+                <a
+                  href="/api/auth/google"
                   className="flex items-center justify-center bg-white text-gray-700 font-semibold py-3 rounded-xl border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all transform hover:scale-[1.02]"
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -215,16 +215,16 @@ export default function Login(){
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
                   Google
-                </button>
-                <button
-                  type="button"
+                </a>
+                <a
+                  href="/api/auth/linkedin"
                   className="flex items-center justify-center bg-white text-gray-700 font-semibold py-3 rounded-xl border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all transform hover:scale-[1.02]"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9.198 21.5h4v-8.01h3.604l.396-3.98h-4V7.5a1 1 0 011-1h3v-4h-3a5 5 0 00-5 5v2.01h-2l-.396 3.98h2.396v8.01z"/>
+                  <svg className="w-5 h-5 mr-2" fill="#0077B5" viewBox="0 0 24 24">
+                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
                   </svg>
-                  Facebook
-                </button>
+                  LinkedIn
+                </a>
               </div>
 
               {message && (
@@ -238,11 +238,11 @@ export default function Login(){
 
               {/* Sign Up Link */}
               <p className="text-center text-sm text-gray-600 mt-6 pt-4 border-t border-gray-200">
-                Don't have an account?{' '}
-                <a href="/admin/signup" className="text-blue-600 hover:text-blue-800 font-bold transition-colors hover:underline">
-                  Sign Up Now
-                </a>
-              </p>
+              Don't have an account?{' '}
+              <a href="/admin/signup" className="text-blue-600 hover:text-blue-800 font-bold transition-colors hover:underline">
+                Sign Up Now
+              </a>
+            </p>
             </div>
           </div>
         </div>
