@@ -43,6 +43,7 @@ export default function AdminTopbar(){
   async function handleLogout(){
     try{ await AuthAPI.logout(); }catch(_e){}
     try{ localStorage.removeItem('adminUser'); localStorage.removeItem('adminToken'); }catch(_e){}
+    try { alert('Logout successful'); } catch(_e){}
     navigate('/admin/login');
   }
 

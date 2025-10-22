@@ -20,9 +20,11 @@ export default function Signup(){
       const user = data?.user;
       if (user) localStorage.setItem('adminUser', JSON.stringify(user));
       if (!localStorage.getItem('adminTheme')) localStorage.setItem('adminTheme','admin-dark');
+      try { alert('Signup successful'); } catch(_e){}
       window.location.assign('/admin');
     } catch (err) {
       setMessage(err.message || 'Signup failed');
+      try { alert(err.message || 'Signup failed'); } catch(_e){}
     } finally {
       setLoading(false);
     }
@@ -51,7 +53,7 @@ export default function Signup(){
             <div className="mb-8">
                <div className="inline-flex items-center justify-center w-36 h-36 rounded-2xl p-2 mb-6 shadow-xl ring-1 ring-gray-200 bg-white hover:scale-105 transition-transform duration-300">
                  <div className="w-full h-full rounded-xl flex items-center justify-center p-2">
-                   <img src="/Devugo Tech.png" alt="Devugo Tech" className="h-24 w-auto object-contain select-none" />
+                   <img src="/Devugo Tech.png" alt="Devugo Tech" className="h-40 w-auto object-contain select-none" />
                  </div>
                </div>
                <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">Create Account</h1>

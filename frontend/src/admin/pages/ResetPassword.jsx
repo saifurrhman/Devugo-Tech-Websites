@@ -40,7 +40,7 @@ export default function ResetPassword(){
           <div className="relative z-10 text-white">
              <div className="inline-flex items-center justify-center w-36 h-36 bg-white rounded-2xl shadow-lg p-3 mb-6 border border-gray-200">
                <div className="w-full h-full rounded-xl flex items-center justify-center p-2">
-                 <img src="/Devugo Tech.png" alt="Devugo Tech" className="w-28 h-28 object-contain" />
+                 <img src="/Devugo Tech.png" alt="Devugo Tech" className="w-28 h-40 object-contain" />
                </div>
              </div>
              <h1 className="text-5xl font-bold mb-4 tracking-tight">Reset Password</h1>
