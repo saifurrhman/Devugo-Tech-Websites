@@ -4,12 +4,42 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
+const session = require('express-session');
+
+// Initialize passport configuration
+require('./config/passport')();
 
 const app = express();
 
 // Middleware
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+
+// Session configuration for passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'devugo-tech-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+// Initialize Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport serialization
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await require('./models/User').findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
 
 const allowedOrigins = [
   'http://localhost:3000',
@@ -48,10 +78,6 @@ app.use(function(req, res, next) {
 });
 
 app.use(cookieParser());
-
-// Initialize Passport
-require('./config/passport')();
-app.use(passport.initialize());
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Atlas connected"))

@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/contactController');
-const requireAdmin = require('../middlewares/auth');
+const { requireAuth } = require('../middlewares/auth');
 
 router.post('/', ctrl.submit);
-router.get('/', requireAdmin, ctrl.list);
+router.get('/', requireAuth, ctrl.list);
 
 module.exports = router;

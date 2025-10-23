@@ -1,45 +1,138 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-function getToken(req){
-  const h = req.headers['authorization'] || '';
-  const m = /^Bearer\s+(.+)$/i.exec(h);
-  if (m) return m[1];
-  // Fallback to cookie-based access token
-  if (req.cookies && req.cookies.accessToken) return req.cookies.accessToken;
-  if (req.cookies && req.cookies.token) return req.cookies.token; // legacy
-  return null;
-}
+// Verify JWT token and attach user to request
+exports.requireAuth = async (req, res, next) => {
+  try {
+    let token;
 
-function requireAuth(req, res, next){
-  try{
-    const token = getToken(req);
-    if(!token) return res.status(401).json({ error: 'Unauthorized' });
-    const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
-    const payload = jwt.verify(token, secret);
-    req.user = payload; // { id, email, role, name }
+    // Check for token in cookies first
+    if (req.cookies && req.cookies.accessToken) {
+      token = req.cookies.accessToken;
+    }
+    
+    // Check Authorization header as fallback
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    // No token found
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authenticated. Please login.'
+      });
+    }
+
+    // Verify token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Token expired. Please refresh your token or login again.'
+        });
+      }
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token. Please login again.'
+      });
+    }
+
+    // Check if user still exists
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User no longer exists.'
+      });
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: 'Your account has been deactivated.'
+      });
+    }
+
+    // Attach user to request
+    req.user = {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      name: user.name
+    };
+
     next();
-  }catch(err){
-    return res.status(401).json({ error: 'Unauthorized' });
+  } catch (err) {
+    console.error('Auth middleware error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Authentication error'
+    });
   }
-}
+};
 
-function requireRole(...roles){
+// Check if user has required role
+exports.requireRole = (...roles) => {
   return (req, res, next) => {
-    if(!req.user) return res.status(401).json({ error: 'Unauthorized' });
-    if(roles.length === 0) return next();
-    if(roles.includes(req.user.role)) return next();
-    return res.status(403).json({ error: 'Forbidden' });
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authenticated'
+      });
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied. Required role: ${roles.join(' or ')}`
+      });
+    }
+
+    next();
   };
-}
+};
 
-// Backwards compatibility: default export behaves like admin-only middleware
-function requireAdminCompat(req, res, next){
-  return requireAuth(req, res, (err)=>{
-    if(err) return next(err);
-    return requireRole('admin')(req, res, next);
-  });
-}
+// Optional auth - doesn't fail if no token
+exports.optionalAuth = async (req, res, next) => {
+  try {
+    let token;
 
-module.exports = requireAdminCompat;
-module.exports.requireAuth = requireAuth;
-module.exports.requireRole = requireRole;
+    if (req.cookies && req.cookies.accessToken) {
+      token = req.cookies.accessToken;
+    }
+    
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        
+        if (user && user.isActive) {
+          req.user = {
+            id: user._id,
+            email: user.email,
+            role: user.role,
+            name: user.name
+          };
+        }
+      } catch (err) {
+        // Token invalid, but continue without user
+      }
+    }
+
+    next();
+  } catch (err) {
+    console.error('Optional auth error:', err);
+    next();
+  }
+};
+
+console.log('✅ Auth middleware loaded');

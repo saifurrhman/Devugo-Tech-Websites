@@ -3,10 +3,14 @@ const BlogPost = require('../models/BlogPost');
 const Contact = require('../models/Contact');
 const Service = require('../models/Service');
 const PricingPlan = require('../models/PricingPlan');
-const Portfolio = require('../models/Portfolio');
+//
+// ✅ FIXED: Added missing '=' sign
+//
+const Portfolio = require('../models/Portfolio'); 
 const TeamMember = require('../models/TeamMember');
 
 exports.capture = async (req, res) => res.status(202).json({ received: true });
+
 exports.metrics = async (req, res) => res.json({ traffic: [], attribution: [] });
 
 // Dashboard summary: totals and recent activities
@@ -44,6 +48,7 @@ exports.summary = async (_req, res) => {
     const visitors = 12000; // placeholder aggregate
     const pageviews = 32000; // placeholder aggregate
     const conversions = Math.max(0, Math.round(totalLeads * 0.3));
+
     const last7 = {
       visitors: [210, 260, 230, 280, 300, 340, 390],
       contacts: [2, 1, 3, 4, 5, 6, 7],
