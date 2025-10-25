@@ -17,12 +17,11 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    select: false 
+    select: false // Transient field, not stored in DB
   },
-
   passwordHash: {
     type: String,
-    select: false, 
+    select: false, // Don't include in queries by default
     required: function() {
       return !this.google && !this.linkedin;
     }
@@ -30,7 +29,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ['admin', 'editor', 'author', 'user'],
-    default: 'admin'
+    default: 'user'
   },
   phone: {
     type: String,
@@ -48,24 +47,21 @@ const userSchema = new mongoose.Schema({
     default: true
   },
   // OAuth providers
-  google: { 
-    id: String, 
-    email: String, 
-    name: String, 
-    picture: String 
+  google: {
+    id: String,
+    email: String,
+    name: String,
+    picture: String
   },
-  linkedin: { 
-    id: String, 
-    email: String, 
-    name: String, 
-    picture: String 
+  linkedin: {
+    id: String,
+    email: String,
+    name: String,
+    picture: String
   }
 }, {
   timestamps: true
 });
-
-// ❌ REMOVE duplicate index - schema already has unique: true on email
-// userSchema.index({ email: 1 }); // Comment out this line
 
 // Don't return sensitive fields in JSON
 userSchema.methods.toJSON = function() {
@@ -75,32 +71,34 @@ userSchema.methods.toJSON = function() {
   return obj;
 };
 
-// ✅ PRE-SAVE HOOK - Password ko hash karta hai
+// ✅ PRE-SAVE HOOK - Hash password before saving
 userSchema.pre('save', async function(next) {
   // Only hash if password field is modified or new
   if (!this.isModified('password')) {
     console.log('⏭️  Password not modified, skipping hash');
     return next();
   }
-
+  
   // Skip if no password (OAuth users)
   if (!this.password) {
     console.log('⏭️  No password field, skipping hash');
     return next();
   }
-
+  
   try {
     console.log('🔐 Pre-save: Hashing password for user:', this.email);
+    console.log('   - Password length:', this.password.length);
     
     // Generate salt and hash
     const salt = await bcrypt.genSalt(12);
     this.passwordHash = await bcrypt.hash(this.password, salt);
     
+    console.log('✅ Pre-save: Password hashed successfully');
+    console.log('   - PasswordHash length:', this.passwordHash?.length);
+    
     // Clear the transient password field
     this.password = undefined;
     
-    console.log('✅ Pre-save: Password hashed successfully');
-    console.log('✅ PasswordHash length:', this.passwordHash?.length);
   } catch (error) {
     console.error('❌ Error hashing password:', error);
     return next(error);
@@ -109,7 +107,7 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-// ✅ METHOD - Password verify karta hai
+// ✅ METHOD - Verify password
 userSchema.methods.correctPassword = async function(candidatePassword) {
   console.log('🔍 correctPassword called');
   console.log('   - Has passwordHash:', !!this.passwordHash);

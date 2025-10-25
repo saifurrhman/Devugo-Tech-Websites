@@ -1,193 +1,251 @@
-// Prefer env, otherwise auto-detect backend at same host on port 5000
+import { apiWithRefresh, saveToken, clearTokens } from './apiInterceptor';
+
+// Auto-detect backend
 const __DEFAULT_API_BASE__ = (typeof window !== 'undefined'
   ? `${window.location.protocol}//${window.location.hostname}:5000`
   : 'http://localhost:5000');
+
 export const API_BASE = process.env.REACT_APP_API_BASE || __DEFAULT_API_BASE__;
 
-// ✅ Helper to get token from localStorage (supports admin token)
-function getToken() {
-  // Prefer explicit admin token, then fall back to general keys
-  return (
-    localStorage.getItem('adminToken') ||
-    localStorage.getItem('token') ||
-    localStorage.getItem('authToken')
-  );
-}
+// Use the interceptor version
+export const api = apiWithRefresh;
 
-// Small helper to build query string from params object
-function buildQuery(params = {}){
-  const entries = Object.entries(params).filter(([,v]) => v !== undefined && v !== null && v !== '');
+// Build query string
+function buildQuery(params = {}) {
+  const entries = Object.entries(params).filter(([, v]) => 
+    v !== undefined && v !== null && v !== ''
+  );
   if (!entries.length) return '';
+  
   const qs = new URLSearchParams();
-  for (const [k,v] of entries){
+  for (const [k, v] of entries) {
     qs.set(k, String(v));
   }
   return `?${qs.toString()}`;
 }
 
-export async function api(path, { method = 'GET', body, token } = {}){
-  const headers = { 'Content-Type': 'application/json' };
-  
-  // ✅ Auto-attach token if not provided
-  const authToken = token || getToken();
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
-  }
-  
-  console.log(`📡 API: ${method} ${path}`, { hasToken: !!authToken });
-  
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-    credentials: 'include',
-  });
-  
-  // Handle 204 No Content (DELETE responses)
-  if (res.status === 204) {
-    console.log(`✅ API: ${method} ${path} - No Content`);
-    return {};
-  }
-  
-  const data = await res.json().catch(()=>({}));
-  
-  if (!res.ok) {
-    console.error(`❌ API: ${method} ${path}`, { status: res.status, error: data });
-    const message = data?.error || data?.message || `Request failed (${res.status})`;
-    throw new Error(message);
-  }
-  
-  console.log(`✅ API: ${method} ${path}`, data);
-  return data;
-}
-
+// ============================================
+// AUTH API
+// ============================================
 export const AuthAPI = {
-  signup: (payload) => api('/api/auth/signup', { method: 'POST', body: payload }),
-  login: (payload) => api('/api/auth/login', { method: 'POST', body: payload }),
-  me:   (token) => api('/api/auth/me', { method: 'GET', token }),
-  logout: (token) => api('/api/auth/logout', { method: 'POST', token }),
-  requestReset: (email) => api('/api/auth/reset-password', { method: 'POST', body: { email } }),
-  updateMe: (payload) => api('/api/auth/me', { method: 'PATCH', body: payload }),
-  changePassword: (payload) => api('/api/auth/change-password', { method: 'POST', body: payload }),
+  signup: async (payload) => {
+    const data = await api('/api/auth/signup', { method: 'POST', body: payload });
+    if (data.accessToken) {
+      saveToken(data.accessToken);
+    }
+    return data;
+  },
+  
+  login: async (payload) => {
+    const data = await api('/api/auth/login', { method: 'POST', body: payload });
+    if (data.accessToken) {
+      saveToken(data.accessToken);
+    }
+    return data;
+  },
+  
+  me: () => api('/api/auth/me', { method: 'GET' }),
+  
+  logout: async () => {
+    try {
+      const data = await api('/api/auth/logout', { method: 'POST' });
+      clearTokens();
+      return data;
+    } catch (error) {
+      // Clear tokens even if logout fails
+      clearTokens();
+      throw error;
+    }
+  },
+  
+  refresh: () => api('/api/auth/refresh', { method: 'POST' }),
+  
+  requestReset: (email) => api('/api/auth/reset-password', { 
+    method: 'POST', 
+    body: { email } 
+  }),
+  
+  resetPassword: (token, password) => api('/api/auth/reset-password-confirm', {
+    method: 'POST',
+    body: { token, password }
+  }),
+  
+  updateMe: (payload) => api('/api/auth/me', { 
+    method: 'PATCH', 
+    body: payload 
+  }),
+  
+  changePassword: (payload) => api('/api/auth/change-password', { 
+    method: 'POST', 
+    body: payload 
+  }),
 };
 
+// ============================================
+// BLOG API
+// ============================================
 export const BlogAPI = {
-  list: (params = {}) => api('/api/blog' + buildQuery(params), { method: 'GET' }),
-  listAll: (params = {}) => api('/api/blog' + buildQuery({ ...params, all: 1 }), { method: 'GET' }),
-  get: (id) => api(`/api/blog/${id}`, { method: 'GET' }),
-  getBySlug: (slug) => api(`/api/blog/slug` /* fallback path not present */, { method: 'GET' })
-    .catch(()=> api('/api/blog' + buildQuery({ slug }), { method: 'GET' })),
+  list: (params = {}) => api('/api/blog' + buildQuery(params)),
+  listAll: (params = {}) => api('/api/blog' + buildQuery({ ...params, all: 1 })),
+  get: (id) => api(`/api/blog/${id}`),
+  getBySlug: (slug) => api('/api/blog' + buildQuery({ slug })),
   create: (payload) => api('/api/blog', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/blog/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/blog/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// BLOG CATEGORIES API
+// ============================================
 export const BlogCategoryAPI = {
-  list: () => api('/api/blog-categories', { method: 'GET' }),
-  get: (id) => api(`/api/blog-categories/${id}`, { method: 'GET' }),
+  list: () => api('/api/blog-categories'),
+  get: (id) => api(`/api/blog-categories/${id}`),
   create: (payload) => api('/api/blog-categories', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/blog-categories/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/blog-categories/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// CONTACT API
+// ============================================
 export const ContactAPI = {
   create: (payload) => api('/api/contact', { method: 'POST', body: payload }),
-  list: () => api('/api/contact', { method: 'GET' }),
+  list: () => api('/api/contact'),
 };
 
+// ============================================
+// ANALYTICS API
+// ============================================
 export const AnalyticsAPI = {
-  summary: () => api('/api/analytics/summary', { method: 'GET' }),
+  summary: () => api('/api/analytics/summary'),
   summaryRange: ({ range, from, to } = {}) => {
     const params = new URLSearchParams();
     if (range) params.set('range', String(range));
     if (from) params.set('from', from);
     if (to) params.set('to', to);
     const q = params.toString();
-    const path = '/api/analytics/summary' + (q ? `?${q}` : '');
-    return api(path, { method: 'GET' });
+    return api('/api/analytics/summary' + (q ? `?${q}` : ''));
   },
 };
 
+// ============================================
+// UPLOAD API
+// ============================================
 export const UploadAPI = {
-  image: (dataUrl, filename) => api('/api/upload/image', { method: 'POST', body: { dataUrl, filename } }),
+  image: (dataUrl, filename) => api('/api/upload/image', { 
+    method: 'POST', 
+    body: { dataUrl, filename } 
+  }),
 };
 
-// ✅ FIXED: ServiceAPI with auto-token
+// ============================================
+// SERVICE API
+// ============================================
 export const ServiceAPI = {
-  // Admin: all services (draft + published)
-  list: () => api('/api/services', { method: 'GET' }), // ✅ Token auto-attach hoga
-  
-  // Public: published-only
-  listPublic: () => api('/api/services/public', { method: 'GET' }),
-  
-  get: (id) => api(`/api/services/${id}`, { method: 'GET' }),
+  list: () => api('/api/services'),
+  listPublic: () => api('/api/services/public'),
+  get: (id) => api(`/api/services/${id}`),
   create: (payload) => api('/api/services', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/services/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/services/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// PRICING API
+// ============================================
 export const PricingAPI = {
-  list: () => api('/api/pricing', { method: 'GET' }),
-  get: (id) => api(`/api/pricing/${id}`, { method: 'GET' }),
+  list: () => api('/api/pricing'),
+  get: (id) => api(`/api/pricing/${id}`),
   create: (payload) => api('/api/pricing', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/pricing/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/pricing/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// PORTFOLIO API
+// ============================================
 export const PortfolioAPI = {
-  list: () => api('/api/portfolio', { method: 'GET' }),
-  get: (id) => api(`/api/portfolio/${id}`, { method: 'GET' }),
+  list: () => api('/api/portfolio'),
+  get: (id) => api(`/api/portfolio/${id}`),
   create: (payload) => api('/api/portfolio', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/portfolio/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/portfolio/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// PORTFOLIO CATEGORIES API
+// ============================================
 export const PortfolioCategoryAPI = {
-  list: () => api('/api/portfolio-categories', { method: 'GET' }),
-  get: (id) => api(`/api/portfolio-categories/${id}`, { method: 'GET' }),
+  list: () => api('/api/portfolio-categories'),
+  get: (id) => api(`/api/portfolio-categories/${id}`),
   create: (payload) => api('/api/portfolio-categories', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/portfolio-categories/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/portfolio-categories/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// TECH STACK API
+// ============================================
 export const TechStackAPI = {
-  list: () => api('/api/tech-stack', { method: 'GET' }),
-  get: (id) => api(`/api/tech-stack/${id}`, { method: 'GET' }),
+  list: () => api('/api/tech-stack'),
+  get: (id) => api(`/api/tech-stack/${id}`),
   create: (payload) => api('/api/tech-stack', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/tech-stack/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/tech-stack/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// CLIENT REVIEW API
+// ============================================
 export const ClientReviewAPI = {
-  list: (params={}) => api('/api/reviews' + buildQuery(params), { method: 'GET' }),
-  get: (id) => api(`/api/reviews/${id}`, { method: 'GET' }),
+  list: (params = {}) => api('/api/reviews' + buildQuery(params)),
+  get: (id) => api(`/api/reviews/${id}`),
   create: (payload) => api('/api/reviews', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/reviews/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/reviews/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// FAQ API
+// ============================================
 export const ClientFaqAPI = {
-  list: (params={}) => api('/api/faqs' + buildQuery(params), { method: 'GET' }),
-  get: (id) => api(`/api/faqs/${id}`, { method: 'GET' }),
+  list: (params = {}) => api('/api/faqs' + buildQuery(params)),
+  get: (id) => api(`/api/faqs/${id}`),
   create: (payload) => api('/api/faqs', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/faqs/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/faqs/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// TEAM API
+// ============================================
 export const TeamAPI = {
-  list: () => api('/api/team', { method: 'GET' }),
-  get: (id) => api(`/api/team/${id}`, { method: 'GET' }),
+  list: () => api('/api/team'),
+  get: (id) => api(`/api/team/${id}`),
   create: (payload) => api('/api/team', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/team/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/team/${id}`, { method: 'DELETE' }),
 };
 
-// Forms Config API
+// ============================================
+// FORMS CONFIG API
+// ============================================
 export const FormAPI = {
-  getPublic: (key) => api(`/api/forms/public/${key}`, { method: 'GET' }),
-  list: () => api('/api/forms', { method: 'GET' }),
-  get: (id) => api(`/api/forms/${id}`, { method: 'GET' }),
+  getPublic: (key) => api(`/api/forms/public/${key}`),
+  list: () => api('/api/forms'),
+  get: (id) => api(`/api/forms/${id}`),
   create: (payload) => api('/api/forms', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/forms/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/forms/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// SOCIAL LINKS API
+// ============================================
+export const SocialLinkAPI = {
+  list: () => api('/api/social-links'),
+  get: (id) => api(`/api/social-links/${id}`),
+  create: (payload) => api('/api/social-links', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/social-links/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/social-links/${id}`, { method: 'DELETE' }),
 };

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/authController');
 const { requireAuth, requireRole } = require('../middlewares/auth');
+const User = require('../models/User'); // ✅ FIXED: Added missing import
 
 console.log('📋 Loading auth routes...');
 
@@ -25,6 +26,16 @@ router.post('/login', ctrl.login);
 // @desc    Refresh access token
 // @access  Public
 router.post('/refresh', ctrl.refresh);
+
+// @route   POST /api/auth/reset-password
+// @desc    Request password reset
+// @access  Public
+router.post('/reset-password', ctrl.requestPasswordReset);
+
+// @route   POST /api/auth/reset-password-confirm
+// @desc    Reset password with token
+// @access  Public
+router.post('/reset-password-confirm', ctrl.resetPassword);
 
 // ============================================
 // PROTECTED ROUTES
@@ -59,13 +70,13 @@ router.post('/change-password', requireAuth, ctrl.changePassword);
 // @access  Private/Admin
 router.get('/users', requireAuth, requireRole('admin'), async (req, res) => {
   try {
-    const users = await User.find().sort('-createdAt');
+    const users = await User.find().select('-passwordHash').sort('-createdAt');
     res.json({
       success: true,
       data: { users, count: users.length }
     });
   } catch (err) {
-    console.error('Get users error:', err);
+    console.error('❌ Get users error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
