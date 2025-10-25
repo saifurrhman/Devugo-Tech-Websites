@@ -38,7 +38,7 @@ async function _api(path, options = {}) {
   // Ensure headers object exists
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
 
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await `${API_BASE}${path}`, {
     ...options,
     headers: headers, // Use the merged headers
     credentials: 'include', // This is vital for refresh cookies
