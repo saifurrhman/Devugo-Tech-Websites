@@ -14,6 +14,7 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+app.use(express.static('public')); // Serve static files from public directory
 
 // Session configuration for passport
 app.use(session({

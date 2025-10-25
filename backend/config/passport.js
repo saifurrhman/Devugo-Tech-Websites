@@ -8,7 +8,7 @@ console.log('🔐 Configuring Passport strategies...');
 // Configure Passport strategies
 module.exports = function() {
   
-  // ============================================
+  // ============================================image.png
   // GOOGLE OAUTH STRATEGY
   // ============================================
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {

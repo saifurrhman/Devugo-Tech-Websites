@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
-import AdminTopbar from '../../components/AdminTopbar';
 import { ContactAPI } from '../../lib/api';
-
+import AdminTopbar from '../../components/AdminTopbar';
 export default function Contacts(){
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
