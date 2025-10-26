@@ -80,9 +80,19 @@ app.use(function(req, res, next) {
 
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URI)
+// mongoose.connect(process.env.MONGO_URI)
+//   .then(() => console.log("✅ MongoDB Atlas connected"))
+//   .catch(err => console.error("❌ MongoDB connection error:", err.message));
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 30000, // 30 seconds
+  socketTimeoutMS: 45000,          // 45 seconds
+})
   .then(() => console.log("✅ MongoDB Atlas connected"))
-  .catch(err => console.error("❌ MongoDB connection error:", err.message));
+  .catch(err => {
+    console.error("❌ MongoDB connection error:", err.message);
+    process.exit(1); // Exit if DB connection fails
+  });
+
 
 // Default API routeD
 app.get("/", (req, res) => {
