@@ -153,7 +153,7 @@ export default function Login() {
             <div className="relative z-10 max-w-md mx-auto w-full">
               {/* Logo */}
               <div className="text-center mb-4">
-                <img src="/assets/Devugo%20Tech.png" alt="Devugo Tech" className="h-8 w-auto mx-auto drop-shadow" />
+                <img src="/Devugo Tech.png" alt="Devugo Tech" className="h-8 w-auto mx-auto drop-shadow" />
               </div>
 
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign In</h2>
