@@ -1,11 +1,8 @@
 import { apiWithRefresh, saveToken, clearTokens } from './apiInterceptor';
+import API_BASE_URL from '../config/api';
 
-// Auto-detect backend
-const __DEFAULT_API_BASE__ = (typeof window !== 'undefined'
-  ? `${window.location.protocol}//${window.location.hostname}:5000`
-  : 'http://localhost:5000');
-
-export const API_BASE = process.env.REACT_APP_API_BASE || __DEFAULT_API_BASE__;
+// Export for use in app
+export const API_BASE = API_BASE_URL;
 
 // Use the interceptor version
 export const api = apiWithRefresh;
