@@ -1,8 +1,7 @@
 import { apiWithRefresh, saveToken, clearTokens } from './apiInterceptor';
-import API_BASE_URL from '../config/api';
 
-// Export for use in app
-export const API_BASE = API_BASE_URL;
+// Use environment variable for API base URL
+export const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 // Use the interceptor version
 export const api = apiWithRefresh;
