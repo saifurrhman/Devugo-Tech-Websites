@@ -243,9 +243,9 @@ export default function ServiceEdit(){
 
           <div className="bottom-actions">
             <div className="container flex flex-row items-center justify-end gap-3">
-              <button type="button" className="btn-cancel" onClick={()=>navigate('/admin/services')}>Cancel</button>
-              {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
-              <button type="submit" className="btn-save" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/services')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
+              {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
+              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
             </div>
           </div>
         </form>

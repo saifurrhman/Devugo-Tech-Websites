@@ -288,10 +288,12 @@ export default function PortfolioEdit(){
           </div>
 
           <div className="bottom-actions">
-            <div className="container flex flex-row items-center justify-end gap-3">
-              <button type="button" className="btn-cancel" onClick={()=>navigate('/admin/portfolio')}>Cancel</button>
-              {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
-              <button type="submit" className="btn-save" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+            <div className="container flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
+              <button type="button" className="btn-secondary lg order-2 sm:order-1" onClick={()=>navigate('/admin/portfolio')}>Back</button>
+              <div className="flex gap-2 sm:gap-3 order-1 sm:order-2">
+                {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
+                <button type="submit" className="btn lg" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+              </div>
             </div>
           </div>
         </form>

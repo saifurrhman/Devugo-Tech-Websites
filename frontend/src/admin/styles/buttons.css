@@ -6,45 +6,34 @@
   margin-top: 20px;
 }
 
-.bottom-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-button.btn-cancel, a.btn-cancel {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border: 1px solid #cbd5e1 !important;
+.btn-cancel {
+  background-color: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
 }
 
-button.btn-cancel:hover, a.btn-cancel:hover {
-  background-color: #f1f5f9 !important;
+.btn-cancel:hover {
+  background-color: #f1f5f9;
 }
 
-button.btn-save, a.btn-save, .btn-save {
-  background-color: #0057b7 !important;
-  color: white !important;
-  border: none !important;
+.btn-save {
+  background-color: #0ea5e9;
+  color: white;
+  border: none;
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
 }
 
-button.btn-save:hover, a.btn-save:hover, .btn-save:hover {
-  background-color: #004494 !important;
+.btn-save:hover {
+  background-color: #0284c7;
 }
 
 .btn-delete {
@@ -63,9 +52,9 @@ button.btn-save:hover, a.btn-save:hover, .btn-save:hover {
 }
 
 .btn-back {
-  background-color: #0057b7;
-  color: white;
-  border: none;
+  background-color: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 500;
@@ -74,35 +63,5 @@ button.btn-save:hover, a.btn-save:hover, .btn-save:hover {
 }
 
 .btn-back:hover {
-  background-color: #004494;
-}
-
-.btn-secondary {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border: 1px solid #cbd5e1 !important;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: #f1f5f9 !important;
-}
-
-.btn {
-  background-color: #0057b7 !important;
-  color: white !important;
-  border: none !important;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn:hover {
-  background-color: #004494 !important;
+  background-color: #f1f5f9;
 }

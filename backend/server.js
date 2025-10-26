@@ -14,7 +14,6 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
-app.use(express.static('public')); // Serve static files from public directory
 
 // Session configuration for passport
 app.use(session({
@@ -80,19 +79,9 @@ app.use(function(req, res, next) {
 
 app.use(cookieParser());
 
-// mongoose.connect(process.env.MONGO_URI)
-//   .then(() => console.log("✅ MongoDB Atlas connected"))
-//   .catch(err => console.error("❌ MongoDB connection error:", err.message));
-mongoose.connect(process.env.MONGO_URI, {
-  serverSelectionTimeoutMS: 30000, // 30 seconds
-  socketTimeoutMS: 45000,          // 45 seconds
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Atlas connected"))
-  .catch(err => {
-    console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1); // Exit if DB connection fails
-  });
-
+  .catch(err => console.error("❌ MongoDB connection error:", err.message));
 
 // Default API routeD
 app.get("/", (req, res) => {

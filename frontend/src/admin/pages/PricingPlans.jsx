@@ -166,15 +166,17 @@ function PlanForm({ initial, onCancel, onSave }){
       <div style={{marginTop:'1.5rem',display:'flex',justifyContent:'flex-end',gap:'.75rem'}}>
         <button 
           type="button" 
+          className="btn-secondary" 
           onClick={onCancel}
-          className="btn-cancel"
+          style={{padding:'.625rem 1.5rem',fontSize:'.9375rem',borderRadius:'6px',border:'1px solid #d1d5db',background:'white',cursor:'pointer'}}
         >
           Cancel
         </button>
         <button 
           type="submit" 
-          className="btn-save" 
+          className="btn" 
           disabled={saving}
+          style={{padding:'.625rem 1.5rem',fontSize:'.9375rem',borderRadius:'6px',background:'#3b82f6',color:'white',border:'none',cursor:saving?'not-allowed':'pointer',opacity:saving?0.6:1}}
         >
           {saving ? 'Saving…' : (initial ? 'Update Plan' : 'Create Plan')}
         </button>

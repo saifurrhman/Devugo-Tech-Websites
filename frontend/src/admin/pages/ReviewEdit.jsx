@@ -102,12 +102,10 @@ export default function ReviewEdit(){
             {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
             {message && <div className="card" style={{marginTop:'1rem', color:'#16a34a'}}>{message}</div>}
 
-            <div className="bottom-actions">
-              <div className="container flex flex-row items-center justify-end gap-3">
-                <button type="button" className="btn-cancel" onClick={() => navigate('/admin/reviews')}>Cancel</button>
-                {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444', color:'#ef4444'}}>Delete</button>}
-                <button type="submit" className="btn-save" disabled={saving}>{saving? 'Saving…':'Save'}</button>
-              </div>
+            <div style={{display:'flex',gap:'.5rem',marginTop:'1rem'}}>
+              <Link to="/admin/reviews" className="btn-secondary">Back</Link>
+              {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444', color:'#ef4444'}}>Delete</button>}
+              <button type="submit" className="btn" disabled={saving}>{saving? 'Saving…':'Save'}</button>
             </div>
           </form>
         )}
