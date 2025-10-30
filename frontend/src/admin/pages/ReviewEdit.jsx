@@ -56,7 +56,7 @@ export default function ReviewEdit(){
         <AdminTopbar />
         <div className="toolbar" style={{display:'flex',flexWrap:'wrap',justifyContent:'space-between',alignItems:'center',gap:'.6rem',padding:'0.5rem'}}>
           <h1 style={{fontSize: 'clamp(1.5rem, 5vw, 2rem)'}}>{isNew? 'Add Review':'Edit Review'}</h1>
-          <Link to="/admin/reviews" className="btn-secondary">Back</Link>
+          
         </div>
 
         {loading ? <div className="card" style={{marginTop:'1rem'}}>Loading…</div> : (
@@ -107,11 +107,13 @@ export default function ReviewEdit(){
             {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
             {message && <div className="card" style={{marginTop:'1rem', color:'#16a34a'}}>{message}</div>}
 
-            <div style={{display:'flex',flexWrap:'wrap',gap:'.5rem',marginTop:'1rem'}}>
-              <Link to="/admin/reviews" className="btn-secondary">Back</Link>
-              {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444', color:'#ef4444'}}>Delete</button>}
-              <button type="submit" className="btn" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+           <div className="bottom-actions">
+            <div className="container flex flex-row items-center justify-end gap-3">
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/review')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
+              {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
+              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
             </div>
+          </div>
           </form>
         )}
       </main>

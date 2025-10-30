@@ -59,7 +59,7 @@ export default function FAQEdit(){
         <AdminTopbar />
         <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem'}}>
           <h1>{isNew? 'Add FAQ':'Edit FAQ'}</h1>
-          <Link to="/admin/faqs" className="btn-secondary">Back</Link>
+        
         </div>
 
         {loading ? <div className="card" style={{marginTop:'1rem'}}>Loading…</div> : (
@@ -97,11 +97,13 @@ export default function FAQEdit(){
             {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
             {message && <div className="card" style={{marginTop:'1rem', color:'#16a34a'}}>{message}</div>}
 
-            <div style={{display:'flex',gap:'.5rem',marginTop:'1rem'}}>
-              <Link to="/admin/faqs" className="btn-secondary">Back</Link>
-              {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444', color:'#ef4444'}}>Delete</button>}
-              <button type="submit" className="btn" disabled={saving}>{saving? 'Saving…':'Save'}</button>
+               <div className="bottom-actions">
+            <div className="container flex flex-row items-center justify-end gap-3">
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/faqs')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
+              {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
+              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
             </div>
+          </div>
           </form>
         )}
       </main>

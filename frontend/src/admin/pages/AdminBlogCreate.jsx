@@ -372,21 +372,11 @@ export default function AdminBlogCreate(){
           </section>
 
           {/* Action Buttons */}
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 pb-4">
-            <button 
-              type="button" 
-              className="w-full sm:w-auto px-6 py-2.5 bg-white text-gray-900 font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-              onClick={()=>navigate('/admin/blog')}
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
-              disabled={saving}
-            >
-              {saving ? 'Publishing...' : 'Save'}
-            </button>
+           <div className="bottom-actions">
+            <div className="container flex flex-row items-center justify-end gap-3">
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/blog')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
+              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+            </div>
           </div>
         </form>
       </main>
