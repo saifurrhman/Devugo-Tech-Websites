@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const BlogPostSchema = new mongoose.Schema(
   {
     title: String,
@@ -22,5 +21,4 @@ const BlogPostSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 module.exports = mongoose.model('BlogPost', BlogPostSchema);

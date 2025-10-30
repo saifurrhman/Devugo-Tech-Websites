@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Verify JWT token and attach user to request
+
 exports.requireAuth = async (req, res, next) => {
   try {
     let token;

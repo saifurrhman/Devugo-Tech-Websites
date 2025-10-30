@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-
 const AnalyticsEventSchema = new mongoose.Schema(
   {
-    type: String, // page_view, form_submit, social_click, etc.
+    type: String, 
     payload: Object,
     sessionId: String,
     ip: String,
@@ -11,5 +10,4 @@ const AnalyticsEventSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 module.exports = mongoose.model('AnalyticsEvent', AnalyticsEventSchema);

@@ -6,9 +6,8 @@ const ContactSubmissionSchema = new mongoose.Schema(
     email: String,
     phone: String,
     message: String,
-    source: String, // attribution (social, campaign, referrer)
+    source: String, 
   },
   { timestamps: true }
 );
-
 module.exports = mongoose.model('ContactSubmission', ContactSubmissionSchema);

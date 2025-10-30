@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const ClientFaqSchema = new mongoose.Schema(
   {
     question: { type: String, required: true, trim: true },
@@ -10,5 +9,4 @@ const ClientFaqSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 module.exports = mongoose.model('ClientFaq', ClientFaqSchema);

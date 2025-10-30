@@ -11,7 +11,7 @@ router.get('/:id', ctrl.get);
 
 //
 // ✅ FIXED: Sahi middleware functions istemal kiye hain
-//
+//  
 router.post('/', requireAuth, requireRole('admin'), ctrl.create);
 router.put('/:id', requireAuth, requireRole('admin'), ctrl.update);
 router.delete('/:id', requireAuth, requireRole('admin'), ctrl.remove);

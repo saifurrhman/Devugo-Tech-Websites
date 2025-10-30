@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const FieldSchema = new mongoose.Schema({
-  name: { type: String, required: true }, // key used in payload
+  name: { type: String, required: true }, 
   label: { type: String, required: true },
   type: { type: String, enum: ['text','email','tel','textarea','select'], default: 'text' },
   placeholder: { type: String },
   required: { type: Boolean, default: false },
-  options: [{ label: String, value: String }], // for select
+  options: [{ label: String, value: String }], 
   order: { type: Number, default: 0 },
 }, { _id: false });
 

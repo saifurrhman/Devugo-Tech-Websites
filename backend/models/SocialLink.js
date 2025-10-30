@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const SocialLinkSchema = new mongoose.Schema(
   {
     platform: { type: String, required: true, trim: true },
@@ -8,5 +7,4 @@ const SocialLinkSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 module.exports = mongoose.model('SocialLink', SocialLinkSchema);

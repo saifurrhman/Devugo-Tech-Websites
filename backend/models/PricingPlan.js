@@ -12,7 +12,7 @@ const PricingPlanSchema = new mongoose.Schema(
       index: true,
       trim: true
     },
-    // Support multiple pricing models
+    
     planType: {
       type: String,
       enum: ['subscription', 'one-time', 'custom'],
@@ -46,14 +46,14 @@ const PricingPlanSchema = new mongoose.Schema(
       type: Number, 
       default: 0 
     },
-    // Optional: link to a service
+    
     service: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: 'Service', 
       index: true, 
       default: null 
     },
-    // Optional: description
+    
     description: {
       type: String,
       default: ''
@@ -64,11 +64,11 @@ const PricingPlanSchema = new mongoose.Schema(
   }
 );
 
-// Index for better query performance
+
 PricingPlanSchema.index({ published: 1, order: 1 });
 PricingPlanSchema.index({ planType: 1 });
 
-// Virtual to get display price
+
 PricingPlanSchema.virtual('displayPrice').get(function() {
   if (this.planType === 'custom') return 'Custom';
   if (this.planType === 'one-time') return `$${this.priceOneTime || 0}`;

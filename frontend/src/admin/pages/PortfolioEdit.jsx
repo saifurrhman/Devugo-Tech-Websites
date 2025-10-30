@@ -168,31 +168,31 @@ export default function PortfolioEdit(){
                 <h3>Basic details</h3>
                 <div className="form-grid" style={{marginTop:'.75rem'}}>
                   <label className="form-label">Title</label>
-                  <input className="form-field ux-input" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Project title" required />
+                  <input className="form-field ux-input w-full" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Project title" required />
                 </div>
                 <div className="form-grid" style={{marginTop:'.75rem'}}>
                   <label className="form-label">Client</label>
-                  <input className="form-field ux-input" value={form.client} onChange={e=>setForm(f=>({...f,client:e.target.value}))} placeholder="Client name" />
+                  <input className="form-field ux-input w-full" value={form.client} onChange={e=>setForm(f=>({...f,client:e.target.value}))} placeholder="Client name" />
                 </div>
                 <div className="form-grid" style={{marginTop:'.75rem'}}>
                   <label className="form-label">Description</label>
-                  <textarea className="form-field ux-input" rows={5} value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Describe the work and outcome" />
+                  <textarea className="form-field ux-input w-full" rows={5} value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Describe the work and outcome" />
                 </div>
               </section>
 
               <section className="section-card">
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.6rem',flexWrap:'wrap'}}>
                   <h3 style={{margin:0}}>Tech stack</h3>
-                  <Link to="/admin/tech-stack" className="btn-secondary">Manage Tech Stack</Link>
+                  <Link to="/admin/tech-stack" className="btn-secondary text-sm sm:text-base">Manage Tech Stack</Link>
                 </div>
                 {!!techOptions.length && (
-                  <div className="quick-links" style={{marginTop:'.5rem'}}>
-                    <div className="ql-wrap">
+                  <div className="quick-links" style={{marginTop:'.5rem',overflow:'auto'}}>
+                    <div className="ql-wrap" style={{flexWrap:'wrap',display:'flex',gap:'0.3rem'}}>
                       {techOptions.map(opt => {
                         const name = String(opt.name||'');
                         const active = (form.techStack||[]).map(x=>String(x).toLowerCase()).includes(name.toLowerCase());
                         return (
-                          <button type="button" key={opt._id||name} className={`ql ${active? 'active':''}`} onClick={()=>{
+                          <button type="button" key={opt._id||name} className={`ql ${active? 'active':''}`} style={{margin:'0.1rem',fontSize:'0.9rem'}} onClick={()=>{
                             setForm(f=>{
                               const has = (f.techStack||[]).some(x=>String(x).toLowerCase()===name.toLowerCase());
                               const next = has ? (f.techStack||[]).filter(x=>String(x).toLowerCase()!==name.toLowerCase()) : [ ...(f.techStack||[]), name ];
@@ -206,7 +206,7 @@ export default function PortfolioEdit(){
                 )}
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Technologies (comma separated)</label>
-                  <input className="form-field ux-input" value={(form.techStack||[]).join(', ')} onChange={e=>setForm(f=>({...f,techStack:e.target.value.split(',').map(s=>s.trim()).filter(Boolean)}))} placeholder="React, Node.js, Tailwind, MongoDB" />
+                  <input className="form-field ux-input w-full" value={(form.techStack||[]).join(', ')} onChange={e=>setForm(f=>({...f,techStack:e.target.value.split(',').map(s=>s.trim()).filter(Boolean)}))} placeholder="React, Node.js, Tailwind, MongoDB" />
                 </div>
               </section>
 
@@ -237,22 +237,22 @@ export default function PortfolioEdit(){
               <section className="section-card">
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.6rem',flexWrap:'wrap'}}>
                   <h3 style={{margin:0}}>Categories & Tags</h3>
-                  <Link to="/admin/portfolio-categories" className="btn-secondary">Manage Categories</Link>
+                  <Link to="/admin/portfolio-categories" className="btn-secondary text-sm sm:text-base">Manage Categories</Link>
                 </div>
                 {!categories.length && (
                   <div className="card" style={{marginTop:'.6rem', padding:'.7rem .85rem'}}>
                     <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.6rem', flexWrap:'wrap'}}>
-                      <span className="muted">No categories available yet. Click "Manage Categories" to create some, then return here to select them.</span>
+                      <span className="muted text-sm">No categories available yet. Click "Manage Categories" to create some, then return here to select them.</span>
                     </div>
                   </div>
                 )}
                 {!!categories.length && (
-                  <div className="quick-links" style={{marginTop:'.5rem'}}>
-                    <div className="ql-wrap">
+                  <div className="quick-links" style={{marginTop:'.5rem',overflow:'auto'}}>
+                    <div className="ql-wrap" style={{flexWrap:'wrap',display:'flex',gap:'0.3rem'}}>
                       {categories.map(cat => {
                         const active = (form.tags||[]).map(t=>String(t).toLowerCase()).includes(String(cat.name||'').toLowerCase());
                         return (
-                          <button type="button" key={cat._id} className={`ql ${active? 'active':''}`} onClick={()=>{
+                          <button type="button" key={cat._id} className={`ql ${active? 'active':''}`} style={{margin:'0.1rem',fontSize:'0.9rem'}} onClick={()=>{
                             setForm(f=>{
                               const name = String(cat.name||'');
                               const has = (f.tags||[]).some(t=>String(t).toLowerCase()===name.toLowerCase());
@@ -269,7 +269,7 @@ export default function PortfolioEdit(){
                 )}
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Custom tags (comma separated)</label>
-                  <input className="form-field ux-input" value={(form.tags||[]).join(', ')} onChange={e=>setForm(f=>({...f,tags:e.target.value.split(',').map(s=>s.trim()).filter(Boolean)}))} placeholder="web, design" />
+                  <input className="form-field ux-input w-full" value={(form.tags||[]).join(', ')} onChange={e=>setForm(f=>({...f,tags:e.target.value.split(',').map(s=>s.trim()).filter(Boolean)}))} placeholder="web, design" />
                 </div>
               </section>
             </div>
@@ -278,7 +278,7 @@ export default function PortfolioEdit(){
               <h3>Settings</h3>
               <div className="form-grid" style={{marginTop:'.5rem'}}>
                 <label className="form-label">Project URL</label>
-                <input className="form-field ux-input" value={form.url} onChange={e=>setForm(f=>({...f,url:e.target.value}))} placeholder="https://..." />
+                <input className="form-field ux-input w-full" value={form.url} onChange={e=>setForm(f=>({...f,url:e.target.value}))} placeholder="https://..." />
               </div>
               <label style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'.75rem'}}>
                 <input type="checkbox" checked={form.featured} onChange={e=>setForm(f=>({...f,featured:e.target.checked}))} />

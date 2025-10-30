@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const BlogCategorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -7,7 +6,6 @@ const BlogCategorySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 BlogCategorySchema.pre('validate', function(next){
   if (!this.slug && this.name){
     this.slug = String(this.name)
@@ -18,5 +16,4 @@ BlogCategorySchema.pre('validate', function(next){
   }
   next();
 });
-
 module.exports = mongoose.model('BlogCategory', BlogCategorySchema);

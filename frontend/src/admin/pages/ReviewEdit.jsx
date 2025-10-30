@@ -54,35 +54,40 @@ export default function ReviewEdit(){
       <AdminSidebar />
       <main className="admin-content">
         <AdminTopbar />
-        <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem'}}>
-          <h1>{isNew? 'Add Review':'Edit Review'}</h1>
+        <div className="toolbar" style={{display:'flex',flexWrap:'wrap',justifyContent:'space-between',alignItems:'center',gap:'.6rem',padding:'0.5rem'}}>
+          <h1 style={{fontSize: 'clamp(1.5rem, 5vw, 2rem)'}}>{isNew? 'Add Review':'Edit Review'}</h1>
           <Link to="/admin/reviews" className="btn-secondary">Back</Link>
         </div>
 
         {loading ? <div className="card" style={{marginTop:'1rem'}}>Loading…</div> : (
           <form onSubmit={handleSave} className="create-post" style={{marginTop:'.9rem'}}>
-            <div className="grid two" style={{alignItems:'start'}}>
+            <div className="grid two" style={{
+              alignItems: 'start',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1rem'
+            }}>
               <section className="section-card">
                 <h3>Details</h3>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Name</label>
-                  <input className="form-field ux-input" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} required />
+                  <input className="form-field ux-input w-full" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} required />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Role / Title</label>
-                  <input className="form-field ux-input" value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))} />
+                  <input className="form-field ux-input w-full" value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))} />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Company</label>
-                  <input className="form-field ux-input" value={form.company} onChange={e=>setForm(f=>({...f,company:e.target.value}))} />
+                  <input className="form-field ux-input w-full" value={form.company} onChange={e=>setForm(f=>({...f,company:e.target.value}))} />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Rating (1–5)</label>
-                  <input type="number" min="1" max="5" className="form-field ux-input" value={form.rating} onChange={e=>setForm(f=>({...f,rating:e.target.value}))} />
+                  <input type="number" min="1" max="5" className="form-field ux-input w-full" value={form.rating} onChange={e=>setForm(f=>({...f,rating:e.target.value}))} />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Summary (short)</label>
-                  <input className="form-field ux-input" value={form.summary} onChange={e=>setForm(f=>({...f,summary:e.target.value}))} placeholder="Short highlight" />
+                  <input className="form-field ux-input w-full" value={form.summary} onChange={e=>setForm(f=>({...f,summary:e.target.value}))} placeholder="Short highlight" />
                 </div>
               </section>
 
@@ -90,7 +95,7 @@ export default function ReviewEdit(){
                 <h3>Settings</h3>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Avatar URL</label>
-                  <input className="form-field ux-input" placeholder="https://..." value={form.avatar} onChange={e=>setForm(f=>({...f,avatar:e.target.value}))} />
+                  <input className="form-field ux-input w-full" placeholder="https://..." value={form.avatar} onChange={e=>setForm(f=>({...f,avatar:e.target.value}))} />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Featured</label>
@@ -102,7 +107,7 @@ export default function ReviewEdit(){
             {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
             {message && <div className="card" style={{marginTop:'1rem', color:'#16a34a'}}>{message}</div>}
 
-            <div style={{display:'flex',gap:'.5rem',marginTop:'1rem'}}>
+            <div style={{display:'flex',flexWrap:'wrap',gap:'.5rem',marginTop:'1rem'}}>
               <Link to="/admin/reviews" className="btn-secondary">Back</Link>
               {!isNew && <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444', color:'#ef4444'}}>Delete</button>}
               <button type="submit" className="btn" disabled={saving}>{saving? 'Saving…':'Save'}</button>

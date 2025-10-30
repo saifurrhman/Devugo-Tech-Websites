@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const PortfolioCategorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -8,7 +7,6 @@ const PortfolioCategorySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 PortfolioCategorySchema.pre('save', function(next){
   if (this.isModified('name') || !this.slug){
     this.slug = String(this.name || '')

@@ -5,10 +5,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const session = require('express-session');
-
-// Initialize passport configuration
 require('./config/passport')();
-
 const app = express();
 
 // Middleware

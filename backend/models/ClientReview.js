@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const ClientReviewSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -12,5 +11,4 @@ const ClientReviewSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 module.exports = mongoose.model('ClientReview', ClientReviewSchema);
