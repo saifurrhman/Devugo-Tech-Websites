@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
-import { ContactAPI } from '../../lib/api';
 import AdminTopbar from '../../components/AdminTopbar';
+import { ContactAPI } from '../../lib/api';
+
 export default function Contacts(){
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,10 +86,12 @@ export default function Contacts(){
     doc.autoTable({ startY: 132, styles:{ fontSize:9, cellPadding:4, overflow:'linebreak' }, head, body, theme:'grid', headStyles:{ fillColor:[248,250,252], textColor:20 }, columnStyles:{ 4: { cellWidth: 180 } } });
     doc.save('contacts_export.pdf');
   }
+
   return (
     <div className="admin-layout">
       <AdminSidebar />
       <main className="admin-content">
+        <AdminTopbar />
         <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem',flexWrap:'wrap'}}>
           <h1>Contacts</h1>
           <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap',alignItems:'center'}}>
