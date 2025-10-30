@@ -39,14 +39,12 @@ function defaultTemplate(key){
   };
 }
 
-// Small UI badge for field type
 function TypeBadge({ type }){
   const map = { text:'#3b82f6', email:'#06b6d4', tel:'#22c55e', textarea:'#a855f7', select:'#f59e0b' };
   const bg = map[type] || '#64748b';
   return <span className="badge" style={{background:bg, color:'#fff'}}>{type}</span>;
 }
 
-// Live preview of the current model
 function Preview({ model }){
   const fields = (model?.fields||[]);
   const typeToInput = (f)=>{

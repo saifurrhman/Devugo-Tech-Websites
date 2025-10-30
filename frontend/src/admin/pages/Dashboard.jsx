@@ -412,14 +412,14 @@ export default function Dashboard() {
         </div>
 
         {/* Quick actions - Mobile optimized */}
-        <div className="card quick-links rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 mb-3 sm:mb-4">
-          <div className="ql-wrap grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2">
-            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/services">Services</a>
-            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/pricing">Pricing</a>
-            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/portfolio">Portfolio</a>
-            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/blog">Blog</a>
-            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/team">Team</a>
-            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/contacts">Contacts</a>
+        <div className="card quick-links rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 mb-3 sm:mb-4" >
+          <div className="ql-wrap grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2" >
+            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/services" style={{ color: 'white', textDecoration: 'none' }}>Services</a>
+            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/pricing" style={{ color: 'white', textDecoration: 'none' }}>Pricing</a>
+            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/portfolio" style={{ color: 'white', textDecoration: 'none' }}>Portfolio</a>
+            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/blog" style={{ color: 'white', textDecoration: 'none' }}>Blog</a>
+            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/team" style={{ color: 'white', textDecoration: 'none' }}>Team</a>
+            <a className="ql text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 text-center" href="/admin/contacts" style={{ color: 'white', textDecoration: 'none' }}>Contacts</a>
           </div>
         </div>
 

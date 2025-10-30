@@ -371,7 +371,7 @@ export default function AdminBlogCreate(){
             </div>
           </section>
 
-          {/* Action Buttons */}
+          {}
            <div className="bottom-actions">
             <div className="container flex flex-row items-center justify-end gap-3">
               <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/blog')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>

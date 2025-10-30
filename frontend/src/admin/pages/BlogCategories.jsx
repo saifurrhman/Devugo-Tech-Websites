@@ -68,7 +68,7 @@ export default function BlogCategories(){
 
         <div className="toolbar" style={{display:'flex',gap:'.6rem',alignItems:'center',justifyContent:'space-between'}}>
           <h1>Blog Categories</h1>
-          <Link to="/admin/blog" className="btn-secondary">Back to Blog</Link>
+          <Link to="/admin/blog" className="btn-secondary" style={{ color: 'white', textDecoration: 'none' }}>Back to Blog</Link>
         </div>
 
         <div className="section-card" style={{marginTop:'.6rem'}}>

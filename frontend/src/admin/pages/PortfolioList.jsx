@@ -39,9 +39,9 @@ export default function PortfolioList(){
         <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem'}}>
           <h1>Portfolio</h1>
           <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
-            <Link to="/admin/portfolio-categories" className="btn-secondary">Portfolio Categories</Link>
-            <Link to="/admin/tech-stack" className="btn-secondary">Tech Stack</Link>
-            <Link to="/admin/reviews" className="btn-secondary">Reviews</Link>
+            <Link to="/admin/portfolio-categories" className="btn-secondary" style={{ color: 'white', textDecoration: 'none' }}>Portfolio Categories</Link>
+            <Link to="/admin/tech-stack" className="btn-secondary" style={{ color: 'white', textDecoration: 'none' }}>Tech Stack</Link>
+            <Link to="/admin/reviews" className="btn-secondary" style={{ color: 'white', textDecoration: 'none' }}>Reviews</Link>
             <Link to="/admin/portfolio/new" className="btn">Add Project</Link>
           </div>
         </div>
