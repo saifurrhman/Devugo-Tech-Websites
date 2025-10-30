@@ -182,13 +182,11 @@ export default function TeamEdit(){
             </aside>
           </div>
 
-          <div className="bottom-actions">
-            <div className="container flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
-              <button type="button" className="btn-secondary lg order-2 sm:order-1" onClick={()=>navigate('/admin/team')}>Back</button>
-              <div className="flex gap-2 sm:gap-3 order-1 sm:order-2">
-                {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>}
-                <button type="submit" className="btn lg" disabled={saving}>{saving? 'Saving…':'Save'}</button>
-              </div>
+           <div className="bottom-actions">
+            <div className="container flex flex-row items-center justify-end gap-3">
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/team')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
+              {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
+              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
             </div>
           </div>
         </form>

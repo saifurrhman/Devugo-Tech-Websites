@@ -46,17 +46,19 @@ export default function TeamList(){
             <span className="badge">Total: {total}</span>
           </div>
         )}
+
         {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+        
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
+
         {!loading && !error && (
           items.length ? (
             <div className="grid three" style={{marginTop:'1rem'}}>
               {items.map(m => (
-                <div className="card" key={m._id} style={{display:'grid',gap:'.5rem',alignItems:'start'}}>
-                  {m.avatar && <img src={m.avatar} alt={m.name} style={{width:'100%',borderRadius:'12px'}} />}
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.5rem'}}>
-                    <h3 style={{margin:0}}>{m.name}</h3>
-                    <span className="badge">{m.role||'Member'}</span>
+                <div className="card" key={m._id} style={{display:'grid',gap:'.5rem'}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem'}}>
+                    <h3 style={{margin:0}}>{m.name || 'Untitled Member'}</h3>
+                    <span className="badge">{m.role || 'Member'}</span>
                   </div>
                   {m.bio && <p style={{margin:0}}>{m.bio}</p>}
                   <div style={{display:'flex',gap:'.4rem',marginTop:'.25rem'}}>

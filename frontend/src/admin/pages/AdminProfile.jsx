@@ -56,24 +56,24 @@ export default function AdminProfile(){
               <div className="grid two">
                 <div>
                   <label className="form-field">
-                    <span className="form-label">Full Name</span>
+                    <span className="form-label" style={{color:'#fff'}}>Full Name</span>
                     <input value={account.name} onChange={e=>setAccount(a=>({...a, name:e.target.value}))} placeholder="Your name" />
                   </label>
                   <label className="form-field">
-                    <span className="form-label">Email</span>
+                    <span className="form-label" style={{color:'#fff'}}>Email</span>
                     <input type="email" value={account.email} onChange={e=>setAccount(a=>({...a, email:e.target.value}))} placeholder="you@company.com" />
                   </label>
                   <label className="form-field">
-                    <span className="form-label">Phone Number</span>
+                    <span className="form-label" style={{color:'#fff'}}>Phone Number</span>
                     <input value={account.phone} onChange={e=>setAccount(a=>({...a, phone:e.target.value}))} placeholder="e.g. +1 555 000 1111" />
                   </label>
                   <label className="form-field">
-                    <span className="form-label">Avatar URL (optional)</span>
+                    <span className="form-label" style={{color:'#fff'}}>Avatar URL (optional)</span>
                     <input value={account.avatar} onChange={e=>{ setAccount(a=>({...a, avatar:e.target.value})); setAvatarPreview(e.target.value); }} placeholder="https://..." />
                   </label>
                 </div>
                 <div>
-                  <div className="form-label" style={{marginBottom:'.35rem'}}>Profile Picture</div>
+                  <div className="form-label" style={{marginBottom:'.35rem',color:'#fff'}}>Profile Picture</div>
                   <div className="card" style={{width:160,height:160,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'}}>
                     {avatarPreview ? (
                       <img src={avatarPreview} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover'}}/>
@@ -81,7 +81,7 @@ export default function AdminProfile(){
                       <div className="center" style={{width:'100%',height:'100%',color:'#94a3b8'}}>No image</div>
                     )}
                   </div>
-                  <label className="btn" style={{marginTop:'.5rem',display:'inline-block',cursor:'pointer'}}>
+                  <label className="btn btn-primary" style={{marginTop:'.5rem',display:'block',width:'100%',textAlign:'center',cursor:'pointer'}}>
                     Upload image
                     <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>{
                       const file = e.target.files?.[0];
@@ -94,7 +94,7 @@ export default function AdminProfile(){
                 </div>
               </div>
               <div className="settings-actions">
-                <button className="btn btn-primary" type="submit" disabled={saving}>{saving?'Saving...':'Save changes'}</button>
+                <button className="btn btn-primary" type="submit" disabled={saving} style={{width:'100%'}}>{saving?'Saving...':'Save changes'}</button>
                 {msg && <div className="surface" style={{padding:'.6rem .8rem'}}>{msg}</div>}
               </div>
             </form>
@@ -102,7 +102,7 @@ export default function AdminProfile(){
           {tab==='security' && (
             <form onSubmit={changePassword} className="form-grid" style={{marginTop:'.75rem',maxWidth:680}}>
               <label className="form-field">
-                <span className="form-label">Current Password</span>
+                <span className="form-label" style={{color:'#fff'}}>Current Password</span>
                 <div className="password-field">
                   <input type={showPwd.current ? 'text' : 'password'} value={security.currentPassword} onChange={e=>setSecurity(s=>({...s,currentPassword:e.target.value}))} placeholder="••••••••" />
                   <button type="button" className="password-toggle" onClick={()=>setShowPwd(p=>({...p,current:!p.current}))} aria-label={showPwd.current?'Hide password':'Show password'}>
@@ -122,7 +122,7 @@ export default function AdminProfile(){
                 </div>
               </label>
               <label className="form-field">
-                <span className="form-label">New Password</span>
+                <span className="form-label" style={{color:'#fff'}}>New Password</span>
                 <div className="password-field">
                   <input type={showPwd.next ? 'text' : 'password'} value={security.newPassword} onChange={e=>setSecurity(s=>({...s,newPassword:e.target.value}))} placeholder="••••••••" />
                   <button type="button" className="password-toggle" onClick={()=>setShowPwd(p=>({...p,next:!p.next}))} aria-label={showPwd.next?'Hide password':'Show password'}>
@@ -142,7 +142,7 @@ export default function AdminProfile(){
                 </div>
               </label>
               <div className="settings-actions">
-                <button className="btn btn-primary" type="submit" disabled={pwdSaving}>{pwdSaving?'Updating...':'Update password'}</button>
+                <button className="btn btn-primary" type="submit" disabled={pwdSaving} style={{width:'100%'}}>{pwdSaving?'Updating...':'Update password'}</button>
                 {pwdMsg && <div className="surface" style={{padding:'.6rem .8rem'}}>{pwdMsg}</div>}
               </div>
             </form>
