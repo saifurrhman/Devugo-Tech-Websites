@@ -3,50 +3,25 @@
 /* Make tables responsive on small screens */
 @media (max-width: 768px) {
   /* General table responsiveness */
-  .admin-table, 
-  .table-container {
+  .admin-table {
     display: block;
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    margin-bottom: 1rem;
-  }
-  
-  /* Ensure table takes full width of container */
-  .admin-table table,
-  .table-container table {
-    width: 100%;
-    min-width: 500px; /* Ensures tables don't get too squished */
-  }
-  
-  /* Improve table header visibility */
-  .admin-table th,
-  .table-container th {
-    white-space: nowrap;
-    padding: 0.75rem 0.5rem;
-  }
-  
-  /* Compact table cells */
-  .admin-table td,
-  .table-container td {
-    padding: 0.75rem 0.5rem;
   }
 
   /* Card-based table alternative for very small screens */
   @media (max-width: 640px) {
-    .admin-table thead,
-    .table-container thead {
+    .admin-table thead {
       display: none; /* Hide table headers on mobile */
     }
     
-    .admin-table tbody,
-    .table-container tbody {
+    .admin-table tbody {
       display: block;
       width: 100%;
     }
     
-    .admin-table tr,
-    .table-container tr {
+    .admin-table tr {
       display: block;
       margin-bottom: 1rem;
       border-radius: 10px;
@@ -56,8 +31,7 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     
-    .admin-table td,
-    .table-container td {
+    .admin-table td {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -66,13 +40,11 @@
       text-align: right;
     }
     
-    .admin-table td:last-child,
-    .table-container td:last-child {
+    .admin-table td:last-child {
       border-bottom: none;
     }
     
-    .admin-table td:before,
-    .table-container td:before {
+    .admin-table td:before {
       content: attr(data-label);
       font-weight: 600;
       margin-right: 1rem;
@@ -81,23 +53,13 @@
     }
     
     /* Action buttons in mobile view */
-    .admin-table td.actions,
-    .table-container td.actions {
+    .admin-table td.actions {
       justify-content: flex-end;
       gap: 0.5rem;
-      flex-wrap: wrap;
     }
     
-    .admin-table td.actions:before,
-    .table-container td.actions:before {
+    .admin-table td.actions:before {
       display: none;
-    }
-    
-    /* Make buttons more tappable on mobile */
-    .admin-table .btn,
-    .table-container .btn {
-      padding: 0.5rem 0.75rem;
-      margin: 0.25rem;
     }
   }
 }
@@ -171,42 +133,5 @@
   .dashboard-charts {
     overflow-x: auto;
     padding-bottom: 1rem;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* KPI cards responsiveness */
-  .kpi-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 0.5rem !important;
-  }
-  
-  .kpi-card {
-    padding: 0.75rem !important;
-  }
-  
-  .kpi-value {
-    font-size: 1.25rem !important;
-  }
-  
-  .kpi-sub {
-    font-size: 0.75rem !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .kpi-icon {
-    transform: scale(0.85);
-  }
-  
-  /* Activity list responsiveness */
-  .activity-list li {
-    padding: 0.5rem !important;
-  }
-  
-  .activity-list .responsive-badge {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.4rem;
-    white-space: nowrap;
   }
 }

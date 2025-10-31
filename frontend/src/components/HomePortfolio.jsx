@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PortfolioAPI } from '../lib/api';
 
-export default function HomePortfolio({ limit = 3, mode = 'grid' }){
+export default function HomePortfolio({ limit = 6, mode = 'grid' }){
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -75,7 +75,7 @@ export default function HomePortfolio({ limit = 3, mode = 'grid' }){
                   <span className="icon" aria-hidden>
                     <svg viewBox="0 0 24 24"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </span>
-                  View all →
+                  View all
                 </Link>
               </article>
             ))}
@@ -85,6 +85,7 @@ export default function HomePortfolio({ limit = 3, mode = 'grid' }){
     );
   }
 
+  // GRID MODE - Main fix here
   return (
     <section className="container mx-auto px-4 py-12 lg:py-16">
       <div className="text-center mb-12">
@@ -101,22 +102,23 @@ export default function HomePortfolio({ limit = 3, mode = 'grid' }){
           No projects yet.
         </div>
       ) : (
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
           {items.map((p, idx) => (
             <article 
               key={p._id} 
-              className="group flex flex-col md:flex-row gap-6 bg-white/5 border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:bg-white/8 hover:border-cyan-400/30 hover:translate-x-2 hover:shadow-2xl"
+              className="group flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:bg-white/8 hover:border-cyan-400/30 hover:-translate-y-2 hover:shadow-2xl"
               style={{
                 animation: `fadeInUp 0.6s ease forwards ${idx * 0.1}s`,
                 opacity: 0
               }}
             >
-              <div className="flex-shrink-0 w-full md:w-72 lg:w-80 h-48 md:h-44 rounded-xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+              {/* Image Section */}
+              <div className="relative w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
                 {p.thumbnails?.[0] ? (
                   <img 
                     src={p.thumbnails[0]} 
                     alt={p.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-600">
@@ -129,26 +131,27 @@ export default function HomePortfolio({ limit = 3, mode = 'grid' }){
                 )}
               </div>
 
-              <div className="flex-1 flex flex-col gap-3">
-                <h3 className="text-xl md:text-2xl font-semibold text-white leading-tight">
+              {/* Content Section */}
+              <div className="flex flex-col gap-3 p-6 flex-1">
+                <h3 className="text-xl font-semibold text-white leading-tight line-clamp-2">
                   {p.title}
                 </h3>
                 
                 {p.client && (
-                  <p className="text-sm md:text-base text-gray-400">
+                  <p className="text-sm text-gray-400">
                     <span className="text-cyan-400 font-medium">Client:</span> {p.client}
                   </p>
                 )}
                 
                 {p.description && (
-                  <p className="text-sm md:text-base text-gray-400 line-clamp-3 leading-relaxed">
+                  <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed flex-1">
                     {p.description}
                   </p>
                 )}
                 
                 <Link 
                   to={`/portfolio/${p._id}`}
-                  className="inline-flex items-center gap-2 text-cyan-400 font-medium text-sm md:text-base mt-auto w-fit transition-all duration-200 group-hover:gap-3"
+                  className="inline-flex items-center gap-2 text-cyan-400 font-medium text-sm mt-auto w-fit transition-all duration-200 group-hover:gap-3"
                 >
                   View Project
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,12 +164,37 @@ export default function HomePortfolio({ limit = 3, mode = 'grid' }){
         </div>
       )}
       
+      {/* View All Button */}
+      {items.length > 0 && (
+        <div className="text-center mt-12">
+          <Link 
+            to="/portfolio"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400 font-medium hover:bg-cyan-500/20 hover:border-cyan-400 transition-all duration-200"
+          >
+            View All Projects
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M5 12h14M13 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
+        </div>
+      )}
+      
       <style>{`
         @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
           to {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
         .line-clamp-3 {
           display: -webkit-box;

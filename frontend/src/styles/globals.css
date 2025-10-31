@@ -1762,3 +1762,5 @@ body.admin-light .admin-auth::before{
 .modal-form input, .modal-form textarea{ background:transparent; border:1px solid rgba(255,255,255,0.24); color:#ffffff; border-radius:12px; padding:.75rem .9rem; outline:none }
 .modal-form input:focus, .modal-form textarea:focus{ border-color:var(--color-primary); box-shadow:0 0 0 3px rgba(67,133,205,.28) }
 .modal .actions{ display:flex; justify-content:flex-end }
+
+
