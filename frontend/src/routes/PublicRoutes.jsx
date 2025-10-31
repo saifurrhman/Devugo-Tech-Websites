@@ -42,7 +42,6 @@ import FAQEdit from '../admin/pages/FAQEdit';
 import Forms from '../admin/pages/Forms';
 import Faq from '../pages/Faq';
 import SocialLinks from '../admin/pages/SocialLinks';
-
 export default function PublicRoutes() {
   return (
     <BrowserRouter>

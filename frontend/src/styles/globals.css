@@ -808,10 +808,10 @@ body.admin-light .badge{
 .dropdown{ position: relative; }
 .dropdown > a{ display:inline-flex; align-items:center; gap:.35rem }
 .dropdown .dropdown-menu{
-  position:absolute; top:calc(100% + 10px); left:50%; transform:translateX(-50%);
+  position:absolute; top:calc(100% + 25px) ; transform:translateX(0%);
   background:#ffffff; border:1px solid #e5e7eb; border-radius:14px;
   box-shadow:0 20px 48px rgba(0,0,0,.20);
-  padding:.5rem; display:none; min-width:220px; z-index:40;
+  padding:1rem; display:none; min-width:220px; z-index:40;
 }
 .dropdown.open .dropdown-menu{ display:block }
 .dropdown .dropdown-menu a{ display:block; color:#0f172a; padding:.55rem .75rem; border-radius:10px }
@@ -832,7 +832,7 @@ body.admin-light .badge{
 @media (max-width: 1024px){
 .mobile-menu{display:block;padding:.75rem;border-radius:16px;
   background: rgba(8,18,34,0.82);
-  border:1px solid rgba(255,255,255,0.14);
+  border:3px solid rgba(255,255,255,0.14);
   color:#ffffff;
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   box-shadow:0 14px 36px rgba(0,0,0,.32);
@@ -853,7 +853,7 @@ body.admin-light .badge{
 .mobile-menu .btn:hover, .mobile-menu .cta:hover{background:rgba(255,255,255,0.18)}
 
 /* Mobile collapsible submenu */
-.mobile-collapsible{ display:flex; align-items:center; justify-content:space-between; width:100%; color:#0b1220; padding:.7rem .9rem; border-radius:12px; background:#f8fafc; border:1px solid #e5e7eb; font-weight:800 }
+.mobile-collapsible{ display:flex; align-items:center; justify-content:space-between; width:100%; color:#0b1220; padding:0.5rem .9rem; border-radius:12px; background:#f8fafc; border:1px solid #e5e7eb; font-weight:800 ;padding: 8px 12px !important; margin-top: 4px;margin-bottom: 4px;}
 .mobile-collapsible:hover{ background:#eef2f7 }
 .mobile-collapsible .rot{ transform:rotate(180deg); transition:transform .18s ease }
 .mobile-submenu{ display:none; padding:.25rem 0 .25rem .25rem }
@@ -1500,9 +1500,6 @@ body.admin-dark .admin-layout .card{
   .desktop-only{display:none}
 }
 
-/* ========================= */
-/* Admin Layout & Sidebar    */
-/* ========================= */
 .admin-layout{display:grid;grid-template-columns:260px 1fr;gap:1rem;min-height:calc(100vh - 120px);padding:1rem}
 .admin-content{padding:1rem}
 
@@ -1651,9 +1648,6 @@ input.form-field, textarea.form-field{width:100%;display:block}
 .btn-google:hover{border-color:#d1d5db;background:#fff}
 .btn-google svg{width:18px;height:18px}
 
-/* ========================= */
-/* BlogList filter dropdown  */
-/* ========================= */
 .toolbar select.form-field.filter-select{
   -webkit-appearance:none;
   -moz-appearance:none;
@@ -1721,9 +1715,7 @@ body.admin-light .admin-auth::before{
     radial-gradient(520px 280px at 80% 110%, rgba(32,65,136,0.09), rgba(0,0,0,0) 60%);
 }
 
-/* ========================= */
-/* Services Section          */
-/* ========================= */
+
 .services-section{ padding:3.2rem 0 3.6rem; background:transparent }
 .services-section .container{ max-width:1200px; margin:0 auto }
 .services-head{ display:grid; grid-template-columns: .6fr 1fr; gap:2rem; align-items:end; margin-bottom:1.6rem }
@@ -1759,9 +1751,6 @@ body.admin-light .admin-auth::before{
   .service-card{ min-height: auto; padding:1.1rem }
 }
 
-/* ========================= */
-/* Modal (Service Inquiry)   */
-/* ========================= */
 .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:1000; padding:1rem }
 .modal{ width:min(640px, 96vw); background:rgba(8,18,34,0.92); color:#ffffff; border:1px solid rgba(255,255,255,0.18); border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,.45); padding:1rem }
 .modal-header{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.5rem }
