@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { TeamAPI, UploadAPI } from '../../lib/api';
+import { TeamAPI } from '../../lib/api';
+import axios from 'axios';
 
 export default function TeamEdit(){
   const { id } = useParams();
@@ -10,6 +11,7 @@ export default function TeamEdit(){
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [form, setForm] = useState({
@@ -17,22 +19,66 @@ export default function TeamEdit(){
   });
   const [avatarOk, setAvatarOk] = useState(true);
 
+  // ============================================================================
+  // UPDATED IMAGE UPLOAD FUNCTION (USES FormData)
+  // ============================================================================
+  
   async function onAvatarFileChange(e){
     const file = e.target.files?.[0];
     if(!file) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try{
-        const dataUrl = reader.result;
-        const { url } = await UploadAPI.image(dataUrl, file.name);
-        setAvatarOk(true);
-        setForm(f=>({...f, avatar:url }));
-        setMessage('Avatar uploaded');
-      }catch(err){
-        setError(err.message || 'Failed to upload avatar');
-      }
-    };
-    reader.readAsDataURL(file);
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setError('Only image files are allowed (jpeg, jpg, png, gif, webp)');
+      return;
+    }
+    
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setError('File size must be less than 5MB');
+      return;
+    }
+    
+    setUploading(true);
+    setError('');
+    setMessage('');
+    
+    try {
+      // Create FormData
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      // Get token from localStorage (if you use authentication)
+      const token = localStorage.getItem('token');
+      
+      // Upload to backend
+      const response = await axios.post(
+        'http://localhost:5000/api/images/upload-single',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+          }
+        }
+      );
+      
+      console.log('Upload response:', response.data);
+      
+      // Update form with new image URL
+      const imageUrl = `http://localhost:5000${response.data.data.url}`;
+      setForm(f => ({ ...f, avatar: imageUrl }));
+      setAvatarOk(true);
+      setMessage('Avatar uploaded successfully!');
+      
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError(err.response?.data?.message || 'Failed to upload avatar');
+    } finally {
+      setUploading(false);
+    }
   }
 
   useEffect(()=>{
@@ -137,15 +183,39 @@ export default function TeamEdit(){
               <div className="form-grid" style={{marginTop:'.5rem'}}>
                 <label className="form-label">Avatar URL</label>
                 <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
-                  <input className="form-field ux-input" value={form.avatar} onChange={e=>{ setAvatarOk(true); setForm(f=>({...f,avatar:e.target.value})); }} placeholder="https://..." style={{flex:1}} />
-                  <input id="avatar-file" type="file" accept="image/*" onChange={onAvatarFileChange} style={{display:'none'}} />
-                  <button type="button" className="btn-secondary" onClick={()=>document.getElementById('avatar-file').click()}>Upload image</button>
+                  <input 
+                    className="form-field ux-input" 
+                    value={form.avatar} 
+                    onChange={e=>{ setAvatarOk(true); setForm(f=>({...f,avatar:e.target.value})); }} 
+                    placeholder="https://..." 
+                    style={{flex:1}} 
+                  />
+                  <input 
+                    id="avatar-file" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={onAvatarFileChange} 
+                    style={{display:'none'}} 
+                  />
+                  <button 
+                    type="button" 
+                    className="btn-secondary" 
+                    onClick={()=>document.getElementById('avatar-file').click()}
+                    disabled={uploading}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload image'}
+                  </button>
                 </div>
                 {(form.avatar || form.name) && (
                   <div className="preview" style={{marginTop:'.6rem',display:'flex',alignItems:'center',gap:'.6rem'}}>
                     <div className="avatar-preview">
                       {form.avatar && avatarOk ? (
-                        <img src={form.avatar} alt="avatar preview" onError={()=>setAvatarOk(false)} style={{width:56,height:56,borderRadius:'50%',objectFit:'cover'}} />
+                        <img 
+                          src={form.avatar} 
+                          alt="avatar preview" 
+                          onError={()=>setAvatarOk(false)} 
+                          style={{width:56,height:56,borderRadius:'50%',objectFit:'cover'}} 
+                        />
                       ) : (
                         <div className="avatar-fallback" style={{width:56,height:56,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',background:'#eef2f7',color:'#0f172a',fontWeight:800}}>
                           {(form.name||'').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()}
@@ -186,7 +256,7 @@ export default function TeamEdit(){
             <div className="container flex flex-row items-center justify-end gap-3">
               <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/team')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
               {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
-              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+              <button type="submit" className="btn lg" disabled={saving || uploading} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
             </div>
           </div>
         </form>

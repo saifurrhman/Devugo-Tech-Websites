@@ -1,4 +1,4 @@
-// Request validation middleware placeholder
+
 module.exports = (schema) => async (req, res, next) => {
   try {
     if (!schema) return next();
