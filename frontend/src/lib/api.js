@@ -1,7 +1,17 @@
 import { apiWithRefresh, saveToken, clearTokens } from './apiInterceptor';
 
-// Use environment variable for API base URL
-export const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// ============================================
+// API BASE URL CONFIGURATION
+// ============================================
+// Production: Use your deployed backend URL
+// Development: Use localhost
+export const API_BASE = process.env.REACT_APP_API_URL || 
+  (process.env.NODE_ENV === 'production' 
+    ? 'https://your-backend-url.vercel.app' // ⚠️ REPLACE with your actual backend URL
+    : 'http://localhost:5000');
+
+console.log('🌐 API_BASE:', API_BASE);
+console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
 
 // Use the interceptor version
 export const api = apiWithRefresh;
@@ -48,7 +58,6 @@ export const AuthAPI = {
       clearTokens();
       return data;
     } catch (error) {
-      // Clear tokens even if logout fails
       clearTokens();
       throw error;
     }
