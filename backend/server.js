@@ -11,11 +11,7 @@ const fs = require('fs');
 require('./config/passport')();
 const app = express();
 
-// =============================================================================
-// MIDDLEWARE CONFIGURATION
-// =============================================================================
-
-// Body parser with increased limit for image uploads
+// Middleware
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
@@ -24,12 +20,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'devugo-tech-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { 
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // FIXED: Allow cross-site cookies
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
+  cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
 // Initialize Passport middleware
@@ -50,68 +41,46 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// =============================================================================
-// CORS CONFIGURATION - FIXED FOR VERCEL DEPLOYMENT
-// =============================================================================
-
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'https://devugo-tech-websites.vercel.app', // ✅ ADDED: Your Vercel frontend
 ];
-
-// Allow configuring extra origins via env
+// Allow configuring extra origins via env, e.g. CORS_ORIGINS="https://admin.example.com,https://www.example.com"
+// Support both CORS_ORIGINS (comma-separated) and CORS_ORIGIN (single or comma-separated)
 const extraOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
 if (extraOrigins) {
   extraOrigins
     .split(',')
     .map(s => s.trim())
     .filter(Boolean)
-    .forEach(o => {
-      if (!allowedOrigins.includes(o)) {
-        allowedOrigins.push(o);
-      }
-    });
+    .forEach(o => allowedOrigins.push(o));
 }
-
-// Regex for local development
 const allowedOriginRegex = /^(https?:\/\/)(localhost|127\.0\.0\.1)(:\d+)?$/;
-
-// Vercel preview deployments regex
-const vercelPreviewRegex = /^https:\/\/devugo-tech-websites.*\.vercel\.app$/;
-
 app.use(cors({
   origin: function(origin, cb){
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) return cb(null, true);
-    
-    // Check if origin is in allowed list
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    
-    // Check if origin matches local development regex
-    if (allowedOriginRegex.test(origin)) return cb(null, true);
-    
-    // Check if origin matches Vercel preview deployments
-    if (vercelPreviewRegex.test(origin)) return cb(null, true);
-    
-    // Log rejected origins for debugging
-    console.warn('⚠️ CORS blocked origin:', origin);
+    if (!origin) return cb(null, true); // SSR or curl
+    if (allowedOrigins.includes(origin) || allowedOriginRegex.test(origin)) return cb(null, true);
     return cb(null, false);
   },
-  credentials: true, // Allow cookies to be sent
+  credentials: true,
   methods: ['GET','POST','PATCH','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 86400 // Cache preflight requests for 24 hours
+  allowedHeaders: ['Content-Type','Authorization'],
 }));
 
-// Handle preflight requests explicitly
-// app.options('*', cors()); // Enable pre-flight across all routes
+// Handle preflight requests (fixed version)
+app.use(function(req, res, next) {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    return res.status(200).send();
+  }
+  next();
+});
 
 app.use(cookieParser());
 
 // =============================================================================
-// STATIC FILES & UPLOAD DIRECTORY
+// IMAGE UPLOAD MODULE - NEW
 // =============================================================================
 
 // Static files serve karein - uploaded images access ke liye
@@ -126,8 +95,6 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // =============================================================================
-// DATABASE CONNECTION
-// =============================================================================
 
 mongoose.connect(process.env.MONGO_URI, {
   serverSelectionTimeoutMS: 30000, // 30 seconds
@@ -139,33 +106,22 @@ mongoose.connect(process.env.MONGO_URI, {
     process.exit(1); // Exit if DB connection fails
   });
 
-// =============================================================================
-// API ROUTES
-// =============================================================================
-
-// Default API route
+// Default API routeD
 app.get("/", (req, res) => {
-  res.json({ 
-    message: "API is running 🚀",
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+  res.json({ message: "API is running 🚀" });
 });
 
-// Health check route
+// Health check: report MongoDB connection state and quick totals for debugging
+// 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
 app.get('/api/health', async (_req, res) => {
   const state = mongoose.connection.readyState;
   const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
   const info = {
-    status: 'ok',
     dbState: state,
     dbStateText: states[state] || 'unknown',
     dbName: mongoose.connection.name,
     host: mongoose.connection.host,
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
   };
-  
   try{
     const Service = require('./models/Service');
     const PricingPlan = require('./models/PricingPlan');
@@ -180,104 +136,65 @@ app.get('/api/health', async (_req, res) => {
       BlogPost.countDocuments({}),
     ]);
     info.totals = { services, pricing, portfolio, team, blogs };
-  }catch(e){ 
-    console.error('Health check model count error:', e.message);
-  }
-  
+  }catch(_e){ /* ignore in health */ }
   res.json(info);
 });
 
-// =============================================================================
-// ALL ROUTES
-// =============================================================================
-
-// Authentication routes
+// Routes
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
-
-// Blog routes
 const blogRoutes = require('./routes/blog');
 app.use('/api/blog', blogRoutes);
-
-// Contact routes
 const contactRoutes = require('./routes/contact');
 app.use('/api/contact', contactRoutes);
-
-// Analytics routes
 const analyticsRoutes = require('./routes/analytics');
 app.use('/api/analytics', analyticsRoutes);
-
-// Upload routes (existing)
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
-// Image upload routes
+// =============================================================================
+// IMAGE UPLOAD ROUTES - NEW
+// =============================================================================
 const imageRoutes = require('./routes/imageRoutes');
 app.use('/api/images', imageRoutes);
+// =============================================================================
 
-// Service routes
 const serviceRoutes = require('./routes/services');
 app.use('/api/services', serviceRoutes);
-
-// Pricing routes
 const pricingRoutes = require('./routes/pricing');
 app.use('/api/pricing', pricingRoutes);
-
-// Portfolio routes
 const portfolioRoutes = require('./routes/portfolio');
 app.use('/api/portfolio', portfolioRoutes);
-
-// Team routes
 const teamRoutes = require('./routes/team');
 app.use('/api/team', teamRoutes);
-
 // Portfolio Categories
 const portfolioCategoryRoutes = require('./routes/portfolioCategories');
 app.use('/api/portfolio-categories', portfolioCategoryRoutes);
-
 // Tech Stack
 const techStackRoutes = require('./routes/techStack');
 app.use('/api/tech-stack', techStackRoutes);
-
 // Client Reviews
 const reviewRoutes = require('./routes/reviews');
 app.use('/api/reviews', reviewRoutes);
-
 // FAQs
 const faqRoutes = require('./routes/faqs');
 app.use('/api/faqs', faqRoutes);
-
 // Forms (public + admin)
 const formRoutes = require('./routes/forms');
 app.use('/api/forms', formRoutes);
-
 // Blog Categories
 const blogCategoryRoutes = require('./routes/blogCategories');
 app.use('/api/blog-categories', blogCategoryRoutes);
-
 // Social Links
 const socialLinkRoutes = require('./routes/socialLinks');
 app.use('/api/social-links', socialLinkRoutes);
 
 // =============================================================================
-// 404 HANDLER - FIXED
+// IMAGE UPLOAD ERROR HANDLING - NEW
 // =============================================================================
-
-// Handle 404 for undefined routes
-app.use((req, res, next) => {
-  res.status(404).json({
-    success: false,
-    message: `Route not found: ${req.method} ${req.path}`
-  });
-});
-
-// =============================================================================
-// ERROR HANDLING MIDDLEWARE
-// =============================================================================
-
 // Multer error handling for image uploads
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err);
+  console.error('Error:', err);
 
   // Multer specific errors
   if (err.name === 'MulterError') {
@@ -309,41 +226,11 @@ app.use((err, req, res, next) => {
     });
   }
 
-  // Generic error response
-  res.status(err.status || 500).json({
-    success: false,
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : err.message,
-    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
-  });
+  // Pass to next error handler if not multer error
+  next(err);
 });
-
-// =============================================================================
-// SERVER START
 // =============================================================================
 
+// Start server
 const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log('='.repeat(60));
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode`);
-  console.log(`📡 Port: ${PORT}`);
-  console.log(`🌐 URL: http://localhost:${PORT}`);
-  console.log(`📁 Upload Directory: ${uploadDir}`);
-  console.log(`✅ Allowed Origins:`, allowedOrigins);
-  console.log(`✅ All routes mounted successfully`);
-  console.log('='.repeat(60));
-});
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('❌ Unhandled Rejection:', err.message);
-  process.exit(1);
-});
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error('❌ Uncaught Exception:', err.message);
-  process.exit(1);
-});
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
