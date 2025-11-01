@@ -1,4 +1,28 @@
-import { API_BASE } from './api';
+// lib/apiInterceptor.js
+// FIXED VERSION - Works on both local and Vercel
+
+// Get API base URL based on environment
+const getAPIBase = () => {
+  // Priority 1: Environment variable (Vercel)
+  if (process.env.REACT_APP_API_URL) {
+    console.log('🌐 Using API URL from env:', process.env.REACT_APP_API_URL);
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // Priority 2: Production detection
+  if (process.env.NODE_ENV === 'production') {
+    // IMPORTANT: Replace with your actual backend Vercel URL
+    const productionURL = 'https://your-backend.vercel.app';
+    console.log('🌐 Using production API URL:', productionURL);
+    return productionURL;
+  }
+  
+  // Priority 3: Development default
+  console.log('🌐 Using localhost API URL');
+  return 'http://localhost:5000';
+};
+
+export const API_BASE = getAPIBase();
 
 // Track if we're currently refreshing
 let isRefreshing = false;
@@ -101,7 +125,15 @@ export async function fetchWithAuth(url, options = {}) {
   
   try {
     console.log(`📡 Request: ${options.method || 'GET'} ${url}`);
-    let response = await fetch(url, config);
+    
+    // Add timeout for better error handling
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Request timeout')), 30000)
+    );
+    
+    const fetchPromise = fetch(url, config);
+    
+    let response = await Promise.race([fetchPromise, timeoutPromise]);
     
     // If 401 and token expired, try to refresh
     if (response.status === 401) {
@@ -153,6 +185,18 @@ export async function fetchWithAuth(url, options = {}) {
     return response;
   } catch (error) {
     console.error('❌ Fetch error:', error);
+    
+    // Better error messages
+    if (error.message === 'Failed to fetch') {
+      console.error('🔥 Connection Error - Possible causes:');
+      console.error('   1. Backend not running');
+      console.error('   2. Wrong API URL:', API_BASE);
+      console.error('   3. CORS not configured');
+      console.error('   4. Network issue');
+      
+      throw new Error('Cannot connect to server. Please check if backend is running.');
+    }
+    
     throw error;
   }
 }
@@ -198,3 +242,11 @@ export async function apiWithRefresh(path, { method = 'GET', body, token } = {})
 }
 
 export { clearTokens, getToken, saveToken };
+
+// Log configuration on load
+console.log('='.repeat(60));
+console.log('🔧 API Configuration:');
+console.log('   API_BASE:', API_BASE);
+console.log('   Environment:', process.env.NODE_ENV);
+console.log('   REACT_APP_API_URL:', process.env.REACT_APP_API_URL || 'Not set');
+console.log('='.repeat(60));
