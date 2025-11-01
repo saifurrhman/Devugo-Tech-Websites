@@ -1,17 +1,15 @@
 // routes/imageRoutes.js
-// Path: D:\Devugo-Tech-Websites\backend\routes\imageRoutes.js
-
 const express = require('express');
 const router = express.Router();
 const upload = require('../middlewares/upload');
+
+// ⚠️ IMPORTANT: File name is 'imagecontroller.js' (lowercase 'c')
+// NOT 'imageController.js' - Linux/Vercel is case-sensitive!
 const {
   uploadSingleImage,
   uploadMultipleImages,
   deleteImage
-} = require('../controllers/imagecontroller');
-
-// Note: Aapke folder name 'controllers' (plural) hai aur file 'imagecontroller.js' (lowercase) hai
-// Isliye path accordingly set kiya hai
+} = require('../controllers/imagecontroller'); // lowercase!
 
 // ============================================================================
 // IMAGE UPLOAD ROUTES
