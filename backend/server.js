@@ -5,6 +5,9 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const session = require('express-session');
+const path = require('path');
+const fs = require('fs');
+
 require('./config/passport')();
 const app = express();
 
@@ -76,10 +79,22 @@ app.use(function(req, res, next) {
 
 app.use(cookieParser());
 
-// mongoose.connect(process.env.MONGO_URI)
-//   .then(() => console.log("✅ MongoDB Atlas connected"))
-//   .catch(err => console.error("❌ MongoDB connection error:", err.message));
+// =============================================================================
+// IMAGE UPLOAD MODULE - NEW
+// =============================================================================
 
+// Static files serve karein - uploaded images access ke liye
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use(express.static('public'));
+
+// Upload directory create karein agar exist nahi karti
+const uploadDir = path.join(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log('✅ Upload directory created:', uploadDir);
+}
+
+// =============================================================================
 
 mongoose.connect(process.env.MONGO_URI, {
   serverSelectionTimeoutMS: 30000, // 30 seconds
@@ -90,9 +105,6 @@ mongoose.connect(process.env.MONGO_URI, {
     console.error("❌ MongoDB connection error:", err.message);
     process.exit(1); // Exit if DB connection fails
   });
-
-
-
 
 // Default API routeD
 app.get("/", (req, res) => {
@@ -139,6 +151,14 @@ const analyticsRoutes = require('./routes/analytics');
 app.use('/api/analytics', analyticsRoutes);
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
+
+// =============================================================================
+// IMAGE UPLOAD ROUTES - NEW
+// =============================================================================
+const imageRoutes = require('./routes/imageRoutes');
+app.use('/api/images', imageRoutes);
+// =============================================================================
+
 const serviceRoutes = require('./routes/services');
 app.use('/api/services', serviceRoutes);
 const pricingRoutes = require('./routes/pricing');
@@ -168,6 +188,48 @@ app.use('/api/blog-categories', blogCategoryRoutes);
 // Social Links
 const socialLinkRoutes = require('./routes/socialLinks');
 app.use('/api/social-links', socialLinkRoutes);
+
+// =============================================================================
+// IMAGE UPLOAD ERROR HANDLING - NEW
+// =============================================================================
+// Multer error handling for image uploads
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+
+  // Multer specific errors
+  if (err.name === 'MulterError') {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File size bohat bari hai! Maximum 5MB allowed hai.'
+      });
+    }
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({
+        success: false,
+        message: 'Bohat zyada files select ki hain!'
+      });
+    }
+    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({
+        success: false,
+        message: 'Unexpected field in form data!'
+      });
+    }
+  }
+
+  // File type error (from multer fileFilter)
+  if (err.message && err.message.includes('Only image files')) {
+    return res.status(400).json({
+      success: false,
+      message: err.message
+    });
+  }
+
+  // Pass to next error handler if not multer error
+  next(err);
+});
+// =============================================================================
 
 // Start server
 const PORT = process.env.PORT || 5000;
