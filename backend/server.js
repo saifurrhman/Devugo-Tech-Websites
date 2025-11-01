@@ -24,7 +24,12 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'devugo-tech-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // FIXED: Allow cross-site cookies
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
 }));
 
 // Initialize Passport middleware
@@ -45,10 +50,14 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// CORS Configuration
+// =============================================================================
+// CORS CONFIGURATION - FIXED FOR VERCEL DEPLOYMENT
+// =============================================================================
+
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  'https://devugo-tech-websites.vercel.app', // ✅ ADDED: Your Vercel frontend
 ];
 
 // Allow configuring extra origins via env
@@ -58,36 +67,51 @@ if (extraOrigins) {
     .split(',')
     .map(s => s.trim())
     .filter(Boolean)
-    .forEach(o => allowedOrigins.push(o));
+    .forEach(o => {
+      if (!allowedOrigins.includes(o)) {
+        allowedOrigins.push(o);
+      }
+    });
 }
 
+// Regex for local development
 const allowedOriginRegex = /^(https?:\/\/)(localhost|127\.0\.0\.1)(:\d+)?$/;
+
+// Vercel preview deployments regex
+const vercelPreviewRegex = /^https:\/\/devugo-tech-websites.*\.vercel\.app$/;
 
 app.use(cors({
   origin: function(origin, cb){
-    if (!origin) return cb(null, true); // SSR or curl
-    if (allowedOrigins.includes(origin) || allowedOriginRegex.test(origin)) return cb(null, true);
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return cb(null, true);
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    
+    // Check if origin matches local development regex
+    if (allowedOriginRegex.test(origin)) return cb(null, true);
+    
+    // Check if origin matches Vercel preview deployments
+    if (vercelPreviewRegex.test(origin)) return cb(null, true);
+    
+    // Log rejected origins for debugging
+    console.warn('⚠️ CORS blocked origin:', origin);
     return cb(null, false);
   },
-  credentials: true,
+  credentials: true, // Allow cookies to be sent
   methods: ['GET','POST','PATCH','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
+  allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400 // Cache preflight requests for 24 hours
 }));
 
-// Handle preflight requests
-app.use(function(req, res, next) {
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-    return res.status(200).send();
-  }
-  next();
-});
+// Handle preflight requests explicitly
+// app.options('*', cors()); // Enable pre-flight across all routes
 
 app.use(cookieParser());
 
 // =============================================================================
-// STATIC FILES & UPLOAD DIRECTORY (NEW - FOR IMAGE UPLOADS)
+// STATIC FILES & UPLOAD DIRECTORY
 // =============================================================================
 
 // Static files serve karein - uploaded images access ke liye
@@ -121,7 +145,11 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Default API route
 app.get("/", (req, res) => {
-  res.json({ message: "API is running 🚀" });
+  res.json({ 
+    message: "API is running 🚀",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Health check route
@@ -129,11 +157,15 @@ app.get('/api/health', async (_req, res) => {
   const state = mongoose.connection.readyState;
   const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
   const info = {
+    status: 'ok',
     dbState: state,
     dbStateText: states[state] || 'unknown',
     dbName: mongoose.connection.name,
     host: mongoose.connection.host,
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
   };
+  
   try{
     const Service = require('./models/Service');
     const PricingPlan = require('./models/PricingPlan');
@@ -148,7 +180,10 @@ app.get('/api/health', async (_req, res) => {
       BlogPost.countDocuments({}),
     ]);
     info.totals = { services, pricing, portfolio, team, blogs };
-  }catch(_e){ /* ignore in health */ }
+  }catch(e){ 
+    console.error('Health check model count error:', e.message);
+  }
+  
   res.json(info);
 });
 
@@ -176,7 +211,7 @@ app.use('/api/analytics', analyticsRoutes);
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
-// Image upload routes (NEW!)
+// Image upload routes
 const imageRoutes = require('./routes/imageRoutes');
 app.use('/api/images', imageRoutes);
 
@@ -225,12 +260,24 @@ const socialLinkRoutes = require('./routes/socialLinks');
 app.use('/api/social-links', socialLinkRoutes);
 
 // =============================================================================
-// ERROR HANDLING MIDDLEWARE (NEW - FOR MULTER ERRORS)
+// 404 HANDLER - FIXED
+// =============================================================================
+
+// Handle 404 for undefined routes
+app.use((req, res, next) => {
+  res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.path}`
+  });
+});
+
+// =============================================================================
+// ERROR HANDLING MIDDLEWARE
 // =============================================================================
 
 // Multer error handling for image uploads
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  console.error('❌ Error:', err);
 
   // Multer specific errors
   if (err.name === 'MulterError') {
@@ -262,8 +309,14 @@ app.use((err, req, res, next) => {
     });
   }
 
-  // Pass to next error handler if not multer error
-  next(err);
+  // Generic error response
+  res.status(err.status || 500).json({
+    success: false,
+    message: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : err.message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+  });
 });
 
 // =============================================================================
@@ -278,6 +331,7 @@ app.listen(PORT, () => {
   console.log(`📡 Port: ${PORT}`);
   console.log(`🌐 URL: http://localhost:${PORT}`);
   console.log(`📁 Upload Directory: ${uploadDir}`);
+  console.log(`✅ Allowed Origins:`, allowedOrigins);
   console.log(`✅ All routes mounted successfully`);
   console.log('='.repeat(60));
 });
@@ -285,5 +339,11 @@ app.listen(PORT, () => {
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('❌ Unhandled Rejection:', err.message);
+  process.exit(1);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err.message);
   process.exit(1);
 });
