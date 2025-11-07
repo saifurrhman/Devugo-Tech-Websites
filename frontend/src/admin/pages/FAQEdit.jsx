@@ -69,11 +69,11 @@ export default function FAQEdit(){
                 <h3>FAQ</h3>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Question</label>
-                  <input className="form-field ux-input" value={form.question} onChange={e=>setForm(f=>({...f,question:e.target.value}))} required />
+                  <input className="form-field ux-input" value={form.question} onChange={e=>setForm(f=>({...f,question:e.target.value}))} placeholder="What is your question?" required />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Answer</label>
-                  <textarea rows={6} className="form-field ux-input" value={form.answer} onChange={e=>setForm(f=>({...f,answer:e.target.value}))} required />
+                  <textarea rows={6} className="form-field ux-input" value={form.answer} onChange={e=>setForm(f=>({...f,answer:e.target.value}))} placeholder="Enter detailed answer here..." required />
                 </div>
               </section>
 
@@ -85,7 +85,7 @@ export default function FAQEdit(){
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Order</label>
-                  <input type="number" className="form-field ux-input" value={form.order} onChange={e=>setForm(f=>({...f,order:e.target.value}))} />
+                  <input type="number" className="form-field ux-input" value={form.order} onChange={e=>setForm(f=>({...f,order:e.target.value}))} placeholder="0" />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Published</label>

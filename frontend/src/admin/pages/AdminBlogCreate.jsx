@@ -28,13 +28,18 @@ export default function AdminBlogCreate(){
 
   useEffect(()=>{
     (async()=>{
-      try{ const { items } = await BlogCategoryAPI.list(); setCategories(items||[]); }catch(_e){}
+      try{ 
+        const { items } = await BlogCategoryAPI.list(); 
+        setCategories(items||[]); 
+      }catch(_e){}
     })();
   },[]);
 
   async function handleSubmit(e){
     e.preventDefault();
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true); 
+    setError(''); 
+    setMessage('');
     try{
       const payload = {
         title: form.title,
@@ -134,7 +139,7 @@ export default function AdminBlogCreate(){
       reader.onload = async () => {
         const dataUrl = reader.result;
         const { url } = await UploadAPI.image(dataUrl, file.name);
-        const img = `<img src="${url}" alt="" />`;
+        const img = `<img src="${url}" alt="" style="max-width:100%;height:auto;" />`;
         const current = editorRef.current;
         if (current) {
           current.focus();
@@ -192,12 +197,23 @@ export default function AdminBlogCreate(){
             <h3>Basic details</h3>
             <div className="form-grid" style={{marginTop:'.75rem'}}>
               <label className="form-label">Post title</label>
-              <input className="form-field" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} required />
+              <input 
+                className="form-field" 
+                value={form.title} 
+                onChange={e=>setForm(f=>({...f,title:e.target.value}))} 
+                placeholder="Enter a compelling post title (50-70 characters recommended)"
+                required 
+              />
               <div className="hint">A clear, descriptive headline works best (50–70 characters).</div>
             </div>
             <div className="form-grid" style={{marginTop:'.75rem'}}>
               <label className="form-label">Short description</label>
-              <input className="form-field" value={form.excerpt} onChange={e=>setForm(f=>({...f,excerpt:e.target.value}))} />
+              <input 
+                className="form-field" 
+                value={form.excerpt} 
+                onChange={e=>setForm(f=>({...f,excerpt:e.target.value}))} 
+                placeholder="Brief summary of your post (1-2 sentences)"
+              />
               <div className="hint">1–2 lines to summarize the post. This may appear on the blog list.</div>
             </div>
           </section>
@@ -231,15 +247,29 @@ export default function AdminBlogCreate(){
               <button type="button" className="btn-secondary w-full sm:w-auto" onClick={handleAddCategory}>New Category</button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {categories.map(cat=>{
-                const checked = form.categories.includes(cat._id);
-                return (
-                  <label key={cat._id} className="chip" style={{cursor:'pointer'}}>
-                    <input type="checkbox" checked={checked} onChange={e=>setForm(f=>({...f,categories:e.target.checked? [...new Set([...(f.categories||[]), cat._id])]: f.categories.filter(x=>x!==cat._id)}))} style={{marginRight:'.4rem'}} />
-                    <span>{cat.name}</span>
-                  </label>
-                );
-              })}
+              {categories.length === 0 ? (
+                <div className="hint">No categories yet. Create one to organize your posts.</div>
+              ) : (
+                categories.map(cat=>{
+                  const checked = form.categories.includes(cat._id);
+                  return (
+                    <label key={cat._id} className="chip" style={{cursor:'pointer'}}>
+                      <input 
+                        type="checkbox" 
+                        checked={checked} 
+                        onChange={e=>setForm(f=>({
+                          ...f,
+                          categories:e.target.checked
+                            ? [...new Set([...(f.categories||[]), cat._id])]
+                            : f.categories.filter(x=>x!==cat._id)
+                        }))} 
+                        style={{marginRight:'.4rem'}} 
+                      />
+                      <span>{cat.name}</span>
+                    </label>
+                  );
+                })
+              )}
             </div>
           </section>
 
@@ -250,26 +280,42 @@ export default function AdminBlogCreate(){
               {form.galleryImages.map((g,i)=>(
                 <div key={i} className="card relative" style={{padding:'.25rem',borderRadius:'12px'}}>
                   <img src={g} alt="gallery" className="w-full h-24 object-cover rounded-lg" />
-                  <button type="button" className="uploader-remove absolute left-2 bottom-2" onClick={()=>setForm(f=>({...f,galleryImages:f.galleryImages.filter((_,x)=>x!==i)}))}>Remove</button>
+                  <button 
+                    type="button" 
+                    className="uploader-remove absolute left-2 bottom-2" 
+                    onClick={()=>setForm(f=>({...f,galleryImages:f.galleryImages.filter((_,x)=>x!==i)}))}
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
-              <button type="button" className="btn-secondary h-24 w-full flex items-center justify-center text-sm" onClick={async()=>{
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = async (ev)=>{
-                  const file = ev.target.files?.[0]; if(!file) return;
-                  const reader = new FileReader();
-                  reader.onload = async ()=>{
-                    const dataUrl = reader.result;
-                    const { url } = await UploadAPI.image(dataUrl, file.name);
-                    setForm(f=>({...f, galleryImages:[...f.galleryImages, url]}));
+              <button 
+                type="button" 
+                className="btn-secondary h-24 w-full flex items-center justify-center text-sm" 
+                onClick={async()=>{
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = async (ev)=>{
+                    const file = ev.target.files?.[0]; 
+                    if(!file) return;
+                    const reader = new FileReader();
+                    reader.onload = async ()=>{
+                      const dataUrl = reader.result;
+                      const { url } = await UploadAPI.image(dataUrl, file.name);
+                      setForm(f=>({...f, galleryImages:[...f.galleryImages, url]}));
+                    };
+                    reader.readAsDataURL(file);
                   };
-                  reader.readAsDataURL(file);
-                };
-                input.click();
-              }}>+ Add image</button>
+                  input.click();
+                }}
+              >
+                + Add image
+              </button>
             </div>
+            {form.galleryImages.length === 0 && (
+              <div className="hint mt-2">Add multiple images to create a gallery for your post.</div>
+            )}
           </section>
 
           {/* Post Cover */}
@@ -299,43 +345,54 @@ export default function AdminBlogCreate(){
           <section className="section-card">
             <h3>Content</h3>
             <div className="editor mt-3">
-              <div className="editor-toolbar overflow-x-auto flex flex-wrap gap-1 p-2">
-                <button type="button" onClick={()=>setBlock('p')} className="whitespace-nowrap">P</button>
-                <button type="button" onClick={()=>setBlock('h1')} className="whitespace-nowrap">H1</button>
-                <button type="button" onClick={()=>setBlock('h2')} className="whitespace-nowrap">H2</button>
-                <button type="button" onClick={()=>setBlock('h3')} className="whitespace-nowrap">H3</button>
-                <button type="button" onClick={()=>setBlock('h4')} className="whitespace-nowrap">H4</button>
-                <button type="button" onClick={()=>setBlock('h5')} className="whitespace-nowrap">H5</button>
-                <button type="button" onClick={()=>exec('bold')} className="whitespace-nowrap">B</button>
-                <button type="button" onClick={()=>exec('italic')} className="whitespace-nowrap">I</button>
-                <button type="button" onClick={()=>exec('underline')} className="whitespace-nowrap">U</button>
-                <button type="button" onClick={()=>exec('insertOrderedList')} className="whitespace-nowrap">1.</button>
-                <button type="button" onClick={()=>exec('insertUnorderedList')} className="whitespace-nowrap">•</button>
-                <button type="button" onClick={()=>setBlock('blockquote')} className="whitespace-nowrap">❝</button>
-                <button type="button" onClick={()=>setBlock('pre')} className="whitespace-nowrap">{'{ }'}</button>
-                <button type="button" onClick={()=>exec('justifyLeft')} className="whitespace-nowrap">⟸</button>
-                <button type="button" onClick={()=>exec('justifyCenter')} className="whitespace-nowrap">⟺</button>
-                <button type="button" onClick={()=>exec('justifyRight')} className="whitespace-nowrap">⟹</button>
-                <button type="button" onClick={insertLink} className="whitespace-nowrap">Link</button>
-                <button type="button" onClick={()=>exec('unlink')} className="whitespace-nowrap">Unlink</button>
-                <button type="button" onClick={()=>exec('undo')} className="whitespace-nowrap">Undo</button>
-                <button type="button" onClick={()=>exec('redo')} className="whitespace-nowrap">Redo</button>
-                <button type="button" onClick={clearFormats} className="whitespace-nowrap">Clear</button>
-                <button type="button" onClick={uploadAndInsertToContent} className="whitespace-nowrap">+ Image</button>
+              <div className="editor-toolbar overflow-x-auto flex flex-wrap gap-1 p-2" style={{backgroundColor:'#f5f5f5',borderRadius:'8px 8px 0 0',borderBottom:'1px solid #ddd'}}>
+                <button type="button" onClick={()=>setBlock('p')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Paragraph">P</button>
+                <button type="button" onClick={()=>setBlock('h1')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Heading 1">H1</button>
+                <button type="button" onClick={()=>setBlock('h2')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Heading 2">H2</button>
+                <button type="button" onClick={()=>setBlock('h3')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Heading 3">H3</button>
+                <button type="button" onClick={()=>setBlock('h4')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Heading 4">H4</button>
+                <button type="button" onClick={()=>setBlock('h5')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Heading 5">H5</button>
+                <button type="button" onClick={()=>exec('bold')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',fontWeight:'bold',minWidth:'36px'}} title="Bold">B</button>
+                <button type="button" onClick={()=>exec('italic')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',fontStyle:'italic',minWidth:'36px'}} title="Italic">I</button>
+                <button type="button" onClick={()=>exec('underline')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',textDecoration:'underline',minWidth:'36px'}} title="Underline">U</button>
+                <button type="button" onClick={()=>exec('insertOrderedList')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Numbered List">1.</button>
+                <button type="button" onClick={()=>exec('insertUnorderedList')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Bullet List">•</button>
+                <button type="button" onClick={()=>setBlock('blockquote')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Quote">❝</button>
+                <button type="button" onClick={()=>setBlock('pre')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Code Block">{'{ }'}</button>
+                <button type="button" onClick={()=>exec('justifyLeft')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Align Left">⟸</button>
+                <button type="button" onClick={()=>exec('justifyCenter')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Align Center">⟺</button>
+                <button type="button" onClick={()=>exec('justifyRight')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer',minWidth:'36px'}} title="Align Right">⟹</button>
+                <button type="button" onClick={insertLink} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer'}} title="Insert Link">Link</button>
+                <button type="button" onClick={()=>exec('unlink')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer'}} title="Remove Link">Unlink</button>
+                <button type="button" onClick={()=>exec('undo')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer'}} title="Undo">Undo</button>
+                <button type="button" onClick={()=>exec('redo')} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer'}} title="Redo">Redo</button>
+                <button type="button" onClick={clearFormats} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #ccc',borderRadius:'4px',background:'white',cursor:'pointer'}} title="Clear Formatting">Clear</button>
+                <button type="button" onClick={uploadAndInsertToContent} className="whitespace-nowrap" style={{padding:'6px 12px',border:'1px solid #0f2b5b',borderRadius:'4px',background:'#0f2b5b',color:'white',cursor:'pointer'}} title="Insert Image">+ Image</button>
               </div>
               <div
                 ref={editorRef}
-                className="form-field min-h-[180px]"
+                className="form-field"
                 contentEditable
                 suppressContentEditableWarning
                 onInput={(e)=>{
                   const html = e.currentTarget?.innerHTML ?? e.target?.innerHTML ?? editorRef.current?.innerHTML ?? '';
                   setForm(f=>({...f, content: html }));
                 }}
-                dangerouslySetInnerHTML={{ __html: form.content || '' }}
+                dangerouslySetInnerHTML={{ __html: form.content || '<p style="color:#999;">Start typing your content here... Use the toolbar above to format text, add headings, lists, links, and images.</p>' }}
                 aria-label="Post content editor"
+                style={{
+                  minHeight:'300px',
+                  padding:'16px',
+                  border:'1px solid #ddd',
+                  borderRadius:'0 0 8px 8px',
+                  outline:'none',
+                  backgroundColor:'white',
+                  lineHeight:'1.6',
+                  fontSize:'15px',
+                  fontFamily:'system-ui, -apple-system, sans-serif'
+                }}
               />
-              <div className="hint mt-2">Use headings, lists, and emphasis to format your post.</div>
+              <div className="hint mt-2">Use headings, lists, and emphasis to format your post. Click "+ Image" to insert images inline.</div>
             </div>
           </section>
 
@@ -345,41 +402,85 @@ export default function AdminBlogCreate(){
             <div className="space-y-4 mt-3">
               <div className="form-grid">
                 <label className="form-label">Tags (comma separated)</label>
-                <input className="form-field" value={form.tags} onChange={e=>setForm(f=>({...f,tags:e.target.value}))} placeholder="design, ux, product"/>
+                <input 
+                  className="form-field" 
+                  value={form.tags} 
+                  onChange={e=>setForm(f=>({...f,tags:e.target.value}))} 
+                  placeholder="design, ux, product, technology"
+                />
                 <div className="hint">Separate with commas. Example: design, ux, product</div>
               </div>
               <div className="form-grid">
                 <label className="form-label">SEO title</label>
-                <input className="form-field" value={form.seoTitle} onChange={e=>setForm(f=>({...f,seoTitle:e.target.value}))} placeholder="SEO title"/>
-                <div className="hint">Keep it under 60 characters.</div>
+                <input 
+                  className="form-field" 
+                  value={form.seoTitle} 
+                  onChange={e=>setForm(f=>({...f,seoTitle:e.target.value}))} 
+                  placeholder="Optimized title for search engines (max 60 characters)"
+                />
+                <div className="hint">Keep it under 60 characters. {form.seoTitle.length}/60</div>
               </div>
               <div className="form-grid">
                 <label className="form-label">SEO description</label>
-                <input className="form-field" value={form.seoDescription} onChange={e=>setForm(f=>({...f,seoDescription:e.target.value}))} placeholder="SEO description"/>
-                <div className="hint">About 150–160 characters describing the post.</div>
+                <input 
+                  className="form-field" 
+                  value={form.seoDescription} 
+                  onChange={e=>setForm(f=>({...f,seoDescription:e.target.value}))} 
+                  placeholder="Brief description for search results (150-160 characters)"
+                />
+                <div className="hint">About 150–160 characters describing the post. {form.seoDescription.length}/160</div>
               </div>
               <div className="space-y-2">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={form.published} onChange={e=>setForm(f=>({...f,published:e.target.checked}))} />
+                <label className="flex items-center gap-2" style={{cursor:'pointer'}}>
+                  <input 
+                    type="checkbox" 
+                    checked={form.published} 
+                    onChange={e=>setForm(f=>({...f,published:e.target.checked}))} 
+                  />
                   <span>Publish immediately</span>
                 </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={shareToSocial} onChange={e=>setShareToSocial(e.target.checked)} />
+                <label className="flex items-center gap-2" style={{cursor:'pointer'}}>
+                  <input 
+                    type="checkbox" 
+                    checked={shareToSocial} 
+                    onChange={e=>setShareToSocial(e.target.checked)} 
+                  />
                   <span>Also share on social media</span>
                 </label>
               </div>
             </div>
           </section>
 
-          {}
-           <div className="bottom-actions">
+          {/* Bottom Actions */}
+          <div className="bottom-actions">
             <div className="container flex flex-row items-center justify-end gap-3">
-              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/blog')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
-              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+              <button 
+                type="button" 
+                className="btn-secondary lg" 
+                onClick={()=>navigate('/admin/blog')} 
+                style={{backgroundColor: 'white', color: 'black', padding: '10px 24px', borderRadius: '8px', border: '1px solid #ddd'}}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="btn lg" 
+                disabled={saving} 
+                style={{
+                  backgroundColor: '#0f2b5b', 
+                  color: 'white', 
+                  padding: '10px 24px', 
+                  borderRadius: '8px',
+                  opacity: saving ? 0.6 : 1,
+                  cursor: saving ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {saving ? 'Saving…' : 'Save Post'}
+              </button>
             </div>
           </div>
         </form>
       </main>
     </div>
   );
-}
+} 

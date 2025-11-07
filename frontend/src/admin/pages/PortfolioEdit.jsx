@@ -221,6 +221,7 @@ export default function PortfolioEdit() {
                   className="form-field ux-input w-full"
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                  placeholder="E-commerce Website, Mobile App, etc."
                   required
                 />
 
@@ -229,6 +230,7 @@ export default function PortfolioEdit() {
                   className="form-field ux-input w-full"
                   value={form.client}
                   onChange={e => setForm(f => ({ ...f, client: e.target.value }))}
+                  placeholder="Client or company name"
                 />
 
                 <label className="form-label mt-4">Description</label>
@@ -237,6 +239,7 @@ export default function PortfolioEdit() {
                   className="form-field ux-input w-full"
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  placeholder="Describe the project, features, and your role..."
                 />
               </section>
 
@@ -358,6 +361,7 @@ export default function PortfolioEdit() {
                 className="form-field ux-input w-full"
                 value={form.url}
                 onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
+                placeholder="https://example.com"
               />
 
               <label className="flex gap-2 mt-4 items-center">

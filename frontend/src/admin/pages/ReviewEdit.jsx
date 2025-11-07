@@ -71,19 +71,19 @@ export default function ReviewEdit(){
                 <h3>Details</h3>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Name</label>
-                  <input className="form-field ux-input w-full" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} required />
+                  <input className="form-field ux-input w-full" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Enter your name" required />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Role / Title</label>
-                  <input className="form-field ux-input w-full" value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))} />
+                  <input className="form-field ux-input w-full" value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))} placeholder="e.g. CEO, Manager" />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Company</label>
-                  <input className="form-field ux-input w-full" value={form.company} onChange={e=>setForm(f=>({...f,company:e.target.value}))} />
+                  <input className="form-field ux-input w-full" value={form.company} onChange={e=>setForm(f=>({...f,company:e.target.value}))} placeholder="Enter company name" />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Rating (1–5)</label>
-                  <input type="number" min="1" max="5" className="form-field ux-input w-full" value={form.rating} onChange={e=>setForm(f=>({...f,rating:e.target.value}))} />
+                  <input type="number" min="1" max="5" className="form-field ux-input w-full" value={form.rating} onChange={e=>setForm(f=>({...f,rating:e.target.value}))} placeholder="5" />
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Summary (short)</label>
@@ -109,7 +109,7 @@ export default function ReviewEdit(){
 
            <div className="bottom-actions">
             <div className="container flex flex-row items-center justify-end gap-3">
-              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/review')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/reviews')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
               {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
               <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
             </div>
