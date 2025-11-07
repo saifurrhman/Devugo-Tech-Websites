@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ContactAPI } from '../../lib/api';
@@ -77,6 +77,24 @@ export default function Contacts() {
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
   const [filterSource, setFilterSource] = useState('all');
+  
+  // Selection state
+  const [selectedIds, setSelectedIds] = useState([]);
+  
+  // Dropdown state
+  const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
+  const sourceDropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sourceDropdownRef.current && !sourceDropdownRef.current.contains(event.target)) {
+        setSourceDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -114,6 +132,43 @@ export default function Contacts() {
     const sourceSet = new Set(items.map(c => c.source).filter(Boolean));
     return ['all', ...Array.from(sourceSet)];
   }, [items]);
+
+  // Toggle single selection
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => 
+      prev.includes(id) 
+        ? prev.filter(i => i !== id)
+        : [...prev, id]
+    );
+  };
+
+  // Toggle select all
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filtered.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filtered.map(c => c._id));
+    }
+  };
+
+  // Delete selected contacts
+  async function handleDeleteSelected() {
+    if (selectedIds.length === 0) {
+      alert('Please select contacts to delete');
+      return;
+    }
+    
+    if (!window.confirm(`Delete ${selectedIds.length} selected contact(s)?`)) return;
+    
+    try {
+      await Promise.all(selectedIds.map(id => ContactAPI.remove(id)));
+      setItems(prev => prev.filter(c => !selectedIds.includes(c._id)));
+      setSelectedIds([]);
+      alert('Selected contacts deleted successfully');
+    } catch (err) { 
+      alert(err.message || 'Failed to delete selected contacts'); 
+    }
+  }
 
   function exportCsv(rows) {
     const header = ['Name', 'Email', 'Phone', 'Subject', 'Message', 'Source', 'Date'];
@@ -204,6 +259,13 @@ export default function Contacts() {
     doc.save(`contacts_export_${new Date().toISOString().split('T')[0]}.pdf`);
   }
 
+  const sourceOptions = sources.map(src => ({
+    value: src,
+    label: src === 'all' ? 'All Sources' : src
+  }));
+
+  const selectedSourceOption = sourceOptions.find(opt => opt.value === filterSource);
+
   return (
     <div className="admin-layout min-h-screen">
       <AdminSidebar />
@@ -230,7 +292,7 @@ export default function Contacts() {
             <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
               <button
                 className="btn-secondary flex-1 sm:flex-none text-xs sm:text-sm px-4 py-2.5 flex items-center justify-center gap-2 font-semibold transition-all duration-200 hover:scale-105"
-                onClick={() => exportCsv(filtered)}
+                onClick={() => exportCsv(selectedIds.length > 0 ? items.filter(c => selectedIds.includes(c._id)) : filtered)}
                 style={{
                   background: 'rgba(59, 130, 246, 0.1)',
                   border: '1.5px solid rgba(59, 130, 246, 0.3)',
@@ -239,11 +301,11 @@ export default function Contacts() {
                 }}
               >
                 <IconFileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Export CSV</span>
+                <span>Export CSV {selectedIds.length > 0 && `(${selectedIds.length})`}</span>
               </button>
               <button
                 className="btn-secondary flex-1 sm:flex-none text-xs sm:text-sm px-4 py-2.5 flex items-center justify-center gap-2 font-semibold transition-all duration-200 hover:scale-105"
-                onClick={() => exportPdf(filtered)}
+                onClick={() => exportPdf(selectedIds.length > 0 ? items.filter(c => selectedIds.includes(c._id)) : filtered)}
                 style={{
                   background: 'rgba(59, 130, 246, 0.1)',
                   border: '1.5px solid rgba(59, 130, 246, 0.3)',
@@ -252,7 +314,7 @@ export default function Contacts() {
                 }}
               >
                 <IconDownload className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Export PDF</span>
+                <span>Export PDF {selectedIds.length > 0 && `(${selectedIds.length})`}</span>
               </button>
             </div>
           </div>
@@ -286,33 +348,98 @@ export default function Contacts() {
               />
             </div>
 
-            {/* Source Filter */}
+            {/* Source Filter Dropdown */}
             <div className="flex items-center gap-2">
               <IconFilter className="w-5 h-5" style={{ color: '#ffffff' }} />
-              <select
-                value={filterSource}
-                onChange={(e) => setFilterSource(e.target.value)}
-                className="px-4 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-xl transition-all duration-200"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1.5px solid rgba(255, 255, 255, 0.12)',
-                  color: '#ffffff',
-                  outline: 'none',
-                  minWidth: '150px'
-                }}
-              >
-                {sources.map(src => (
-                  <option key={src} value={src} style={{ background: '#0f172a' }}>
-                    {src === 'all' ? 'All Sources' : src}
-                  </option>
-                ))}
-              </select>
+              <div ref={sourceDropdownRef} style={{position:'relative'}}>
+                <button
+                  onClick={() => setSourceDropdownOpen(!sourceDropdownOpen)}
+                  className="px-4 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-xl transition-all duration-200"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1.5px solid rgba(255, 255, 255, 0.12)',
+                    color: '#ffffff',
+                    outline: 'none',
+                    minWidth: '150px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '.5rem'
+                  }}
+                >
+                  <span>{selectedSourceOption.label}</span>
+                  <span style={{fontSize:'.75rem'}}>▼</span>
+                </button>
+                
+                {sourceDropdownOpen && (
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + .5rem)',
+                      right: 0,
+                      minWidth: '200px',
+                      padding: '.4rem',
+                      zIndex: 1000,
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '.5rem',
+                      boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+                      maxHeight: '300px',
+                      overflowY: 'auto'
+                    }}
+                  >
+                    {sourceOptions.map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setFilterSource(option.value);
+                          setSourceDropdownOpen(false);
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '.6rem .85rem',
+                          background: filterSource === option.value 
+                            ? 'rgba(59, 130, 246, 0.3)' 
+                            : 'transparent',
+                          border: filterSource === option.value 
+                            ? '1px solid rgba(59, 130, 246, 0.5)' 
+                            : '1px solid transparent',
+                          borderRadius: '.375rem',
+                          color: '#fff',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all .2s',
+                          fontSize: '.9rem',
+                          fontWeight: filterSource === option.value ? '500' : '400',
+                          marginBottom: '.25rem'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (filterSource !== option.value) {
+                            e.target.style.background = 'rgba(255, 255, 255, 0.15)';
+                            e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (filterSource !== option.value) {
+                            e.target.style.background = 'transparent';
+                            e.target.style.borderColor = 'transparent';
+                          }
+                        }}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Stats Bar - Glass Morphism White Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 mb-4 sm:mb-6">
           <div className="card p-3 sm:p-4 text-center transition-all duration-300 hover:scale-105" style={{
             background: 'rgba(255, 255, 255, 0.08)',
             border: '1.5px solid rgba(255, 255, 255, 0.15)',
@@ -356,7 +483,59 @@ export default function Contacts() {
             <div className="text-2xl sm:text-3xl font-black mb-1" style={{ color: '#ffffff' }}>{items.filter(c => c.phone).length}</div>
             <div className="text-xs sm:text-sm font-semibold" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>With Phone</div>
           </div>
+
+          {selectedIds.length > 0 && (
+            <div className="card p-3 sm:p-4 text-center transition-all duration-300 hover:scale-105" style={{
+              background: 'rgba(59, 130, 246, 0.2)',
+              border: '1.5px solid rgba(59, 130, 246, 0.4)',
+              borderRadius: '16px',
+              backdropFilter: 'blur(12px)',
+              boxShadow: '0 8px 32px rgba(59, 130, 246, 0.2)'
+            }}>
+              <div className="text-2xl sm:text-3xl font-black mb-1" style={{ color: '#ffffff' }}>{selectedIds.length}</div>
+              <div className="text-xs sm:text-sm font-semibold" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>Selected</div>
+            </div>
+          )}
         </div>
+
+        {/* Bulk Actions Bar */}
+        {!loading && !error && filtered.length > 0 && (
+          <div className="card p-3 sm:p-4 mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-3" style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1.5px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '16px',
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
+          }}>
+            <div style={{display:'flex',gap:'.6rem',alignItems:'center'}}>
+              <input 
+                type="checkbox" 
+                checked={selectedIds.length === filtered.length && filtered.length > 0}
+                onChange={toggleSelectAll}
+                style={{cursor:'pointer',width:'18px',height:'18px'}}
+              />
+              <span style={{fontSize:'.9rem',color:'#ffffff',fontWeight:'600'}}>
+                {selectedIds.length === filtered.length && filtered.length > 0 
+                  ? 'Deselect All' 
+                  : 'Select All'}
+              </span>
+            </div>
+            
+            {selectedIds.length > 0 && (
+              <button 
+                onClick={handleDeleteSelected}
+                className="text-xs sm:text-sm px-4 py-2.5 flex items-center gap-2 font-bold rounded-lg transition-all duration-200 hover:scale-105"
+                style={{
+                  background: 'rgba(239, 68, 68, 0.15)',
+                  border: '1.5px solid rgba(239, 68, 68, 0.3)',
+                  color: '#ef4444'
+                }}
+              >
+                Delete Selected ({selectedIds.length})
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Loading/Error States */}
         {loading && (
@@ -383,22 +562,30 @@ export default function Contacts() {
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pb-6">
               {filtered.map((c, idx) => {
                 const initials = String(c.name || c.email || '?').trim().slice(0, 1).toUpperCase();
+                const isSelected = selectedIds.includes(c._id);
 
                 return (
                   <div
                     key={c._id || idx}
                     className="card p-4 sm:p-5 flex flex-col gap-4 transition-all duration-300 hover:scale-[1.02]"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      border: '1.5px solid rgba(255, 255, 255, 0.15)',
+                      background: isSelected ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                      border: isSelected ? '2px solid #3b82f6' : '1.5px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '20px',
                       backdropFilter: 'blur(16px)',
-                      boxShadow: '0 8px 32px rgba(59, 130, 246, 0.15)'
+                      boxShadow: isSelected ? '0 8px 32px rgba(59, 130, 246, 0.3)' : '0 8px 32px rgba(59, 130, 246, 0.15)'
                     }}
                   >
-                    {/* Header with Avatar */}
+                    {/* Checkbox and Header with Avatar */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <input 
+                          type="checkbox" 
+                          checked={isSelected}
+                          onChange={() => toggleSelect(c._id)}
+                          style={{cursor:'pointer',width:'18px',height:'18px',flexShrink:0}}
+                        />
+                        
                         {/* Glass Avatar */}
                         <div
                           className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex-shrink-0 flex items-center justify-center font-black text-base sm:text-lg"
@@ -426,7 +613,7 @@ export default function Contacts() {
                     </div>
 
                     {/* Badges Row - Glass Badges */}
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-2 flex-wrap" style={{paddingLeft:'1.75rem'}}>
                       {c.subject && (
                         <span className="badge text-xs px-3 py-1.5 flex items-center gap-1.5 font-bold rounded-lg"
                           style={{
@@ -470,7 +657,8 @@ export default function Contacts() {
                       <div className="p-3 rounded-xl" style={{
                         background: 'rgba(255, 255, 255, 0.06)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
-                        backdropFilter: 'blur(8px)'
+                        backdropFilter: 'blur(8px)',
+                        marginLeft: '1.75rem'
                       }}>
                         <p
                           className="text-xs sm:text-sm m-0 leading-relaxed"
@@ -490,7 +678,7 @@ export default function Contacts() {
 
                     {/* Footer */}
                     <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 pt-3"
-                      style={{ borderTop: '1.5px solid rgba(255, 255, 255, 0.1)' }}>
+                      style={{ borderTop: '1.5px solid rgba(255, 255, 255, 0.1)', marginLeft: '1.75rem' }}>
                       <small className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                         <IconClock className="w-3.5 h-3.5" />
                         <span>
