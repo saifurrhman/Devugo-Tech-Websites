@@ -5,8 +5,8 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const session = require('express-session');
-const path = require('path'); // <-- ADD THIS
-const fs = require('fs'); // <-- ADD THIS
+const path = require('path');
+const fs = require('fs');
 
 require('./config/passport')();
 
@@ -53,15 +53,15 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // ============================================
-// CORS CONFIGURATION
+// ✅ CORS CONFIGURATION - FIXED FOR VERCEL
 // ============================================
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'https://devugo-tech-websites.vercel.app',
-  'https://www.your-domain.com',
+  'https://devugo-tech-websites.vercel.app', // ✅ Your frontend URL
 ];
 
+// ✅ Add all Vercel preview URLs automatically
 const extraOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
 if (extraOrigins) {
   extraOrigins
@@ -75,29 +75,41 @@ if (extraOrigins) {
     });
 }
 
+// ✅ Allow all Vercel preview deployments
 const allowedOriginRegex = /^(https?:\/\/)(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/.*\.vercel\.app$/;
 
 app.use(cors({
   origin: function(origin, cb){
+    // ✅ Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return cb(null, true);
+    
+    // ✅ Check against allowed origins or regex
     if (allowedOrigins.includes(origin) || allowedOriginRegex.test(origin)) {
       console.log('✅ CORS allowed for:', origin);
       return cb(null, true);
     }
+    
     console.log('❌ CORS blocked origin:', origin);
     return cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET','POST','PATCH','PUT','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization'],
+  exposedHeaders: ['Set-Cookie'], // ✅ Important for cookies
 }));
 
-// Handle preflight requests
+// ✅ Enhanced preflight handling
 app.use(function(req, res, next) {
+  const origin = req.headers.origin;
+  
+  if (origin && (allowedOrigins.includes(origin) || allowedOriginRegex.test(origin))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  
   if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-    res.header('Access-Control-Allow-Credentials', 'true');
     return res.status(200).send();
   }
   next();
@@ -106,17 +118,17 @@ app.use(function(req, res, next) {
 app.use(cookieParser());
 
 // ============================================
-// IMAGE UPLOAD FOLDER (FIX 1)
+// IMAGE UPLOAD FOLDER
 // ============================================
-// Static files serve karein uploaded images access ke liye
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use(express.static('public'));
 
-// Upload directory create karein agar exist nahi karti
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
   console.log('✅ Upload directory created:', uploadDir);
+} else {
+  console.log('📁 Upload directory exists:', uploadDir);
 }
 
 // ============================================
@@ -136,7 +148,6 @@ mongoose.connect(process.env.MONGO_URI, {
 // ROUTES
 // ============================================
 
-// Default API route
 app.get("/", (req, res) => {
   res.json({
     message: "API is running 🚀",
@@ -145,7 +156,6 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health check
 app.get('/api/health', async (_req, res) => {
   const state = mongoose.connection.readyState;
   const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
@@ -160,7 +170,7 @@ app.get('/api/health', async (_req, res) => {
   try{
     const Service = require('./models/Service');
     const PricingPlan = require('./models/PricingPlan');
-    const Portfolio = require('./modelsS/Portfolio');
+    const Portfolio = require('./models/Portfolio');
     const TeamMember = require('./models/TeamMember');
     const BlogPost = require('./models/BlogPost');
 
@@ -173,12 +183,11 @@ app.get('/api/health', async (_req, res) => {
     ]);
 
     info.totals = { services, pricing, portfolio, team, blogs };
-  } catch(_e) { /* ignore in health */ }
+  } catch(_e) { /* ignore */ }
 
   res.json(info);
 });
 
-// API Routes
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
@@ -194,7 +203,6 @@ app.use('/api/analytics', analyticsRoutes);
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
-// ✅ IMAGE ROUTES - NOW ENABLED
 const imageRoutes = require('./routes/imageRoutes');
 app.use('/api/images', imageRoutes);
 
@@ -232,23 +240,22 @@ const socialLinkRoutes = require('./routes/socialLinks');
 app.use('/api/social-links', socialLinkRoutes);
 
 // ============================================
-// ERROR HANDLING (FIX 2)
+// ERROR HANDLING
 // ============================================
 app.use((err, req, res, next) => {
   console.error('Error:', err);
 
-  // Multer specific errors (FROM ORIGINAL PDF)
   if (err.name === 'MulterError') {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: 'File size bohat bari hai! Maximum 5MB allowed hai.'
+        message: 'File size too large! Maximum 5MB allowed.'
       });
     }
     if (err.code === 'LIMIT_FILE_COUNT') {
       return res.status(400).json({
         success: false,
-        message: 'Bohat zyada files select ki hain!'
+        message: 'Too many files!'
       });
     }
     if (err.code === 'LIMIT_UNEXPECTED_FILE') {
@@ -259,7 +266,6 @@ app.use((err, req, res, next) => {
     }
   }
 
-  // File type error (from multer fileFilter)
   if (err.message && err.message.includes('Only image files')) {
     return res.status(400).json({
       success: false,
@@ -267,7 +273,6 @@ app.use((err, req, res, next) => {
     });
   }
 
-  // CORS errors
   if (err.message === 'Not allowed by CORS') {
     return res.status(403).json({
       success: false,
@@ -275,7 +280,6 @@ app.use((err, req, res, next) => {
     });
   }
 
-  // Generic error
   res.status(500).json({
     success: false,
     message: process.env.NODE_ENV === 'production'
