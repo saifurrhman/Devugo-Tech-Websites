@@ -44,5 +44,5 @@ export default function SocialManager(){
         </div>
       </main>
     </div>
-  );
+  );  
 }

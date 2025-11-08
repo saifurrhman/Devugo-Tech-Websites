@@ -5,8 +5,8 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const session = require('express-session');
-const path = require('path'); // <-- ADD THIS
-const fs = require('fs'); // <-- ADD THIS
+const path = require('path');
+const fs = require('fs');
 
 require('./config/passport')();
 
@@ -17,6 +17,11 @@ const app = express();
 // ============================================
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+
+// ============================================
+// TRUST PROXY (VERCEL KE LIYE ZAROORI)
+// ============================================
+app.set('trust proxy', 1);
 
 // ============================================
 // SESSION CONFIGURATION
@@ -53,15 +58,16 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // ============================================
-// CORS CONFIGURATION
+// CORS CONFIGURATION (IMPROVED FOR VERCEL)
 // ============================================
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'https://devugo-tech-websites.vercel.app',
-  'https://www.your-domain.com',
-];
+  process.env.FRONTEND_URL, // Frontend URL from env
+].filter(Boolean);
 
+// Extra origins from environment variables
 const extraOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
 if (extraOrigins) {
   extraOrigins
@@ -75,16 +81,21 @@ if (extraOrigins) {
     });
 }
 
+// Vercel domains ko automatically allow karein
 const allowedOriginRegex = /^(https?:\/\/)(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/.*\.vercel\.app$/;
 
 app.use(cors({
   origin: function(origin, cb){
+    // No origin (Postman, mobile apps, etc.)
     if (!origin) return cb(null, true);
+    
+    // Check allowed origins or regex
     if (allowedOrigins.includes(origin) || allowedOriginRegex.test(origin)) {
       console.log('✅ CORS allowed for:', origin);
       return cb(null, true);
     }
-    console.log('❌ CORS blocked origin:', origin);
+    
+    console.warn('❌ CORS blocked origin:', origin);
     return cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
@@ -92,7 +103,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization'],
 }));
 
-// Handle preflight requests
+// Preflight requests
 app.use(function(req, res, next) {
   if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
@@ -106,17 +117,17 @@ app.use(function(req, res, next) {
 app.use(cookieParser());
 
 // ============================================
-// IMAGE UPLOAD FOLDER (FIX 1)
+// STATIC FILES (ONLY FOR LOCAL, NOT VERCEL)
 // ============================================
-// Static files serve karein uploaded images access ke liye
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-app.use(express.static('public'));
-
-// Upload directory create karein agar exist nahi karti
-const uploadDir = path.join(__dirname, 'public/uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('✅ Upload directory created:', uploadDir);
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+  app.use(express.static('public'));
+  
+  const uploadDir = path.join(__dirname, 'public/uploads');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('✅ Upload directory created:', uploadDir);
+  }
 }
 
 // ============================================
@@ -136,119 +147,183 @@ mongoose.connect(process.env.MONGO_URI, {
 // ROUTES
 // ============================================
 
-// Default API route
+// Root route
 app.get("/", (req, res) => {
   res.json({
-    message: "API is running 🚀",
+    message: "✅ Devugo Tech API is running",
     environment: process.env.NODE_ENV || 'development',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      blog: '/api/blog',
+      services: '/api/services',
+      portfolio: '/api/portfolio',
+      team: '/api/team',
+      contact: '/api/contact'
+    }
   });
 });
 
-// Health check
+// Health check with better error handling
 app.get('/api/health', async (_req, res) => {
-  const state = mongoose.connection.readyState;
-  const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
-  const info = {
-    dbState: state,
-    dbStateText: states[state] || 'unknown',
-    dbName: mongoose.connection.name,
-    host: mongoose.connection.host,
-    environment: process.env.NODE_ENV || 'development',
-  };
+  try {
+    const state = mongoose.connection.readyState;
+    const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+    
+    const info = {
+      status: 'ok',
+      dbState: state,
+      dbStateText: states[state] || 'unknown',
+      dbName: mongoose.connection.name,
+      host: mongoose.connection.host,
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
+    };
 
-  try{
-    const Service = require('./models/Service');
-    const PricingPlan = require('./models/PricingPlan');
-    const Portfolio = require('./modelsS/Portfolio');
-    const TeamMember = require('./models/TeamMember');
-    const BlogPost = require('./models/BlogPost');
+    // Try to get counts (with error handling)
+    try {
+      const Service = require('./models/Service');
+      const PricingPlan = require('./models/PricingPlan');
+      const Portfolio = require('./models/Portfolio');
+      const TeamMember = require('./models/TeamMember');
+      const BlogPost = require('./models/BlogPost');
 
-    const [services, pricing, portfolio, team, blogs] = await Promise.all([
-      Service.countDocuments({}),
-      PricingPlan.countDocuments({}),
-      Portfolio.countDocuments({}),
-      TeamMember.countDocuments({}),
-      BlogPost.countDocuments({}),
-    ]);
+      const [services, pricing, portfolio, team, blogs] = await Promise.all([
+        Service.countDocuments({}),
+        PricingPlan.countDocuments({}),
+        Portfolio.countDocuments({}),
+        TeamMember.countDocuments({}),
+        BlogPost.countDocuments({}),
+      ]);
 
-    info.totals = { services, pricing, portfolio, team, blogs };
-  } catch(_e) { /* ignore in health */ }
+      info.totals = { services, pricing, portfolio, team, blogs };
+    } catch(e) {
+      info.totals = { error: 'Could not fetch counts' };
+    }
 
-  res.json(info);
+    res.json(info);
+  } catch(error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
 });
 
 // API Routes
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes);
+try {
+  const authRoutes = require('./routes/auth');
+  app.use('/api/auth', authRoutes);
+} catch(e) { console.error('❌ Auth routes error:', e.message); }
 
-const blogRoutes = require('./routes/blog');
-app.use('/api/blog', blogRoutes);
+try {
+  const blogRoutes = require('./routes/blog');
+  app.use('/api/blog', blogRoutes);
+} catch(e) { console.error('❌ Blog routes error:', e.message); }
 
-const contactRoutes = require('./routes/contact');
-app.use('/api/contact', contactRoutes);
+try {
+  const contactRoutes = require('./routes/contact');
+  app.use('/api/contact', contactRoutes);
+} catch(e) { console.error('❌ Contact routes error:', e.message); }
 
-const analyticsRoutes = require('./routes/analytics');
-app.use('/api/analytics', analyticsRoutes);
+try {
+  const analyticsRoutes = require('./routes/analytics');
+  app.use('/api/analytics', analyticsRoutes);
+} catch(e) { console.error('❌ Analytics routes error:', e.message); }
 
-const uploadRoutes = require('./routes/upload');
-app.use('/api/upload', uploadRoutes);
+try {
+  const uploadRoutes = require('./routes/upload');
+  app.use('/api/upload', uploadRoutes);
+} catch(e) { console.error('❌ Upload routes error:', e.message); }
 
-// ✅ IMAGE ROUTES - NOW ENABLED
-const imageRoutes = require('./routes/imageRoutes');
-app.use('/api/images', imageRoutes);
+try {
+  const imageRoutes = require('./routes/imageRoutes');
+  app.use('/api/images', imageRoutes);
+} catch(e) { console.error('❌ Image routes error:', e.message); }
 
-const serviceRoutes = require('./routes/services');
-app.use('/api/services', serviceRoutes);
+try {
+  const serviceRoutes = require('./routes/services');
+  app.use('/api/services', serviceRoutes);
+} catch(e) { console.error('❌ Service routes error:', e.message); }
 
-const pricingRoutes = require('./routes/pricing');
-app.use('/api/pricing', pricingRoutes);
+try {
+  const pricingRoutes = require('./routes/pricing');
+  app.use('/api/pricing', pricingRoutes);
+} catch(e) { console.error('❌ Pricing routes error:', e.message); }
 
-const portfolioRoutes = require('./routes/portfolio');
-app.use('/api/portfolio', portfolioRoutes);
+try {
+  const portfolioRoutes = require('./routes/portfolio');
+  app.use('/api/portfolio', portfolioRoutes);
+} catch(e) { console.error('❌ Portfolio routes error:', e.message); }
 
-const teamRoutes = require('./routes/team');
-app.use('/api/team', teamRoutes);
+try {
+  const teamRoutes = require('./routes/team');
+  app.use('/api/team', teamRoutes);
+} catch(e) { console.error('❌ Team routes error:', e.message); }
 
-const portfolioCategoryRoutes = require('./routes/portfolioCategories');
-app.use('/api/portfolio-categories', portfolioCategoryRoutes);
+try {
+  const portfolioCategoryRoutes = require('./routes/portfolioCategories');
+  app.use('/api/portfolio-categories', portfolioCategoryRoutes);
+} catch(e) { console.error('❌ Portfolio category routes error:', e.message); }
 
-const techStackRoutes = require('./routes/techStack');
-app.use('/api/tech-stack', techStackRoutes);
+try {
+  const techStackRoutes = require('./routes/techStack');
+  app.use('/api/tech-stack', techStackRoutes);
+} catch(e) { console.error('❌ Tech stack routes error:', e.message); }
 
-const reviewRoutes = require('./routes/reviews');
-app.use('/api/reviews', reviewRoutes);
+try {
+  const reviewRoutes = require('./routes/reviews');
+  app.use('/api/reviews', reviewRoutes);
+} catch(e) { console.error('❌ Review routes error:', e.message); }
 
-const faqRoutes = require('./routes/faqs');
-app.use('/api/faqs', faqRoutes);
+try {
+  const faqRoutes = require('./routes/faqs');
+  app.use('/api/faqs', faqRoutes);
+} catch(e) { console.error('❌ FAQ routes error:', e.message); }
 
-const formRoutes = require('./routes/forms');
-app.use('/api/forms', formRoutes);
+try {
+  const formRoutes = require('./routes/forms');
+  app.use('/api/forms', formRoutes);
+} catch(e) { console.error('❌ Form routes error:', e.message); }
 
-const blogCategoryRoutes = require('./routes/blogCategories');
-app.use('/api/blog-categories', blogCategoryRoutes);
+try {
+  const blogCategoryRoutes = require('./routes/blogCategories');
+  app.use('/api/blog-categories', blogCategoryRoutes);
+} catch(e) { console.error('❌ Blog category routes error:', e.message); }
 
-const socialLinkRoutes = require('./routes/socialLinks');
-app.use('/api/social-links', socialLinkRoutes);
+try {
+  const socialLinkRoutes = require('./routes/socialLinks');
+  app.use('/api/social-links', socialLinkRoutes);
+} catch(e) { console.error('❌ Social link routes error:', e.message); }
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+    availableRoutes: ['/api/health', '/api/auth', '/api/blog', '/api/services']
+  });
+});
 
 // ============================================
-// ERROR HANDLING (FIX 2)
+// ERROR HANDLING
 // ============================================
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  console.error('❌ Error:', err);
 
-  // Multer specific errors (FROM ORIGINAL PDF)
+  // Multer errors
   if (err.name === 'MulterError') {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: 'File size bohat bari hai! Maximum 5MB allowed hai.'
+        message: 'File size too large! Maximum 5MB allowed.'
       });
     }
     if (err.code === 'LIMIT_FILE_COUNT') {
       return res.status(400).json({
         success: false,
-        message: 'Bohat zyada files select ki hain!'
+        message: 'Too many files selected!'
       });
     }
     if (err.code === 'LIMIT_UNEXPECTED_FILE') {
@@ -259,7 +334,7 @@ app.use((err, req, res, next) => {
     }
   }
 
-  // File type error (from multer fileFilter)
+  // File type error
   if (err.message && err.message.includes('Only image files')) {
     return res.status(400).json({
       success: false,
@@ -271,27 +346,34 @@ app.use((err, req, res, next) => {
   if (err.message === 'Not allowed by CORS') {
     return res.status(403).json({
       success: false,
-      message: 'CORS policy violation'
+      message: 'CORS policy violation',
+      origin: req.headers.origin
     });
   }
 
   // Generic error
-  res.status(500).json({
+  res.status(err.status || 500).json({
     success: false,
     message: process.env.NODE_ENV === 'production'
       ? 'Internal server error'
-      : err.message
+      : err.message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
   });
 });
 
 // ============================================
-// START SERVER
+// START SERVER (VERCEL EXPORTS THIS)
 // ============================================
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 Allowed origins:`, allowedOrigins);
-  console.log(`\n`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Server running on port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 Allowed origins:`, allowedOrigins);
+    console.log(`\n`);
+  });
+}
+
+// Export for Vercel
+module.exports = app;
