@@ -53,15 +53,14 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // ============================================
-// ✅ CRITICAL FIX: CORS MUST BE BEFORE ROUTES
+// ✅ CORS CONFIGURATION - FIXED
 // ============================================
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'https://devugo-tech-websites.vercel.app', // ✅ Your production frontend
+  'https://devugo-tech-websites.vercel.app',
 ];
 
-// Add environment variable origins
 if (process.env.CORS_ORIGINS) {
   const extraOrigins = process.env.CORS_ORIGINS.split(',').map(o => o.trim()).filter(Boolean);
   extraOrigins.forEach(origin => {
@@ -73,44 +72,23 @@ if (process.env.CORS_ORIGINS) {
 
 console.log('✅ Allowed CORS Origins:', allowedOrigins);
 
-// Allow all Vercel preview URLs
 const vercelRegex = /^https:\/\/.*\.vercel\.app$/;
 
-// ✅ CORS Configuration - MUST be BEFORE routes
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (Postman, mobile apps)
-    if (!origin) {
-      return callback(null, true);
-    }
-    
-    // Check if origin is allowed
+    if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin) || vercelRegex.test(origin)) {
-      console.log('✅ CORS: Allowed origin:', origin);
+      console.log('✅ CORS: Allowed', origin);
       return callback(null, true);
     }
-    
-    console.log('❌ CORS: Blocked origin:', origin);
+    console.log('❌ CORS: Blocked', origin);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Set-Cookie'],
-  maxAge: 86400, // Cache preflight for 24 hours
 }));
-
-// ✅ Additional CORS headers for preflight
-app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  if (origin && (allowedOrigins.includes(origin) || vercelRegex.test(origin))) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
-  }
-  res.sendStatus(200);
-});
 
 app.use(cookieParser());
 
@@ -123,7 +101,7 @@ app.use(express.static('public'));
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('✅ Upload directory created:', uploadDir);
+  console.log('✅ Upload directory created');
 }
 
 // ============================================
@@ -151,10 +129,9 @@ app.get("/", (req, res) => {
 });
 
 app.get('/api/health', async (_req, res) => {
-  const state = mongoose.connection.readyState;
   res.json({
     status: 'ok',
-    database: state === 1 ? 'connected' : 'disconnected',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     environment: process.env.NODE_ENV || 'development'
   });
 });
@@ -174,8 +151,14 @@ app.use('/api/analytics', analyticsRoutes);
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
-const imageRoutes = require('./routes/imageRoutes');
-app.use('/api/images', imageRoutes);
+// ✅ IMAGE ROUTES - Comment karo agar imageController missing hai
+try {
+  const imageRoutes = require('./routes/imageRoutes');
+  app.use('/api/images', imageRoutes);
+  console.log('✅ Image routes loaded');
+} catch (err) {
+  console.log('⚠️ Image routes not loaded:', err.message);
+}
 
 const serviceRoutes = require('./routes/services');
 app.use('/api/services', serviceRoutes);
@@ -242,7 +225,8 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`\n🚀 Server on port ${PORT}`);
+  console.log(`\n🚀 Server running on port ${PORT}`);
   console.log(`📍 ENV: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 CORS origins:`, allowedOrigins);
-})
+  console.log('\n');
+});
