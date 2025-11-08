@@ -1,12 +1,10 @@
-import { apiWithRefresh, saveToken, clearTokens } from './apiInterceptor';
+import { apiWithRefresh, saveToken, clearTokens, fetchWithAuth } from './apiInterceptor';
 
 // ============================================
 // API BASE URL CONFIGURATION
 // ============================================
-// Production: Use your deployed backend URL
-// Development: Use localhost
-export const API_BASE = process.env.REACT_APP_API_URL || 
-  (process.env.NODE_ENV === 'production' 
+export const API_BASE = process.env.REACT_APP_API_URL ||
+  (process.env.NODE_ENV === 'production'
     ? 'https://your-backend-url.vercel.app' // ⚠️ REPLACE with your actual backend URL
     : 'http://localhost:5000');
 
@@ -18,11 +16,11 @@ export const api = apiWithRefresh;
 
 // Build query string
 function buildQuery(params = {}) {
-  const entries = Object.entries(params).filter(([, v]) => 
+  const entries = Object.entries(params).filter(([, v]) =>
     v !== undefined && v !== null && v !== ''
   );
   if (!entries.length) return '';
-  
+
   const qs = new URLSearchParams();
   for (const [k, v] of entries) {
     qs.set(k, String(v));
@@ -41,7 +39,7 @@ export const AuthAPI = {
     }
     return data;
   },
-  
+
   login: async (payload) => {
     const data = await api('/api/auth/login', { method: 'POST', body: payload });
     if (data.accessToken) {
@@ -49,9 +47,9 @@ export const AuthAPI = {
     }
     return data;
   },
-  
+
   me: () => api('/api/auth/me', { method: 'GET' }),
-  
+
   logout: async () => {
     try {
       const data = await api('/api/auth/logout', { method: 'POST' });
@@ -62,27 +60,27 @@ export const AuthAPI = {
       throw error;
     }
   },
-  
+
   refresh: () => api('/api/auth/refresh', { method: 'POST' }),
-  
-  requestReset: (email) => api('/api/auth/reset-password', { 
-    method: 'POST', 
-    body: { email } 
+
+  requestReset: (email) => api('/api/auth/reset-password', {
+    method: 'POST',
+    body: { email }
   }),
-  
+
   resetPassword: (token, password) => api('/api/auth/reset-password-confirm', {
     method: 'POST',
     body: { token, password }
   }),
-  
-  updateMe: (payload) => api('/api/auth/me', { 
-    method: 'PATCH', 
-    body: payload 
+
+  updateMe: (payload) => api('/api/auth/me', {
+    method: 'PATCH',
+    body: payload
   }),
-  
-  changePassword: (payload) => api('/api/auth/change-password', { 
-    method: 'POST', 
-    body: payload 
+
+  changePassword: (payload) => api('/api/auth/change-password', {
+    method: 'POST',
+    body: payload
   }),
 };
 
@@ -134,13 +132,101 @@ export const AnalyticsAPI = {
 };
 
 // ============================================
-// UPLOAD API
+// UPLOAD API (COMPLETE & FIXED)
 // ============================================
 export const UploadAPI = {
-  image: (dataUrl, filename) => api('/api/upload/image', { 
-    method: 'POST', 
-    body: { dataUrl, filename } 
-  }),
+  /**
+   * Uploads a single file to the backend.
+   * @param {File} file The file object from an <input>
+   * @returns {Promise<object>} The API response (e.g., { success: true, data: { url, ... } })
+   */
+  uploadSingle: async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    // ✅ FIXED: Match backend route /api/images/upload-single
+    const url = `${API_BASE}/api/images/upload-single`;
+    const response = await fetchWithAuth(url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.status === 204) return {};
+    
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      const message = data?.error || data?.message || `Upload failed (${response.status})`;
+      throw new Error(message);
+    }
+    
+    return data;
+  },
+
+  /**
+   * Uploads multiple files.
+   * @param {FileList|File[]} files Array of file objects
+   * @returns {Promise<object>} The API response (e.g., { success: true, data: [...] })
+   */
+  uploadMultiple: async (files) => {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('images', file);
+    }
+
+    // ✅ FIXED: Match backend route /api/images/upload-multiple
+    const url = `${API_BASE}/api/images/upload-multiple`;
+    const response = await fetchWithAuth(url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.status === 204) return {};
+    
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      const message = data?.error || data?.message || `Upload failed (${response.status})`;
+      throw new Error(message);
+    }
+    
+    return data;
+  },
+
+  /**
+   * ✅ BACKWARD COMPATIBILITY
+   * Legacy method for base64 image upload
+   * @deprecated Use uploadSingle instead
+   */
+  image: async (dataUrl, filename) => {
+    console.warn('⚠️ UploadAPI.image() is deprecated. Use UploadAPI.uploadSingle() instead.');
+    
+    try {
+      // Convert base64 to File object
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], filename || 'image.jpg', { type: blob.type });
+      
+      // Use the new upload method
+      const result = await UploadAPI.uploadSingle(file);
+      
+      // Return in old format for compatibility
+      return { url: result.data?.url || '' };
+    } catch (err) {
+      console.error('❌ UploadAPI.image error:', err);
+      throw err;
+    }
+  }
 };
 
 // ============================================

@@ -20,6 +20,9 @@ export default function TeamList(){
   // Dropdown state
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const roleDropdownRef = useRef(null);
+  
+  // ✅ Track broken images
+  const [brokenImages, setBrokenImages] = useState(new Set());
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -120,6 +123,11 @@ export default function TeamList(){
     }
     catch(err){ alert(err.message||'Failed to delete'); }
   }
+  
+  // ✅ Handle image error
+  const handleImageError = (id) => {
+    setBrokenImages(prev => new Set([...prev, id]));
+  };
 
   return (
     <div className="admin-layout">
@@ -297,30 +305,81 @@ export default function TeamList(){
                   key={m._id} 
                   style={{
                     display:'grid',
-                    gap:'.5rem',
+                    gap:'.75rem',
                     border: selectedIds.includes(m._id) ? '2px solid #3b82f6' : undefined,
                     background: selectedIds.includes(m._id) ? 'rgba(59, 130, 246, 0.1)' : undefined
                   }}
                 >
-                  {/* Checkbox and Header */}
-                  <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+                  {/* ✅ AVATAR + CHECKBOX ROW */}
+                  <div style={{display:'flex',alignItems:'center',gap:'.75rem'}}>
                     <input 
                       type="checkbox" 
                       checked={selectedIds.includes(m._id)}
                       onChange={() => toggleSelect(m._id)}
                       style={{cursor:'pointer',width:'18px',height:'18px'}}
                     />
-                    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem'}}>
-                      <h3 style={{margin:0}}>{m.name || 'Untitled Member'}</h3>
-                      <span className="badge">{m.role || 'Member'}</span>
+                    
+                    {/* ✅ AVATAR IMAGE */}
+                    <div style={{width:56,height:56,borderRadius:'50%',overflow:'hidden',flexShrink:0}}>
+                      {m.avatar && !brokenImages.has(m._id) ? (
+                        <img 
+                          src={m.avatar} 
+                          alt={m.name || 'Avatar'} 
+                          onError={() => handleImageError(m._id)}
+                          style={{width:'100%',height:'100%',objectFit:'cover'}} 
+                        />
+                      ) : (
+                        <div 
+                          style={{
+                            width:'100%',
+                            height:'100%',
+                            display:'flex',
+                            alignItems:'center',
+                            justifyContent:'center',
+                            background:'#eef2f7',
+                            color:'#0f172a',
+                            fontWeight:800,
+                            fontSize:'1.25rem'
+                          }}
+                        >
+                          {(m.name || '?').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* NAME + ROLE */}
+                    <div style={{flex:1,minWidth:0}}>
+                      <h3 style={{margin:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                        {m.name || 'Untitled Member'}
+                      </h3>
+                      <span className="badge" style={{marginTop:'.25rem',display:'inline-block'}}>
+                        {m.role || 'Member'}
+                      </span>
                     </div>
                   </div>
                   
-                  {m.bio && <p style={{margin:0,paddingLeft:'1.75rem'}}>{m.bio}</p>}
+                  {/* BIO */}
+                  {m.bio && (
+                    <p style={{
+                      margin:0,
+                      fontSize:'.9rem',
+                      lineHeight:1.5,
+                      color:'rgba(255,255,255,0.8)'
+                    }}>
+                      {m.bio}
+                    </p>
+                  )}
                   
-                  <div style={{display:'flex',gap:'.4rem',marginTop:'.25rem',paddingLeft:'1.75rem'}}>
+                  {/* ACTIONS */}
+                  <div style={{display:'flex',gap:'.4rem',marginTop:'.25rem'}}>
                     <button className="btn-secondary" onClick={()=>navigate(`/admin/team/${m._id}`)}>Edit</button>
-                    <button className="btn-secondary" onClick={()=>handleDelete(m._id)} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
+                    <button 
+                      className="btn-secondary" 
+                      onClick={()=>handleDelete(m._id)} 
+                      style={{borderColor:'#ef4444',color:'#ef4444'}}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}

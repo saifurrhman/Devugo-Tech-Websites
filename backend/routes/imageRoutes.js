@@ -1,46 +1,18 @@
-// routes/imageRoutes.js
 const express = require('express');
 const router = express.Router();
 const upload = require('../middlewares/upload');
-
-// ⚠️ IMPORTANT: File name is 'imagecontroller.js' (lowercase 'c')
-// NOT 'imageController.js' - Linux/Vercel is case-sensitive!
 const {
   uploadSingleImage,
   uploadMultipleImages,
   deleteImage
-} = require('../controllers/imagecontroller'); // lowercase!
+} = require('../controllers/imagecontroller');
 
-// ============================================================================
-// IMAGE UPLOAD ROUTES
-// ============================================================================
-
-/**
- * @route   POST /api/images/upload-single
- * @desc    Upload single image
- * @access  Public (add auth middleware if needed)
- */
+// Upload routes
 router.post('/upload-single', upload.single('image'), uploadSingleImage);
-
-/**
- * @route   POST /api/images/upload-multiple
- * @desc    Upload multiple images (max 10)
- * @access  Public (add auth middleware if needed)
- */
 router.post('/upload-multiple', upload.array('images', 10), uploadMultipleImages);
-
-/**
- * @route   DELETE /api/images/delete/:filename
- * @desc    Delete an uploaded image
- * @access  Public (add auth middleware if needed)
- */
 router.delete('/delete/:filename', deleteImage);
 
-/**
- * @route   GET /api/images/test
- * @desc    Test if image routes are working
- * @access  Public
- */
+// Test route
 router.get('/test', (req, res) => {
   res.json({
     success: true,

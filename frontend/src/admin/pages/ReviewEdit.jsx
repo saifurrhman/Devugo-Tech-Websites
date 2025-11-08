@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { ClientReviewAPI } from '../../lib/api';
+import { ClientReviewAPI, UploadAPI } from '../../lib/api'; // ✅ Added UploadAPI
 
 export default function ReviewEdit(){
   const { id } = useParams();
@@ -10,9 +10,57 @@ export default function ReviewEdit(){
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false); // ✅ Added uploading state
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [form, setForm] = useState({ name:'', role:'', company:'', rating:5, summary:'', avatar:'', featured:true });
+  const [avatarOk, setAvatarOk] = useState(true); // ✅ Added avatar preview state
+
+  // ✅ ADDED: Image Upload Function
+  async function onAvatarFileChange(e){
+    const file = e.target.files?.[0];
+    if(!file) return;
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setError('Only image files are allowed (jpeg, jpg, png, gif, webp)');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+    
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setError('File size must be less than 5MB');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+    
+    setUploading(true);
+    setError('');
+    setMessage('');
+    
+    try {
+      const { data } = await UploadAPI.uploadSingle(file);
+      
+      if (data && data.url) {
+        setForm(f => ({ ...f, avatar: data.url }));
+        setAvatarOk(true);
+        setMessage('Avatar uploaded successfully!');
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        throw new Error('Upload failed - no URL returned');
+      }
+      
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError(err.message || 'Failed to upload avatar');
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setUploading(false);
+    }
+  }
 
   useEffect(()=>{
     if(isNew) return;
@@ -56,8 +104,11 @@ export default function ReviewEdit(){
         <AdminTopbar />
         <div className="toolbar" style={{display:'flex',flexWrap:'wrap',justifyContent:'space-between',alignItems:'center',gap:'.6rem',padding:'0.5rem'}}>
           <h1 style={{fontSize: 'clamp(1.5rem, 5vw, 2rem)'}}>{isNew? 'Add Review':'Edit Review'}</h1>
-          
         </div>
+
+        {error && <div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>}
+        {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
+        {uploading && <div className="chip" style={{marginTop:'.5rem'}}>Uploading...</div>}
 
         {loading ? <div className="card" style={{marginTop:'1rem'}}>Loading…</div> : (
           <form onSubmit={handleSave} className="create-post" style={{marginTop:'.9rem'}}>
@@ -87,31 +138,94 @@ export default function ReviewEdit(){
                 </div>
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
                   <label className="form-label">Summary (short)</label>
-                  <input className="form-field ux-input w-full" value={form.summary} onChange={e=>setForm(f=>({...f,summary:e.target.value}))} placeholder="Short highlight" />
+                  <textarea className="form-field ux-input w-full" rows={3} value={form.summary} onChange={e=>setForm(f=>({...f,summary:e.target.value}))} placeholder="Short highlight or testimonial" />
                 </div>
               </section>
 
               <aside className="section-card">
                 <h3>Settings</h3>
+                
+                {/* ✅ FIXED: Avatar Upload Section */}
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
-                  <label className="form-label">Avatar URL</label>
-                  <input className="form-field ux-input w-full" placeholder="https://..." value={form.avatar} onChange={e=>setForm(f=>({...f,avatar:e.target.value}))} />
+                  <label className="form-label">Avatar</label>
+                  <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
+                    <input 
+                      className="form-field ux-input" 
+                      placeholder="https://..." 
+                      value={form.avatar} 
+                      onChange={e=>{ 
+                        setAvatarOk(true); 
+                        setForm(f=>({...f,avatar:e.target.value})); 
+                      }} 
+                      style={{flex:1}}
+                    />
+                    <input 
+                      id="avatar-file-review" 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={onAvatarFileChange} 
+                      style={{display:'none'}} 
+                    />
+                    <button 
+                      type="button" 
+                      className="btn-secondary" 
+                      onClick={()=>document.getElementById('avatar-file-review').click()}
+                      disabled={uploading}
+                    >
+                      {uploading ? 'Uploading...' : 'Upload'}
+                    </button>
+                  </div>
+                  
+                  {/* ✅ Avatar Preview */}
+                  {form.avatar && (
+                    <div style={{marginTop:'.6rem',display:'flex',alignItems:'center',gap:'.6rem'}}>
+                      <div style={{width:56,height:56,borderRadius:'50%',overflow:'hidden',flexShrink:0}}>
+                        {avatarOk ? (
+                          <img 
+                            src={form.avatar} 
+                            alt="avatar preview" 
+                            onError={()=>setAvatarOk(false)} 
+                            style={{width:'100%',height:'100%',objectFit:'cover'}} 
+                          />
+                        ) : (
+                          <div 
+                            style={{
+                              width:'100%',
+                              height:'100%',
+                              display:'flex',
+                              alignItems:'center',
+                              justifyContent:'center',
+                              background:'#eef2f7',
+                              color:'#0f172a',
+                              fontWeight:800,
+                              fontSize:'1.25rem'
+                            }}
+                          >
+                            {(form.name||'?').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <small className="muted">Preview</small>
+                      </div>
+                    </div>
+                  )}
                 </div>
+
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
-                  <label className="form-label">Featured</label>
-                  <input type="checkbox" checked={!!form.featured} onChange={e=>setForm(f=>({...f, featured:e.target.checked}))} />
+                  <label style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+                    <input type="checkbox" checked={!!form.featured} onChange={e=>setForm(f=>({...f, featured:e.target.checked}))} />
+                    <span className="form-label" style={{margin:0}}>Featured Review</span>
+                  </label>
                 </div>
               </aside>
             </div>
-
-            {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
-            {message && <div className="card" style={{marginTop:'1rem', color:'#16a34a'}}>{message}</div>}
 
            <div className="bottom-actions">
             <div className="container flex flex-row items-center justify-end gap-3">
               <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/reviews')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
               {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
-              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+              <button type="submit" className="btn lg" disabled={saving || uploading} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
             </div>
           </div>
           </form>

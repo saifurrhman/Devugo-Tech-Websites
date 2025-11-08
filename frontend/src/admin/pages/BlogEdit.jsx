@@ -9,6 +9,7 @@ export default function BlogEdit(){
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [shareToSocial, setShareToSocial] = useState(false);
@@ -75,17 +76,118 @@ export default function BlogEdit(){
     document.execCommand(cmd,false,val);
     setForm(f=>({...f,content:el.innerHTML}));
   }
+
   function setBlock(tag){ const t = String(tag||'').toUpperCase(); exec('formatBlock', t); }
   function insertLink(){ const url = window.prompt('Enter URL (https://...)'); if(!url) return; exec('createLink', url); }
   function clearFormats(){ exec('removeFormat'); }
+
+  // ✅ FIXED: Upload image using actual file upload
   async function uploadAndSet(field){
-    const input = document.createElement('input'); input.type='file'; input.accept='image/*';
-    input.onchange = async (ev)=>{ const file=ev.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=async ()=>{ const { url } = await UploadAPI.image(reader.result, file.name); setForm(f=>({...f,[field]:url})); }; reader.readAsDataURL(file); };
+    const input = document.createElement('input'); 
+    input.type = 'file'; 
+    input.accept = 'image/*';
+    
+    input.onchange = async (ev) => { 
+      const file = ev.target.files?.[0]; 
+      if (!file) return;
+      
+      setUploading(true);
+      setMessage('Uploading image...');
+      
+      try {
+        // ✅ Use uploadSingle instead of base64
+        const { data } = await UploadAPI.uploadSingle(file);
+        
+        if (data && data.url) {
+          setForm(f => ({ ...f, [field]: data.url }));
+          setMessage('Image uploaded successfully!');
+          setTimeout(() => setMessage(''), 2000);
+        } else {
+          throw new Error('Upload failed - no URL returned');
+        }
+      } catch (err) {
+        setError(err.message || 'Image upload failed');
+        setTimeout(() => setError(''), 3000);
+      } finally {
+        setUploading(false);
+      }
+    };
+    
     input.click();
   }
+
+  // ✅ FIXED: Insert image to content editor
   async function uploadAndInsertToContent(){
-    const input = document.createElement('input'); input.type='file'; input.accept='image/*';
-    input.onchange = async (ev)=>{ const file=ev.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=async ()=>{ const { url } = await UploadAPI.image(reader.result, file.name); const el=editorRef.current; if(el){ el.focus(); document.execCommand('insertHTML', false, `<img src="${url}" alt="" />`); setForm(f=>({...f,content:el.innerHTML})); } }; reader.readAsDataURL(file); };
+    const input = document.createElement('input'); 
+    input.type = 'file'; 
+    input.accept = 'image/*';
+    
+    input.onchange = async (ev) => { 
+      const file = ev.target.files?.[0]; 
+      if (!file) return;
+      
+      setUploading(true);
+      setMessage('Uploading image...');
+      
+      try {
+        // ✅ Use uploadSingle instead of base64
+        const { data } = await UploadAPI.uploadSingle(file);
+        
+        if (data && data.url) {
+          const el = editorRef.current; 
+          if (el) { 
+            el.focus(); 
+            document.execCommand('insertHTML', false, `<img src="${data.url}" alt="" style="max-width:100%;height:auto;" />`); 
+            setForm(f => ({ ...f, content: el.innerHTML })); 
+          }
+          setMessage('Image inserted successfully!');
+          setTimeout(() => setMessage(''), 2000);
+        } else {
+          throw new Error('Upload failed - no URL returned');
+        }
+      } catch (err) {
+        setError(err.message || 'Image upload failed');
+        setTimeout(() => setError(''), 3000);
+      } finally {
+        setUploading(false);
+      }
+    };
+    
+    input.click();
+  }
+
+  // ✅ FIXED: Upload gallery image
+  async function uploadGalleryImage() {
+    const input = document.createElement('input'); 
+    input.type = 'file'; 
+    input.accept = 'image/*';
+    
+    input.onchange = async (ev) => { 
+      const file = ev.target.files?.[0]; 
+      if (!file) return;
+      
+      setUploading(true);
+      setMessage('Uploading gallery image...');
+      
+      try {
+        // ✅ Use uploadSingle instead of base64
+        const { data } = await UploadAPI.uploadSingle(file);
+        
+        if (data && data.url) {
+          setForm(f => ({ ...f, galleryImages: [...f.galleryImages, data.url] }));
+          setMessage('Gallery image uploaded!');
+          setTimeout(() => setMessage(''), 2000);
+        } else {
+          throw new Error('Upload failed - no URL returned');
+        }
+      } catch (err) {
+        setError(err.message || 'Gallery image upload failed');
+        setTimeout(() => setError(''), 3000);
+      } finally {
+        setUploading(false);
+      }
+    };
+    
     input.click();
   }
 
@@ -127,21 +229,31 @@ export default function BlogEdit(){
     }
   }
 
-  function onFileChange(e){
+  // ✅ FIXED: Cover image upload
+  async function onFileChange(e){
     const file = e.target.files?.[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try{
-        const dataUrl = reader.result;
-        const { url } = await UploadAPI.image(dataUrl, file.name);
-        setForm(f=>({...f, coverImage: url }));
-        setMessage('Cover image uploaded');
-      }catch(err){
-        setError(err.message || 'Failed to upload image');
+    if (!file) return;
+    
+    setUploading(true);
+    setMessage('Uploading cover image...');
+    
+    try {
+      // ✅ Use uploadSingle instead of base64
+      const { data } = await UploadAPI.uploadSingle(file);
+      
+      if (data && data.url) {
+        setForm(f => ({ ...f, coverImage: data.url }));
+        setMessage('Cover image uploaded!');
+        setTimeout(() => setMessage(''), 2000);
+      } else {
+        throw new Error('Upload failed - no URL returned');
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      setError(err.message || 'Cover image upload failed');
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setUploading(false);
+    }
   }
 
   if (loading) {
@@ -175,6 +287,7 @@ export default function BlogEdit(){
 
         {error && (<div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>)}
         {message && (<div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>)}
+        {uploading && (<div className="chip" style={{marginTop:'.5rem'}}>Uploading...</div>)}
 
         <form onSubmit={handleSave} style={{marginTop:'1rem', display:'grid', gap:'1rem'}}>
           <section className="section-card">
@@ -221,11 +334,9 @@ export default function BlogEdit(){
                   <button type="button" className="uploader-remove" onClick={()=>setForm(f=>({...f,galleryImages:f.galleryImages.filter((_,x)=>x!==i)}))} style={{left:6,bottom:6}}>Remove</button>
                 </div>
               ))}
-              <button type="button" className="btn-secondary" onClick={async()=>{
-                const input=document.createElement('input'); input.type='file'; input.accept='image/*';
-                input.onchange=async(ev)=>{ const file=ev.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=async()=>{ const { url } = await UploadAPI.image(reader.result, file.name); setForm(f=>({...f, galleryImages:[...f.galleryImages, url]})); }; reader.readAsDataURL(file); };
-                input.click();
-              }}>Add image</button>
+              <button type="button" className="btn-secondary" onClick={uploadGalleryImage} disabled={uploading}>
+                {uploading ? 'Uploading...' : 'Add image'}
+              </button>
             </div>
           </section>
 
@@ -276,7 +387,9 @@ export default function BlogEdit(){
                 <button type="button" onClick={()=>exec('undo')}>Undo</button>
                 <button type="button" onClick={()=>exec('redo')}>Redo</button>
                 <button type="button" onClick={clearFormats}>Clear</button>
-                <button type="button" onClick={uploadAndInsertToContent}>+ Image</button>
+                <button type="button" onClick={uploadAndInsertToContent} disabled={uploading}>
+                  {uploading ? 'Uploading...' : '+ Image'}
+                </button>
               </div>
               <div
                 ref={editorRef}
@@ -335,8 +448,12 @@ export default function BlogEdit(){
               <button type="button" className="btn-secondary" onClick={()=>navigate('/admin/blog')}>Back</button>
             </div>
             <div style={{display:'flex', gap:'.5rem'}}>
-              <button type="button" className="btn-secondary" onClick={handleSave} disabled={saving}>{saving? 'Saving…' : 'Save changes'}</button>
-              <button type="submit" className="btn" disabled={saving}>{saving? 'Saving…' : 'Save & Stay'}</button>
+              <button type="button" className="btn-secondary" onClick={handleSave} disabled={saving || uploading}>
+                {saving ? 'Saving…' : 'Save changes'}
+              </button>
+              <button type="submit" className="btn" disabled={saving || uploading}>
+                {saving ? 'Saving…' : 'Save & Stay'}
+              </button>
               <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
             </div>
           </div>

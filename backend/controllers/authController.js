@@ -3,7 +3,7 @@ const User = require('../models/User');
 
 console.log('✅ Auth controller loaded');
 
-
+// Generate Access Token (1 hour)
 const signAccess = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
@@ -38,7 +38,9 @@ const setAuthCookies = (res, { accessToken, refreshToken }) => {
   });
 };
 
-
+// ==========================================
+// SIGNUP - Register New User
+// ==========================================
 exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -207,6 +209,9 @@ exports.login = async (req, res) => {
   }
 };
 
+// ==========================================
+// REFRESH TOKEN
+// ==========================================
 exports.refresh = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
@@ -259,6 +264,9 @@ exports.refresh = async (req, res) => {
   }
 };
 
+// ==========================================
+// GET ME - Get Current User Profile
+// ==========================================
 exports.getMe = async (req, res) => {
   try {
     // req.user is set by requireAuth middleware
@@ -293,14 +301,19 @@ exports.getMe = async (req, res) => {
 
 // ==========================================
 // UPDATE ME - Update Current User Profile
+// ✅ FIXED: Added phone and avatar support
 // ==========================================
 exports.updateMe = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, phone, avatar } = req.body; // ✅ Added phone and avatar
     const updates = {};
     
     if (name) updates.name = name.trim();
     if (email) updates.email = email.toLowerCase();
+    if (phone !== undefined) updates.phone = phone; // ✅ Added phone
+    if (avatar !== undefined) updates.avatar = avatar; // ✅ Added avatar
+    
+    console.log('📝 Update request:', updates);
     
     // Check if email is already taken
     if (email && email.toLowerCase() !== req.user.email.toLowerCase()) {
@@ -325,6 +338,9 @@ exports.updateMe = async (req, res) => {
     delete userData.password;
     delete userData.__v;
     
+    console.log('✅ User updated successfully');
+    console.log('   Avatar:', userData.avatar);
+    
     res.json({
       success: true,
       message: 'Profile updated successfully',
@@ -341,7 +357,9 @@ exports.updateMe = async (req, res) => {
   }
 };
 
-
+// ==========================================
+// CHANGE PASSWORD
+// ==========================================
 exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -399,7 +417,9 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-
+// ==========================================
+// LOGOUT
+// ==========================================
 exports.logout = async (req, res) => {
   try {
     // Clear auth cookies
@@ -420,7 +440,9 @@ exports.logout = async (req, res) => {
   }
 };
 
-
+// ==========================================
+// REQUEST PASSWORD RESET
+// ==========================================
 exports.requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
@@ -529,7 +551,9 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-
+// ==========================================
+// GOOGLE OAUTH CALLBACK
+// ==========================================
 exports.googleCallback = async (req, res) => {
   try {
     if (!req.user) {
@@ -549,7 +573,9 @@ exports.googleCallback = async (req, res) => {
   }
 };
 
-// LinkedIn OAuth Callback
+// ==========================================
+// LINKEDIN OAUTH CALLBACK
+// ==========================================
 exports.linkedinCallback = async (req, res) => {
   try {
     if (!req.user) {

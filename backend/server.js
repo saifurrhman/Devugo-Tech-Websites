@@ -5,24 +5,27 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const session = require('express-session');
-const path = require('path');
-const fs = require('fs');
+const path = require('path'); // <-- ADD THIS
+const fs = require('fs'); // <-- ADD THIS
 
 require('./config/passport')();
+
 const app = express();
 
-// Middleware
+// ============================================
+// MIDDLEWARE
+// ============================================
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // ============================================
-// SESSION CONFIGURATION - UPDATED FOR VERCEL
+// SESSION CONFIGURATION
 // ============================================
 app.use(session({
   secret: process.env.SESSION_SECRET || 'devugo-tech-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { 
+  cookie: {
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     httpOnly: true,
@@ -30,11 +33,12 @@ app.use(session({
   }
 }));
 
-// Initialize Passport middleware
+// ============================================
+// PASSPORT CONFIGURATION
+// ============================================
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport serialization
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
@@ -49,7 +53,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // ============================================
-// CORS CONFIGURATION - UPDATED FOR VERCEL
+// CORS CONFIGURATION
 // ============================================
 const allowedOrigins = [
   'http://localhost:3000',
@@ -101,11 +105,10 @@ app.use(function(req, res, next) {
 
 app.use(cookieParser());
 
-// =============================================================================
-// IMAGE UPLOAD MODULE
-// =============================================================================
-
-// Static files serve karein - uploaded images access ke liye
+// ============================================
+// IMAGE UPLOAD FOLDER (FIX 1)
+// ============================================
+// Static files serve karein uploaded images access ke liye
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use(express.static('public'));
 
@@ -116,10 +119,9 @@ if (!fs.existsSync(uploadDir)) {
   console.log('✅ Upload directory created:', uploadDir);
 }
 
-// =============================================================================
+// ============================================
 // MONGODB CONNECTION
-// =============================================================================
-
+// ============================================
 mongoose.connect(process.env.MONGO_URI, {
   serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
@@ -130,13 +132,13 @@ mongoose.connect(process.env.MONGO_URI, {
     process.exit(1);
   });
 
-// =============================================================================
+// ============================================
 // ROUTES
-// =============================================================================
+// ============================================
 
 // Default API route
 app.get("/", (req, res) => {
-  res.json({ 
+  res.json({
     message: "API is running 🚀",
     environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString()
@@ -154,12 +156,14 @@ app.get('/api/health', async (_req, res) => {
     host: mongoose.connection.host,
     environment: process.env.NODE_ENV || 'development',
   };
+
   try{
     const Service = require('./models/Service');
     const PricingPlan = require('./models/PricingPlan');
-    const Portfolio = require('./models/Portfolio');
+    const Portfolio = require('./modelsS/Portfolio');
     const TeamMember = require('./models/TeamMember');
     const BlogPost = require('./models/BlogPost');
+
     const [services, pricing, portfolio, team, blogs] = await Promise.all([
       Service.countDocuments({}),
       PricingPlan.countDocuments({}),
@@ -167,8 +171,10 @@ app.get('/api/health', async (_req, res) => {
       TeamMember.countDocuments({}),
       BlogPost.countDocuments({}),
     ]);
+
     info.totals = { services, pricing, portfolio, team, blogs };
-  }catch(_e){ /* ignore in health */ }
+  } catch(_e) { /* ignore in health */ }
+
   res.json(info);
 });
 
@@ -188,14 +194,9 @@ app.use('/api/analytics', analyticsRoutes);
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
-// ⚠️ IMAGE ROUTES - COMMENTED OUT (YE LINE ERROR DE RAHI HAI)
-// Image controller missing hai ya file name wrong hai
-// Check karo: controllers/imageController.js file exist karti hai ya nahi
-// Agar nahi chahiye toh ye line comment rakh do
-// Agar chahiye toh file banao ya name fix karo
-
-// const imageRoutes = require('./routes/imageRoutes');
-// app.use('/api/images', imageRoutes);
+// ✅ IMAGE ROUTES - NOW ENABLED
+const imageRoutes = require('./routes/imageRoutes');
+app.use('/api/images', imageRoutes);
 
 const serviceRoutes = require('./routes/services');
 app.use('/api/services', serviceRoutes);
@@ -230,15 +231,13 @@ app.use('/api/blog-categories', blogCategoryRoutes);
 const socialLinkRoutes = require('./routes/socialLinks');
 app.use('/api/social-links', socialLinkRoutes);
 
-// =============================================================================
-// ERROR HANDLING
-// =============================================================================
-
-// Multer error handling for image uploads
+// ============================================
+// ERROR HANDLING (FIX 2)
+// ============================================
 app.use((err, req, res, next) => {
   console.error('Error:', err);
 
-  // Multer specific errors
+  // Multer specific errors (FROM ORIGINAL PDF)
   if (err.name === 'MulterError') {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
@@ -279,17 +278,17 @@ app.use((err, req, res, next) => {
   // Generic error
   res.status(500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
+    message: process.env.NODE_ENV === 'production'
+      ? 'Internal server error'
       : err.message
   });
 });
 
-// =============================================================================
+// ============================================
 // START SERVER
-// =============================================================================
-
+// ============================================
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`\n🚀 Server running on port ${PORT}`);
   console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);

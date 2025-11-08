@@ -12,7 +12,7 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-  
+
   failedQueue = [];
 };
 
@@ -27,13 +27,13 @@ function getToken() {
 }
 
 // Helper to save token
-function saveToken(token) {
+export function saveToken(token) {
   localStorage.setItem('accessToken', token);
   localStorage.setItem('token', token);
 }
 
 // Helper to clear tokens
-function clearTokens() {
+export function clearTokens() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('token');
   localStorage.removeItem('authToken');
@@ -44,7 +44,7 @@ function clearTokens() {
 async function refreshToken() {
   try {
     console.log('🔄 Attempting to refresh token...');
-    
+
     const response = await fetch(`${API_BASE}/api/auth/refresh`, {
       method: 'POST',
       credentials: 'include', // Important: send cookies
@@ -52,29 +52,29 @@ async function refreshToken() {
         'Content-Type': 'application/json'
       }
     });
-    
+
     if (!response.ok) {
       throw new Error('Token refresh failed');
     }
-    
+
     const data = await response.json();
-    
+
     if (data.accessToken) {
       console.log('✅ Token refreshed successfully');
       saveToken(data.accessToken);
       return data.accessToken;
     }
-    
+
     throw new Error('No access token in response');
   } catch (error) {
     console.error('❌ Token refresh failed:', error);
     clearTokens();
-    
+
     // Redirect to login
     if (window.location.pathname !== '/admin/login') {
       window.location.href = '/admin/login?expired=true';
     }
-    
+
     throw error;
   }
 }
@@ -82,36 +82,44 @@ async function refreshToken() {
 // Enhanced fetch with auto token refresh
 export async function fetchWithAuth(url, options = {}) {
   const token = getToken();
-  
-  // Add token to headers
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers
-  };
-  
+
+  // CLONE the headers object to avoid mutation if one is passed in
+  const headers = { ...options.headers };
+
+  // CRITICAL FIX: Only set Content-Type if it's not explicitly provided
+  // For FormData uploads, Content-Type should NOT be set (browser sets it automatically with boundary)
+  if (!headers.hasOwnProperty('Content-Type') && options.body && !(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  // Remove Content-Type if explicitly set to undefined (for FormData)
+  if (headers['Content-Type'] === undefined) {
+    delete headers['Content-Type'];
+  }
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   const config = {
     ...options,
     headers,
     credentials: 'include'
   };
-  
+
   try {
     console.log(`📡 Request: ${options.method || 'GET'} ${url}`);
     let response = await fetch(url, config);
-    
+
     // If 401 and token expired, try to refresh
     if (response.status === 401) {
       const errorData = await response.json().catch(() => ({}));
-      
+
       console.log('⚠️ 401 Error:', errorData);
-      
+
       if (errorData.error === 'TokenExpired' || errorData.message?.includes('expired')) {
         console.log('🔄 Token expired, attempting refresh...');
-        
+
         if (isRefreshing) {
           // Wait for the current refresh to complete
           console.log('⏳ Waiting for ongoing refresh...');
@@ -122,14 +130,14 @@ export async function fetchWithAuth(url, options = {}) {
             return fetch(url, config);
           });
         }
-        
+
         isRefreshing = true;
-        
+
         try {
           const newToken = await refreshToken();
           isRefreshing = false;
           processQueue(null, newToken);
-          
+
           // Retry original request with new token
           config.headers['Authorization'] = `Bearer ${newToken}`;
           console.log('🔁 Retrying original request...');
@@ -149,7 +157,7 @@ export async function fetchWithAuth(url, options = {}) {
         throw new Error(errorData.message || 'Unauthorized');
       }
     }
-    
+
     return response;
   } catch (error) {
     console.error('❌ Fetch error:', error);
@@ -160,41 +168,48 @@ export async function fetchWithAuth(url, options = {}) {
 // Wrapper for api function
 export async function apiWithRefresh(path, { method = 'GET', body, token } = {}) {
   const url = `${API_BASE}${path}`;
-  
+
   const options = {
     method,
     body: body ? JSON.stringify(body) : undefined
   };
-  
+
   if (token) {
+    // We create headers object only if token is passed,
+    // otherwise fetchWithAuth will handle it.
     options.headers = { 'Authorization': `Bearer ${token}` };
   }
-  
+
   const response = await fetchWithAuth(url, options);
-  
+
   // Handle 204 No Content
   if (response.status === 204) {
     console.log(`✅ ${method} ${path} - No Content`);
     return {};
   }
-  
+
   // Parse JSON
   let data;
   try {
     data = await response.json();
   } catch (e) {
-    data = {};
+    // Handle cases where response is not JSON but still OK
+    if (response.ok) {
+      return {}; // Or response.text() if needed
+    }
+    data = {}; // Error case, not JSON
   }
-  
+
   // Handle errors
   if (!response.ok) {
     console.error(`❌ ${method} ${path}`, { status: response.status, error: data });
     const message = data?.error || data?.message || `Request failed (${response.status})`;
     throw new Error(message);
   }
-  
-  console.log(`✅ ${method} ${path}`, data);
+
+  console.log(`✅ ${method} ${path}`);
   return data;
 }
 
-export { clearTokens, getToken, saveToken };
+// Re-export getToken for use in other parts (if needed)
+export { getToken };

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { TeamAPI } from '../../lib/api';
-import axios from 'axios';
+import { TeamAPI, UploadAPI } from '../../lib/api'; // ✅ Added UploadAPI
 
 export default function TeamEdit(){
   const { id } = useParams();
@@ -20,7 +19,7 @@ export default function TeamEdit(){
   const [avatarOk, setAvatarOk] = useState(true);
 
   // ============================================================================
-  // UPDATED IMAGE UPLOAD FUNCTION (USES FormData)
+  // ✅ FIXED: MODERN IMAGE UPLOAD FUNCTION (USES UploadAPI)
   // ============================================================================
   
   async function onAvatarFileChange(e){
@@ -31,6 +30,7 @@ export default function TeamEdit(){
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       setError('Only image files are allowed (jpeg, jpg, png, gif, webp)');
+      setTimeout(() => setError(''), 3000);
       return;
     }
     
@@ -38,6 +38,7 @@ export default function TeamEdit(){
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       setError('File size must be less than 5MB');
+      setTimeout(() => setError(''), 3000);
       return;
     }
     
@@ -46,36 +47,23 @@ export default function TeamEdit(){
     setMessage('');
     
     try {
-      // Create FormData
-      const formData = new FormData();
-      formData.append('image', file);
+      // ✅ Use UploadAPI instead of axios
+      const { data } = await UploadAPI.uploadSingle(file);
       
-      // Get token from localStorage (if you use authentication)
-      const token = localStorage.getItem('token');
-      
-      // Upload to backend
-      const response = await axios.post(
-        'http://localhost:5000/api/images/upload-single',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            ...(token && { 'Authorization': `Bearer ${token}` })
-          }
-        }
-      );
-      
-      console.log('Upload response:', response.data);
-      
-      // Update form with new image URL
-      const imageUrl = `http://localhost:5000${response.data.data.url}`;
-      setForm(f => ({ ...f, avatar: imageUrl }));
-      setAvatarOk(true);
-      setMessage('Avatar uploaded successfully!');
+      if (data && data.url) {
+        // Update form with new image URL
+        setForm(f => ({ ...f, avatar: data.url }));
+        setAvatarOk(true);
+        setMessage('Avatar uploaded successfully!');
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        throw new Error('Upload failed - no URL returned');
+      }
       
     } catch (err) {
       console.error('Upload error:', err);
-      setError(err.response?.data?.message || 'Failed to upload avatar');
+      setError(err.message || 'Failed to upload avatar');
+      setTimeout(() => setError(''), 3000);
     } finally {
       setUploading(false);
     }
@@ -158,6 +146,7 @@ export default function TeamEdit(){
         <h1 className="page-title" style={{marginTop:'.25rem'}}>{isNew? 'Add Member' : 'Edit Member'}</h1>
         {error && <div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>}
         {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
+        {uploading && <div className="chip" style={{marginTop:'.5rem'}}>Uploading...</div>}
 
         <form onSubmit={handleSave} style={{marginTop:'1rem'}}>
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-4">
@@ -203,7 +192,7 @@ export default function TeamEdit(){
                     onClick={()=>document.getElementById('avatar-file').click()}
                     disabled={uploading}
                   >
-                    {uploading ? 'Uploading...' : 'Upload image'}
+                    {uploading ? 'Uploading...' : 'Upload'}
                   </button>
                 </div>
                 {(form.avatar || form.name) && (

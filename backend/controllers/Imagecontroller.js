@@ -1,17 +1,13 @@
-// controllers/imagecontroller.js
-// Path: D:\Devugo-Tech-Websites\backend\controllers\imagecontroller.js
-
 const fs = require('fs');
 const path = require('path');
 
-// ============================================================================
+// ============================================
 // SINGLE IMAGE UPLOAD HANDLER
-// ============================================================================
-
+// ============================================
 const uploadSingleImage = async (req, res) => {
   try {
     console.log('✅ Upload request received');
-    console.log('📁 File:', req.file);
+    console.log('File:', req.file);
 
     // Check if file exists
     if (!req.file) {
@@ -21,8 +17,8 @@ const uploadSingleImage = async (req, res) => {
       });
     }
 
-    // Generate image URL
-    const imageUrl = `/uploads/${req.file.filename}`;
+    // ✅ CRITICAL FIX: Generate FULL URL with protocol and host
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
     console.log('✅ Image uploaded successfully:', imageUrl);
 
@@ -32,13 +28,14 @@ const uploadSingleImage = async (req, res) => {
       message: 'Image successfully upload ho gayi!',
       data: {
         filename: req.file.filename,
-        url: imageUrl,
+        url: imageUrl,  // ✅ This should return: http://localhost:5000/uploads/image-xxx.jpg
         path: req.file.path,
         size: req.file.size,
         mimetype: req.file.mimetype,
         originalname: req.file.originalname
       }
     });
+
   } catch (error) {
     console.error('❌ Upload Error:', error);
     res.status(500).json({
@@ -49,16 +46,14 @@ const uploadSingleImage = async (req, res) => {
   }
 };
 
-// ============================================================================
+// ============================================
 // MULTIPLE IMAGES UPLOAD HANDLER
-// ============================================================================
-
+// ============================================
 const uploadMultipleImages = async (req, res) => {
   try {
     console.log('✅ Multiple upload request received');
-    console.log('📁 Files count:', req.files?.length || 0);
+    console.log('Files count:', req.files?.length || 0);
 
-    // Check if files exist
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
@@ -66,10 +61,10 @@ const uploadMultipleImages = async (req, res) => {
       });
     }
 
-    // Prepare data for all images
+    // ✅ FIXED: Generate FULL URLs
     const imagesData = req.files.map(file => ({
       filename: file.filename,
-      url: `/uploads/${file.filename}`,
+      url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
       path: file.path,
       size: file.size,
       mimetype: file.mimetype,
@@ -78,13 +73,13 @@ const uploadMultipleImages = async (req, res) => {
 
     console.log(`✅ ${req.files.length} images uploaded successfully`);
 
-    // Send success response
     res.status(200).json({
       success: true,
       message: `${req.files.length} images successfully upload ho gayi!`,
       count: req.files.length,
       data: imagesData
     });
+
   } catch (error) {
     console.error('❌ Multiple Upload Error:', error);
     res.status(500).json({
@@ -95,17 +90,14 @@ const uploadMultipleImages = async (req, res) => {
   }
 };
 
-// ============================================================================
+// ============================================
 // IMAGE DELETE HANDLER
-// ============================================================================
-
+// ============================================
 const deleteImage = async (req, res) => {
   try {
     const { filename } = req.params;
-    
-    console.log('🗑️ Delete request for:', filename);
+    console.log('Delete request for:', filename);
 
-    // Validate filename (security check)
     if (!filename || filename.includes('..') || filename.includes('/')) {
       return res.status(400).json({
         success: false,
@@ -113,17 +105,12 @@ const deleteImage = async (req, res) => {
       });
     }
 
-    // Construct file path
     const filePath = path.join(__dirname, '../public/uploads', filename);
-    
-    console.log('🔍 Checking file at:', filePath);
+    console.log('Checking file at:', filePath);
 
-    // Check if file exists
     if (fs.existsSync(filePath)) {
-      // Delete file
       fs.unlinkSync(filePath);
       console.log('✅ Image deleted:', filename);
-      
       res.status(200).json({
         success: true,
         message: 'Image successfully delete ho gayi!',
@@ -145,10 +132,6 @@ const deleteImage = async (req, res) => {
     });
   }
 };
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
 
 module.exports = {
   uploadSingleImage,
