@@ -53,7 +53,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // ============================================
-// ✅ CORS CONFIGURATION - FIXED
+// CORS CONFIGURATION
 // ============================================
 const allowedOrigins = [
   'http://localhost:3000',
@@ -78,10 +78,8 @@ app.use(cors({
   origin: function(origin, callback) {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin) || vercelRegex.test(origin)) {
-      console.log('✅ CORS: Allowed', origin);
       return callback(null, true);
     }
-    console.log('❌ CORS: Blocked', origin);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
@@ -93,7 +91,7 @@ app.use(cors({
 app.use(cookieParser());
 
 // ============================================
-// IMAGE UPLOAD FOLDER
+// STATIC FILES
 // ============================================
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use(express.static('public'));
@@ -136,22 +134,27 @@ app.get('/api/health', async (_req, res) => {
   });
 });
 
+// Auth Routes
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+// Blog Routes
 const blogRoutes = require('./routes/blog');
 app.use('/api/blog', blogRoutes);
 
+// Contact Routes
 const contactRoutes = require('./routes/contact');
 app.use('/api/contact', contactRoutes);
 
+// Analytics Routes
 const analyticsRoutes = require('./routes/analytics');
 app.use('/api/analytics', analyticsRoutes);
 
+// Upload Routes
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
-// ✅ IMAGE ROUTES - Comment karo agar imageController missing hai
+// Image Routes (with error handling)
 try {
   const imageRoutes = require('./routes/imageRoutes');
   app.use('/api/images', imageRoutes);
@@ -160,36 +163,47 @@ try {
   console.log('⚠️ Image routes not loaded:', err.message);
 }
 
+// Service Routes
 const serviceRoutes = require('./routes/services');
 app.use('/api/services', serviceRoutes);
 
+// Pricing Routes
 const pricingRoutes = require('./routes/pricing');
 app.use('/api/pricing', pricingRoutes);
 
+// Portfolio Routes
 const portfolioRoutes = require('./routes/portfolio');
 app.use('/api/portfolio', portfolioRoutes);
 
+// Team Routes
 const teamRoutes = require('./routes/team');
 app.use('/api/team', teamRoutes);
 
+// Portfolio Category Routes
 const portfolioCategoryRoutes = require('./routes/portfolioCategories');
 app.use('/api/portfolio-categories', portfolioCategoryRoutes);
 
+// Tech Stack Routes
 const techStackRoutes = require('./routes/techStack');
 app.use('/api/tech-stack', techStackRoutes);
 
+// Review Routes
 const reviewRoutes = require('./routes/reviews');
 app.use('/api/reviews', reviewRoutes);
 
+// FAQ Routes
 const faqRoutes = require('./routes/faqs');
 app.use('/api/faqs', faqRoutes);
 
+// Form Routes
 const formRoutes = require('./routes/forms');
 app.use('/api/forms', formRoutes);
 
+// Blog Category Routes
 const blogCategoryRoutes = require('./routes/blogCategories');
 app.use('/api/blog-categories', blogCategoryRoutes);
 
+// Social Link Routes
 const socialLinkRoutes = require('./routes/socialLinks');
 app.use('/api/social-links', socialLinkRoutes);
 
