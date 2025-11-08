@@ -1,11 +1,11 @@
 import { apiWithRefresh, saveToken, clearTokens, fetchWithAuth } from './apiInterceptor';
 
 // ============================================
-// API BASE URL CONFIGURATION
+// ✅ API BASE URL CONFIGURATION - PRODUCTION READY
 // ============================================
 export const API_BASE = process.env.REACT_APP_API_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://your-backend-url.vercel.app' // ⚠️ REPLACE with your actual backend URL
+    ? 'https://devugo-tech-backend.vercel.app' // ✅ CHANGE TO YOUR BACKEND URL
     : 'http://localhost:5000');
 
 console.log('🌐 API_BASE:', API_BASE);
@@ -135,16 +135,10 @@ export const AnalyticsAPI = {
 // UPLOAD API (COMPLETE & FIXED)
 // ============================================
 export const UploadAPI = {
-  /**
-   * Uploads a single file to the backend.
-   * @param {File} file The file object from an <input>
-   * @returns {Promise<object>} The API response (e.g., { success: true, data: { url, ... } })
-   */
   uploadSingle: async (file) => {
     const formData = new FormData();
     formData.append('image', file);
 
-    // ✅ FIXED: Match backend route /api/images/upload-single
     const url = `${API_BASE}/api/images/upload-single`;
     const response = await fetchWithAuth(url, {
       method: 'POST',
@@ -168,18 +162,12 @@ export const UploadAPI = {
     return data;
   },
 
-  /**
-   * Uploads multiple files.
-   * @param {FileList|File[]} files Array of file objects
-   * @returns {Promise<object>} The API response (e.g., { success: true, data: [...] })
-   */
   uploadMultiple: async (files) => {
     const formData = new FormData();
     for (const file of files) {
       formData.append('images', file);
     }
 
-    // ✅ FIXED: Match backend route /api/images/upload-multiple
     const url = `${API_BASE}/api/images/upload-multiple`;
     const response = await fetchWithAuth(url, {
       method: 'POST',
@@ -203,24 +191,14 @@ export const UploadAPI = {
     return data;
   },
 
-  /**
-   * ✅ BACKWARD COMPATIBILITY
-   * Legacy method for base64 image upload
-   * @deprecated Use uploadSingle instead
-   */
   image: async (dataUrl, filename) => {
     console.warn('⚠️ UploadAPI.image() is deprecated. Use UploadAPI.uploadSingle() instead.');
     
     try {
-      // Convert base64 to File object
       const response = await fetch(dataUrl);
       const blob = await response.blob();
       const file = new File([blob], filename || 'image.jpg', { type: blob.type });
-      
-      // Use the new upload method
       const result = await UploadAPI.uploadSingle(file);
-      
-      // Return in old format for compatibility
       return { url: result.data?.url || '' };
     } catch (err) {
       console.error('❌ UploadAPI.image error:', err);
@@ -339,4 +317,4 @@ export const SocialLinkAPI = {
   create: (payload) => api('/api/social-links', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/social-links/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/social-links/${id}`, { method: 'DELETE' }),
-};
+};  
