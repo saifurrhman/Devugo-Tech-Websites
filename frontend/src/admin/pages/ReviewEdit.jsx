@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { ClientReviewAPI, UploadAPI } from '../../lib/api'; // ✅ Added UploadAPI
+import { ClientReviewAPI, UploadAPI } from '../../lib/api'; // ✅ UploadAPI add kiya
 
 export default function ReviewEdit(){
   const { id } = useParams();
@@ -10,13 +10,13 @@ export default function ReviewEdit(){
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false); // ✅ Added uploading state
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [form, setForm] = useState({ name:'', role:'', company:'', rating:5, summary:'', avatar:'', featured:true });
-  const [avatarOk, setAvatarOk] = useState(true); // ✅ Added avatar preview state
+  const [avatarOk, setAvatarOk] = useState(true);
 
-  // ✅ ADDED: Image Upload Function
+  // ✅ Team Jaisa Upload Function - UploadAPI Use Karta Hai
   async function onAvatarFileChange(e){
     const file = e.target.files?.[0];
     if(!file) return;
@@ -42,6 +42,7 @@ export default function ReviewEdit(){
     setMessage('');
     
     try {
+      // ✅ Use UploadAPI (Team jaisa)
       const { data } = await UploadAPI.uploadSingle(file);
       
       if (data && data.url) {
@@ -145,19 +146,21 @@ export default function ReviewEdit(){
               <aside className="section-card">
                 <h3>Settings</h3>
                 
-                {/* ✅ FIXED: Avatar Upload Section */}
+                {/* ✅ Avatar Upload Section - Team Style */}
                 <div className="form-grid" style={{marginTop:'.6rem'}}>
-                  <label className="form-label">Avatar</label>
+                  <label className="form-label">Avatar URL</label>
+                  
+                  {/* ✅ Input aur Button Ek Line Mein */}
                   <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
                     <input 
                       className="form-field ux-input" 
-                      placeholder="https://..." 
                       value={form.avatar} 
                       onChange={e=>{ 
                         setAvatarOk(true); 
                         setForm(f=>({...f,avatar:e.target.value})); 
                       }} 
-                      style={{flex:1}}
+                      placeholder="https://..." 
+                      style={{flex:1}} 
                     />
                     <input 
                       id="avatar-file-review" 
@@ -176,31 +179,19 @@ export default function ReviewEdit(){
                     </button>
                   </div>
                   
-                  {/* ✅ Avatar Preview */}
-                  {form.avatar && (
-                    <div style={{marginTop:'.6rem',display:'flex',alignItems:'center',gap:'.6rem'}}>
-                      <div style={{width:56,height:56,borderRadius:'50%',overflow:'hidden',flexShrink:0}}>
-                        {avatarOk ? (
+                  {/* ✅ Avatar Preview - Team Style */}
+                  {(form.avatar || form.name) && (
+                    <div className="preview" style={{marginTop:'.6rem',display:'flex',alignItems:'center',gap:'.6rem'}}>
+                      <div className="avatar-preview">
+                        {form.avatar && avatarOk ? (
                           <img 
                             src={form.avatar} 
                             alt="avatar preview" 
                             onError={()=>setAvatarOk(false)} 
-                            style={{width:'100%',height:'100%',objectFit:'cover'}} 
+                            style={{width:56,height:56,borderRadius:'50%',objectFit:'cover'}} 
                           />
                         ) : (
-                          <div 
-                            style={{
-                              width:'100%',
-                              height:'100%',
-                              display:'flex',
-                              alignItems:'center',
-                              justifyContent:'center',
-                              background:'#eef2f7',
-                              color:'#0f172a',
-                              fontWeight:800,
-                              fontSize:'1.25rem'
-                            }}
-                          >
+                          <div className="avatar-fallback" style={{width:56,height:56,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',background:'#eef2f7',color:'#0f172a',fontWeight:800}}>
                             {(form.name||'?').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()}
                           </div>
                         )}
@@ -221,13 +212,13 @@ export default function ReviewEdit(){
               </aside>
             </div>
 
-           <div className="bottom-actions">
-            <div className="container flex flex-row items-center justify-end gap-3">
-              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/reviews')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
-              {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
-              <button type="submit" className="btn lg" disabled={saving || uploading} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+            <div className="bottom-actions">
+              <div className="container flex flex-row items-center justify-end gap-3">
+                <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/reviews')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
+                {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
+                <button type="submit" className="btn lg" disabled={saving || uploading} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+              </div>
             </div>
-          </div>
           </form>
         )}
       </main>
