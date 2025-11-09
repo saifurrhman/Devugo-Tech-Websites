@@ -15,7 +15,6 @@ const app = express();
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
-
 app.use(session({
   secret: process.env.SESSION_SECRET || 'devugo-tech-secret',
   resave: false,
@@ -54,7 +53,6 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'https://devugo-tech-websites.vercel.app',
-  
 ];
 
 if (process.env.CORS_ORIGINS) {
@@ -96,6 +94,8 @@ const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
   console.log('✅ Upload directory created');
+} else {
+  console.log('📁 Upload directory exists:', uploadDir);
 }
 
 // ============================================
@@ -131,8 +131,10 @@ app.get('/api/health', async (_req, res) => {
 });
 
 // Auth Routes
+console.log('📋 Loading auth routes...');
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+console.log('✅ Auth routes loaded');
 
 // Blog Routes
 const blogRoutes = require('./routes/blog');
@@ -150,14 +152,10 @@ app.use('/api/analytics', analyticsRoutes);
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
-// Image Routes (with error handling)
-try {
-  const imageRoutes = require('./routes/imageRoutes');
-  app.use('/api/images', imageRoutes);
-  console.log('✅ Image routes loaded');
-} catch (err) {
-  console.log('⚠️ Image routes not loaded:', err.message);
-}
+// ✅ Image Routes (FIXED)
+const imageRoutes = require('./routes/imageRoutes');
+app.use('/api/images', imageRoutes);
+console.log('✅ Image routes loaded');
 
 // Service Routes
 const serviceRoutes = require('./routes/services');
@@ -212,7 +210,7 @@ app.use((err, req, res, next) => {
   if (err.name === 'MulterError') {
     return res.status(400).json({
       success: false,
-      message: 'File upload error'
+      message: 'File upload error: ' + err.message
     });
   }
 
@@ -223,9 +221,27 @@ app.use((err, req, res, next) => {
     });
   }
 
+  if (err.message && err.message.includes('Only image files')) {
+    return res.status(400).json({
+      success: false,
+      message: err.message
+    });
+  }
+
   res.status(500).json({
     success: false,
     message: process.env.NODE_ENV === 'production' ? 'Server error' : err.message
+  });
+});
+
+// ============================================
+// 404 HANDLER
+// ============================================
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+    path: req.path
   });
 });
 
@@ -239,4 +255,26 @@ app.listen(PORT, () => {
   console.log(`📍 ENV: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 CORS origins:`, allowedOrigins);
   console.log('\n');
+});
+
+// ============================================
+// GRACEFUL SHUTDOWN
+// ============================================
+process.on('SIGTERM', () => {
+  console.log('👋 SIGTERM signal received: closing HTTP server');
+  server.close(() => {
+    console.log('✅ HTTP server closed');
+    mongoose.connection.close(false, () => {
+      console.log('✅ MongoDB connection closed');
+      process.exit(0);
+    });
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('👋 SIGINT signal received: closing HTTP server');
+  mongoose.connection.close(false, () => {
+    console.log('✅ MongoDB connection closed');
+    process.exit(0);
+  });
 });

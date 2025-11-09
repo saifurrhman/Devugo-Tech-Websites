@@ -1,26 +1,23 @@
 import { apiWithRefresh, saveToken, clearTokens, fetchWithAuth } from './apiInterceptor';
 
 // ============================================
-// ✅ API BASE URL CONFIGURATION - PRODUCTION READY
+// ✅ API BASE URL CONFIGURATION
 // ============================================
 export const API_BASE = process.env.REACT_APP_API_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://devugo-tech-backend.vercel.app' // ✅ CHANGE TO YOUR BACKEND URL
+    ? 'https://devugo-tech-backend.vercel.app'
     : 'http://localhost:5000');
 
 console.log('🌐 API_BASE:', API_BASE);
 console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
 
-// Use the interceptor version
 export const api = apiWithRefresh;
 
-// Build query string
 function buildQuery(params = {}) {
   const entries = Object.entries(params).filter(([, v]) =>
     v !== undefined && v !== null && v !== ''
   );
   if (!entries.length) return '';
-
   const qs = new URLSearchParams();
   for (const [k, v] of entries) {
     qs.set(k, String(v));
@@ -34,22 +31,15 @@ function buildQuery(params = {}) {
 export const AuthAPI = {
   signup: async (payload) => {
     const data = await api('/api/auth/signup', { method: 'POST', body: payload });
-    if (data.accessToken) {
-      saveToken(data.accessToken);
-    }
+    if (data.accessToken) saveToken(data.accessToken);
     return data;
   },
-
   login: async (payload) => {
     const data = await api('/api/auth/login', { method: 'POST', body: payload });
-    if (data.accessToken) {
-      saveToken(data.accessToken);
-    }
+    if (data.accessToken) saveToken(data.accessToken);
     return data;
   },
-
   me: () => api('/api/auth/me', { method: 'GET' }),
-
   logout: async () => {
     try {
       const data = await api('/api/auth/logout', { method: 'POST' });
@@ -60,28 +50,11 @@ export const AuthAPI = {
       throw error;
     }
   },
-
   refresh: () => api('/api/auth/refresh', { method: 'POST' }),
-
-  requestReset: (email) => api('/api/auth/reset-password', {
-    method: 'POST',
-    body: { email }
-  }),
-
-  resetPassword: (token, password) => api('/api/auth/reset-password-confirm', {
-    method: 'POST',
-    body: { token, password }
-  }),
-
-  updateMe: (payload) => api('/api/auth/me', {
-    method: 'PATCH',
-    body: payload
-  }),
-
-  changePassword: (payload) => api('/api/auth/change-password', {
-    method: 'POST',
-    body: payload
-  }),
+  requestReset: (email) => api('/api/auth/reset-password', { method: 'POST', body: { email } }),
+  resetPassword: (token, password) => api('/api/auth/reset-password-confirm', { method: 'POST', body: { token, password } }),
+  updateMe: (payload) => api('/api/auth/me', { method: 'PATCH', body: payload }),
+  changePassword: (payload) => api('/api/auth/change-password', { method: 'POST', body: payload }),
 };
 
 // ============================================
@@ -132,9 +105,10 @@ export const AnalyticsAPI = {
 };
 
 // ============================================
-// UPLOAD API (COMPLETE & FIXED)
+// ✅ UPLOAD API (COMPLETE WITH COMPATIBILITY)
 // ============================================
 export const UploadAPI = {
+  // ✅ Main upload function
   uploadSingle: async (file) => {
     const formData = new FormData();
     formData.append('image', file);
@@ -162,6 +136,7 @@ export const UploadAPI = {
     return data;
   },
 
+  // ✅ Multiple upload function
   uploadMultiple: async (files) => {
     const formData = new FormData();
     for (const file of files) {
@@ -191,15 +166,29 @@ export const UploadAPI = {
     return data;
   },
 
+  // ✅ COMPATIBILITY FUNCTION (For old Portfolio code)
   image: async (dataUrl, filename) => {
     console.warn('⚠️ UploadAPI.image() is deprecated. Use UploadAPI.uploadSingle() instead.');
     
     try {
+      // Convert base64 dataUrl to Blob
       const response = await fetch(dataUrl);
       const blob = await response.blob();
-      const file = new File([blob], filename || 'image.jpg', { type: blob.type });
+      
+      // Convert Blob to File
+      const file = new File([blob], filename || 'image.jpg', { 
+        type: blob.type || 'image/jpeg' 
+      });
+      
+      // Use uploadSingle
       const result = await UploadAPI.uploadSingle(file);
-      return { url: result.data?.url || '' };
+      
+      // Return in old format for compatibility
+      return { 
+        url: result.data?.url || '',
+        success: result.success,
+        message: result.message
+      };
     } catch (err) {
       console.error('❌ UploadAPI.image error:', err);
       throw err;
@@ -317,4 +306,4 @@ export const SocialLinkAPI = {
   create: (payload) => api('/api/social-links', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/social-links/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/social-links/${id}`, { method: 'DELETE' }),
-};  
+};
