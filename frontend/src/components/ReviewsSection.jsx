@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ClientReviewAPI } from '../lib/api';
 
 export default function ReviewsSection({ 
@@ -10,6 +10,7 @@ export default function ReviewsSection({
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const columnRefs = useRef([]);
 
   useEffect(() => {
     let mounted = true;
@@ -30,17 +31,58 @@ export default function ReviewsSection({
     return () => { mounted = false };
   }, [limit, featuredOnly]);
 
-  if (loading) return (
-    <section className="py-20">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="bg-white/10 border border-white/20 rounded-2xl p-10 text-center text-white">
-          Loading reviews…
-        </div>
-      </div>
-    </section>
-  );
+  const pauseAnimation = (index) => {
+    if (columnRefs.current[index]) {
+      columnRefs.current[index].style.animationPlayState = 'paused';
+    }
+  };
 
-  if (error || !items.length) return null;
+  const resumeAnimation = (index) => {
+    if (columnRefs.current[index]) {
+      columnRefs.current[index].style.animationPlayState = 'running';
+    }
+  };
+
+  // Loading State
+  if (loading) {
+    return (
+      <section className="py-20" aria-label="Client reviews">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-16">
+            <h3 className="text-xl md:text-2xl font-bold uppercase tracking-tight text-white mb-4">
+              {title}
+            </h3>
+            <p className="text-base text-gray-300">{subtitle}</p>
+          </div>
+          <div className="bg-white/10 border border-white/20 rounded-2xl p-10 text-center">
+            <div className="inline-block w-10 h-10 border-3 border-white/20 border-t-blue-400 rounded-full animate-spin mb-4"></div>
+            <p className="text-white text-lg">Loading reviews…</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Empty State
+  if (error || !items.length) {
+    return (
+      <section className="py-20" aria-label="Client reviews">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-16">
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tight text-white mb-4">
+              {title}
+            </h2>
+            <p className="text-base text-gray-300">{subtitle}</p>
+          </div>
+          <div className="bg-white/10 border border-white/20 rounded-2xl p-10 text-center">
+            <p className="text-white text-lg">
+              {error || 'Reviews are being prepared. Check back soon!'}
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   // Create 4 columns
   const columns = [[], [], [], []];
@@ -56,10 +98,10 @@ export default function ReviewsSection({
       <div className="container mx-auto px-4 max-w-[1400px]">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-white mb-4">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-tight text-white mb-4">
             {title}
           </h2>
-          <p className="text-lg text-gray-300">
+          <p className="text-base text-gray-300">
             {subtitle}
           </p>
         </div>
@@ -69,58 +111,49 @@ export default function ReviewsSection({
           {columns.map((column, colIndex) => (
             <div 
               key={colIndex}
-              className="flex flex-col gap-6 overflow-hidden"
-              style={{
-                maxHeight: '800px'
-              }}
+              className="flex flex-col gap-6 overflow-hidden max-h-[500px] md:max-h-[700px] lg:max-h-[800px]"
             >
               <div
+                ref={(el) => (columnRefs.current[colIndex] = el)}
                 className="flex flex-col gap-6"
                 style={{
-                  animation: `scroll${animationDirections[colIndex]} 15s linear infinite`,
-                  animationDelay: `${colIndex * 0.5}s`
+                  animation: `scroll${animationDirections[colIndex]} ${Math.max(15, column.length * 3)}s linear infinite`,
+                  animationDelay: `${colIndex * 0.5}s`,
+                  willChange: 'transform'
                 }}
+                onMouseEnter={() => pauseAnimation(colIndex)}
+                onMouseLeave={() => resumeAnimation(colIndex)}
               >
                 {/* Triple items for smooth infinite scroll */}
                 {[...column, ...column, ...column].map((r, idx) => (
                   <article 
-                    key={`${r._id}-${idx}`} 
-                    className="flex-shrink-0 rounded-2xl p-6 border transition-all duration-300 hover:scale-105"
-                    style={{ 
-                      minHeight: '220px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      WebkitBackdropFilter: 'blur(10px)',
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'  
-                    }}
+                    key={`${r._id}-${idx}`}
+                    aria-hidden={idx >= column.length}
+                    className="flex-shrink-0 rounded-2xl p-6 border border-white/20 transition-all duration-300 hover:scale-105 bg-white/10 backdrop-blur-md min-h-[220px] shadow-lg"
                   >
                     {/* Avatar and Name Section */}
                     <div className="flex items-start gap-3 mb-4">
                       {r.avatar ? (
                         <img 
                           src={r.avatar} 
-                          alt={r.name} 
-                          className="w-12 h-12 rounded-full object-cover flex-shrink-0" 
-                          style={{ border: '2px solid rgba(59, 130, 246, 0.3)' }}
+                          alt={r.name}
+                          loading="lazy"
+                          className="w-12 h-12 rounded-full object-cover flex-shrink-0 border-2 border-blue-400/30" 
                         />
                       ) : (
                         <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0"
-                          style={{ 
-                            background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-                            border: '2px solid rgba(59, 130, 246, 0.3)'
-                          }}
+                          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0 bg-gradient-to-br from-blue-600 to-blue-800 border-2 border-blue-400/30"
+                          aria-hidden="true"
                         >
-                          {String(r.name || '?').slice(0, 1).toUpperCase()}
+                          {String(r.name || '?').charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <strong className="block text-white-700 font-bold text-base mb-1">
+                        <strong className="block text-white font-bold text-base mb-1">
                           {r.name}
                         </strong>
                         {(r.role || r.company) && (
-                          <div className="text-xs text-white-500 truncate">
+                          <div className="text-xs text-gray-300 truncate">
                             {[r.role, r.company].filter(Boolean).join(' • ')}
                           </div>
                         )}
@@ -129,11 +162,16 @@ export default function ReviewsSection({
 
                     {/* Stars */}
                     <div className="mb-4">
-                      <div className="flex gap-1 text-lg">
+                      <div 
+                        className="flex gap-1 text-lg" 
+                        role="img" 
+                        aria-label={`${r.rating || 5} out of 5 stars`}
+                      >
                         {Array.from({ length: 5 }, (_, i) => (
                           <span 
-                            key={i} 
-                            className={i < (r.rating || 5) ? 'text-yellow-400' : 'text-gray-300'}
+                            key={i}
+                            aria-hidden="true"
+                            className={i < (r.rating || 5) ? 'text-yellow-400' : 'text-gray-400'}
                           >
                             ★
                           </span>
@@ -143,7 +181,7 @@ export default function ReviewsSection({
                     
                     {/* Review Text */}
                     {r.summary && (
-                      <p className="text-white-700 text-sm leading-relaxed line-clamp-6">
+                      <p className="text-gray-100 text-sm leading-relaxed line-clamp-6">
                         {r.summary}
                       </p>
                     )}
@@ -157,18 +195,24 @@ export default function ReviewsSection({
         {/* CSS for vertical scrolling animation */}
         <style jsx>{`
           @keyframes scrollup {
-            0% { transform: translateY(100%); }
+            0% { transform: translateY(0); }
             100% { transform: translateY(-66.666%); }
           }
           @keyframes scrolldown {
             0% { transform: translateY(-66.666%); }
-            100% { transform: translateY(100%); }
+            100% { transform: translateY(0); }
           }
           .line-clamp-6 {
             display: -webkit-box;
             -webkit-line-clamp: 6;
             -webkit-box-orient: vertical;
             overflow: hidden;
+          }
+          
+          @media (prefers-reduced-motion: reduce) {
+            .flex-col > div {
+              animation: none !important;
+            }
           }
         `}</style>
       </div>

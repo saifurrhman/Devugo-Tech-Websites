@@ -11,6 +11,7 @@ import SocialFloating from '../components/SocialFloating';
 import HomePortfolio from '../components/HomePortfolio';
 import ReviewsSection from '../components/ReviewsSection';
 
+
 export default function Home() {
   return (
     <>
@@ -18,13 +19,13 @@ export default function Home() {
       <SocialFloating />
       <Hero />
       <PortfolioCategories />
-      {/* CHANGED: Use grid mode instead of carousel */}
       <HomePortfolio limit={6} mode="grid" />
+      
       <WhyChoose />
-      {/* Show only 6 services on homepage */}
       <ServicesSection variant="home" />
       <HomeFaq />
       <HomeCta />
+      
       <ReviewsSection 
         title="What clients say" 
         subtitle="Real feedback from our partners" 
@@ -33,6 +34,7 @@ export default function Home() {
         mode="carousel" 
         showArrows={false} 
       />
+      
       <Footer />
     </>
   );

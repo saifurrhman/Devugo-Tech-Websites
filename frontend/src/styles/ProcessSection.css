@@ -1,0 +1,337 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* PROCESS SECTION STYLES - Based on developios.com                          */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Base Section Styles */
+.section-home-process {
+  position: relative;
+  background-color: #0d0d0d;
+  overflow: hidden;
+}
+
+/* Container Styles */
+.process_container {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.process_wrapper {
+  position: relative;
+  padding: 2rem 0;
+}
+
+/* Individual Step Styles */
+.process_step {
+  position: relative;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s ease-out forwards;
+  transition: all 0.3s ease;
+}
+
+.process_step:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.process_step:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.process_step:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.process_step:hover {
+  transform: translateX(10px);
+}
+
+/* Visual Card Styles */
+.process_visual {
+  position: relative;
+  perspective: 1000px;
+}
+
+.process_visual > div {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.process_visual:hover > div {
+  transform: rotateY(5deg) scale(1.02);
+}
+
+/* Progress Bar Animation */
+.process_timeline-progress {
+  position: relative;
+  overflow: hidden;
+  animation: progressFlow 4s ease-in-out infinite;
+}
+
+.process_timeline-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes progressFlow {
+  0%, 100% {
+    width: 20%;
+  }
+  50% {
+    width: 80%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Icon Animations */
+.process_visual [class*="absolute"] {
+  animation: float 3s ease-in-out infinite;
+}
+
+.process_visual [class*="top-left"] {
+  animation-delay: 0s;
+}
+
+.process_visual [class*="top-right"] {
+  animation-delay: 0.3s;
+}
+
+.process_visual [class*="bottom-left"] {
+  animation-delay: 0.6s;
+}
+
+.process_visual [class*="bottom-right"] {
+  animation-delay: 0.9s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+/* Timeline Connector */
+.process_timeline {
+  position: absolute;
+  left: 10rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 255, 136, 0.3),
+    transparent
+  );
+}
+
+.process_timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    #00ff88,
+    transparent
+  );
+  animation: timelineFlow 3s ease-in-out infinite;
+}
+
+@keyframes timelineFlow {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(100%);
+  }
+}
+
+/* Content Animations */
+.process_content h3 {
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.process_content h3::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #00ff88, transparent);
+  transition: width 0.4s ease;
+}
+
+.process_step:hover .process_content h3::after {
+  width: 100px;
+}
+
+/* Fade In Up Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glow Effect on Hover */
+.process_visual:hover {
+  filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.3));
+}
+
+/* Number Circle Pulse */
+.process_visual .w-32.h-32 {
+  animation: circlePulse 2s ease-in-out infinite;
+}
+
+@keyframes circlePulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.6);
+  }
+}
+
+/* Overlay Gradients */
+.process_overlay-top,
+.process_overlay-bottom {
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .process_timeline {
+    display: none;
+  }
+
+  .process_step {
+    margin-bottom: 3rem;
+  }
+
+  .process_visual {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .process_visual > div {
+    height: 300px;
+  }
+
+  .process_content h3 {
+    font-size: 1.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .process_visual > div {
+    height: 250px;
+  }
+
+  .process_content h3 {
+    font-size: 1.5rem;
+  }
+
+  .process_step:hover {
+    transform: none;
+  }
+}
+
+/* Loading Animation */
+@keyframes loadingPulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.process_step.loading {
+  animation: loadingPulse 1.5s ease-in-out infinite;
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .process_step,
+  .process_visual [class*="absolute"],
+  .process_timeline-progress,
+  .process_timeline::before {
+    animation: none !important;
+  }
+
+  .process_step:hover {
+    transform: none;
+  }
+}
+
+/* Custom Scrollbar for Process Section */
+.process_container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.process_container::-webkit-scrollbar-track {
+  background: #0d0d0d;
+}
+
+.process_container::-webkit-scrollbar-thumb {
+  background: #00ff88;
+  border-radius: 4px;
+}
+
+.process_container::-webkit-scrollbar-thumb:hover {
+  background: #00ffaa;
+}
+
+/* Print Styles */
+@media print {
+  .process_step {
+    page-break-inside: avoid;
+    opacity: 1;
+    transform: none;
+  }
+
+  .process_timeline,
+  .process_overlay-top,
+  .process_overlay-bottom {
+    display: none;
+  }
+}
