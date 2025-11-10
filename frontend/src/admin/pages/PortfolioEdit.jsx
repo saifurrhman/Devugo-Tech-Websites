@@ -176,7 +176,7 @@ export default function PortfolioEdit() {
     return (
       <div className="admin-layout">
         <AdminSidebar />
-        <main className="admin-content create-post">
+        <main className="admin-content">
           <AdminTopbar />
           <div className="card mt-4">Loading…</div>
         </main>
@@ -188,99 +188,129 @@ export default function PortfolioEdit() {
     <div className="admin-layout">
       <AdminSidebar />
 
-      <main className="admin-content create-post">
+      <main className="admin-content">
         <AdminTopbar />
 
-        <div className="page-bar sticky">
-          <div className="breadcrumbs">
-            <Link to="/admin">Dashboard</Link>
-            <span>/</span>
-            <Link to="/admin/portfolio">Portfolio</Link>
-            <span>/</span>
+        {/* Breadcrumbs */}
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+          <div className="flex items-center gap-2 flex-wrap text-sm">
+            <Link to="/admin" className="opacity-70 hover:opacity-100">Dashboard</Link>
+            <span className="opacity-50">/</span>
+            <Link to="/admin/portfolio" className="opacity-70 hover:opacity-100">Portfolio</Link>
+            <span className="opacity-50">/</span>
             <strong>{isNew ? 'Create' : 'Edit'}</strong>
           </div>
+          <Link to="/admin/portfolio" className="btn-secondary">Back to Portfolio</Link>
         </div>
 
-        <h1 className="page-title mt-2">{isNew ? 'Add Project' : 'Edit Project'}</h1>
-        {error && <div className="chip chip-error mt-2">{error}</div>}
-        {message && <div className="chip chip-success mt-2">{message}</div>}
+        <h1 className="text-2xl font-bold mb-4">{isNew ? 'Add Project' : 'Edit Project'}</h1>
+        
+        {error && (
+          <div className="card mb-4 p-3 bg-red-50 border border-red-200 text-red-600">
+            {error}
+          </div>
+        )}
+        {message && (
+          <div className="card mb-4 p-3 bg-green-50 border border-green-200 text-green-600">
+            {message}
+          </div>
+        )}
 
-        <form onSubmit={handleSave} className="mt-4">
-
-          {/* RESPONSIVE 2-COLUMN */}
+        <form onSubmit={handleSave}>
+          
+          {/* RESPONSIVE 2-COLUMN LAYOUT */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            {/* LEFT COLUMN */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
+            {/* LEFT COLUMN - Main Content */}
+            <div className="lg:col-span-2 space-y-6">
 
-              <section className="section-card">
-                <h3>Basic details</h3>
+              {/* Basic Details */}
+              <div className="card p-5">
+                <h3 className="text-lg font-semibold mb-4">Basic details</h3>
 
-                <label className="form-label mt-4">Title</label>
-                <input
-                  className="form-field ux-input w-full"
-                  value={form.title}
-                  onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  placeholder="E-commerce Website, Mobile App, etc."
-                  required
-                />
-
-                <label className="form-label mt-4">Client</label>
-                <input
-                  className="form-field ux-input w-full"
-                  value={form.client}
-                  onChange={e => setForm(f => ({ ...f, client: e.target.value }))}
-                  placeholder="Client or company name"
-                />
-
-                <label className="form-label mt-4">Description</label>
-                <textarea
-                  rows={5}
-                  className="form-field ux-input w-full"
-                  value={form.description}
-                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="Describe the project, features, and your role..."
-                />
-              </section>
-
-              <section className="section-card">
-                <div className="flex justify-between flex-wrap">
-                  <h3>Tech stack</h3>
-                  <Link to="/admin/tech-stack" className="btn-secondary">Manage</Link>
+                <div className="mb-4">
+                  <label className="form-label block mb-2">Title</label>
+                  <input
+                    className="form-field w-full"
+                    value={form.title}
+                    onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                    placeholder="E-commerce Website, Mobile App, etc."
+                    required
+                  />
                 </div>
 
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {techOptions.map(opt => {
-                    const name = String(opt.name || '');
-                    const active = form.techStack.includes(name);
-
-                    return (
-                      <button
-                        key={opt._id}
-                        type="button"
-                        className={`ql ${active ? 'active' : ''}`}
-                        onClick={() => {
-                          setForm(f => {
-                            const exists = f.techStack.includes(name);
-                            const next = exists
-                              ? f.techStack.filter(x => x !== name)
-                              : [...f.techStack, name];
-                            return { ...f, techStack: next };
-                          });
-                        }}
-                      >
-                        {name}
-                      </button>
-                    );
-                  })}
+                <div className="mb-4">
+                  <label className="form-label block mb-2">Client</label>
+                  <input
+                    className="form-field w-full"
+                    value={form.client}
+                    onChange={e => setForm(f => ({ ...f, client: e.target.value }))}
+                    placeholder="Client or company name"
+                  />
                 </div>
-              </section>
 
-              <section className="section-card">
-                <h3>Gallery</h3>
+                <div>
+                  <label className="form-label block mb-2">Description</label>
+                  <textarea
+                    rows={5}
+                    className="form-field w-full resize-y"
+                    value={form.description}
+                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                    placeholder="Describe the project, features, and your role..."
+                  />
+                </div>
+              </div>
+
+              {/* Tech Stack */}
+              <div className="card p-5">
+                <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                  <h3 className="text-lg font-semibold">Tech stack</h3>
+                  <Link to="/admin/tech-stack" className="btn-secondary">Manage Tech Stack</Link>
+                </div>
+
+                {techOptions.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {techOptions.map(opt => {
+                      const name = String(opt.name || '');
+                      const active = form.techStack.includes(name);
+
+                      return (
+                        <button
+                          key={opt._id}
+                          type="button"
+                          className={`px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                            active 
+                              ? 'bg-blue-500 text-white border-blue-500' 
+                              : 'bg-transparent border-gray-300 hover:border-blue-400'
+                          }`}
+                          onClick={() => {
+                            setForm(f => {
+                              const exists = f.techStack.includes(name);
+                              const next = exists
+                                ? f.techStack.filter(x => x !== name)
+                                : [...f.techStack, name];
+                              return { ...f, techStack: next };
+                            });
+                          }}
+                        >
+                          {name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm opacity-60">
+                    No technologies available. <Link to="/admin/tech-stack" className="text-blue-500 hover:underline">Add some</Link>
+                  </p>
+                )}
+              </div>
+
+              {/* Gallery */}
+              <div className="card p-5">
+                <h3 className="text-lg font-semibold mb-4">Gallery</h3>
 
                 <div
-                  className="uploader"
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition-colors mb-4"
                   onClick={() => document.getElementById('pf-uploader').click()}
                 >
                   <input
@@ -291,21 +321,25 @@ export default function PortfolioEdit() {
                     onChange={onFiles}
                     className="hidden"
                   />
-                  <div className="uploader-empty text-center">
-                    <strong>Click to upload</strong>
-                    <div className="muted text-sm">JPG, PNG, WEBP, GIF</div>
+                  <div>
+                    <strong className="block mb-1">Click to upload images</strong>
+                    <div className="text-sm opacity-60">JPG, PNG, WEBP, GIF</div>
                   </div>
                 </div>
 
-                {/* RESPONSIVE THUMB GRID */}
+                {/* Thumbnails Grid */}
                 {form.thumbnails.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {form.thumbnails.map((url, idx) => (
-                      <div key={idx} className="relative rounded border p-1">
-                        <img src={url} className="rounded w-full h-24 object-cover" />
+                      <div key={idx} className="relative border border-gray-300 rounded-lg p-2">
+                        <img 
+                          src={url} 
+                          alt={`Thumbnail ${idx + 1}`}
+                          className="w-full h-28 object-cover rounded mb-2"
+                        />
                         <button
                           type="button"
-                          className="uploader-remove"
+                          className="btn-secondary w-full text-sm py-1 border-red-400 text-red-500 hover:bg-red-50"
                           onClick={() => removeThumb(idx)}
                         >
                           Remove
@@ -314,83 +348,104 @@ export default function PortfolioEdit() {
                     ))}
                   </div>
                 )}
-              </section>
+              </div>
 
-              <section className="section-card">
-                <div className="flex justify-between flex-wrap">
-                  <h3>Categories and tags</h3>
+              {/* Categories and Tags */}
+              <div className="card p-5">
+                <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                  <h3 className="text-lg font-semibold">Categories and tags</h3>
                   <Link to="/admin/portfolio-categories" className="btn-secondary">
-                    Manage
+                    Manage Categories
                   </Link>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {categories.map(cat => {
-                    const active = form.tags.includes(cat.name);
+                {categories.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map(cat => {
+                      const active = form.tags.includes(cat.name);
 
-                    return (
-                      <button
-                        key={cat._id}
-                        type="button"
-                        className={`ql ${active ? 'active' : ''}`}
-                        onClick={() =>
-                          setForm(f => {
-                            const exists = f.tags.includes(cat.name);
-                            const next = exists
-                              ? f.tags.filter(t => t !== cat.name)
-                              : [...f.tags, cat.name];
-                            return { ...f, tags: next };
-                          })
-                        }
-                      >
-                        {cat.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
+                      return (
+                        <button
+                          key={cat._id}
+                          type="button"
+                          className={`px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                            active 
+                              ? 'bg-blue-500 text-white border-blue-500' 
+                              : 'bg-transparent border-gray-300 hover:border-blue-400'
+                          }`}
+                          onClick={() =>
+                            setForm(f => {
+                              const exists = f.tags.includes(cat.name);
+                              const next = exists
+                                ? f.tags.filter(t => t !== cat.name)
+                                : [...f.tags, cat.name];
+                              return { ...f, tags: next };
+                            })
+                          }
+                        >
+                          {cat.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm opacity-60">
+                    No categories available. <Link to="/admin/portfolio-categories" className="text-blue-500 hover:underline">Add some</Link>
+                  </p>
+                )}
+              </div>
 
             </div>
 
-            {/* RIGHT SIDEBAR */}
-            <aside className="section-card">
-              <h3>Settings</h3>
+            {/* RIGHT SIDEBAR - Settings */}
+            <aside className="card p-5 h-fit">
+              <h3 className="text-lg font-semibold mb-4">Settings</h3>
 
-              <label className="form-label mt-4">Project URL</label>
-              <input
-                className="form-field ux-input w-full"
-                value={form.url}
-                onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
-                placeholder="https://example.com"
-              />
+              <div className="mb-4">
+                <label className="form-label block mb-2">Project URL</label>
+                <input
+                  className="form-field w-full"
+                  value={form.url}
+                  onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
+                  placeholder="https://example.com"
+                />
+              </div>
 
-              <label className="flex gap-2 mt-4 items-center">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.featured}
                   onChange={e => setForm(f => ({ ...f, featured: e.target.checked }))}
+                  className="w-4 h-4 cursor-pointer"
                 />
-                Featured
+                <span>Featured Project</span>
               </label>
             </aside>
           </div>
 
-          <div className="bottom-actions">
-            <div className="flex flex-wrap justify-end gap-3">
-              <button type="button" onClick={() => navigate('/admin/portfolio')} className="btn-secondary">
-                Cancel
-              </button>
+          {/* Action Buttons */}
+          <div className="mt-8 pt-4 border-t border-gray-300 flex justify-end gap-3 flex-wrap">
+            <button 
+              type="button" 
+              onClick={() => navigate('/admin/portfolio')} 
+              className="btn-secondary"
+            >
+              Cancel
+            </button>
 
-              {!isNew && (
-                <button type="button" onClick={handleDelete} className="btn-secondary">
-                  Delete
-                </button>
-              )}
-
-              <button type="submit" disabled={saving} className="btn">
-                {saving ? 'Saving...' : 'Save'}
+            {!isNew && (
+              <button 
+                type="button" 
+                onClick={handleDelete} 
+                className="btn-secondary border-red-400 text-red-500 hover:bg-red-50"
+              >
+                Delete
               </button>
-            </div>
+            )}
+
+            <button type="submit" disabled={saving} className="btn">
+              {saving ? 'Saving...' : 'Save Project'}
+            </button>
           </div>
 
         </form>

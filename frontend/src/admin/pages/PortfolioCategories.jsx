@@ -99,70 +99,67 @@ export default function PortfolioCategories(){
       <main className="admin-content">
         <AdminTopbar />
 
-        <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem',flexWrap:'wrap'}}>
-          <h1>Portfolio Categories</h1>
-          <div style={{display:'flex',gap:'.6rem',alignItems:'center',flexWrap:'wrap'}}>
+        {/* Toolbar */}
+        <div className="flex justify-between items-center gap-3 flex-wrap mb-4">
+          <h1 className="text-2xl font-bold">Portfolio Categories</h1>
+          <div className="flex gap-3 items-center flex-wrap">
             {/* Search Bar */}
-            <div className="admin-search" style={{maxWidth:280}}>
+            <div className="admin-search max-w-xs">
               <span className="admin-search__icon" aria-hidden="true">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8"/>
                   <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
                 </svg>
               </span>
-              <input className="admin-search__input" placeholder="Search categories..." value={q} onChange={e=>setQ(e.target.value)} />
+              <input 
+                className="admin-search__input" 
+                placeholder="Search categories..." 
+                value={q} 
+                onChange={e=>setQ(e.target.value)} 
+              />
             </div>
             <Link to="/admin/portfolio" className="btn-secondary">Back to Portfolio</Link>
           </div>
         </div>
 
         {/* Add Category Form */}
-        <form onSubmit={addCategory} className="card" style={{marginTop:'.75rem', padding:'1rem'}}>
-          <label className="form-label" style={{marginBottom:'.5rem',display:'block'}}>Add New Category</label>
-          <div style={{display:'flex',alignItems:'center',gap:'.6rem',flexWrap:'wrap'}}>
+        <form onSubmit={addCategory} className="card p-4 mb-3">
+          <label className="form-label block mb-2">Add New Category</label>
+          <div className="flex items-center gap-3 flex-wrap">
             <input 
-              className="form-field" 
+              className="form-field flex-1 min-w-[200px]" 
               value={name} 
               onChange={e=>setName(e.target.value)} 
               placeholder="e.g. Websites" 
               required 
               onKeyPress={e => e.key === 'Enter' && addCategory(e)}
-              style={{flex:1,minWidth:'200px'}}
             />
             <button type="submit" className="btn">Add Category</button>
           </div>
         </form>
 
-        {/* Stats Badge */}
+        {/* Stats Badges */}
         {!loading && !error && (
-          <div className="card" style={{marginTop:'.75rem', padding:'.5rem 1rem', display:'flex', gap:'.6rem', alignItems:'center', flexWrap:'wrap'}}>
+          <div className="card p-3 mb-3 flex gap-3 items-center flex-wrap">
             <span className="badge">Total: {total}</span>
             <span className="badge">Showing: {filtered.length}</span>
             {selectedIds.length > 0 && (
-              <span className="badge" style={{background:'#3b82f6'}}>Selected: {selectedIds.length}</span>
+              <span className="badge bg-blue-500 text-white">Selected: {selectedIds.length}</span>
             )}
           </div>
         )}
 
         {/* Bulk Actions Bar */}
         {!loading && !error && filtered.length > 0 && (
-          <div className="card" style={{
-            marginTop:'.75rem', 
-            padding:'.5rem 1rem', 
-            display:'flex', 
-            gap:'.6rem', 
-            alignItems:'center',
-            justifyContent:'space-between',
-            flexWrap:'wrap'
-          }}>
-            <div style={{display:'flex',gap:'.6rem',alignItems:'center'}}>
+          <div className="card p-3 mb-3 flex gap-3 items-center justify-between flex-wrap">
+            <div className="flex gap-3 items-center">
               <input 
                 type="checkbox" 
                 checked={selectedIds.length === filtered.length && filtered.length > 0}
                 onChange={toggleSelectAll}
-                style={{cursor:'pointer',width:'18px',height:'18px'}}
+                className="cursor-pointer w-5 h-5"
               />
-              <span style={{fontSize:'.9rem'}}>
+              <span className="text-sm">
                 {selectedIds.length === filtered.length && filtered.length > 0 
                   ? 'Deselect All' 
                   : 'Select All'}
@@ -171,13 +168,8 @@ export default function PortfolioCategories(){
             
             {selectedIds.length > 0 && (
               <button 
-                className="btn-secondary" 
+                className="btn-secondary border-red-400 text-red-500 font-medium hover:bg-red-50" 
                 onClick={handleDeleteSelected}
-                style={{
-                  borderColor:'#ef4444',
-                  color:'#ef4444',
-                  fontWeight:'500'
-                }}
               >
                 Delete Selected ({selectedIds.length})
               </button>
@@ -185,50 +177,55 @@ export default function PortfolioCategories(){
           </div>
         )}
 
-        {/* List */}
-        {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
-        {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
+        {/* Loading & Error States */}
+        {loading && <div className="card mt-4 p-4">Loading…</div>}
+        {error && <div className="card mt-4 p-4 text-red-500">{error}</div>}
         
+        {/* Categories List */}
         {!loading && !error && (
           filtered.length ? (
-            <div className="grid two" style={{marginTop:'1rem'}}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {filtered.map(cat => (
                 <div 
                   key={cat._id} 
-                  className="card" 
-                  style={{
-                    display:'grid',
-                    gap:'.5rem',
-                    border: selectedIds.includes(cat._id) ? '2px solid #3b82f6' : undefined,
-                    background: selectedIds.includes(cat._id) ? 'rgba(59, 130, 246, 0.1)' : undefined
-                  }}
+                  className={`card p-4 space-y-2 transition-all ${
+                    selectedIds.includes(cat._id) 
+                      ? 'border-2 border-blue-500 bg-blue-50' 
+                      : ''
+                  }`}
                 >
                   {/* Checkbox and Header */}
-                  <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+                  <div className="flex items-center gap-2">
                     <input 
                       type="checkbox" 
                       checked={selectedIds.includes(cat._id)}
                       onChange={() => toggleSelect(cat._id)}
-                      style={{cursor:'pointer',width:'18px',height:'18px'}}
+                      className="cursor-pointer w-5 h-5"
                     />
-                    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem'}}>
-                      <h3 style={{margin:0}}>{cat.name}</h3>
-                      <span className="badge" style={{fontSize:'.75rem'}}>{cat.slug}</span>
+                    <div className="flex-1 flex items-center justify-between gap-2">
+                      <h3 className="text-lg font-semibold m-0">{cat.name}</h3>
+                      <span className="badge text-xs">{cat.slug}</span>
                     </div>
                   </div>
                   
-                  <div style={{display:'flex',gap:'.4rem',paddingLeft:'1.75rem'}}>
-                    <button className="btn-secondary" onClick={()=>removeCategory(cat._id)} style={{borderColor:'#ef4444', color:'#ef4444'}}>Delete</button>
+                  {/* Actions */}
+                  <div className="flex gap-2 pl-7">
+                    <button 
+                      className="btn-secondary border-red-400 text-red-500 hover:bg-red-50" 
+                      onClick={()=>removeCategory(cat._id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="card" style={{marginTop:'1rem',textAlign:'center',padding:'2rem'}}>
-              <h3 style={{marginTop:0}}>
+            <div className="card mt-4 text-center p-8">
+              <h3 className="text-xl font-semibold mt-0 mb-2">
                 {q.trim() ? 'No Categories Found' : 'No Categories Yet'}
               </h3>
-              <p style={{opacity:.8,marginTop:'.25rem'}}>
+              <p className="opacity-70 text-sm">
                 {q.trim() 
                   ? 'Try a different search term or add a new category above.'
                   : 'Add your first portfolio category using the form above.'
