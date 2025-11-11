@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PricingQuoteModal from '../components/PricingQuoteModal';
+import HomeFaq from '../components/HomeFaq';
 import './Pricing.css';
 import { PricingAPI } from '../lib/api';
 
@@ -220,6 +221,7 @@ export default function Pricing(){
       </main>
       
       <PricingQuoteModal open={open} onClose={()=>setOpen(false)} />
+        <HomeFaq />
       <Footer />
     </>
   );
