@@ -145,7 +145,7 @@ export default function Pricing(){
                 padding: '4rem 2rem',
                 color: '#6b7280'
               }}>
-                <div style={{fontSize: '2rem', marginBottom: '1rem'}}>⏳</div>
+                <div style={{fontSize: '2rem', marginBottom: '1rem'}}></div>
                 <p>Loading pricing plans...</p>
               </div>
             ) : filtered.length === 0 ? (
@@ -212,113 +212,11 @@ export default function Pricing(){
               ))
             )}
 
-            {/* Additional CTAs */}
-            {!loading && filtered.length > 0 && (
-              <>
-                <article className="pricing-card special" style={{transitionDelay: `${filtered.length * 60}ms`}}>
-                  <div className="special-icon" style={{fontSize: '3rem', marginBottom: '1rem'}}>
-                    🛠️
-                  </div>
-                  <h3>Maintenance & Support</h3>
-                  <p className="desc">
-                    Keep your product running smoothly with ongoing support, updates, and improvements.
-                  </p>
-                  <ul className="features" style={{marginTop: '1.5rem', marginBottom: '1.5rem'}}>
-                    <li>
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="10" cy="10" r="9" fill="#6366f1" opacity="0.1"/>
-                        <path d="M6 10l2.5 2.5L14 7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span>Bug fixes & patches</span>
-                    </li>
-                    <li>
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="10" cy="10" r="9" fill="#6366f1" opacity="0.1"/>
-                        <path d="M6 10l2.5 2.5L14 7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span>Performance monitoring</span>
-                    </li>
-                    <li>
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="10" cy="10" r="9" fill="#6366f1" opacity="0.1"/>
-                        <path d="M6 10l2.5 2.5L14 7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span>Monthly reports</span>
-                    </li>
-                  </ul>
-                  <button className="btn cta-dark" onClick={()=>setOpen(true)}>
-                    Contact Sales
-                  </button>
-                </article>
-
-                <article className="pricing-card special alt" style={{transitionDelay: `${(filtered.length + 1) * 60}ms`}}>
-                  <div className="special-art" aria-hidden="true">
-                    <div style={{fontSize: '3rem', marginBottom: '1rem'}}>💬</div>
-                  </div>
-                  <h3>Need Something Custom?</h3>
-                  <p className="desc">
-                    Have unique requirements? Let's discuss a tailored solution that fits your exact needs.
-                  </p>
-                  <button className="btn cta-dark" onClick={()=>setOpen(true)} style={{marginTop: '2rem'}}>
-                    Get Custom Quote →
-                  </button>
-                </article>
-              </>
-            )}
+           
           </div>
         </section>
 
-        {/* Features Comparison (Optional) */}
-        {!loading && plans.length > 0 && (
-          <section className="pricing-features" style={{padding: '4rem 0', background: '#f9fafb'}}>
-            <div className="container">
-              <div style={{textAlign: 'center', marginBottom: '3rem'}}>
-                <h2 style={{fontSize: '2rem', marginBottom: '.5rem'}}>Why Choose Our Services?</h2>
-                <p style={{color: '#6b7280', maxWidth: '600px', margin: '0 auto'}}>
-                  Every plan includes our commitment to quality, transparency, and exceptional support.
-                </p>
-              </div>
-              
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                gap: '2rem'
-              }}>
-                <div style={{textAlign: 'center'}}>
-                  <div style={{fontSize: '2.5rem', marginBottom: '1rem'}}>⚡</div>
-                  <h3 style={{fontSize: '1.125rem', marginBottom: '.5rem'}}>Fast Delivery</h3>
-                  <p style={{color: '#6b7280', fontSize: '.875rem'}}>
-                    Quick turnaround times without compromising quality
-                  </p>
-                </div>
-                
-                <div style={{textAlign: 'center'}}>
-                  <div style={{fontSize: '2.5rem', marginBottom: '1rem'}}>🎯</div>
-                  <h3 style={{fontSize: '1.125rem', marginBottom: '.5rem'}}>Quality First</h3>
-                  <p style={{color: '#6b7280', fontSize: '.875rem'}}>
-                    Premium code, design, and user experience in every project
-                  </p>
-                </div>
-                
-                <div style={{textAlign: 'center'}}>
-                  <div style={{fontSize: '2.5rem', marginBottom: '1rem'}}>💬</div>
-                  <h3 style={{fontSize: '1.125rem', marginBottom: '.5rem'}}>Dedicated Support</h3>
-                  <p style={{color: '#6b7280', fontSize: '.875rem'}}>
-                    Direct communication and ongoing assistance
-                  </p>
-                </div>
-                
-                <div style={{textAlign: 'center'}}>
-                  <div style={{fontSize: '2.5rem', marginBottom: '1rem'}}>🔒</div>
-                  <h3 style={{fontSize: '1.125rem', marginBottom: '.5rem'}}>Secure & Scalable</h3>
-                  <p style={{color: '#6b7280', fontSize: '.875rem'}}>
-                    Built with best practices and future growth in mind
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        
       </main>
       
       <PricingQuoteModal open={open} onClose={()=>setOpen(false)} />
