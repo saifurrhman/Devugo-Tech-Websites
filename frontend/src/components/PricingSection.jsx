@@ -2,91 +2,38 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './PricingSection.css';
 import PricingQuoteModal from './PricingQuoteModal';
+import { PricingAPI } from '../lib/api';
 
-const TIERS = [
-  {
-    title: 'CX + CRO Audit',
-    blurb: 'Fix critical areas of your website to improve conversions.',
-    price: '$1,500',
-    features: [
-      'x5 Critical redesigned sections',
-      '10+ page audit report',
-      'Figma source file',
-      'Loom walkthrough',
-      'Desktop + Mobile design',
-      'On‑page SEO & copy review',
-    ],
-  },
-  {
-    title: 'UX UI Design',
-    blurb: 'Modern design for your website, app, or SaaS product.',
-    price: '$2,000',
-    features: [
-      'Up to 5 pages / screens',
-      'Wireframes',
-      'Desktop + Mobile responsive',
-      'UI Design system',
-      'Figma source file',
-      'Unlimited revisions',
-    ],
-    highlight: true,
-  },
-  {
-    title: 'No/Low‑Code Dev',
-    blurb: 'Websites built in Webflow, Wix, or Shopify with speed.',
-    price: '$2,500+',
-    features: [
-      'Up to 5 pages',
-      'Componentized',
-      'CMS integration',
-      'Interactions/animations',
-      'Fully responsive',
-      'Unlimited revisions',
-    ],
-  },
-  {
-    title: 'Web Development',
-    blurb: 'Full‑stack web development for scalable, high‑performing apps.',
-    price: '$3,500+',
-    features: [
-      'Modern stack (React/Next)',
-      'API integration',
-      'Auth & dashboards',
-      'Accessibility & SEO',
-      'Analytics setup',
-      'Deployment & docs',
-    ],
-  },
-  {
-    title: 'AI Call Agent',
-    blurb: 'Voice AI that answers calls, books, and qualifies leads 24/7.',
-    price: '$1,800+',
-    features: [
-      'Custom voice + knowledge',
-      'Calendar/CRM integration',
-      'Call logs & transcripts',
-      'Warm transfers',
-      'Usage analytics',
-      'Go live in days',
-    ],
-  },
-  {
-    title: 'Mobile Apps Dev',
-    blurb: 'iOS/Android or cross‑platform apps with smooth UX and performance.',
-    price: '$5,000+',
-    features: [
-      'React Native stack',
-      'Auth + push notifications',
-      'Offline support',
-      'App store readiness',
-      'Analytics & crash reports',
-      'Support & updates',
-    ],
-  },
-];
-
-export default function PricingSection({ showCustom = true }){
+export default function PricingSection({ showCustom = true, limit = 6 }){
   const [open, setOpen] = useState(false);
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch pricing plans from API
+  useEffect(()=>{
+    let mounted = true;
+    (async()=>{
+      setLoading(true);
+      try{
+        const { items } = await PricingAPI.list();
+        if(mounted && Array.isArray(items) && items.length){
+          const published = items
+            .filter(p => p.published !== false)
+            .sort((a,b) => (a.order || 0) - (b.order || 0))
+            .slice(0, limit); // Limit number of plans shown
+          setPlans(published);
+        }
+      }catch(err){ 
+        console.error('Failed to load pricing:', err);
+      }
+      finally{ 
+        if(mounted) setLoading(false); 
+      }
+    })();
+    return ()=>{ mounted=false };
+  },[limit]);
+
+  // Animate cards on scroll
   useEffect(()=>{
     const cards = Array.from(document.querySelectorAll('.pricing-home .price-card'));
     const io = new IntersectionObserver((entries)=>{
@@ -99,7 +46,25 @@ export default function PricingSection({ showCustom = true }){
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     cards.forEach(c=> io.observe(c));
     return ()=> io.disconnect();
-  }, []);
+  }, [plans]);
+
+  function formatPrice(plan) {
+    if (plan.planType === 'custom') {
+      return 'Custom Quote';
+    }
+    if (plan.planType === 'one-time') {
+      return `$${plan.priceOneTime || 0}`;
+    }
+    // subscription
+    if (plan.priceMonthly) {
+      return `$${plan.priceMonthly}/mo`;
+    }
+    if (plan.priceYearly) {
+      return `$${plan.priceYearly}/yr`;
+    }
+    return 'Contact Us';
+  }
+
   return (
     <section className="pricing-home" aria-labelledby="pricing-home-title">
       <div className="container">
@@ -109,32 +74,88 @@ export default function PricingSection({ showCustom = true }){
         </header>
 
         <div className="pricing-grid">
-          {TIERS.map((t, i)=> (
-            <article key={i} className={`price-card ${t.highlight ? 'highlight' : ''}`} style={{ transitionDelay: `${i*60}ms` }}>
-              <h3 className="price-title">{t.title}</h3>
-              <p className="price-blurb">{t.blurb}</p>
-              <div className="price-amount">{t.price}</div>
-              <ul className="price-features">
-                {t.features.map((f, j)=> (<li key={j}>{f}</li>))}
-              </ul>
-              <button className="btn cta-dark" onClick={()=>setOpen(true)}>Get started</button>
-            </article>
-          ))}
+          {loading ? (
+            <div style={{
+              gridColumn: '1 / -1',
+              textAlign: 'center',
+              padding: '3rem 2rem',
+              color: '#6b7280'
+            }}>
+              <div style={{fontSize: '2rem', marginBottom: '1rem'}}>⏳</div>
+              <p>Loading pricing plans...</p>
+            </div>
+          ) : plans.length === 0 ? (
+            <div style={{
+              gridColumn: '1 / -1',
+              textAlign: 'center',
+              padding: '3rem 2rem'
+            }}>
+              <h3 style={{marginBottom: '.5rem'}}>No Plans Available</h3>
+              <p style={{color: '#6b7280', marginBottom: '1.5rem'}}>
+                No pricing plans are currently available.
+              </p>
+              <button className="btn" onClick={()=>setOpen(true)}>
+                Request Custom Quote
+              </button>
+            </div>
+          ) : (
+            <>
+              {plans.map((plan, i)=> (
+                <article 
+                  key={plan._id || i} 
+                  className={`price-card ${plan.recommended ? 'highlight' : ''}`} 
+                  style={{ transitionDelay: `${i*60}ms` }}
+                >
+                  {plan.recommended && (
+                    <div className="recommended-badge" style={{
+                      position: 'absolute',
+                      top: '-12px',
+                      right: '20px',
+                      background: '#10b981',
+                      color: 'white',
+                      padding: '4px 12px',
+                      borderRadius: '12px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600'
+                    }}>
+                      ⭐ Recommended
+                    </div>
+                  )}
+                  
+                  <h3 className="price-title">{plan.name}</h3>
+                  <p className="price-blurb">{plan.description || ''}</p>
+                  <div className="price-amount">{formatPrice(plan)}</div>
+                  
+                  {plan.features && plan.features.length > 0 && (
+                    <ul className="price-features">
+                      {plan.features.map((f, j)=> (<li key={j}>{f}</li>))}
+                    </ul>
+                  )}
+                  
+                  <button className="btn cta-dark" onClick={()=>setOpen(true)}>
+                    {plan.planType === 'custom' ? 'Get Quote' : 'Get started'}
+                  </button>
+                </article>
+              ))}
 
-          {/* Custom quote card */}
-          {showCustom && (
-            <article className="price-card custom" style={{ transitionDelay: `${TIERS.length*60}ms` }}>
-              <div className="custom-graphic" aria-hidden="true" />
-              <h3 className="price-title">Need a custom quote?</h3>
-              <p className="price-blurb">Tell us what you want to build — we’ll tailor a plan to your scope.</p>
-              <button className="btn cta-dark" onClick={()=>setOpen(true)}>Get started →</button>
-            </article>
+              {/* Custom quote card */}
+              {showCustom && (
+                <article className="price-card custom" style={{ transitionDelay: `${plans.length*60}ms` }}>
+                  <div className="custom-graphic" aria-hidden="true" />
+                  <h3 className="price-title">Need a custom quote?</h3>
+                  <p className="price-blurb">Tell us what you want to build — we'll tailor a plan to your scope.</p>
+                  <button className="btn cta-dark" onClick={()=>setOpen(true)}>Get started →</button>
+                </article>
+              )}
+            </>
           )}
         </div>
 
-        <div className="pricing-actions">
-          <Link to="/pricing" className="btn outline">See all pricing</Link>
-        </div>
+        {!loading && plans.length > 0 && (
+          <div className="pricing-actions">
+            <Link to="/pricing" className="btn outline">See all pricing</Link>
+          </div>
+        )}
       </div>
       <PricingQuoteModal open={open} onClose={()=>setOpen(false)} />
     </section>

@@ -89,3 +89,6 @@
   /* Ultra-small screens: stack stats */
   .about-stats .stats-grid{ grid-template-columns: 1fr }
 }
+.about-page .btn.outline {
+  border: 0.5px solid rgba(255, 255, 255, 0.3) !important;
+}

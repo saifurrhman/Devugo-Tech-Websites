@@ -12,6 +12,16 @@ export default function ReviewsSection({
   const [error, setError] = useState('');
   const columnRefs = useRef([]);
 
+  // Shuffle function to randomize array
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -21,7 +31,9 @@ export default function ReviewsSection({
         const params = featuredOnly ? { featured: true } : {};
         const { items } = await ClientReviewAPI.list(params);
         if (!mounted) return;
-        setItems((items || []).slice(0, limit));
+        // Shuffle items before distributing to columns
+        const shuffledItems = shuffleArray((items || []).slice(0, limit));
+        setItems(shuffledItems);
       } catch (err) {
         if (mounted) setError(err.message || 'Failed to load reviews');
       } finally {
@@ -84,7 +96,7 @@ export default function ReviewsSection({
     );
   }
 
-  // Create 4 columns
+  // Create 4 columns with randomized distribution
   const columns = [[], [], [], []];
   items.forEach((item, index) => {
     columns[index % 4].push(item);
@@ -106,18 +118,95 @@ export default function ReviewsSection({
           </p>
         </div>
 
-        {/* 4 Column Grid with Vertical Scrolling */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Mobile Single Column - WITH Animation */}
+        <div className="md:hidden">
+          <div className="flex flex-col gap-6 overflow-hidden max-h-[600px]">
+            <div
+              className="flex flex-col gap-6"
+              style={{
+                animation: 'scrollup 30s linear infinite',
+                willChange: 'transform'
+              }}
+            >
+              {/* Triple items for smooth infinite scroll */}
+              {[...items, ...items, ...items].map((r, idx) => (
+                <article 
+                  key={`${r._id}-mobile-${idx}`}
+                  aria-hidden={idx >= items.length}
+                  className="flex-shrink-0 rounded-2xl p-6 border border-white/20 transition-all duration-300 bg-white/10 backdrop-blur-md min-h-[220px] shadow-lg"
+                >
+                  {/* Avatar and Name Section */}
+                  <div className="flex items-start gap-3 mb-4">
+                    {r.avatar ? (
+                      <img 
+                        src={r.avatar} 
+                        alt={r.name}
+                        loading="lazy"
+                        className="w-12 h-12 rounded-full object-cover flex-shrink-0 border-2 border-blue-400/30" 
+                      />
+                    ) : (
+                      <div 
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0 bg-gradient-to-br from-blue-600 to-blue-800 border-2 border-blue-400/30"
+                        aria-hidden="true"
+                      >
+                        {String(r.name || '?').charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <strong className="block text-white font-bold text-base mb-1">
+                        {r.name}
+                      </strong>
+                      {(r.role || r.company) && (
+                        <div className="text-xs text-gray-300 truncate">
+                          {[r.role, r.company].filter(Boolean).join(' • ')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Stars */}
+                  <div className="mb-4">
+                    <div 
+                      className="flex gap-1 text-lg" 
+                      role="img" 
+                      aria-label={`${r.rating || 5} out of 5 stars`}
+                    >
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <span 
+                          key={i}
+                          aria-hidden="true"
+                          className={i < (r.rating || 5) ? 'text-yellow-400' : 'text-gray-400'}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Review Text */}
+                  {r.summary && (
+                    <p className="text-gray-100 text-sm leading-relaxed line-clamp-6">
+                      {r.summary}
+                    </p>
+                  )}
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 4 Column Grid with Vertical Scrolling - Desktop/Tablet Only */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {columns.map((column, colIndex) => (
             <div 
               key={colIndex}
-              className="flex flex-col gap-6 overflow-hidden max-h-[500px] md:max-h-[700px] lg:max-h-[800px]"
+              className="flex flex-col gap-6 overflow-hidden mobile-column"
             >
               <div
                 ref={(el) => (columnRefs.current[colIndex] = el)}
                 className="flex flex-col gap-6"
                 style={{
-                  animation: `scroll${animationDirections[colIndex]} ${Math.max(15, column.length * 3)}s linear infinite`,
+                  animation: `${animationDirections[colIndex] === 'up' ? 'scrollup' : 'scrolldown'} ${Math.max(20, column.length * 3)}s linear infinite`,
                   animationDelay: `${colIndex * 0.5}s`,
                   willChange: 'transform'
                 }}
@@ -194,14 +283,36 @@ export default function ReviewsSection({
 
         {/* CSS for vertical scrolling animation */}
         <style jsx>{`
+          /* Animation keyframes */
           @keyframes scrollup {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-66.666%); }
+            0% {
+              transform: translateY(0);
+            }
+            100% {
+              transform: translateY(-66.666%);
+            }
           }
+
           @keyframes scrolldown {
-            0% { transform: translateY(-66.666%); }
-            100% { transform: translateY(0); }
+            0% {
+              transform: translateY(-66.666%);
+            }
+            100% {
+              transform: translateY(0);
+            }
           }
+
+          /* Column max heights */
+          .mobile-column {
+            max-height: 600px;
+          }
+
+          @media (min-width: 1024px) {
+            .mobile-column {
+              max-height: 800px;
+            }
+          }
+
           .line-clamp-6 {
             display: -webkit-box;
             -webkit-line-clamp: 6;
