@@ -7,7 +7,7 @@ import HomeFaq from '../components/HomeFaq';
 import WhyChoose from '../components/WhyChoose';
 import ServicesSection from '../components/ServicesSection';
 import PricingSection from '../components/PricingSection';
-import Footer from '../components/Footer'; // No longer needed here
+import Footer from '../components/Footer'; 
 import SocialFloating from '../components/SocialFloating';
 import HomePortfolio from '../components/HomePortfolio';
 import ReviewsSection from '../components/ReviewsSection';
