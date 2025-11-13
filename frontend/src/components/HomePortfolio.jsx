@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PortfolioAPI } from '../lib/api';
 
-export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
+export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCategory = null }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -15,7 +15,22 @@ export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
       try {
         const { items } = await PortfolioAPI.list();
         if (!mounted) return;
-        const sorted = (items || []).slice().sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        
+        let filtered = items || [];
+        
+        // Filter by category if selected
+        if (selectedCategory) {
+          filtered = filtered.filter(item => 
+            (item.tags || []).some(tag => 
+              String(tag).toLowerCase() === selectedCategory.toLowerCase()
+            )
+          );
+        }
+        
+        const sorted = filtered.slice().sort((a, b) => 
+          new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
+        
         setItems(sorted.slice(0, limit));
       } catch (err) {
         if (mounted) setError(err.message || 'Failed to load projects');
@@ -24,14 +39,14 @@ export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
       }
     })();
     return () => { mounted = false };
-  }, [limit]);
+  }, [limit, selectedCategory]);
 
   if (loading) {
     return (
       <section className="services-section">
         <div className="container">
           <div className="services-head">
-            <p className="services-sub">Latest work we shipped</p>
+            <p className="services-sub">Loading projects...</p>
           </div>
           <p style={{ textAlign: 'center', color: 'var(--color-muted)' }}>Loading…</p>
         </div>
@@ -53,21 +68,20 @@ export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
     );
   }
 
-  // HORIZONTAL SCROLLING MODE - FULL WIDTH - NO FADE EFFECTS
   return (
     <section className="services-section" style={{ overflow: 'hidden' }}>
-      {/* Header in Container */}
-     
-
       {items.length === 0 ? (
         <div className="container">
           <div className="card" style={{ marginTop: '1rem', textAlign: 'center' }}>
-            No projects yet.
+            {selectedCategory 
+              ? `No projects found in "${selectedCategory}" category.`
+              : 'No projects yet.'
+            }
           </div>
         </div>
       ) : (
         <>
-          {/* FULL WIDTH Horizontal Scrolling Container - NO FADE */}
+          {/* FULL WIDTH Horizontal Scrolling Container */}
           <div className="horizontal-scroll-wrapper-clean" style={{ marginTop: '1rem' }}>
             <div className="horizontal-scroll-track">
               {/* First set of cards */}
@@ -124,8 +138,8 @@ export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
                 </article>
               ))}
               
-              {/* Duplicate set for seamless loop */}
-              {items.map((p) => (
+              {/* Duplicate set for seamless loop - only if enough items */}
+              {items.length >= 3 && items.map((p) => (
                 <article key={`second-${p._id}`} className="service-card-horizontal">
                   {p.thumbnails?.[0] && (
                     <img
@@ -180,7 +194,7 @@ export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
             </div>
           </div>
 
-          {/* View All Button - Back in Container */}
+          {/* View All Button */}
           <div className="container">
             <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
               <Link
@@ -199,9 +213,8 @@ export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
         </>
       )}
 
-      {/* CLEAN Horizontal Scrolling CSS - NO FADE EFFECTS */}
+      {/* Horizontal Scrolling CSS */}
       <style jsx>{`
-        /* FULL WIDTH WRAPPER - NO FADE GRADIENTS */
         .horizontal-scroll-wrapper-clean {
           width: 100vw;
           position: relative;
@@ -213,9 +226,6 @@ export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
           padding: 2rem 0;
         }
 
-        /* NO ::before and ::after pseudo-elements = NO FADE! */
-
-        /* Scrolling track */
         .horizontal-scroll-track {
           display: flex;
           gap: 1.5rem;
@@ -229,15 +239,10 @@ export default function HomePortfolio({ limit = 6, mode = 'grid' }) {
         }
 
         @keyframes scrollLeft {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
 
-        /* Card styling */
         .service-card-horizontal {
           flex: 0 0 380px;
           width: 380px;

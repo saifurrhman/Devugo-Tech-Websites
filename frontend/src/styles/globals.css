@@ -1272,6 +1272,7 @@ body.site-light .social-btn:hover{background:#e2e8f0}
 .contact-list a:hover{ color:#fff; text-decoration:underline }
 .contact-social{ display:flex; gap:.5rem; margin-top:.35rem }
 
+
 /* Form card (right) */
 .contact-card{ background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:1.25rem; box-shadow:0 16px 32px rgba(0,0,0,.22) }
 .contact-form{ display:grid; gap:.9rem }

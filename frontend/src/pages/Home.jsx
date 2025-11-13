@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import PortfolioCategories from '../components/PortfolioCategories';
@@ -12,15 +12,28 @@ import SocialFloating from '../components/SocialFloating';
 import HomePortfolio from '../components/HomePortfolio';
 import ReviewsSection from '../components/ReviewsSection';
 
-
 export default function Home() {
+  // State to manage selected category
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
   return (
     <>
       <Navbar />
       <SocialFloating />
       <Hero />
-      <PortfolioCategories />
-      <HomePortfolio limit={6} mode="grid" />
+      
+      {/* Portfolio Categories - User will click here */}
+      <PortfolioCategories 
+        showHeader={true}
+        onCategorySelect={setSelectedCategory}
+      />
+      
+      {/* Portfolio Items - Will filter based on selected category */}
+      <HomePortfolio 
+        limit={6} 
+        mode="grid" 
+        selectedCategory={selectedCategory}
+      />
       
       <WhyChoose />
       <ServicesSection variant="home" />

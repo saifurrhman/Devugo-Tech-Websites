@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { PortfolioCategoryAPI } from '../lib/api';
 
-export default function PortfolioCategories({ showHeader = true }){
+export default function PortfolioCategories({ showHeader = true, onCategorySelect, activeCategory = 'All' }){
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [activeTag, setActiveTag] = useState(activeCategory);
 
   useEffect(()=>{
     let mounted = true;
@@ -24,8 +23,17 @@ export default function PortfolioCategories({ showHeader = true }){
     return ()=>{ mounted=false };
   },[]);
 
-  const goToTag = (tag) => {
-    navigate(`/portfolio?tag=${encodeURIComponent(tag)}`);
+  // Sync activeTag with activeCategory prop
+  useEffect(() => {
+    setActiveTag(activeCategory);
+  }, [activeCategory]);
+
+  const handleTagClick = (tag) => {
+    setActiveTag(tag);
+    // Parent component ko batao ke konsi category select hui
+    if (onCategorySelect) {
+      onCategorySelect(tag === 'All' ? null : tag);
+    }
   };
 
   // Show loading state
@@ -45,7 +53,7 @@ export default function PortfolioCategories({ showHeader = true }){
     );
   }
 
-  // Don't render if no tags (but don't hide completely)
+  // Don't render if no tags
   if (error || !tags.length) return null;
 
   return (
@@ -64,30 +72,133 @@ export default function PortfolioCategories({ showHeader = true }){
           </div>
         )}
 
-        {/* Categories/Tags Grid */}
-        <div className="flex flex-wrap items-center justify-center gap-3 lg:gap-4">
-          
-          {/* "All" Button */}
-          <button 
-            type="button" 
-            className="px-4 py-2 lg:px-5 lg:py-2 bg-white text-blue-900 font-semibold rounded-lg hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
-            onClick={()=>navigate('/portfolio')}
-          >
-            All
-          </button>
-
-          {/* Category Buttons */}
-          {tags.map(tag => (
+        {/* Categories/Tags - Horizontal Scroll on Mobile, Wrap on Desktop */}
+        <div className="categories-scroll-wrapper">
+          <div className="categories-container">
+            
+            {/* "All" Button */}
             <button 
-              key={tag} 
               type="button" 
-              className="px-4 py-2 lg:px-5 lg:py-2 bg-white/10 text-white font-medium rounded-lg border border-white/20 hover:bg-white hover:text-blue-900 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
-              onClick={()=>goToTag(tag)}
+              className={`category-btn ${
+                activeTag === 'All' ? 'active' : ''
+              }`}
+              onClick={() => handleTagClick('All')}
             >
-              {tag}
+              All
             </button>
-          ))}
+
+            {/* Category Buttons */}
+            {tags.map(tag => (
+              <button 
+                key={tag} 
+                type="button" 
+                className={`category-btn ${
+                  activeTag === tag ? 'active' : ''
+                }`}
+                onClick={() => handleTagClick(tag)}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         </div>
+
+        <style jsx>{`
+          /* Mobile & Tablet: Horizontal Scroll */
+          @media (max-width: 1023px) {
+            .categories-scroll-wrapper {
+              width: 100vw;
+              position: relative;
+              left: 50%;
+              right: 50%;
+              margin-left: -50vw;
+              margin-right: -50vw;
+              overflow-x: auto;
+              overflow-y: hidden;
+              -webkit-overflow-scrolling: touch;
+              scrollbar-width: none;
+              -ms-overflow-style: none;
+            }
+
+            .categories-scroll-wrapper::-webkit-scrollbar {
+              display: none;
+            }
+
+            .categories-container {
+              display: flex;
+              gap: 0.75rem;
+              padding: 0 1rem;
+              width: max-content;
+            }
+
+            .category-btn {
+              flex-shrink: 0;
+              white-space: nowrap;
+              padding: 0.5rem 1rem;
+              font-size: 0.875rem;
+              font-weight: 500;
+              border-radius: 0.5rem;
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              background: rgba(255, 255, 255, 0.1);
+              color: white;
+              transition: all 0.3s ease;
+              backdrop-filter: blur(4px);
+            }
+
+            .category-btn.active {
+              background: white;
+              color: rgb(30, 58, 138);
+              border-color: white;
+              font-weight: 600;
+            }
+
+            .category-btn:active {
+              transform: scale(0.95);
+            }
+          }
+
+          /* Desktop: Flex Wrap */
+          @media (min-width: 1024px) {
+            .categories-scroll-wrapper {
+              overflow: visible;
+            }
+
+            .categories-container {
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              justify-content: center;
+              gap: 1rem;
+            }
+
+            .category-btn {
+              padding: 0.5rem 1.25rem;
+              font-weight: 500;
+              border-radius: 0.5rem;
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              background: rgba(255, 255, 255, 0.1);
+              color: white;
+              transition: all 0.3s ease;
+              backdrop-filter: blur(4px);
+              cursor: pointer;
+            }
+
+            .category-btn.active {
+              background: white;
+              color: rgb(30, 58, 138);
+              border-color: white;
+              font-weight: 600;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .category-btn:hover {
+              background: white;
+              color: rgb(30, 58, 138);
+              transform: scale(1.05);
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+          }
+        `}</style>
       </div>
     </section>
   );
