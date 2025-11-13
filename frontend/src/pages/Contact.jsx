@@ -24,7 +24,9 @@ export default function Contact() {
   });
 
   const [socialLinks, setSocialLinks] = useState([]);
-
+useEffect(() => {
+  document.title = 'Contact Us - Devugo Tech';
+}, []);
   useEffect(()=>{
     let mounted = true;
     (async()=>{

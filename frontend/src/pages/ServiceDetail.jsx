@@ -10,7 +10,9 @@ export default function ServiceDetail(){
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [plans, setPlans] = useState([]);
-
+useEffect(() => {
+  document.title = service ? `${service.title} - Devugo Tech` : 'Service - Devugo Tech';
+}, [service]);
   useEffect(()=>{
     let mounted = true;
     (async()=>{

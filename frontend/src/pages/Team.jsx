@@ -8,7 +8,9 @@ export default function Team() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+useEffect(() => {
+  document.title = 'Our Team - Devugo Tech';
+}, []);
   useEffect(()=>{
     let mounted = true;
     (async()=>{

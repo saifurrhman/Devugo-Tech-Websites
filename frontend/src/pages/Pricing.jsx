@@ -11,7 +11,9 @@ export default function Pricing(){
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState('All');
-
+useEffect(() => {
+  document.title = 'Pricing - Devugo Tech';
+}, []);
   // Animate cards on scroll
   useEffect(()=>{
     const els = Array.from(document.querySelectorAll('.pricing-page .pricing-card'));

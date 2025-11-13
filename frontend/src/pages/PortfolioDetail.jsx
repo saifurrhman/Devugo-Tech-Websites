@@ -10,7 +10,9 @@ export default function PortfolioDetail(){
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+useEffect(() => {
+  document.title = item ? `${item.title} - Devugo Tech` : 'Project - Devugo Tech';
+}, [item]);
   useEffect(()=>{
     let mounted = true;
     (async()=>{

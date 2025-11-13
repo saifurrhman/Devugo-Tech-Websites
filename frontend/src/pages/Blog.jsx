@@ -9,7 +9,9 @@ export default function Blog() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+useEffect(() => {
+  document.title = 'Blog - Devugo Tech';
+}, []);
   useEffect(()=>{
     let mounted = true;
     (async()=>{

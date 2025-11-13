@@ -9,7 +9,9 @@ export default function Faq(){
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [openKey, setOpenKey] = useState('');
-
+useEffect(() => {
+  document.title = 'FAQ - Devugo Tech';
+}, []);
   useEffect(()=>{
     let mounted = true;
     (async()=>{

@@ -11,7 +11,9 @@ export default function Portfolio() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
-
+useEffect(() => {
+  document.title = 'Portfolio - Devugo Tech';
+}, []);
   useEffect(() => {
     let mounted = true;
     (async () => {

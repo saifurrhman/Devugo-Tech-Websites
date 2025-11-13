@@ -8,6 +8,9 @@ export default function About() {
   const [team, setTeam] = useState([]);
   const [teamLoading, setTeamLoading] = useState(true);
   const [teamError, setTeamError] = useState('');
+  useEffect(() => {
+    document.title = 'About Us - Devugo Tech';
+  }, []);
   useEffect(()=>{
     const els = Array.from(document.querySelectorAll('.about-page .reveal'));
     const io = new IntersectionObserver((entries)=>{

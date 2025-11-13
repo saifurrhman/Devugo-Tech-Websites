@@ -21,6 +21,9 @@ export default function Solutions(){
       href: '#custom'
     },
   ];
+  useEffect(() => {
+  document.title = 'Solutions - Devugo Tech';
+}, []);
 
   useEffect(()=>{
     const els = Array.from(document.querySelectorAll('.reveal'));
