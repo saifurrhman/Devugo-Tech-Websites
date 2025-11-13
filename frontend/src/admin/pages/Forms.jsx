@@ -11,7 +11,7 @@ function defaultTemplate(key){
       key: 'contact', enabled: true,
       title: "Let's work together",
       subtitle: 'Ready to take your business to the next level? Reach out, and let s discuss how we can help.',
-      buttonText: 'Submit, successMessage Thanks! Your message has been sent.',
+      buttonText: 'Submit', successMessage: 'Thanks! Your message has been sent.',
       fields: [
         { name:'name', label:'Name', type:'text', placeholder:'Your name', required:true, order:0 },
         { name:'email', label:'Email', type:'email', placeholder:'Email address', required:true, order:1 },
@@ -447,7 +447,7 @@ export default function Forms(){
                               arr[idx]={...arr[idx],type:e.target.value}; 
                               return {...m,fields:arr}; 
                             })}
-                            className="w-full min-h-[36px] sm:min-h-[40px] md:min-h-[44px] px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs md:text-sm border rounded-md"
+                            className="w-full min-h-[36px] sm:min-h-[40px] md:min-h-[44px] px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs md:text-sm border rounded-md bg-white text-slate-900"
                           >
                             <option value="text">Text</option>
                             <option value="email">Email</option>
@@ -516,7 +516,7 @@ export default function Forms(){
                 </div>
               </div>
 
-              {/* Live Preview */}
+               {/* Live Preview */}
               <Preview model={model} />
             </div>
           </div>

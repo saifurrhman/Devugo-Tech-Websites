@@ -32,11 +32,11 @@ export default function PortfolioDetail(){
       <Navbar />
       <main className="container" style={{paddingTop:'2rem', paddingBottom:'2rem'}}>
         <div className="breadcrumbs" style={{marginBottom:'.75rem'}}>
-          <Link to="/">Home</Link>
-          <span> / </span>
-          <Link to="/portfolio">Portfolio</Link>
-          <span> / </span>
-          <strong className="active">{item?.title || 'Project'}</strong>
+          <Link to="/" style={{color:'white', textDecoration:'none'}}>Home</Link>
+          <span style={{color:'rgba(255,255,255,0.5)', margin:'0 0.3rem'}}> / </span>
+          <Link to="/portfolio" style={{color:'white', textDecoration:'none'}}>Portfolio</Link>
+          <span style={{color:'#ffffff', margin:'0 0.3rem'}}> / </span>
+          <strong style={{color:'#ffffff', fontWeight:500}}>{item?.title || 'Project'}</strong>
         </div>
 
         {loading && <div className="card">Loading…</div>}

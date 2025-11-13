@@ -273,11 +273,11 @@ export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCatego
           
           .horizontal-scroll-track {
             animation-duration: 25s;
-            padding: 0 1rem;
+            padding: 0   1rem;
             gap: 1rem;
           }
         }
       `}</style>
     </section>
   );
-}
+} 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
+import BlogHeroSection from '../components/BlogHeroSection';  
 import Footer from '../components/Footer';
+
 import { BlogAPI } from '../lib/api';
 
 export default function Blog() {
@@ -26,12 +28,12 @@ export default function Blog() {
   return (
     <>
       <Navbar />
+      <BlogHeroSection />
       <main className="container">
-        <h1>Blog</h1>
-        {loading && <p>Loading posts…</p>}
+        {loading && <p>Loading posts...</p>}
         {error && <p style={{color:'#ef4444'}}>{error}</p>}
         {!loading && !error && (
-          <div className="grid three" style={{marginTop:'1rem'}}>
+          <div className="grid three" style={{marginTop:'2rem'}}>
             {posts.length === 0 && (
               <div className="card">No posts yet.</div>
             )}
