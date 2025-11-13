@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Navbar from '../components/Navbar';
+import ContactHero from '../components/ContactHero';
 import Footer from '../components/Footer';
 import BudgetSelect from '../components/BudgetSelect';
 import { ContactAPI, FormAPI } from '../lib/api';
@@ -114,12 +115,13 @@ export default function Contact() {
   return (
     <>
       <Navbar />
+      <ContactHero />
       <main className="contact-page">
         <div className="container">
           <div className="contact-grid">
             <section className="contact-intro">
-              <h1 className="contact-title">Let’s work together</h1>
-              <p className="contact-sub">Ready to take your business to the next level? Reach out, and let’s discuss how we can help.</p>
+              <h1 className="contact-title">Get in touch</h1>
+              <p className="contact-sub">We're here to help bring your ideas to life. Reach out through any channel below.</p>
 
               <ul className="contact-list">
                 <li>

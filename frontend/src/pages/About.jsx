@@ -144,7 +144,7 @@ export default function About() {
         </section>
 
         {/* 6b. Team grid (About page) */}
-        <section className="about-team-grid" aria-labelledby="team-grid-title">
+        {/* <section className="about-team-grid" aria-labelledby="team-grid-title">
           <div className="container">
             <h2 id="team-grid-title" className="reveal">Meet the team</h2>
             {teamLoading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
@@ -171,7 +171,7 @@ export default function About() {
               <a className="btn" href="/team">View full team</a>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* 7. CTA */}
         <section className="about-cta" aria-labelledby="cta-title">
