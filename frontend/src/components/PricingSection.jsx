@@ -6,6 +6,7 @@ import { PricingAPI } from '../lib/api';
 
 export default function PricingSection({ showCustom = true, limit = 6 }){
   const [open, setOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -65,6 +66,17 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
     return 'Contact Us';
   }
 
+  function handleOpenQuote(plan = null) {
+    setSelectedPlan(plan);
+    setOpen(true);
+  }
+
+  function handleCloseQuote() {
+    setOpen(false);
+    // Clear selected plan after modal closes
+    setTimeout(() => setSelectedPlan(null), 300);
+  }
+
   return (
     <section className="pricing-home" aria-labelledby="pricing-home-title">
       <div className="container">
@@ -94,7 +106,7 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
               <p style={{color: '#6b7280', marginBottom: '1.5rem'}}>
                 No pricing plans are currently available.
               </p>
-              <button className="btn" onClick={()=>setOpen(true)}>
+              <button className="btn" onClick={() => handleOpenQuote(null)}>
                 Request Custom Quote
               </button>
             </div>
@@ -132,7 +144,7 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
                     </ul>
                   )}
                   
-                  <button className="btn cta-dark" onClick={()=>setOpen(true)}>
+                  <button className="btn cta-dark" onClick={() => handleOpenQuote(plan)}>
                     {plan.planType === 'custom' ? 'Get Quote' : 'Get started'}
                   </button>
                 </article>
@@ -144,7 +156,7 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
                   <div className="custom-graphic" aria-hidden="true" />
                   <h3 className="price-title">Need a custom quote?</h3>
                   <p className="price-blurb">Tell us what you want to build — we'll tailor a plan to your scope.</p>
-                  <button className="btn cta-dark" onClick={()=>setOpen(true)}>Get started →</button>
+                  <button className="btn cta-dark" onClick={() => handleOpenQuote(null)}>Get started →</button>
                 </article>
               )}
             </>
@@ -157,7 +169,11 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
           </div>
         )}
       </div>
-      <PricingQuoteModal open={open} onClose={()=>setOpen(false)} />
+      <PricingQuoteModal 
+        open={open} 
+        onClose={handleCloseQuote}
+        selectedPlan={selectedPlan}
+      />
     </section>
   );
 }

@@ -43,7 +43,7 @@ export default function Home() {
       <PricingSection showCustom={true} limit={6} />
       
       <HomeFaq />
-      <HomeCta />
+      
       
       <ReviewsSection 
         title="What clients say" 
@@ -53,8 +53,8 @@ export default function Home() {
         mode="carousel" 
         showArrows={false} 
       />
-      
+      <HomeCta />
       { <Footer /> }
     </>
   );
-}
+} 

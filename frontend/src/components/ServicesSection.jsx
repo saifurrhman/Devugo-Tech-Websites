@@ -3,30 +3,12 @@ import ServiceInquiryModal from './ServiceInquiryModal';
 import './ServicesSection.css';
 import { ServiceAPI } from '../lib/api';
 
-const STATIC_SERVICES = [
-  { title: 'UX CRO Audit', desc: 'Detailed UX and CRO audits to uncover conversion barriers, optimize user flows, and enhance engagement.' },
-  { title: 'UX UI Design', desc: 'Clean designs for websites, web apps, mobile apps, and SaaS products that enhance user experience and drive conversions.' },
-  { title: 'Web Development', desc: 'Robust web development for scalable, high–performing websites and applications tailored to your business needs.' },
-  { title: 'SAAS Products', desc: 'From MVPs to full–scale platforms, we build SaaS products that are scalable, reliable, and ready for growth.' },
-  { title: 'E‑commerce Development', desc: 'High‑converting eCommerce solutions crafted to maximize sales and streamline management for sustained growth.' },
-  { title: 'Low‑Code / No‑Code', desc: 'Build MVPs rapidly using tools like Webflow and automation platforms — launch faster with quality.' },
-  { title: 'AI Call Agent', desc: 'Deploy voice AI agents that answer calls, schedule, qualify leads, and provide instant responses 24/7.' },
-  { title: 'AI Agent', desc: 'Custom AI assistants for support, sales, and internal ops — integrated with your tools and workflows.' },
-  { title: 'Custom CRM System', desc: 'Tailor‑made CRM systems with pipelines, automations, and reporting designed around your team.' },
-  { title: 'Custom Software Development', desc: 'End‑to‑end product development — from discovery and design to scalable, secure engineering.' },
-  { title: 'Shopify Development', desc: 'High‑performing Shopify stores, custom themes, and app integrations that convert.' },
-  { title: 'Wix Development', desc: 'Beautiful Wix websites with custom components and SEO best practices.' },
-  { title: 'Webflow Development', desc: 'Pixel‑perfect Webflow sites with CMS, animations, and enterprise‑grade performance.' },
-  { title: 'AI Development', desc: 'Design, train, and integrate AI models into your product — from LLM features to intelligent automation.' },
-  { title: 'Mobile Apps Development', desc: 'Native and cross‑platform apps with smooth UX, performance, and app‑store readiness.' },
-];
-
 export default function ServicesSection({ variant }){
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [services, setServices] = useState(STATIC_SERVICES);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [usingStatic, setUsingStatic] = useState(false);
+  const [error, setError] = useState('');
   const [initialCount, setInitialCount] = useState(6);
   const [visibleCount, setVisibleCount] = useState(6);
   const gridRef = useRef(null);
@@ -42,58 +24,62 @@ export default function ServicesSection({ variant }){
     setVisibleCount(init);
   }, []);
 
-  // Fetch dynamic services from admin, fallback to static
   useEffect(()=>{
     let mounted = true;
     
     (async()=>{
+      setLoading(true);
+      setError('');
       try{
-        console.log('🔍 Attempting to fetch services from API...');
+        console.log('🔍 Fetching services from API...');
         
-        // Try to fetch from API
         const response = await ServiceAPI.list();
-        console.log('✅ API Response:', response);
+        console.log('✅ Raw API Response:', response);
+        console.log('✅ Response type:', typeof response);
+        console.log('✅ Is Array?:', Array.isArray(response));
         
-        // Extract items from response
-        const items = response.items || response.data || (Array.isArray(response) ? response : []);
+        // Handle different response formats
+        let items = [];
+        if (Array.isArray(response)) {
+          items = response;
+        } else if (response && typeof response === 'object') {
+          items = response.items || response.data || response.services || [];
+        }
+        
+        console.log('📦 Extracted items:', items);
+        console.log('📊 Items length:', items.length);
         
         if(mounted && Array.isArray(items) && items.length > 0){
-          // Map dynamic services to expected format
           const mapped = items
             .filter(s => {
-              // Handle different published field types
-              if (s.published === undefined) return true;
-              if (typeof s.published === 'boolean') return s.published;
+              console.log('🔍 Checking service:', s.title, 'Published:', s.published);
+              // Accept all services if published field doesn't exist
+              if (s.published === undefined || s.published === null) return true;
+              if (typeof s.published === 'boolean') return s.published === true;
               if (typeof s.published === 'string') return s.published === 'true' || s.published === '1';
               if (typeof s.published === 'number') return s.published === 1;
-              return s.published !== false;
+              return false;
             })
             .sort((a,b) => (a.order || 0) - (b.order || 0))
             .map(s => ({
-              title: s.title,
-              desc: s.description || s.desc,
-              slug: s.slug,
+              title: s.title || 'Untitled Service',
+              desc: s.description || s.desc || '',
+              slug: s.slug || '',
             }));
           
-          if(mapped.length > 0) {
-            console.log('✅ Using dynamic services:', mapped.length);
-            setServices(mapped);
-            setUsingStatic(false);
-          } else {
-            console.warn('⚠️ No published services found, using static services');
-            setServices(STATIC_SERVICES);
-            setUsingStatic(true);
-          }
+          console.log('✅ Final mapped services:', mapped.length, mapped);
+          setServices(mapped);
         } else {
-          console.warn('⚠️ API returned no items, using static services');
-          setServices(STATIC_SERVICES);
-          setUsingStatic(true);
+          console.warn('⚠️ No services found or empty array');
+          console.log('Items received:', items);
+          setServices([]);
         }
       } catch(err) { 
-        console.warn('⚠️ Failed to load dynamic services, using static fallback:', err.message);
+        console.error('❌ Failed to load services:', err);
+        console.error('❌ Error details:', err.message, err.stack);
         if(mounted) {
-          setServices(STATIC_SERVICES);
-          setUsingStatic(true);
+          setError('Failed to load services. Please try again later.');
+          setServices([]);
         }
       } finally { 
         if(mounted) setLoading(false); 
@@ -103,14 +89,12 @@ export default function ServicesSection({ variant }){
     return ()=>{ mounted = false };
   }, []);
 
-  // Animation effect
   useEffect(()=>{
     if (loading) return;
 
     const els = Array.from(gridRef.current?.querySelectorAll('.service-card') || []);
     const vh = window.innerHeight || 800;
     
-    // Stagger in any cards already in (or near) the viewport on first paint
     els.forEach((el, index)=>{
       const rect = el.getBoundingClientRect();
       if (rect.top < vh * 0.9){
@@ -118,7 +102,6 @@ export default function ServicesSection({ variant }){
       }
     });
 
-    // Observe the rest for lazy reveal while scrolling
     const io = new IntersectionObserver((entries)=>{
       entries.forEach(entry=>{
         if(entry.isIntersecting){
@@ -170,78 +153,48 @@ export default function ServicesSection({ variant }){
         </div>
 
         {loading ? (
-          <div style={{textAlign:'center', padding:'3rem 0'}}>
-            <p style={{color:'#666'}}>Loading services...</p>
+          <div className="text-center py-12">
+            <p className="text-slate-600">Loading services...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : services.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-slate-600 mb-4">No services available yet.</p>
+            <a 
+              href="/admin/services" 
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-block no-underline"
+            >
+              Add Services in Admin
+            </a>
           </div>
         ) : (
           <>
-            {/* Optional: Show a subtle notice when using static services */}
-            {usingStatic && !isHome && (
-              <div style={{
-                textAlign: 'center',
-                padding: '0.75rem 1rem',
-                marginBottom: '1.5rem',
-                background: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-                borderRadius: '8px',
-                color: '#93c5fd',
-                fontSize: '0.9rem'
-              }}>
-                💡 <strong>Note:</strong> Dynamic services unavailable. Showing default service list.
-                {' '}
-                <a 
-                  href="/admin/services" 
-                  style={{
-                    color: '#60a5fa',
-                    textDecoration: 'underline'
-                  }}
-                >
-                  Manage in Admin
-                </a>
-              </div>
-            )}
-
             <div ref={gridRef} className="services-grid">
               {(isHome ? services.slice(0,6) : services.slice(0, visibleCount)).map((s, i) => (
                 <article
-                  className="service-card"
+                  className="service-card flex flex-col"
                   key={`${s.slug || s.title}-${i}`}
-                  onClick={()=>{
-                    if (s.slug) { 
-                      window.location.href = `/services/${s.slug}`; 
-                      return; 
-                    }
-                    if(!isHome){ 
-                      openInquiry(s) 
-                    } else { 
-                      window.location.href = '/services#services'; 
-                    }
-                  }}
-                  role={isHome ? 'link' : 'button'}
+                  role="article"
                   tabIndex={0}
-                  onKeyDown={(e)=>{
-                    if(e.key==='Enter' || e.key===' '){
-                      e.preventDefault();
-                      if (s.slug) { 
-                        window.location.href = `/services/${s.slug}`; 
-                        return; 
-                      }
-                      if(!isHome){ 
-                        openInquiry(s) 
-                      } else { 
-                        window.location.href = '/services#services'; 
-                      }
-                    }
-                  }}
                 >
                   <h3 className="service-title">{s.title}</h3>
-                  <p className="service-desc">{s.desc}</p>
-                  {isHome ? (
+                  <p className="service-desc mb-auto">{s.desc}</p>
+                  
+                  {/* HOME PAGE: Single button at bottom */}
+                  {isHome && (
                     <a 
                       href="/services#services" 
-                      className="service-link" 
-                      aria-label={`View ${s.title} on Services page`} 
-                      onClick={(e)=>e.stopPropagation()}
+                      className="service-link mt-auto"
+                      aria-label={`View ${s.title} on Services page`}
                     >
                       <span className="icon" aria-hidden>
                         <svg viewBox="0 0 24 24">
@@ -257,41 +210,88 @@ export default function ServicesSection({ variant }){
                       </span>
                       View on Services
                     </a>
-                  ) : (
-                    <a 
-                      href={s.slug ? `/services/${s.slug}` : '#services'} 
-                      className="service-link" 
-                      aria-label={`Learn more about ${s.title}`} 
-                      onClick={(e)=>e.stopPropagation()}
-                    >
-                      <span className="icon" aria-hidden>
-                        <svg viewBox="0 0 24 24">
-                          <path 
-                            d="M5 12h12M13 6l6 6-6 6" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </span>
-                      Learn More
-                    </a>
+                  )}
+
+                  {/* SERVICES PAGE: Two centered buttons */}
+                  {!isHome && (
+                    <div className="flex gap-2 mt-auto pt-4 justify-center items-center">
+                      {/* Learn More Button */}
+                      {s.slug ? (
+                        <a 
+                          href={`/services/${s.slug}`}
+                          className="service-link flex-1"
+                          aria-label={`Learn more about ${s.title}`}
+                        >
+                          <span className="icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16">
+                              <path 
+                                d="M5 12h12M13 6l6 6-6 6" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                strokeWidth="2" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </span>
+                          Learn More
+                        </a>
+                      ) : (
+                        <button 
+                          onClick={() => openInquiry(s)}
+                          className="service-link flex-1"
+                          aria-label={`Learn more about ${s.title}`}
+                        >
+                          <span className="icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16">
+                              <path 
+                                d="M5 12h12M13 6l6 6-6 6" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                strokeWidth="2" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </span>
+                          Learn More
+                        </button>
+                      )}
+
+                      {/* Get Quote Button - Primary */}
+                      <button 
+                        onClick={() => openInquiry(s)}
+                        className="service-link service-link-primary flex-1"
+                        aria-label={`Get quote for ${s.title}`}
+                      >
+                        <span className="icon">
+                          <svg viewBox="0 0 24 24" width="16" height="16">
+                            <path 
+                              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </span>
+                        Get Quote
+                      </button>
+                    </div>
                   )}
                 </article>
               ))}
             </div>
 
-            {/* View All Services Button - Only on Home Page */}
+            {/* View All Services - Home Page Only */}
             {isHome && services.length > 6 && (
-              <div className="load-more-wrap" style={{marginTop: '2rem'}}>
+              <div className="load-more-wrap mt-8">
                 <a 
                   href="/services#services" 
-                  className="btn cta-dark load-more-btn"
-                  style={{textDecoration: 'none', display: 'inline-block'}}
+                  className="btn cta-dark load-more-btn no-underline inline-block"
                 >
-                  <span style={{display:'inline-flex',alignItems:'center',gap:'.4rem'}}>
+                  <span className="inline-flex items-center gap-2">
                     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
                       <path 
                         d="M5 12h14M12 5l7 7-7 7" 
@@ -308,11 +308,11 @@ export default function ServicesSection({ variant }){
               </div>
             )}
 
-            {/* Load More/Show Less - Only on Services Page */}
+            {/* Load More/Show Less - Services Page Only */}
             {!isHome && services.length > visibleCount ? (
               <div className="load-more-wrap">
                 <button className="btn cta-dark load-more-btn" onClick={loadMore}>
-                  <span style={{display:'inline-flex',alignItems:'center',gap:'.4rem'}}>
+                  <span className="inline-flex items-center gap-2">
                     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
                       <path 
                         d="M12 5v14M5 12h14" 
@@ -332,7 +332,7 @@ export default function ServicesSection({ variant }){
             ) : !isHome && services.length > initialCount ? (
               <div className="load-more-wrap">
                 <button className="btn cta-dark load-more-btn" onClick={showLess}>
-                  <span style={{display:'inline-flex',alignItems:'center',gap:'.4rem'}}>
+                  <span className="inline-flex items-center gap-2">
                     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
                       <path 
                         d="M5 12h14" 
@@ -362,4 +362,4 @@ export default function ServicesSection({ variant }){
       )}
     </section>
   );
-}
+}         
