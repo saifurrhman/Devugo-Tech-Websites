@@ -8,12 +8,15 @@ import { PricingAPI } from '../lib/api';
 
 export default function Pricing(){
   const [open, setOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState('All');
-useEffect(() => {
-  document.title = 'Pricing - Devugo Tech';
-}, []);
+
+  useEffect(() => {
+    document.title = 'Pricing - Devugo Tech';
+  }, []);
+
   // Animate cards on scroll
   useEffect(()=>{
     const els = Array.from(document.querySelectorAll('.pricing-page .pricing-card'));
@@ -104,6 +107,16 @@ useEffect(() => {
     return '';
   }
 
+  function handleOpenQuote(plan = null) {
+    setSelectedPlan(plan);
+    setOpen(true);
+  }
+
+  function handleCloseQuote() {
+    setOpen(false);
+    setTimeout(() => setSelectedPlan(null), 300);
+  }
+
   return (
     <>
       <Navbar />
@@ -117,7 +130,7 @@ useEffect(() => {
             </p>
             <div className="actions">
               <a href="#grid" className="btn">View Plans</a>
-              <button className="btn-secondary" onClick={()=>setOpen(true)}>
+              <button className="btn-secondary" onClick={() => handleOpenQuote(null)}>
                 Get Custom Quote
               </button>
             </div>
@@ -148,7 +161,7 @@ useEffect(() => {
                 padding: '4rem 2rem',
                 color: '#6b7280'
               }}>
-                <div style={{fontSize: '2rem', marginBottom: '1rem'}}></div>
+                <div style={{fontSize: '2rem', marginBottom: '1rem'}}>⏳</div>
                 <p>Loading pricing plans...</p>
               </div>
             ) : filtered.length === 0 ? (
@@ -163,7 +176,7 @@ useEffect(() => {
                     ? 'No pricing plans are currently available.' 
                     : `No ${selected.toLowerCase()} plans available.`}
                 </p>
-                <button className="btn" onClick={()=>setOpen(true)}>
+                <button className="btn" onClick={() => handleOpenQuote(null)}>
                   Request Custom Quote
                 </button>
               </div>
@@ -206,7 +219,7 @@ useEffect(() => {
 
                   <button 
                     className="btn cta-dark" 
-                    onClick={()=>setOpen(true)}
+                    onClick={() => handleOpenQuote(plan)}
                     style={{marginTop: 'auto'}}
                   >
                     {plan.planType === 'custom' ? 'Get Quote' : 'Get Started'}
@@ -214,16 +227,16 @@ useEffect(() => {
                 </article>
               ))
             )}
-
-           
           </div>
         </section>
-
-        
       </main>
       
-      <PricingQuoteModal open={open} onClose={()=>setOpen(false)} />
-        <HomeFaq />
+      <PricingQuoteModal 
+        open={open} 
+        onClose={handleCloseQuote}
+        selectedPlan={selectedPlan}
+      />
+      <HomeFaq />
       <Footer />
     </>
   );

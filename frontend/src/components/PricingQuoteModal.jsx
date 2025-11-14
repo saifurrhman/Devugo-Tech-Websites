@@ -1,12 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-
-// Mock API - replace with your actual API
-const ContactAPI = {
-  create: async (data) => {
-    console.log('Submitting quote request:', data);
-    return new Promise((resolve) => setTimeout(resolve, 1000));
-  }
-};
+import { ContactAPI } from '../lib/api'; // Real API import
 
 export default function PricingQuoteModal({ open, onClose, selectedPlan = null }){
   const ref = useRef(null);
@@ -17,7 +10,7 @@ export default function PricingQuoteModal({ open, onClose, selectedPlan = null }
     projectType: '', 
     budget: '', 
     message:'',
-    pricingOption: 'monthly' // new field for monthly/yearly choice
+    pricingOption: 'monthly'
   });
   const [loading, setLoading] = useState(false);
 
@@ -31,19 +24,16 @@ export default function PricingQuoteModal({ open, onClose, selectedPlan = null }
     { value: '$50k+', label: '$50k+' }
   ];
 
-  // Check if plan has both monthly and yearly pricing
   const hasBothPricingOptions = selectedPlan && selectedPlan.priceMonthly && selectedPlan.priceYearly;
 
   useEffect(() => {
     if (selectedPlan && open) {
-      const planDetails = `Interested in: ${selectedPlan.name}\nPlan Type: ${selectedPlan.planType}\nPrice: ${formatPlanPrice(selectedPlan)}`;
-      
       setForm(f => ({
         ...f,
         projectType: selectedPlan.name,
         budget: '',
-        pricingOption: 'monthly', // default to monthly
-        message: planDetails + '\n\nAdditional details:\n'
+        pricingOption: 'monthly',
+        message: ''
       }));
     } else if (!selectedPlan && open) {
       setForm(f => ({
@@ -74,11 +64,9 @@ export default function PricingQuoteModal({ open, onClose, selectedPlan = null }
     if (plan.planType === 'custom') return 'Custom Quote';
     if (plan.planType === 'one-time') return `$${plan.priceOneTime || 0} (One-time)`;
     
-    // If option is specified, use that
     if (option === 'yearly' && plan.priceYearly) return `$${plan.priceYearly}/yr`;
     if (option === 'monthly' && plan.priceMonthly) return `$${plan.priceMonthly}/mo`;
     
-    // Otherwise default behavior
     if (plan.priceMonthly) return `$${plan.priceMonthly}/mo`;
     if (plan.priceYearly) return `$${plan.priceYearly}/yr`;
     return 'Contact for pricing';
@@ -113,7 +101,6 @@ export default function PricingQuoteModal({ open, onClose, selectedPlan = null }
       if (selectedPlan) {
         const selectedPrice = getSelectedPrice();
         adminMessage = `
-=== PRICING QUOTE REQUEST ===
 
 Selected Plan: ${selectedPlan.name}
 Plan Type: ${selectedPlan.planType}
@@ -144,17 +131,17 @@ ${form.message}
         email: form.email,
         phone: form.phone || '',
         message: adminMessage,
-        source: 'Pricing Page Quote',
+        source: selectedPlan ? `Pricing Quote - ${selectedPlan.name}` : 'Pricing Quote - Custom',
         inquiryType: 'pricing_quote',
         projectType: form.projectType,
         budget: selectedPlan ? getSelectedPrice() : form.budget,
-        pricingOption: selectedPlan ? form.pricingOption : null, // monthly or yearly
+        pricingOption: selectedPlan ? form.pricingOption : null,
         selectedPlan: selectedPlan ? {
           id: selectedPlan._id,
           name: selectedPlan.name,
           planType: selectedPlan.planType,
           price: getSelectedPrice(),
-          pricingOption: form.pricingOption, // Add pricing option
+          pricingOption: form.pricingOption,
           priceMonthly: selectedPlan.priceMonthly || null,
           priceYearly: selectedPlan.priceYearly || null,
           priceOneTime: selectedPlan.priceOneTime || null,
@@ -211,7 +198,6 @@ ${form.message}
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
         }}
       >
-        {/* Header */}
         <header style={{
           padding: '1.75rem 2rem 1.5rem',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
@@ -226,7 +212,7 @@ ${form.message}
             fontWeight: '700',
             letterSpacing: '-0.01em'
           }}>
-            Custom Quote
+            {selectedPlan ? selectedPlan.name : 'Custom Quote'}
           </h3>
           <button 
             onClick={onClose} 
@@ -260,9 +246,7 @@ ${form.message}
           </button>
         </header>
 
-        {/* Form */}
         <div style={{padding: '2rem'}}>
-          {/* Name & Email Grid */}
           <div style={{
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr', 
@@ -346,7 +330,6 @@ ${form.message}
             </div>
           </div>
 
-          {/* Project Type & Budget/Pricing Option Grid */}
           <div style={{
             display: 'grid', 
             gridTemplateColumns: selectedPlan ? '1fr 1fr' : '1fr 1fr',
@@ -403,7 +386,6 @@ ${form.message}
               )}
             </div>
             
-            {/* Show pricing option selector if plan has both monthly and yearly */}
             {selectedPlan && hasBothPricingOptions ? (
               <div>
                 <label style={{
@@ -520,7 +502,6 @@ ${form.message}
                 </div>
               </div>
             ) : !selectedPlan ? (
-              // Show budget dropdown for custom quotes
               <div>
                 <label style={{
                   display: 'block', 
@@ -582,7 +563,6 @@ ${form.message}
             ) : null}
           </div>
 
-          {/* Additional Details */}
           <div style={{marginBottom: '1.5rem'}}>
             <label style={{
               display: 'block', 
@@ -624,7 +604,6 @@ ${form.message}
             />
           </div>
 
-          {/* Buttons */}
           <div style={{display: 'flex', gap: '0.75rem', justifyContent: 'flex-end'}}>
             <button 
               type="button"
