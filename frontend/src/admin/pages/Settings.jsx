@@ -81,7 +81,7 @@ export default function Settings() {
         
         {/* Page Header */}
         <div className="settings-header">
-          <h1>Company Settings</h1>
+          <h1> Contact Settings</h1>
           <p>Manage your company information and WhatsApp integration</p>
         </div>
 
