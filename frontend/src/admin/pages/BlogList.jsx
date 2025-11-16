@@ -18,7 +18,9 @@ export default function BlogList(){
   // Dropdown state
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef(null);
-
+useEffect(() => {
+    document.title = 'Blog List - Devugo Tech';
+  }, []);
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {

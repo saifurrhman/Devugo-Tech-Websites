@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { BlogAPI, UploadAPI, BlogCategoryAPI } from '../../lib/api';
@@ -25,7 +26,9 @@ export default function AdminBlogCreate(){
   const [shareToSocial, setShareToSocial] = useState(false);
   const editorRef = useRef(null);
   const [categories, setCategories] = useState([]);
-
+useEffect(() => {
+    document.title = 'Create Blog - Devugo Tech';
+  }, []);
   useEffect(()=>{
     (async()=>{
       try{ 

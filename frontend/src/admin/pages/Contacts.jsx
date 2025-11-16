@@ -116,6 +116,9 @@ const ContactDetailPage = ({ contact, onBack, onDelete }) => {
     }
   };
 
+  // useEffect(() => {
+  //   document.title = 'Contact - Devugo Tech';
+  // }, []);
   return (
     <div className="w-full" style={{ minHeight: '100vh' }}>
       {/* Header with Back Button */}

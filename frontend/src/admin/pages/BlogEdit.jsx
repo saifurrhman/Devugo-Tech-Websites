@@ -28,7 +28,9 @@ export default function BlogEdit(){
     publishedAt: null,
   });
   const [categories, setCategories] = useState([]);
-
+useEffect(() => {
+    document.title = 'Blog Edit - Devugo Tech';
+  }, []);
   useEffect(()=>{
     let mounted = true;
     (async()=>{

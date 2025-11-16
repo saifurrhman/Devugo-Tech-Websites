@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar'; 
 import Hero from '../components/Hero';
 import PortfolioCategories from '../components/PortfolioCategories';
@@ -16,20 +16,22 @@ import ReviewsSection from '../components/ReviewsSection';
 export default function Home() {
   
   const [selectedCategory, setSelectedCategory] = useState(null);
-
+  
+  useEffect(() => {
+    document.title = 'Home - Devugo Tech';
+  }, []);
+  
   return (
     <>
-      { <Navbar /> }
+      <Navbar />
       <SocialFloating />
       <Hero />
       
-      {}
       <PortfolioCategories 
         showHeader={true}
         onCategorySelect={setSelectedCategory}
       />
       
-      {}
       <HomePortfolio 
         limit={6} 
         mode="grid" 
@@ -39,11 +41,9 @@ export default function Home() {
       <WhyChoose />
       <ServicesSection variant="home" />
       
-      {}
       <PricingSection showCustom={true} limit={6} />
       
       <HomeFaq />
-      
       
       <ReviewsSection 
         title="What clients say" 
@@ -54,7 +54,7 @@ export default function Home() {
         showArrows={false} 
       />
       <HomeCta />
-      { <Footer /> }
+      <Footer />
     </>
   );
-} 
+}

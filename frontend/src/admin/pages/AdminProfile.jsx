@@ -16,7 +16,9 @@ export default function AdminProfile(){
   const [tab, setTab] =useState('account');
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || '');
   const [showPwd, setShowPwd] = useState({ current:false, next:false });
-
+useEffect(() => {
+    document.title = 'Admin Profile - Devugo Tech';
+  }, []);
   useEffect(()=>{ 
     setAccount({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', avatar: user?.avatar || '' }); 
     setAvatarPreview(user?.avatar || ''); 
