@@ -42,6 +42,9 @@ import FAQEdit from '../admin/pages/FAQEdit';
 import Forms from '../admin/pages/Forms';
 import Faq from '../pages/Faq';
 import SocialLinks from '../admin/pages/SocialLinks';
+import Settings from '../admin/pages/Settings'; // ✅ ADD THIS
+import WhatsAppFloat from '../components/WhatsAppFloat'; // ✅ ADD THIS
+
 export default function PublicRoutes() {
   return (
     <BrowserRouter>
@@ -59,6 +62,7 @@ export default function PublicRoutes() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/solutions" element={<Solutions />} />
         <Route path="/pricing" element={<Pricing />} />
+        
         {/* Admin routes (no auth guard yet) */}
         <Route path="/admin/login" element={<Login />} />
         <Route path="/admin/signup" element={<Signup />} />
@@ -88,7 +92,13 @@ export default function PublicRoutes() {
         <Route path="/admin/faqs/:id" element={<ProtectedRoute><FAQEdit /></ProtectedRoute>} />
         <Route path="/admin/forms" element={<ProtectedRoute><Forms /></ProtectedRoute>} />
         <Route path="/admin/social-links" element={<ProtectedRoute><SocialLinks /></ProtectedRoute>} />
+        
+        {/* ✅ ADD SETTINGS ROUTE */}
+        <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       </Routes>
+      
+      {/* ✅ ADD WHATSAPP FLOAT - Shows on all pages */}
+      <WhatsAppFloat />
     </BrowserRouter>
   );
 }

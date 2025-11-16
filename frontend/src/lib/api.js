@@ -307,3 +307,8 @@ export const SocialLinkAPI = {
   update: (id, payload) => api(`/api/social-links/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/social-links/${id}`, { method: 'DELETE' }),
 };
+export const CompanyInfoAPI = {
+  getPublic: () => api('/api/company-info/public'),
+  get: () => api('/api/company-info'),
+  update: (payload) => api('/api/company-info', { method: 'PUT', body: payload }),
+}

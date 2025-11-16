@@ -201,6 +201,8 @@ app.use('/api/blog-categories', blogCategoryRoutes);
 const socialLinkRoutes = require('./routes/socialLinks');
 app.use('/api/social-links', socialLinkRoutes);
 
+// Add this line with other routes
+app.use('/api/company-info', require('./routes/companyInfo'));
 // ============================================
 // ERROR HANDLING
 // ============================================

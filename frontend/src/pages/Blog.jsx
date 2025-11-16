@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import BlogHeroSection from '../components/BlogHeroSection';  
 import Footer from '../components/Footer';
 
+
 import { BlogAPI } from '../lib/api';
 
 export default function Blog() {

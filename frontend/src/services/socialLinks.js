@@ -1,5 +1,4 @@
 import { api } from './apiClient';
-
 export const SocialLinksAPI = {
   listPublic: () => api('/api/social-links/public'),
   list: () => api('/api/social-links'),
