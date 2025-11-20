@@ -27,9 +27,7 @@ app.use(session({
   }
 }));
 
-// ============================================
 // PASSPORT CONFIGURATION
-// ============================================
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -46,9 +44,7 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// ============================================
 // CORS CONFIGURATION
-// ============================================
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
@@ -84,9 +80,9 @@ app.use(cors({
 
 app.use(cookieParser());
 
-// ============================================
+
 // STATIC FILES
-// ============================================
+
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use(express.static('public'));
 
@@ -98,9 +94,7 @@ if (!fs.existsSync(uploadDir)) {
   console.log('📁 Upload directory exists:', uploadDir);
 }
 
-// ============================================
 // MONGODB CONNECTION
-// ============================================
 mongoose.connect(process.env.MONGO_URI, {
   serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
@@ -111,9 +105,7 @@ mongoose.connect(process.env.MONGO_URI, {
     process.exit(1);
   });
 
-// ============================================
 // ROUTES
-// ============================================
 app.get("/", (req, res) => {
   res.json({
     message: "API is running 🚀",
@@ -152,7 +144,7 @@ app.use('/api/analytics', analyticsRoutes);
 const uploadRoutes = require('./routes/upload');
 app.use('/api/upload', uploadRoutes);
 
-// ✅ Image Routes (FIXED)
+// ✅ Image Routes 
 const imageRoutes = require('./routes/imageRoutes');
 app.use('/api/images', imageRoutes);
 console.log('✅ Image routes loaded');
@@ -203,9 +195,9 @@ app.use('/api/social-links', socialLinkRoutes);
 
 // Add this line with other routes
 app.use('/api/company-info', require('./routes/companyInfo'));
-// ============================================
+
 // ERROR HANDLING
-// ============================================
+
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err);
 
@@ -236,9 +228,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ============================================
+
 // 404 HANDLER
-// ============================================
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -247,9 +239,9 @@ app.use((req, res) => {
   });
 });
 
-// ============================================
+
 // START SERVER
-// ============================================
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
@@ -259,9 +251,7 @@ app.listen(PORT, () => {
   console.log('\n');
 });
 
-// ============================================
-// GRACEFUL SHUTDOWN
-// ============================================
+// GRACEFUL SHUTDOW
 process.on('SIGTERM', () => {
   console.log('👋 SIGTERM signal received: closing HTTP server');
   server.close(() => {

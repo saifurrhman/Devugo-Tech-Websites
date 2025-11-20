@@ -8,9 +8,9 @@ console.log('🔐 Configuring Passport strategies...');
 // Configure Passport strategies
 module.exports = function() {
   
-  // ============================================image.png
+  
   // GOOGLE OAUTH STRATEGY
-  // ============================================
+  
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
       clientID: process.env.GOOGLE_CLIENT_ID,
@@ -74,7 +74,7 @@ module.exports = function() {
           isActive: true
         });
         
-        console.log('New user created via Google OAuth:', newUser.email);
+        console.log('New user Created via Google OAuth:', newUser.email);
         return done(null, newUser);
         
       } catch (err) {

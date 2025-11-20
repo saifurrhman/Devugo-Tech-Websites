@@ -8,6 +8,7 @@ import Portfolio from '../pages/Portfolio';
 import PortfolioDetail from '../pages/PortfolioDetail';
 import Team from '../pages/Team';
 import Blog from '../pages/Blog';
+import BlogDetail from '../pages/Blogdetail'; 
 import Contact from '../pages/Contact';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
 import Solutions from '../pages/Solutions';
@@ -42,13 +43,14 @@ import FAQEdit from '../admin/pages/FAQEdit';
 import Forms from '../admin/pages/Forms';
 import Faq from '../pages/Faq';
 import SocialLinks from '../admin/pages/SocialLinks';
-import Settings from '../admin/pages/Settings'; // ✅ ADD THIS
-import WhatsAppFloat from '../components/WhatsAppFloat'; // ✅ ADD THIS
+import Settings from '../admin/pages/Settings';
+import WhatsAppFloat from '../components/WhatsAppFloat';
 
 export default function PublicRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Pages */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
@@ -57,47 +59,65 @@ export default function PublicRoutes() {
         <Route path="/faq" element={<Faq />} />
         <Route path="/portfolio/:slug" element={<PortfolioDetail />} />
         <Route path="/team" element={<Team />} />
+        
+        {/* ✅ BLOG ROUTES - IMPORTANT: /blog must come before /blog/:id */}
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogDetail />} /> {/* ✅ ADD THIS ROUTE */}
+        
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/solutions" element={<Solutions />} />
         <Route path="/pricing" element={<Pricing />} />
         
-        {/* Admin routes (no auth guard yet) */}
+        {/* Admin Authentication */}
         <Route path="/admin/login" element={<Login />} />
         <Route path="/admin/signup" element={<Signup />} />
         <Route path="/admin/reset-password" element={<ResetPassword />} />
         <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
+        
+        {/* Admin Dashboard */}
         <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        
+        {/* Admin Portfolio */}
         <Route path="/admin/portfolio" element={<ProtectedRoute><PortfolioList /></ProtectedRoute>} />
         <Route path="/admin/portfolio/:id" element={<ProtectedRoute><PortfolioEdit /></ProtectedRoute>} />
+        <Route path="/admin/portfolio-categories" element={<ProtectedRoute><PortfolioCategories /></ProtectedRoute>} />
+        
+        {/* Admin Blog */}
         <Route path="/admin/blog" element={<ProtectedRoute><BlogList /></ProtectedRoute>} />
         <Route path="/admin/blog/create" element={<ProtectedRoute><AdminBlogCreate /></ProtectedRoute>} />
         <Route path="/admin/blog/:id" element={<ProtectedRoute><BlogEdit /></ProtectedRoute>} />
+        <Route path="/admin/blog/categories" element={<ProtectedRoute><BlogCategories /></ProtectedRoute>} />
+        
+        {/* Admin Team */}
         <Route path="/admin/team" element={<ProtectedRoute><TeamList /></ProtectedRoute>} />
         <Route path="/admin/team/:id" element={<ProtectedRoute><TeamEdit /></ProtectedRoute>} />
+        
+        {/* Admin Contacts & Leads */}
         <Route path="/admin/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
-        <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
         <Route path="/admin/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
         <Route path="/admin/leads/:id" element={<ProtectedRoute><LeadEdit /></ProtectedRoute>} />
+        <Route path="/admin/forms" element={<ProtectedRoute><Forms /></ProtectedRoute>} />
+        
+        {/* Admin Services */}
         <Route path="/admin/services" element={<ProtectedRoute><ServicesList /></ProtectedRoute>} />
         <Route path="/admin/services/:id" element={<ProtectedRoute><ServiceEdit /></ProtectedRoute>} />
+        
+        {/* Admin Content */}
         <Route path="/admin/pricing" element={<ProtectedRoute><PricingPlans /></ProtectedRoute>} />
-        <Route path="/admin/portfolio-categories" element={<ProtectedRoute><PortfolioCategories /></ProtectedRoute>} />
-        <Route path="/admin/blog/categories" element={<ProtectedRoute><BlogCategories /></ProtectedRoute>} />
         <Route path="/admin/tech-stack" element={<ProtectedRoute><TechStack /></ProtectedRoute>} />
         <Route path="/admin/reviews" element={<ProtectedRoute><ReviewsList /></ProtectedRoute>} />
         <Route path="/admin/reviews/:id" element={<ProtectedRoute><ReviewEdit /></ProtectedRoute>} />
         <Route path="/admin/faqs" element={<ProtectedRoute><FAQsList /></ProtectedRoute>} />
         <Route path="/admin/faqs/:id" element={<ProtectedRoute><FAQEdit /></ProtectedRoute>} />
-        <Route path="/admin/forms" element={<ProtectedRoute><Forms /></ProtectedRoute>} />
-        <Route path="/admin/social-links" element={<ProtectedRoute><SocialLinks /></ProtectedRoute>} />
         
-        {/* ✅ ADD SETTINGS ROUTE */}
+        {/* Admin Settings */}
+        <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/admin/social-links" element={<ProtectedRoute><SocialLinks /></ProtectedRoute>} />
         <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       </Routes>
       
-      {/* ✅ ADD WHATSAPP FLOAT - Shows on all pages */}
+      {/* WhatsApp Float - Shows on all pages */}
       <WhatsAppFloat />
     </BrowserRouter>
   );
