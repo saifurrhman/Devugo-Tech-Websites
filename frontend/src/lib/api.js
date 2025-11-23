@@ -120,7 +120,7 @@ export const UploadAPI = {
     });
 
     if (response.status === 204) return {};
-    
+
     let data;
     try {
       data = await response.json();
@@ -132,7 +132,7 @@ export const UploadAPI = {
       const message = data?.error || data?.message || `Upload failed (${response.status})`;
       throw new Error(message);
     }
-    
+
     return data;
   },
 
@@ -150,7 +150,7 @@ export const UploadAPI = {
     });
 
     if (response.status === 204) return {};
-    
+
     let data;
     try {
       data = await response.json();
@@ -162,29 +162,29 @@ export const UploadAPI = {
       const message = data?.error || data?.message || `Upload failed (${response.status})`;
       throw new Error(message);
     }
-    
+
     return data;
   },
 
   // ✅ COMPATIBILITY FUNCTION (For old Portfolio code)
   image: async (dataUrl, filename) => {
     console.warn('⚠️ UploadAPI.image() is deprecated. Use UploadAPI.uploadSingle() instead.');
-    
+
     try {
       // Convert base64 dataUrl to Blob
       const response = await fetch(dataUrl);
       const blob = await response.blob();
-      
+
       // Convert Blob to File
-      const file = new File([blob], filename || 'image.jpg', { 
-        type: blob.type || 'image/jpeg' 
+      const file = new File([blob], filename || 'image.jpg', {
+        type: blob.type || 'image/jpeg'
       });
-      
+
       // Use uploadSingle
       const result = await UploadAPI.uploadSingle(file);
-      
+
       // Return in old format for compatibility
-      return { 
+      return {
         url: result.data?.url || '',
         success: result.success,
         message: result.message
@@ -311,4 +311,109 @@ export const CompanyInfoAPI = {
   getPublic: () => api('/api/company-info/public'),
   get: () => api('/api/company-info'),
   update: (payload) => api('/api/company-info', { method: 'PUT', body: payload }),
-}
+};
+
+// ============================================
+// CAMPAIGN API
+// ============================================
+export const CampaignAPI = {
+  list: (params = {}) => api('/api/campaigns' + buildQuery(params)),
+  get: (id) => api(`/api/campaigns/${id}`),
+  create: (payload) => api('/api/campaigns', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/campaigns/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/campaigns/${id}`, { method: 'DELETE' }),
+  schedule: (id, payload) => api(`/api/campaigns/${id}/schedule`, { method: 'POST', body: payload }),
+};
+
+// ============================================
+// AUTOMATION API
+// ============================================
+export const AutomationAPI = {
+  list: () => api('/api/automations'),
+  get: (id) => api(`/api/automations/${id}`),
+  create: (payload) => api('/api/automations', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/automations/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/automations/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// INBOX API
+// ============================================
+export const InboxAPI = {
+  list: (params = {}) => api('/api/inbox' + buildQuery(params)),
+  get: (id) => api(`/api/inbox/${id}`),
+  reply: (id, payload) => api(`/api/inbox/${id}/reply`, { method: 'POST', body: payload }),
+  markRead: (id) => api(`/api/inbox/${id}/read`, { method: 'POST' }),
+};
+
+// ============================================
+// TEMPLATE API
+// ============================================
+export const TemplateAPI = {
+  list: () => api('/api/templates'),
+  get: (id) => api(`/api/templates/${id}`),
+  create: (payload) => api('/api/templates', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/templates/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/templates/${id}`, { method: 'DELETE' }),
+  generate: (payload) => api('/api/templates/generate', { method: 'POST', body: payload }),
+};
+
+// ============================================
+// PIPELINE API
+// ============================================
+export const PipelineAPI = {
+  listDeals: (params = {}) => api('/api/pipeline/deals' + buildQuery(params)),
+  getDeal: (id) => api(`/api/pipeline/deals/${id}`),
+  createDeal: (payload) => api('/api/pipeline/deals', { method: 'POST', body: payload }),
+  updateDeal: (id, payload) => api(`/api/pipeline/deals/${id}`, { method: 'PUT', body: payload }),
+  removeDeal: (id) => api(`/api/pipeline/deals/${id}`, { method: 'DELETE' }),
+  listStages: () => api('/api/pipeline/stages'),
+  updateStages: (payload) => api('/api/pipeline/stages', { method: 'PUT', body: payload }),
+};
+
+// ============================================
+// PROJECT API
+// ============================================
+export const ProjectAPI = {
+  list: (params = {}) => api('/api/projects' + buildQuery(params)),
+  get: (id) => api(`/api/projects/${id}`),
+  create: (payload) => api('/api/projects', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/projects/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/projects/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// INVOICE API
+// ============================================
+export const InvoiceAPI = {
+  list: (params = {}) => api('/api/invoices' + buildQuery(params)),
+  get: (id) => api(`/api/invoices/${id}`),
+  create: (payload) => api('/api/invoices', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/invoices/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/invoices/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// MEETING API
+// ============================================
+export const MeetingAPI = {
+  list: (params = {}) => api('/api/meetings' + buildQuery(params)),
+  get: (id) => api(`/api/meetings/${id}`),
+  create: (payload) => api('/api/meetings', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/meetings/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/meetings/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// SETTINGS API
+// ============================================
+export const SettingsAPI = {
+  getSMTP: () => api('/api/settings/smtp'),
+  updateSMTP: (payload) => api('/api/settings/smtp', { method: 'PUT', body: payload }),
+  getIntegrations: () => api('/api/settings/integrations'),
+  updateIntegrations: (payload) => api('/api/settings/integrations', { method: 'PUT', body: payload }),
+  getEmail: () => api('/api/settings/email'),
+  updateEmail: (payload) => api('/api/settings/email', { method: 'PUT', body: payload }),
+  getAI: () => api('/api/settings/ai'),
+  updateAI: (payload) => api('/api/settings/ai', { method: 'PUT', body: payload }),
+};

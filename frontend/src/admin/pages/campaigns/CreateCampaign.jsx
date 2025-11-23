@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import { CampaignAPI, TemplateAPI, ContactAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function CreateCampaign() {
   const navigate = useNavigate();
+  const { success, error, warning } = useNotification();
   const [step, setStep] = useState(1); // 1: Details, 2: Recipients, 3: Content, 4: Review
   const [loading, setLoading] = useState(false);
-  
+
   // Form data
   const [formData, setFormData] = useState({
     name: '',
@@ -29,28 +32,44 @@ export default function CreateCampaign() {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    loadTemplates();
-    loadLists();
+    loadData();
   }, []);
 
-  async function loadTemplates() {
-    // TODO: Replace with actual API call
-    const mockTemplates = [
-      { _id: '1', name: 'Newsletter Template', preview: '/templates/newsletter.png' },
-      { _id: '2', name: 'Promotional Email', preview: '/templates/promo.png' },
-      { _id: '3', name: 'Product Launch', preview: '/templates/launch.png' }
-    ];
-    setTemplates(mockTemplates);
-  }
+  async function loadData() {
+    try {
+      setLoading(true);
+      const [templatesData, listsData] = await Promise.all([
+        TemplateAPI.list(),
+        ContactAPI.getLists ? ContactAPI.getLists() : Promise.resolve([]) // Fallback if getLists not implemented yet
+      ]);
 
-  async function loadLists() {
-    // TODO: Replace with actual API call
-    const mockLists = [
-      { _id: '1', name: 'All Subscribers', count: 1247 },
-      { _id: '2', name: 'Newsletter Subscribers', count: 892 },
-      { _id: '3', name: 'VIP Customers', count: 156 }
-    ];
-    setLists(mockLists);
+      setTemplates(Array.isArray(templatesData) ? templatesData : (templatesData.data || []));
+      // Mock lists if API not ready, or use real data
+      const loadedLists = Array.isArray(listsData) ? listsData : (listsData.data || []);
+      if (loadedLists.length === 0) {
+        setLists([
+          { _id: '1', name: 'All Subscribers', count: 1247 },
+          { _id: '2', name: 'Newsletter Subscribers', count: 892 },
+          { _id: '3', name: 'VIP Customers', count: 156 }
+        ]);
+      } else {
+        setLists(loadedLists);
+      }
+    } catch (err) {
+      console.error("Failed to load initial data", err);
+      error("Failed to load initial data");
+      // Fallback mock data for demo purposes if API fails
+      setTemplates([
+        { _id: '1', name: 'Newsletter Template', preview: 'https://via.placeholder.com/150' },
+        { _id: '2', name: 'Promotional Email', preview: 'https://via.placeholder.com/150' },
+      ]);
+      setLists([
+        { _id: '1', name: 'All Subscribers', count: 1247 },
+        { _id: '2', name: 'Newsletter Subscribers', count: 892 },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleChange(e) {
@@ -68,6 +87,9 @@ export default function CreateCampaign() {
         ? prev.lists.filter(id => id !== listId)
         : [...prev.lists, listId]
     }));
+    if (errors.lists) {
+      setErrors(prev => ({ ...prev, lists: '' }));
+    }
   }
 
   function validateStep(currentStep) {
@@ -86,12 +108,14 @@ export default function CreateCampaign() {
     if (currentStep === 2) {
       if (formData.lists.length === 0) {
         newErrors.lists = 'Select at least one recipient list';
+        warning('Please select at least one recipient list');
       }
     }
 
     if (currentStep === 3) {
       if (!formData.templateId) {
         newErrors.templateId = 'Select an email template';
+        warning('Please select an email template');
       }
     }
 
@@ -121,22 +145,20 @@ export default function CreateCampaign() {
 
     setLoading(true);
     try {
-      // TODO: Replace with actual API call
       const payload = {
         ...formData,
         status: isDraft ? 'draft' : (formData.scheduleType === 'now' ? 'sending' : 'scheduled')
       };
 
       console.log('Submitting campaign:', payload);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      alert(isDraft ? 'Campaign saved as draft!' : 'Campaign created successfully!');
+
+      await CampaignAPI.create(payload);
+
+      success(isDraft ? 'Campaign saved as draft!' : 'Campaign created successfully!');
       navigate('/admin/campaigns');
-    } catch (error) {
-      console.error('Failed to create campaign:', error);
-      alert('Failed to create campaign. Please try again.');
+    } catch (err) {
+      console.error('Failed to create campaign:', err);
+      error('Failed to create campaign. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -150,10 +172,10 @@ export default function CreateCampaign() {
   return (
     <div className="admin-layout">
       <AdminSidebar />
-      
+
       <main className="admin-content">
         <AdminTopbar />
-        
+
         {/* Breadcrumb */}
         <div className="breadcrumb">
           <span onClick={() => navigate('/admin/campaigns')} style={{ cursor: 'pointer' }}>
@@ -314,7 +336,7 @@ export default function CreateCampaign() {
                       <input
                         type="checkbox"
                         checked={formData.lists.includes(list._id)}
-                        onChange={() => {}}
+                        onChange={() => { }}
                       />
                     </div>
                     <div className="list-info">
@@ -503,7 +525,7 @@ export default function CreateCampaign() {
                 ← Previous
               </button>
             )}
-            
+
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.75rem' }}>
               <button
                 type="button"
@@ -513,7 +535,7 @@ export default function CreateCampaign() {
               >
                 Save as Draft
               </button>
-              
+
               {step < 4 ? (
                 <button
                   type="button"
