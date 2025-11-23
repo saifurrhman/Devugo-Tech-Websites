@@ -31,6 +31,7 @@ const emailListSchema = new mongoose.Schema({
   timestamps: true
 });
 
-emailListSchema.index({ name: 1 });
+// ❌ DELETE THIS LINE - Already indexed by unique: true
+// emailListSchema.index({ name: 1 });
 
 module.exports = mongoose.model('EmailList', emailListSchema);

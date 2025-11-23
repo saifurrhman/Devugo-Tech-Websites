@@ -2,12 +2,11 @@ const mongoose = require('mongoose');
 
 const invoiceSchema = new mongoose.Schema({
   // Invoice Number
-  invoiceNumber: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true
-  },
+ invoiceNumber: {
+  type: String,
+  required: true,
+  unique: true
+},
 
   // Client Reference
   client: {
@@ -191,7 +190,7 @@ const invoiceSchema = new mongoose.Schema({
 invoiceSchema.index({ client: 1, status: 1 });
 invoiceSchema.index({ project: 1 });
 invoiceSchema.index({ status: 1, dueDate: 1 });
-invoiceSchema.index({ invoiceNumber: 1 });
+// invoiceSchema.index({ invoiceNumber: 1 });
 
 // Pre-save hook to calculate totals
 invoiceSchema.pre('save', function(next) {

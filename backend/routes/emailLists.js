@@ -3,7 +3,7 @@ const router = express.Router();
 const EmailList = require('../models/EmailList');
 const EmailRecipient = require('../models/EmailRecipient');
 const { auth } = require('../middlewares/auth');
-const { checkRole } = require('../middlewares/checkRole');
+const { checkRole } = require('../middlewares/auth'); // ✅ CORRECT
 
 /**
  * @route   GET /api/lists

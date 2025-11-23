@@ -1,68 +1,92 @@
-const Joi = require('joi');
-const campaignValidator = require('./campaignValidator');
-const invoiceValidator = require('./invoiceValidator');
-const projectValidator = require('./projectValidator');
+class Pagination {
 
-/**
- * Validation middleware factory
- */
-const validate = (schema) => {
-  return (req, res, next) => {
-    const { error, value } = schema.validate(req.body, { 
-      abortEarly: false,
-      stripUnknown: true 
-    });
+  /**
+   * Get pagination parameters
+   */
+  getParams(query) {
+    const page = parseInt(query.page) || 1;
+    const limit = Math.min(parseInt(query.limit) || 20, 100); // Max 100
+    const skip = (page - 1) * limit;
 
-    if (error) {
-      const errors = error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
-      }));
+    return {
+      page,
+      limit,
+      skip
+    };
+  }
 
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors
-      });
+  /**
+   * Create pagination response
+   */
+  createResponse(data, total, page, limit) {
+    const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return {
+      data,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage,
+        hasPrevPage,
+        nextPage: hasNextPage ? page + 1 : null,
+        prevPage: hasPrevPage ? page - 1 : null
+      }
+    };
+  }
+
+  /**
+   * Paginate query
+   */
+  async paginate(query, Model, page = 1, limit = 20, populate = null, sort = null) {
+    const skip = (page - 1) * limit;
+
+    let queryBuilder = Model.find(query).skip(skip).limit(limit);
+
+    if (populate) {
+      if (Array.isArray(populate)) {
+        populate.forEach(p => queryBuilder = queryBuilder.populate(p));
+      } else {
+        queryBuilder = queryBuilder.populate(populate);
+      }
     }
 
-    req.validatedData = value;
-    next();
-  };
-};
-
-/**
- * Query params validation
- */
-const validateQuery = (schema) => {
-  return (req, res, next) => {
-    const { error, value } = schema.validate(req.query, { 
-      abortEarly: false,
-      stripUnknown: true 
-    });
-
-    if (error) {
-      const errors = error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
-      }));
-
-      return res.status(400).json({
-        success: false,
-        message: 'Query validation failed',
-        errors
-      });
+    if (sort) {
+      queryBuilder = queryBuilder.sort(sort);
     }
 
-    req.validatedQuery = value;
-    next();
-  };
-};
+    const [data, total] = await Promise.all([
+      queryBuilder.exec(),
+      Model.countDocuments(query)
+    ]);
 
-module.exports = {
-  validate,
-  validateQuery,
-  campaignValidator,
-  invoiceValidator,
-  projectValidator
-};
+    return this.createResponse(data, total, page, limit);
+  }
+
+  /**
+   * Create pagination links (for REST APIs)
+   */
+  createLinks(baseUrl, page, limit, total) {
+    const totalPages = Math.ceil(total / limit);
+    const links = {
+      self: `${baseUrl}?page=${page}&limit=${limit}`,
+      first: `${baseUrl}?page=1&limit=${limit}`,
+      last: `${baseUrl}?page=${totalPages}&limit=${limit}`
+    };
+
+    if (page > 1) {
+      links.prev = `${baseUrl}?page=${page - 1}&limit=${limit}`;
+    }
+
+    if (page < totalPages) {
+      links.next = `${baseUrl}?page=${page + 1}&limit=${limit}`;
+    }
+
+    return links;
+  }
+}
+
+module.exports = new Pagination();

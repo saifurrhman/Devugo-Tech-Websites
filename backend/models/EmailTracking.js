@@ -8,12 +8,11 @@ const emailTrackingSchema = new mongoose.Schema({
     required: true,
     index: true
   },
-  recipient: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'EmailRecipient',
-    required: true,
-    index: true
-  },
+ recipient: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'EmailRecipient',
+  required: true
+},
   emailLog: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'EmailLog'
@@ -118,7 +117,7 @@ const emailTrackingSchema = new mongoose.Schema({
 
 // Indexes for performance
 emailTrackingSchema.index({ campaign: 1, status: 1 });
-emailTrackingSchema.index({ recipient: 1, createdAt: -1 });
+// emailTrackingSchema.index({ recipient: 1, createdAt: -1 });
 emailTrackingSchema.index({ toEmail: 1 });
 emailTrackingSchema.index({ 'status.opened': 1 });
 emailTrackingSchema.index({ 'status.clicked': 1 });

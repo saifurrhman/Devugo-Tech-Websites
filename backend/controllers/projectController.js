@@ -16,7 +16,7 @@ class ProjectController {
         status,
         client,
         assignedTo,
-        healthStatus,
+        healthStatus, 
         startDate,
         endDate,
         search
