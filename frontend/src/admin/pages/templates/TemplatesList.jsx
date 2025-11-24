@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminSidebar from '../../components/AdminSidebar';
-import AdminTopbar from '../../components/AdminTopbar';
+import AdminSidebar from '../../../components/AdminSidebar';
+import AdminTopbar from '../../../components/AdminTopbar';
 import { TemplateAPI } from '../../../lib/api';
-import { useState } from 'react';
 
 export default function TemplatesList() {
     const navigate = useNavigate();

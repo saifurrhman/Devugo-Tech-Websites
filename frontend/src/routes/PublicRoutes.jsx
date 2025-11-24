@@ -46,6 +46,15 @@ import SocialLinks from '../admin/pages/SocialLinks';
 import Settings from '../admin/pages/Settings';
 import WhatsAppFloat from '../components/WhatsAppFloat';
 import { NotificationProvider } from '../contexts/NotificationContext';
+import CampaignsList from '../admin/pages/campaigns/CampaignsList';
+import InboxList from '../admin/pages/inbox/InboxList';
+import TemplatesList from '../admin/pages/templates/TemplatesList';
+import EmailAnalytics from '../admin/pages/analytics/EmailAnalytics';
+import PipelineBoard from '../admin/pages/pipeline/PipelineBoard';
+import ProjectsList from '../admin/pages/projects/ProjectsList';
+import InvoicesList from '../admin/pages/invoices/InvoicesList';
+import MeetingsList from '../admin/pages/meetings/MeetingsList';
+import ContactsList from '../admin/pages/contacts/ContactsList';
 
 export default function PublicRoutes() {
   return (
@@ -117,6 +126,19 @@ export default function PublicRoutes() {
           <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="/admin/social-links" element={<ProtectedRoute><SocialLinks /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+
+          {/* Email Marketing Routes */}
+          <Route path="/admin/campaigns" element={<ProtectedRoute><CampaignsList /></ProtectedRoute>} />
+          <Route path="/admin/recipients" element={<ProtectedRoute><ContactsList /></ProtectedRoute>} />
+          <Route path="/admin/inbox" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
+          <Route path="/admin/templates" element={<ProtectedRoute><TemplatesList /></ProtectedRoute>} />
+          <Route path="/admin/email-analytics" element={<ProtectedRoute><EmailAnalytics /></ProtectedRoute>} />
+
+          {/* CRM & Projects Routes */}
+          <Route path="/admin/pipeline" element={<ProtectedRoute><PipelineBoard /></ProtectedRoute>} />
+          <Route path="/admin/projects" element={<ProtectedRoute><ProjectsList /></ProtectedRoute>} />
+          <Route path="/admin/invoices" element={<ProtectedRoute><InvoicesList /></ProtectedRoute>} />
+          <Route path="/admin/meetings" element={<ProtectedRoute><MeetingsList /></ProtectedRoute>} />
         </Routes>
 
         {/* WhatsApp Float - Shows on all pages */}

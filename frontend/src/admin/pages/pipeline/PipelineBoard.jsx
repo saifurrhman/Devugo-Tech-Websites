@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminSidebar from '../../components/AdminSidebar';
-import AdminTopbar from '../../components/AdminTopbar';
+import AdminSidebar from '../../../components/AdminSidebar';
+import AdminTopbar from '../../../components/AdminTopbar';
 import { PipelineAPI } from '../../../lib/api';
 
 export default function PipelineBoard() {

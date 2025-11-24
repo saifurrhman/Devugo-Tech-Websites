@@ -1,2 +1,4 @@
 {"timestamp":"2025-11-23T13:59:15.367Z","level":"ERROR","message":"Test error message"}
 {"timestamp":"2025-11-23T14:04:58.753Z","level":"ERROR","message":"Test error message"}
+{"timestamp":"2025-11-24T03:35:10.070Z","level":"ERROR","message":"Error processing personalization queue","data":{"error":"Operation `aipersonalizations.find()` buffering timed out after 10000ms"}}
+{"timestamp":"2025-11-24T03:35:10.095Z","level":"ERROR","message":"AI Personalizer job failed","data":{"error":"Operation `aipersonalizations.find()` buffering timed out after 10000ms"}}
