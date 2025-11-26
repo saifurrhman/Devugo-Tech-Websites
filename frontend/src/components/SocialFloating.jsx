@@ -20,4 +20,16 @@ export default function SocialFloating() {
       ))}
     </aside>
   );
+
+  useEffect(()=>{
+  (async()=>{
+    try{ 
+      const { items } = await SocialLinksAPI.listPublic(); 
+      console.log('Social links loaded:', items); // Debug
+      setLinks(items||[]); 
+    }catch(e){ 
+      console.error('Social links error:', e); // See actual error
+    }
+  })();
+},[]);
 }

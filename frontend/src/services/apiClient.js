@@ -27,11 +27,15 @@ const logoutUser = () => {
 };
 
 // --- API Configuration ---
-const __DEFAULT_API_BASE__ = (typeof window !== 'undefined'
-  ? `${window.location.protocol}//${window.location.hostname}:5000`
-  : 'http://localhost:5000');
+// ✅ FIXED: Check if running on localhost or production
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-const API_BASE = process.env.REACT_APP_API_BASE || __DEFAULT_API_BASE__;
+const API_BASE = process.env.REACT_APP_API_BASE || 
+  (isLocalhost ? 'http://localhost:5000' : 'https://devugo-tech-backend.vercel.app');
+
+// Debug log (remove in production if you want)
+console.log('API_BASE:', API_BASE);
 
 // --- Base API function ---
 async function _api(path, options = {}) {
@@ -40,7 +44,7 @@ async function _api(path, options = {}) {
     ...(options.headers || {}) 
   };
 
-  const res = await fetch(`${API_BASE}${path}`, {  // ✅ fetch ADD KIYA!
+  const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: headers,
     credentials: 'include',
