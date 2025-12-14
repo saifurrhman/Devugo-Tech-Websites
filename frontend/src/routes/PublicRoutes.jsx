@@ -47,6 +47,7 @@ import Settings from '../admin/pages/Settings';
 import WhatsAppFloat from '../components/WhatsAppFloat';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import CampaignsList from '../admin/pages/campaigns/CampaignsList';
+import CreateCampaign from '../admin/pages/campaigns/CreateCampaign';
 import InboxList from '../admin/pages/inbox/InboxList';
 import TemplatesList from '../admin/pages/templates/TemplatesList';
 import EmailAnalytics from '../admin/pages/analytics/EmailAnalytics';
@@ -129,6 +130,7 @@ export default function PublicRoutes() {
 
           {/* Email Marketing Routes */}
           <Route path="/admin/campaigns" element={<ProtectedRoute><CampaignsList /></ProtectedRoute>} />
+          <Route path="/admin/campaigns/create" element={<ProtectedRoute><CreateCampaign /></ProtectedRoute>} />
           <Route path="/admin/recipients" element={<ProtectedRoute><ContactsList /></ProtectedRoute>} />
           <Route path="/admin/inbox" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
           <Route path="/admin/templates" element={<ProtectedRoute><TemplatesList /></ProtectedRoute>} />
