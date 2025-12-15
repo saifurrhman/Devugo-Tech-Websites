@@ -1431,3 +1431,8 @@
 {"timestamp":"2025-12-15T18:00:00.878Z","level":"INFO","message":"Follow-up automation completed"}
 {"timestamp":"2025-12-15T18:05:00.046Z","level":"INFO","message":"AI Personalizer job started"}
 {"timestamp":"2025-12-15T18:05:00.212Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-15T18:10:00.038Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2025-12-15T18:10:00.070Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-15T18:10:01.206Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2025-12-15T18:10:01.212Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-15T18:10:01.802Z","level":"INFO","message":"Updated stats for 0 recipients"}

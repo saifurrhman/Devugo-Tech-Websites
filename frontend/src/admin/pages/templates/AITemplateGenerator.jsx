@@ -39,6 +39,7 @@ export default function AITemplateGenerator() {
 
         setGenerating(true);
         try {
+            console.log('🔄 Calling TemplateAPI.generateAI...', formData);
             // Call backend API
             const response = await TemplateAPI.generateAI(formData);
 
