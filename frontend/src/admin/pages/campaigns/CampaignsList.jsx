@@ -81,8 +81,8 @@ export default function CampaignsList() {
                                     <th className="px-6 py-3">Campaign Name</th>
                                     <th className="px-6 py-3">Status</th>
                                     <th className="px-6 py-3 text-right">Sent</th>
-                                    <th className="px-6 py-3 text-right">Opens</th>
-                                    <th className="px-6 py-3 text-right">Clicks</th>
+                                    <th className="px-6 py-3 text-right">Opens %</th>
+                                    <th className="px-6 py-3 text-right">Clicks %</th>
                                     <th className="px-6 py-3 text-right">Date</th>
                                     <th className="px-6 py-3 text-right">Actions</th>
                                 </tr>
@@ -109,9 +109,19 @@ export default function CampaignsList() {
                                                     {campaign.status || 'Draft'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-right text-gray-300">{campaign.sent || '-'}</td>
-                                            <td className="px-6 py-4 text-right text-gray-300">{campaign.opens || '-'}</td>
-                                            <td className="px-6 py-4 text-right text-gray-300">{campaign.clicks || '-'}</td>
+                                            <td className="px-6 py-4 text-right text-gray-300">
+                                                {campaign.stats?.sent || 0}
+                                            </td>
+                                            <td className="px-6 py-4 text-right text-gray-300">
+                                                {campaign.stats?.sent > 0
+                                                    ? Math.round(((campaign.stats?.opened || 0) / campaign.stats.sent) * 100) + '%'
+                                                    : '0%'}
+                                            </td>
+                                            <td className="px-6 py-4 text-right text-gray-300">
+                                                {campaign.stats?.sent > 0
+                                                    ? Math.round(((campaign.stats?.clicked || 0) / campaign.stats.sent) * 100) + '%'
+                                                    : '0%'}
+                                            </td>
                                             <td className="px-6 py-4 text-right text-gray-400">{campaign.date || new Date().toLocaleDateString()}</td>
                                             <td className="px-6 py-4 text-right">
                                                 <button className="text-gray-400 hover:text-white mx-2">Edit</button>

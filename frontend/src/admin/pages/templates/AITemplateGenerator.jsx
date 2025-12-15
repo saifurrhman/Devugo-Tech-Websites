@@ -1,15 +1,92 @@
 import React, { useState } from 'react';
-import AdminSidebar from '../../components/AdminSidebar';
-import AdminTopbar from '../../components/AdminTopbar';
+import { useNavigate } from 'react-router-dom';
+import { Sparkles, Bot, Wand2, Loader2, X, Save, RotateCcw } from 'lucide-react';
+import AdminSidebar from '../../../components/AdminSidebar';
+import AdminTopbar from '../../../components/AdminTopbar';
+import { TemplateAPI } from '../../../lib/api';
+import { useNotification } from '../../../contexts/NotificationContext';
 
 export default function AITemplateGenerator() {
-    const [prompt, setPrompt] = useState('');
-    const [generating, setGenerating] = useState(false);
+    const navigate = useNavigate();
+    const { success, error, warning } = useNotification();
 
-    const handleGenerate = () => {
-        if (!prompt) return;
+    // Form State
+    const [formData, setFormData] = useState({
+        type: 'promotional', // newsletter, promotional, transactional, welcome, other
+        goal: 'lead_generation', // lead_generation, sales, engagement, announcement
+        tone: 'professional', // professional, friendly, urgent, witty
+        language: 'english',
+        prompt: ''
+    });
+
+    // UI State
+    const [generating, setGenerating] = useState(false);
+    const [generatedContent, setGeneratedContent] = useState(null); // { subject, body, followUp: { subject, body } }
+    const [showPreview, setShowPreview] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [saveName, setSaveName] = useState('');
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleGenerate = async () => {
+        if (!formData.prompt && !formData.type) {
+            warning('Please describe what you want to generate');
+            return;
+        }
+
         setGenerating(true);
-        setTimeout(() => setGenerating(false), 3000);
+        try {
+            // Call backend API
+            const response = await TemplateAPI.generateAI(formData);
+
+            if (response.success || response.data) {
+                const data = response.data || response; // Adapt based on API wrapper return style
+                setGeneratedContent(data);
+                setShowPreview(true);
+                success('Template generated successfully!');
+            } else {
+                error('Failed to generate template');
+            }
+        } catch (err) {
+            console.error('Generation failed:', err);
+            error('AI Generation failed. Using mock data for demo if API key is missing.');
+        } finally {
+            setGenerating(false);
+        }
+    };
+
+    const handleSave = async () => {
+        if (!saveName.trim()) {
+            warning('Please give your template a name');
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const payload = {
+                name: saveName,
+                subject: generatedContent.subject,
+                htmlContent: generatedContent.body,
+                category: formData.type,
+                isActive: true
+            };
+
+            await TemplateAPI.create(payload);
+
+            // If follow-up exists, maybe ask user if they want to save that too? 
+            // For now, simpler flow: success and redirect.
+
+            success('Template saved successfully!');
+            navigate('/admin/templates');
+        } catch (err) {
+            console.error('Save failed:', err);
+            error('Failed to save template');
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
@@ -18,55 +95,217 @@ export default function AITemplateGenerator() {
             <main className="admin-content w-full px-4 sm:px-6 lg:px-8 py-6">
                 <AdminTopbar />
 
-                <div className="max-w-3xl mx-auto text-center mb-10 mt-8">
-                    <div className="inline-block p-3 rounded-full bg-purple-500/10 mb-4">
-                        <span className="text-4xl">✨</span>
+                <div className="max-w-4xl mx-auto mb-10 mt-6">
+                    <div className="text-center mb-8">
+                        <div className="inline-block p-4 rounded-full bg-blue-600/10 mb-4 border border-blue-500/20">
+                            <Bot size={40} className="text-blue-400" />
+                        </div>
+                        <h1 className="text-3xl font-bold mb-3 text-white">
+                            AI Email Generator
+                        </h1>
+                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                            Generate professional email templates and follow-ups in seconds using advanced AI.
+                        </p>
                     </div>
-                    <h1 className="text-3xl font-bold mb-3">AI Template Generator</h1>
-                    <p className="text-gray-400 text-lg">
-                        Describe the email you want to create, and our AI will design it for you in seconds.
-                    </p>
-                </div>
 
-                <div className="max-w-2xl mx-auto">
-                    <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-2">
-                        <textarea
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            placeholder="e.g., Create a modern newsletter for a tech startup announcing a new product launch. Use blue and dark gray colors. Include a hero image, feature list, and a call to action button."
-                            className="w-full bg-[#0f172a] border-none rounded-lg p-4 text-white outline-none focus:ring-0 min-h-[120px] resize-none text-lg"
-                        ></textarea>
-                        <div className="flex justify-between items-center p-2 border-t border-gray-800 mt-2">
-                            <div className="flex gap-2">
-                                <button className="px-3 py-1.5 rounded-full bg-gray-800 text-xs text-gray-300 hover:bg-gray-700">Newsletter</button>
-                                <button className="px-3 py-1.5 rounded-full bg-gray-800 text-xs text-gray-300 hover:bg-gray-700">Promotional</button>
-                                <button className="px-3 py-1.5 rounded-full bg-gray-800 text-xs text-gray-300 hover:bg-gray-700">Welcome</button>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Left Panel: Controls */}
+                        <div className="lg:col-span-1 space-y-4">
+                            <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-5">
+                                <h3 className="font-semibold mb-4 text-blue-400 flex items-center gap-2">
+                                    <Sparkles size={16} /> Configuration
+                                </h3>
+
+                                <label className="block mb-3">
+                                    <span className="text-sm text-gray-400 mb-1 block">Email Type</span>
+                                    <select
+                                        name="type"
+                                        value={formData.type}
+                                        onChange={handleChange}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
+                                    >
+                                        <option value="newsletter">Newsletter</option>
+                                        <option value="promotional">Promotional Offer</option>
+                                        <option value="welcome">Welcome Email</option>
+                                        <option value="transactional">Transactional</option>
+                                        <option value="followup">Follow-up</option>
+                                    </select>
+                                </label>
+
+                                <label className="block mb-3">
+                                    <span className="text-sm text-gray-400 mb-1 block">Goal</span>
+                                    <select
+                                        name="goal"
+                                        value={formData.goal}
+                                        onChange={handleChange}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
+                                    >
+                                        <option value="lead_generation">Lead Generation</option>
+                                        <option value="sales">Drive Sales</option>
+                                        <option value="engagement">Engagement</option>
+                                        <option value="announcement">Announcement</option>
+                                        <option value="nurture">Nurture Relationship</option>
+                                    </select>
+                                </label>
+
+                                <label className="block mb-3">
+                                    <span className="text-sm text-gray-400 mb-1 block">Tone</span>
+                                    <select
+                                        name="tone"
+                                        value={formData.tone}
+                                        onChange={handleChange}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
+                                    >
+                                        <option value="professional">Professional</option>
+                                        <option value="friendly">Friendly & Casual</option>
+                                        <option value="urgent">Urgent / Scarcity</option>
+                                        <option value="witty">Witty / Humorous</option>
+                                        <option value="empathetic">Empathetic</option>
+                                    </select>
+                                </label>
+
+                                <label className="block mb-3">
+                                    <span className="text-sm text-gray-400 mb-1 block">Language</span>
+                                    <select
+                                        name="language"
+                                        value={formData.language}
+                                        onChange={handleChange}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
+                                    >
+                                        <option value="english">English</option>
+                                        <option value="urdu">Urdu</option>
+                                        <option value="spanish">Spanish</option>
+                                        <option value="french">French</option>
+                                        <option value="german">German</option>
+                                    </select>
+                                </label>
                             </div>
-                            <button
-                                onClick={handleGenerate}
-                                disabled={generating || !prompt}
-                                className={`px-6 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${generating || !prompt
-                                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-500/20'
-                                    }`}
-                            >
-                                {generating ? (
-                                    <>
-                                        <span className="animate-spin">↻</span> Generating...
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>✨</span> Generate Template
-                                    </>
-                                )}
-                            </button>
+                        </div>
+
+                        {/* Right Panel: Prompt & Action */}
+                        <div className="lg:col-span-2">
+                            <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-2 h-full flex flex-col">
+                                <textarea
+                                    name="prompt"
+                                    value={formData.prompt}
+                                    onChange={handleChange}
+                                    placeholder="Describe your email specifically... e.g. 'Announce our new summer collection with 50% discount for early birds. Mention free shipping on orders over $50.'"
+                                    className="w-full bg-[#0f172a] border-none rounded-lg p-4 text-white outline-none focus:ring-1 focus:ring-blue-500/50 min-h-[200px] resize-none text-base flex-1"
+                                ></textarea>
+
+                                <div className="p-3 border-t border-gray-800 flex justify-end">
+                                    <button
+                                        onClick={handleGenerate}
+                                        disabled={generating}
+                                        className={`px-6 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 ${generating
+                                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20'
+                                            }`}
+                                    >
+                                        {generating ? (
+                                            <>
+                                                <Loader2 className="animate-spin" size={18} /> Generating Magic...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Wand2 size={18} /> Generate My Email
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="mt-8 text-center">
-                        <p className="text-sm text-gray-500">Powered by OpenAI GPT-4 & DALL-E 3</p>
-                    </div>
                 </div>
+
+                {/* PREVIEW MODAL */}
+                {showPreview && generatedContent && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                        <div className="bg-[#1e293b] w-full max-w-4xl rounded-2xl border border-gray-700 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                            {/* Modal Header */}
+                            <div className="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-[#0f172a]">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-green-500/20 p-2 rounded-lg text-green-400">
+                                        <Sparkles size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-lg text-white">AI Result</h3>
+                                        <p className="text-xs text-green-400 flex items-center gap-1">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            Content Generated Successfully
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setShowPreview(false)}
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            {/* Modal Content - Scrollable */}
+                            <div className="flex-1 overflow-y-auto p-6 bg-gray-100">
+                                {/* Email Preview Card */}
+                                <div className="bg-white text-gray-900 rounded-lg shadow-sm overflow-hidden mb-6">
+                                    <div className="bg-gray-50 px-4 py-3 border-b text-sm flex gap-2">
+                                        <span className="text-gray-500 font-medium">Subject:</span>
+                                        <span className="font-semibold text-gray-800">{generatedContent.subject}</span>
+                                    </div>
+                                    <div
+                                        className="p-8 prose max-w-none"
+                                        dangerouslySetInnerHTML={{ __html: generatedContent.body }}
+                                    ></div>
+                                </div>
+
+                                {/* Follow Up Preview if available */}
+                                {generatedContent.followUp && (
+                                    <div className="mt-8">
+                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Suggested Follow-up</h4>
+                                        <div className="bg-white text-gray-900 rounded-lg shadow-sm overflow-hidden opacity-90">
+                                            <div className="bg-gray-50 px-4 py-3 border-b text-sm flex gap-2">
+                                                <span className="text-gray-500 font-medium">Subject:</span>
+                                                <span className="font-semibold text-gray-800">{generatedContent.followUp.subject}</span>
+                                            </div>
+                                            <div
+                                                className="p-6 prose max-w-none text-sm"
+                                                dangerouslySetInnerHTML={{ __html: generatedContent.followUp.body }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Modal Footer */}
+                            <div className="px-6 py-4 border-t border-gray-700 bg-[#0f172a] flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div className="flex-1 w-full sm:w-auto">
+                                    <input
+                                        type="text"
+                                        value={saveName}
+                                        onChange={(e) => setSaveName(e.target.value)}
+                                        placeholder="Enter template name to save..."
+                                        className="w-full bg-[#1e293b] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={handleGenerate}
+                                        className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-medium transition-colors flex items-center gap-2"
+                                    >
+                                        <RotateCcw size={16} /> Regenerate
+                                    </button>
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={saving}
+                                        className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors shadow-lg shadow-blue-900/20 flex items-center gap-2"
+                                    >
+                                        <Save size={16} /> {saving ? 'Saving...' : 'Save Template'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );

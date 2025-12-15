@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { CompanyInfoAPI } from '../../services/companyInfo';
 
 export default function Settings() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     companyName: '',
     tagline: '',
@@ -58,9 +60,9 @@ export default function Settings() {
         <AdminTopbar />
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-            <div style={{ 
-              width: '32px', 
-              height: '32px', 
+            <div style={{
+              width: '32px',
+              height: '32px',
               border: '4px solid rgba(59, 130, 246, 0.2)',
               borderTopColor: '#3b82f6',
               borderRadius: '50%',
@@ -78,11 +80,19 @@ export default function Settings() {
       <AdminSidebar />
       <main className="admin-content">
         <AdminTopbar />
-        
+
         {/* Page Header */}
-        <div className="settings-header">
-          <h1> Contact Settings</h1>
-          <p>Manage your company information and WhatsApp integration</p>
+        <div className="settings-header flex justify-between items-end">
+          <div>
+            <h1>Settings</h1>
+            <p>Manage your company information and WhatsApp integration</p>
+          </div>
+          <button
+            onClick={() => navigate('/admin/settings/email')}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white text-sm font-medium transition-colors flex items-center gap-2 mb-1"
+          >
+            <span>🔌</span> Integrations
+          </button>
         </div>
 
         <form onSubmit={onSave}>
@@ -92,21 +102,21 @@ export default function Settings() {
               <h2>Basic Information</h2>
               <p>Update your company's basic details</p>
             </div>
-            
+
             <div className="card-body">
               <div className="form-grid">
                 <div className="form-group">
                   <label>
                     Company Name <span className="required">*</span>
                   </label>
-                  <input 
+                  <input
                     type="text"
                     className="form-input"
-                    name="companyName" 
-                    value={form.companyName} 
-                    onChange={onChange} 
+                    name="companyName"
+                    value={form.companyName}
+                    onChange={onChange}
                     placeholder="e.g., Devugo Tech"
-                    required 
+                    required
                   />
                 </div>
 
@@ -114,25 +124,25 @@ export default function Settings() {
                   <label>
                     Phone Number <span className="required">*</span>
                   </label>
-                  <input 
+                  <input
                     type="tel"
                     className="form-input"
-                    name="phone" 
-                    value={form.phone} 
-                    onChange={onChange} 
+                    name="phone"
+                    value={form.phone}
+                    onChange={onChange}
                     placeholder="+92 300 123 4567"
-                    required 
+                    required
                   />
                 </div>
 
                 <div className="form-group full-width">
                   <label>Tagline</label>
-                  <input 
+                  <input
                     type="text"
                     className="form-input"
-                    name="tagline" 
-                    value={form.tagline} 
-                    onChange={onChange} 
+                    name="tagline"
+                    value={form.tagline}
+                    onChange={onChange}
                     placeholder="We build modern websites, products and brands"
                   />
                 </div>
@@ -141,14 +151,14 @@ export default function Settings() {
                   <label>
                     Email <span className="required">*</span>
                   </label>
-                  <input 
+                  <input
                     type="email"
                     className="form-input"
-                    name="email" 
-                    value={form.email} 
-                    onChange={onChange} 
+                    name="email"
+                    value={form.email}
+                    onChange={onChange}
                     placeholder="hello@devugo.tech"
-                    required 
+                    required
                   />
                 </div>
 
@@ -156,25 +166,25 @@ export default function Settings() {
                   <label>
                     Address <span className="required">*</span>
                   </label>
-                  <input 
+                  <input
                     type="text"
                     className="form-input"
-                    name="address" 
-                    value={form.address} 
-                    onChange={onChange} 
+                    name="address"
+                    value={form.address}
+                    onChange={onChange}
                     placeholder="Lahore, Pakistan"
-                    required 
+                    required
                   />
                 </div>
 
                 <div className="form-group full-width">
                   <label>Working Hours</label>
-                  <input 
+                  <input
                     type="text"
                     className="form-input"
-                    name="workingHours" 
-                    value={form.workingHours} 
-                    onChange={onChange} 
+                    name="workingHours"
+                    value={form.workingHours}
+                    onChange={onChange}
                     placeholder="Mon–Fri · 9am–6pm PKT"
                   />
                 </div>
@@ -188,7 +198,7 @@ export default function Settings() {
               <div className="header-content">
                 <div className="whatsapp-icon">
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                   </svg>
                 </div>
                 <div>
@@ -197,21 +207,21 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-            
+
             <div className="card-body">
               <div className="form-grid">
                 <div className="form-group">
                   <label>
                     WhatsApp Number <span className="required">*</span>
                   </label>
-                  <input 
+                  <input
                     type="tel"
                     className="form-input"
-                    name="whatsappNumber" 
-                    value={form.whatsappNumber} 
-                    onChange={onChange} 
+                    name="whatsappNumber"
+                    value={form.whatsappNumber}
+                    onChange={onChange}
                     placeholder="+923001234567"
-                    required 
+                    required
                   />
                   <p className="field-hint">Enter number without spaces or dashes</p>
                 </div>
@@ -229,11 +239,11 @@ export default function Settings() {
 
                 <div className="form-group full-width">
                   <label>Default WhatsApp Message</label>
-                  <textarea 
+                  <textarea
                     className="form-input"
-                    name="whatsappMessage" 
-                    value={form.whatsappMessage} 
-                    onChange={onChange} 
+                    name="whatsappMessage"
+                    value={form.whatsappMessage}
+                    onChange={onChange}
                     rows="3"
                     placeholder="Hello! I would like to discuss a project."
                   />
@@ -266,7 +276,7 @@ export default function Settings() {
           </div>
         </form>
       </main>
-      
+
       <style>{`
         /* Settings Page Styles */
         .settings-page {

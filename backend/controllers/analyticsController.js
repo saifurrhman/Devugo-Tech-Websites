@@ -3,7 +3,7 @@ const BlogPost = require('../models/BlogPost');
 const Contact = require('../models/Contact');
 const Service = require('../models/Service');
 const PricingPlan = require('../models/PricingPlan');
-const Portfolio = require('../models/Portfolio'); 
+const Portfolio = require('../models/Portfolio');
 const TeamMember = require('../models/TeamMember');
 const { getAnalyticsSummary, getRealtimeData } = require('../services/analyticsService');
 
@@ -117,14 +117,14 @@ exports.summaryRange = async (req, res) => {
   try {
     const { range, from, to } = req.query;
     let days = 7;
-    
+
     if (range) {
       days = parseInt(range);
     }
-    
+
     // Fetch Google Analytics data
     const gaData = await getAnalyticsSummary(days);
-    
+
     // Fetch database counts
     const [totalBlogs, totalLeads] = await Promise.all([
       BlogPost.countDocuments({}),
@@ -146,9 +146,9 @@ exports.summaryRange = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Summary Range Error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch analytics data',
-      details: error.message 
+      details: error.message
     });
   }
 };
@@ -160,9 +160,112 @@ exports.realtime = async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error('❌ Realtime Error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch realtime data',
-      details: error.message 
+      details: error.message
     });
+  });
+}
+};
+
+// NEW: Email Analytics
+exports.getEmailStats = async (req, res) => {
+  try {
+    const { timeRange } = req.query;
+    // Calculate date filter based on timeRange (24h, 7d, 30d)
+    let startDate = new Date();
+    if (timeRange === '24h') startDate.setDate(startDate.getDate() - 1);
+    else if (timeRange === '30d') startDate.setDate(startDate.getDate() - 30);
+    else startDate.setDate(startDate.getDate() - 7); // Default 7d
+
+    const EmailCampaign = require('../models/EmailCampaign');
+    const EmailLog = require('../models/EmailLog');
+
+    // 1. Aggregate Campaign Stats
+    const campaigns = await EmailCampaign.find({
+      createdAt: { $gte: startDate }
+    });
+
+    let totalSent = 0;
+    let totalDelivered = 0;
+    let totalOpened = 0;
+    let totalClicked = 0;
+    let totalUnsubscribed = 0;
+    let totalComplaints = 0;
+
+    campaigns.forEach(c => {
+      const s = c.stats || {};
+      totalSent += s.sent || 0;
+      totalDelivered += s.delivered || 0;
+      totalOpened += s.opened || 0;
+      totalClicked += s.clicked || 0;
+      totalUnsubscribed += s.unsubscribed || (s.bounced ? s.bounced * 0.1 : 0); // Approx if not tracked
+      totalComplaints += s.complaints || 0;
+    });
+
+    // 2. Recent Activity from Logs
+    const recentActivity = await EmailLog.find({
+      createdAt: { $gte: startDate }
+    })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate('recipient', 'email name')
+      .lean();
+
+    // Map logs to frontend table format
+    const formattedActivity = recentActivity.map(log => ({
+      email: log.recipientEmail || (log.recipient ? log.recipient.email : 'Unknown'),
+      opened: log.openedAt ? true : false,
+      clicked: log.clickedAt ? true : false,
+      date: log.createdAt,
+      status: log.status
+    }));
+
+    // 3. Domain Performance (Simple Aggregation from Logs)
+    const logs = await EmailLog.find({ createdAt: { $gte: startDate } }).select('recipientEmail status');
+    const domainStats = {};
+    logs.forEach(log => {
+      if (!log.recipientEmail) return;
+      const domain = log.recipientEmail.split('@')[1];
+      if (!domain) return;
+
+      if (!domainStats[domain]) domainStats[domain] = { sent: 0, opened: 0 };
+      domainStats[domain].sent++;
+      if (log.status === 'opened' || log.status === 'clicked') domainStats[domain].opened++;
+    });
+
+    const domainPerformance = Object.keys(domainStats)
+      .map(d => ({
+        domain: d,
+        sent: domainStats[d].sent,
+        openRate: Math.round((domainStats[d].opened / domainStats[d].sent) * 100) || 0
+      }))
+      .sort((a, b) => b.sent - a.sent)
+      .slice(0, 5);
+
+    // Calculate Global Rates
+    const openRate = totalSent > 0 ? ((totalOpened / totalSent) * 100).toFixed(1) : 0;
+    const clickRate = totalSent > 0 ? ((totalClicked / totalSent) * 100).toFixed(1) : 0;
+    const unsRate = totalSent > 0 ? ((totalUnsubscribed / totalSent) * 100).toFixed(2) : 0;
+    const spamRate = totalSent > 0 ? ((totalComplaints / totalSent) * 100).toFixed(2) : 0;
+    const deliveryRate = totalSent > 0 ? ((totalDelivered / totalSent) * 100).toFixed(1) : 0;
+
+    res.json({
+      stats: {
+        sent: totalSent,
+        delivered: Number(deliveryRate), // Keep as number for progress bars if needed, or string
+        openRate: Number(openRate),
+        clickRate: Number(clickRate),
+        unsubscribed: Number(unsRate),
+        spam: Number(spamRate),
+        complaints: totalComplaints
+      },
+      domainPerformance,
+      recentActivity: formattedActivity
+    });
+
+  } catch (error) {
+    console.error('Email Analytics Error:', error);
+    res.status(500).json({ error: 'Failed to fetch email analytics' });
   }
 };

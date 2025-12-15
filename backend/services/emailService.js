@@ -7,6 +7,15 @@ let transporter = null;
 // Create transporter only if SMTP is enabled and credentials exist
 function createTransporter() {
   try {
+    // Check Brevo Configuration first
+    if (smtpConfig.brevo && smtpConfig.brevo.enabled) {
+      if (smtpConfig.brevo.apiKey) {
+        logger.info('✅ Brevo Email Service is active');
+        return { type: 'brevo' };
+      }
+      logger.warn('Brevo enabled but API Key is missing');
+    }
+
     // Check if SMTP is enabled and has credentials
     if (!smtpConfig.smtp.enabled) {
       logger.info('SMTP is disabled');
@@ -57,6 +66,58 @@ class EmailService {
         };
       }
 
+      // Handle Brevo Sending
+      if (transporter.type === 'brevo') {
+        const recipients = Array.isArray(emailData.to)
+          ? emailData.to.map(email => ({ email: typeof email === 'string' ? email : email.email }))
+          : [{ email: emailData.to }];
+
+        const sender = {
+          name: smtpConfig.brevo.senderName,
+          email: smtpConfig.brevo.senderEmail
+        };
+
+        const payload = {
+          sender,
+          to: recipients,
+          subject: emailData.subject,
+          htmlContent: emailData.html,
+          textContent: emailData.text
+        };
+
+        try {
+          const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+              'accept': 'application/json',
+              'api-key': smtpConfig.brevo.apiKey,
+              'content-type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Failed to send email via Brevo');
+          }
+
+          logger.info('Email sent successfully via Brevo', {
+            to: emailData.to,
+            messageId: data.messageId
+          });
+
+          return {
+            success: true,
+            messageId: data.messageId
+          };
+        } catch (err) {
+          logger.error('Brevo API Error:', err.message);
+          throw err;
+        }
+      }
+
+      // Handle standard SMTP Sending
       const mailOptions = {
         from: `${smtpConfig.smtp.from.name} <${smtpConfig.smtp.from.email}>`,
         to: emailData.to,
@@ -137,20 +198,20 @@ class EmailService {
           };
 
           const result = await this.sendEmail(emailData);
-          results.push({ 
-            recipient: recipient.email, 
+          results.push({
+            recipient: recipient.email,
             success: result.success,
-            messageId: result.messageId 
+            messageId: result.messageId
           });
 
           // Rate limiting - 1 second between emails
           await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
           logger.error(`Failed to send to ${recipient.email}:`, error.message);
-          results.push({ 
-            recipient: recipient.email, 
-            success: false, 
-            error: error.message 
+          results.push({
+            recipient: recipient.email,
+            success: false,
+            error: error.message
           });
         }
       }
@@ -158,8 +219,8 @@ class EmailService {
       const successCount = results.filter(r => r.success).length;
       logger.info(`Campaign completed: ${successCount}/${recipients.length} sent successfully`);
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         results,
         total: recipients.length,
         sent: successCount,
@@ -182,7 +243,7 @@ class EmailService {
       });
 
       const trackingPixel = `<img src="${process.env.BACKEND_URL || 'http://localhost:5000'}/api/tracking/pixel/${recipient._id}" width="1" height="1" style="display:none;" />`;
-      
+
       const emailData = {
         to: recipient.email,
         subject: this.personalize(template.subject, recipient),
@@ -281,7 +342,7 @@ class EmailService {
 
   personalize(content, data) {
     if (!content) return '';
-    
+
     let personalized = content;
 
     Object.keys(data).forEach(key => {

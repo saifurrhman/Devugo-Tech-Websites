@@ -17,4 +17,7 @@ router.get('/summary-range', ctrl.summaryRange);
 // NEW: Real-time active users
 router.get('/realtime', requireAuth, requireRole('admin'), ctrl.realtime);
 
+// NEW: Email Analytics
+router.get('/email', requireAuth, requireRole('admin'), ctrl.getEmailStats);
+
 module.exports = router;

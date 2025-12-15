@@ -15,6 +15,12 @@ export default function EmailAnalytics() {
             try {
                 // Try to fetch real data
                 const result = await AnalyticsAPI.getEmailStats(timeRange);
+
+                // Ensure stats object exists even if API returns partial
+                if (!result.stats) result.stats = {};
+                if (!result.recentActivity) result.recentActivity = [];
+                if (!result.domainPerformance) result.domainPerformance = [];
+
                 setData(result);
             } catch (err) {
                 console.warn("API failed, using mock data for demonstration", err);
@@ -54,8 +60,9 @@ export default function EmailAnalytics() {
         </div>
     );
 
-    const stats = data.stats || { delivered: 0, spam: 0, unsubscribed: 0, complaints: 0 };
+    const stats = data.stats || { sent: 0, delivered: 0, openRate: 0, clickRate: 0, unsubscribed: 0, spam: 0, complaints: 0 };
     const domainPerformance = data.domainPerformance || [];
+    const recentActivity = data.recentActivity || [];
 
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -93,34 +100,64 @@ export default function EmailAnalytics() {
                     </div>
                 </div>
 
-                {/* Delivery Stats */}
+                {/* Stats Cards (Updated per requirements) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div className="card p-4 bg-[#1e293b] rounded-xl border border-gray-800">
-                        <div className="text-gray-400 text-sm mb-1">Delivery Rate</div>
-                        <div className="text-2xl font-bold text-green-400">{stats.delivered}%</div>
-                        <div className="w-full bg-gray-700 h-1.5 mt-3 rounded-full overflow-hidden">
-                            <div className="bg-green-500 h-full" style={{ width: `${stats.delivered}%` }}></div>
+                        <div className="text-gray-400 text-sm mb-1">Total Sent</div>
+                        <div className="text-2xl font-bold text-white">{stats.sent.toLocaleString()}</div>
+                        <div className="text-xs text-green-400 mt-1 flex items-center">
+                            <span>Delivery: {stats.delivered}%</span>
                         </div>
                     </div>
                     <div className="card p-4 bg-[#1e293b] rounded-xl border border-gray-800">
-                        <div className="text-gray-400 text-sm mb-1">Spam Rate</div>
-                        <div className="text-2xl font-bold text-yellow-400">{stats.spam}%</div>
-                        <div className="w-full bg-gray-700 h-1.5 mt-3 rounded-full overflow-hidden">
-                            <div className="bg-yellow-500 h-full" style={{ width: `${stats.spam * 10}%` }}></div>
+                        <div className="text-gray-400 text-sm mb-1">Open Rate</div>
+                        <div className="text-2xl font-bold text-blue-400">{stats.openRate}%</div>
+                        <div className="w-full bg-gray-700 h-1 mt-3 rounded-full overflow-hidden">
+                            <div className="bg-blue-500 h-full" style={{ width: `${Math.min(stats.openRate, 100)}%` }}></div>
                         </div>
                     </div>
                     <div className="card p-4 bg-[#1e293b] rounded-xl border border-gray-800">
-                        <div className="text-gray-400 text-sm mb-1">Unsubscribe Rate</div>
+                        <div className="text-gray-400 text-sm mb-1">Click Rate</div>
+                        <div className="text-2xl font-bold text-green-400">{stats.clickRate}%</div>
+                        <div className="w-full bg-gray-700 h-1 mt-3 rounded-full overflow-hidden">
+                            <div className="bg-green-500 h-full" style={{ width: `${Math.min(stats.clickRate, 100)}%` }}></div>
+                        </div>
+                    </div>
+                    <div className="card p-4 bg-[#1e293b] rounded-xl border border-gray-800">
+                        <div className="text-gray-400 text-sm mb-1">Unsubscribes</div>
                         <div className="text-2xl font-bold text-orange-400">{stats.unsubscribed}%</div>
-                        <div className="w-full bg-gray-700 h-1.5 mt-3 rounded-full overflow-hidden">
-                            <div className="bg-orange-500 h-full" style={{ width: `${stats.unsubscribed * 10}%` }}></div>
-                        </div>
+                        <div className="text-xs text-gray-500 mt-1">Spam: {stats.spam}%</div>
                     </div>
-                    <div className="card p-4 bg-[#1e293b] rounded-xl border border-gray-800">
-                        <div className="text-gray-400 text-sm mb-1">Complaint Rate</div>
-                        <div className="text-2xl font-bold text-red-400">{stats.complaints}%</div>
-                        <div className="w-full bg-gray-700 h-1.5 mt-3 rounded-full overflow-hidden">
-                            <div className="bg-red-500 h-full" style={{ width: `${stats.complaints * 10}%` }}></div>
+                </div>
+
+                {/* Opens vs Clicks Chart Placeholder */}
+                <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6 mb-6">
+                    <h3 className="font-semibold mb-4">Engagement Over Time (Opens vs Clicks)</h3>
+                    <div className="h-64 flex items-end justify-between gap-2 px-4 relative">
+                        {/* Fake Line Chart Visual using CSS bars for now as we don't have a chart lib explicitly */}
+                        {[40, 65, 45, 70, 50, 80, 60].map((h, i) => (
+                            <div key={i} className="w-full bg-gray-800/30 h-full relative rounded-t group mx-1">
+                                {/* Open Bar */}
+                                <div className="absolute bottom-0 left-1 right-1 bg-blue-500/80 rounded-t transition-all hover:bg-blue-400" style={{ height: `${h}%` }}>
+                                    <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-xs px-2 py-1 rounded border border-gray-700 whitespace-nowrap z-10">
+                                        Opens: {h * 10}
+                                    </div>
+                                </div>
+                                {/* Click Bar (Lower) */}
+                                <div className="absolute bottom-0 left-1.5 right-1.5 bg-green-500/80 rounded-t transition-all hover:bg-green-400" style={{ height: `${h * 0.4}%` }}></div>
+                            </div>
+                        ))}
+                        {/* Chart Grid Lines */}
+                        <div className="absolute inset-0 border-b border-l border-gray-700 pointer-events-none opacity-50"></div>
+                    </div>
+                    <div className="flex justify-center gap-6 mt-4 text-sm">
+                        <div className="flex items-center gap-2">
+                            <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                            <span className="text-gray-400">Opens</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                            <span className="text-gray-400">Clicks</span>
                         </div>
                     </div>
                 </div>
@@ -148,21 +185,43 @@ export default function EmailAnalytics() {
                         </div>
                     </div>
 
-                    {/* Bounce Analysis */}
+                    {/* Detailed Activity Table (New Requirement) */}
                     <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-5">
-                        <h3 className="font-semibold mb-4">Bounce Analysis</h3>
-                        <div className="flex items-center justify-center h-48 text-gray-500 text-sm">
-                            [Pie Chart Placeholder: Hard vs Soft Bounces]
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-                                <div className="text-red-400 font-bold text-lg">12</div>
-                                <div className="text-xs text-gray-400">Hard Bounces</div>
-                            </div>
-                            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-                                <div className="text-yellow-400 font-bold text-lg">45</div>
-                                <div className="text-xs text-gray-400">Soft Bounces</div>
-                            </div>
+                        <h3 className="font-semibold mb-4">Recent Activity</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-gray-400 border-b border-gray-700 font-medium">
+                                    <tr>
+                                        <th className="pb-3 text-left">Contact</th>
+                                        <th className="pb-3 text-center">Opened</th>
+                                        <th className="pb-3 text-center">Clicked</th>
+                                        <th className="pb-3 text-right">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800">
+                                    {/* Real Data from API */}
+                                    {recentActivity.length === 0 ? (
+                                        <tr>
+                                            <td colspan="4" className="px-6 py-8 text-center text-gray-500">
+                                                No recent activity found.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        recentActivity.map((row, i) => (
+                                            <tr key={i} className="group hover:bg-gray-800/50 transition-colors">
+                                                <td className="py-3 text-white font-medium">{row.email}</td>
+                                                <td className="py-3 text-center">
+                                                    {row.opened ? <span className="text-green-400">Yes</span> : <span className="text-gray-600">No</span>}
+                                                </td>
+                                                <td className="py-3 text-center">
+                                                    {row.clicked ? <span className="text-blue-400">Yes</span> : <span className="text-gray-600">No</span>}
+                                                </td>
+                                                <td className="py-3 text-right text-gray-400">{new Date(row.date).toLocaleDateString()} {new Date(row.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

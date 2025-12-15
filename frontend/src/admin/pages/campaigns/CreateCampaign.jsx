@@ -20,6 +20,8 @@ export default function CreateCampaign() {
     fromName: '',
     fromEmail: '',
     replyTo: '',
+    type: 'email', // email, sms
+    smsContent: '',
     templateId: '',
     recipients: [],
     lists: [],
@@ -160,11 +162,13 @@ export default function CreateCampaign() {
 
     if (currentStep === 1) {
       if (!formData.name.trim()) newErrors.name = 'Campaign name is required';
-      if (!formData.subject.trim()) newErrors.subject = 'Subject line is required';
-      if (!formData.fromName.trim()) newErrors.fromName = 'From name is required';
-      if (!formData.fromEmail.trim()) newErrors.fromEmail = 'From email is required';
-      if (formData.fromEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.fromEmail)) {
-        newErrors.fromEmail = 'Invalid email format';
+      if (formData.type === 'email') {
+        if (!formData.subject.trim()) newErrors.subject = 'Subject line is required';
+        if (!formData.fromName.trim()) newErrors.fromName = 'From name is required';
+        if (!formData.fromEmail.trim()) newErrors.fromEmail = 'From email is required';
+        if (formData.fromEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.fromEmail)) {
+          newErrors.fromEmail = 'Invalid email format';
+        }
       }
     }
 
@@ -176,9 +180,12 @@ export default function CreateCampaign() {
     }
 
     if (currentStep === 3) {
-      if (!formData.templateId) {
+      if (formData.type === 'email' && !formData.templateId) {
         newErrors.templateId = 'Select an email template';
         warning('Please select an email template');
+      }
+      if (formData.type === 'sms' && !formData.smsContent.trim()) {
+        newErrors.smsContent = 'SMS content is required';
       }
     }
 
@@ -309,7 +316,27 @@ export default function CreateCampaign() {
             <div className="flex flex-col gap-6">
               <div>
                 <h2 className="text-xl font-bold mb-1">Campaign Details</h2>
-                <p className="text-gray-400 text-sm">Basic information about your email campaign</p>
+                <p className="text-gray-400 text-sm">Basic information about your campaign</p>
+              </div>
+
+              {/* Campaign Type Selector */}
+              <div className="grid grid-cols-2 gap-4 mb-2">
+                <button
+                  type="button"
+                  onClick={() => setFormData(p => ({ ...p, type: 'email' }))}
+                  className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${formData.type === 'email' ? 'bg-blue-600/20 border-blue-500 text-blue-400' : 'bg-gray-800/30 border-gray-700 text-gray-400'}`}
+                >
+                  <Mail size={24} />
+                  <span className="font-medium">Email Campaign</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData(p => ({ ...p, type: 'sms' }))}
+                  className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${formData.type === 'sms' ? 'bg-green-600/20 border-green-500 text-green-400' : 'bg-gray-800/30 border-gray-700 text-gray-400'}`}
+                >
+                  <span className="text-xl">📱</span>
+                  <span className="font-medium">SMS Campaign</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
@@ -326,59 +353,63 @@ export default function CreateCampaign() {
                   {errors.name && <span className="text-red-400 text-xs">{errors.name}</span>}
                 </label>
 
-                <label className="flex flex-col gap-1">
-                  <span className="font-medium text-sm">Subject Line *</span>
-                  <input
-                    type="text"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    placeholder="e.g., Get 50% OFF on all services! 🎉"
-                    className={`form-field ux-input px-3 py-2 border rounded text-base ${errors.subject ? 'border-red-500' : ''}`}
-                  />
-                  {errors.subject && <span className="text-red-400 text-xs">{errors.subject}</span>}
-                </label>
+                {formData.type === 'email' && (
+                  <>
+                    <label className="flex flex-col gap-1">
+                      <span className="font-medium text-sm">Subject Line *</span>
+                      <input
+                        type="text"
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        placeholder="e.g., Get 50% OFF on all services! 🎉"
+                        className={`form-field ux-input px-3 py-2 border rounded text-base ${errors.subject ? 'border-red-500' : ''}`}
+                      />
+                      {errors.subject && <span className="text-red-400 text-xs">{errors.subject}</span>}
+                    </label>
 
-                <label className="flex flex-col gap-1">
-                  <span className="font-medium text-sm">Preheader Text (Optional)</span>
-                  <input
-                    type="text"
-                    name="preheader"
-                    value={formData.preheader}
-                    onChange={handleChange}
-                    placeholder="Preview text shown in inbox"
-                    className="form-field ux-input px-3 py-2 border rounded text-base"
-                  />
-                  <span className="text-xs text-gray-500">This appears next to the subject line in inbox</span>
-                </label>
+                    <label className="flex flex-col gap-1">
+                      <span className="font-medium text-sm">Preheader Text (Optional)</span>
+                      <input
+                        type="text"
+                        name="preheader"
+                        value={formData.preheader}
+                        onChange={handleChange}
+                        placeholder="Preview text shown in inbox"
+                        className="form-field ux-input px-3 py-2 border rounded text-base"
+                      />
+                      <span className="text-xs text-gray-500">This appears next to the subject line in inbox</span>
+                    </label>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <label className="flex flex-col gap-1">
-                    <span className="font-medium text-sm">From Name *</span>
-                    <input
-                      type="text"
-                      name="fromName"
-                      value={formData.fromName}
-                      onChange={handleChange}
-                      placeholder="Devugo Tech"
-                      className={`form-field ux-input px-3 py-2 border rounded text-base ${errors.fromName ? 'border-red-500' : ''}`}
-                    />
-                    {errors.fromName && <span className="text-red-400 text-xs">{errors.fromName}</span>}
-                  </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <label className="flex flex-col gap-1">
+                        <span className="font-medium text-sm">From Name *</span>
+                        <input
+                          type="text"
+                          name="fromName"
+                          value={formData.fromName}
+                          onChange={handleChange}
+                          placeholder="Devugo Tech"
+                          className={`form-field ux-input px-3 py-2 border rounded text-base ${errors.fromName ? 'border-red-500' : ''}`}
+                        />
+                        {errors.fromName && <span className="text-red-400 text-xs">{errors.fromName}</span>}
+                      </label>
 
-                  <label className="flex flex-col gap-1">
-                    <span className="font-medium text-sm">From Email *</span>
-                    <input
-                      type="email"
-                      name="fromEmail"
-                      value={formData.fromEmail}
-                      onChange={handleChange}
-                      placeholder="hello@devugo.com"
-                      className={`form-field ux-input px-3 py-2 border rounded text-base ${errors.fromEmail ? 'border-red-500' : ''}`}
-                    />
-                    {errors.fromEmail && <span className="text-red-400 text-xs">{errors.fromEmail}</span>}
-                  </label>
-                </div>
+                      <label className="flex flex-col gap-1">
+                        <span className="font-medium text-sm">From Email *</span>
+                        <input
+                          type="email"
+                          name="fromEmail"
+                          value={formData.fromEmail}
+                          onChange={handleChange}
+                          placeholder="hello@devugo.com"
+                          className={`form-field ux-input px-3 py-2 border rounded text-base ${errors.fromEmail ? 'border-red-500' : ''}`}
+                        />
+                        {errors.fromEmail && <span className="text-red-400 text-xs">{errors.fromEmail}</span>}
+                      </label>
+                    </div>
+                  </>
+                )}
 
                 <label className="flex flex-col gap-1">
                   <span className="font-medium text-sm">Reply-To Email (Optional)</span>
@@ -441,8 +472,8 @@ export default function CreateCampaign() {
                           key={list._id}
                           onClick={() => handleListToggle(list._id)}
                           className={`cursor-pointer p-4 rounded-xl border transition-all group ${isSelected
-                              ? 'bg-blue-600/10 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]'
-                              : 'bg-gray-800/30 border-gray-700 hover:border-gray-600 hover:bg-gray-800/50'
+                            ? 'bg-blue-600/10 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]'
+                            : 'bg-gray-800/30 border-gray-700 hover:border-gray-600 hover:bg-gray-800/50'
                             }`}
                         >
                           <div className="flex items-start gap-4">
@@ -482,8 +513,8 @@ export default function CreateCampaign() {
 
                   <div
                     className={`flex-1 min-h-[200px] border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all ${dragActive
-                        ? 'border-blue-500 bg-blue-500/10'
-                        : 'border-gray-700 hover:border-gray-600 bg-gray-800/30'
+                      ? 'border-blue-500 bg-blue-500/10'
+                      : 'border-gray-700 hover:border-gray-600 bg-gray-800/30'
                       }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
@@ -549,53 +580,89 @@ export default function CreateCampaign() {
             </div>
           )}
 
-          {/* STEP 3: Email Content */}
+          {/* STEP 3: Content */}
           {step === 3 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="text-xl font-bold mb-1">Choose Email Template</h2>
-                <p className="text-gray-400 text-sm">Select a template for your campaign</p>
+                <h2 className="text-xl font-bold mb-1">
+                  {formData.type === 'sms' ? 'Compose SMS' : 'Choose Email Template'}
+                </h2>
+                <p className="text-gray-400 text-sm">
+                  {formData.type === 'sms' ? 'Write your message content' : 'Select a template for your campaign'}
+                </p>
               </div>
 
-              {errors.templateId && (
-                <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded">{errors.templateId}</div>
-              )}
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {templates.map((template) => (
-                  <div
-                    key={template._id}
-                    onClick={() => setFormData(prev => ({ ...prev, templateId: template._id }))}
-                    className={`group cursor-pointer relative rounded-xl overflow-hidden border transition-all ${formData.templateId === template._id
-                      ? 'ring-2 ring-blue-500 border-transparent'
-                      : 'border-gray-700 hover:border-gray-500'
-                      }`}
-                  >
-                    <div className="aspect-[3/4] bg-gray-800 relative">
-                      <img src={template.preview} alt={template.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                      {formData.templateId === template._id && (
-                        <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded shadow">
-                          SELECTED
-                        </div>
-                      )}
+              {formData.type === 'sms' ? (
+                // SMS Editor
+                <div className="max-w-xl">
+                  <label className="flex flex-col gap-2">
+                    <span className="font-medium text-sm text-gray-300">Message Content</span>
+                    <div className="relative">
+                      <textarea
+                        value={formData.smsContent}
+                        onChange={(e) => {
+                          if (e.target.value.length <= 160) {
+                            setFormData(prev => ({ ...prev, smsContent: e.target.value }));
+                          }
+                        }}
+                        placeholder="Type your SMS message here..."
+                        rows={5}
+                        className={`w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-green-500 ${errors.smsContent ? 'border-red-500' : ''}`}
+                      />
+                      <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+                        {formData.smsContent.length}/160
+                      </div>
                     </div>
-                    <div className="p-3 bg-gray-800/80 backdrop-blur-sm absolute bottom-0 left-0 right-0 border-t border-gray-700">
-                      <h3 className="text-sm font-medium text-white truncate">{template.name}</h3>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Add New Template Card */}
-                <div
-                  onClick={() => navigate('/admin/templates/create')}
-                  className="cursor-pointer rounded-xl border-2 border-dashed border-gray-700 hover:border-blue-500/50 hover:bg-gray-800/30 transition-all flex flex-col items-center justify-center gap-3 aspect-[3/4]"
-                >
-                  <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-xl text-gray-400">
-                    +
-                  </div>
-                  <span className="text-gray-400 font-medium text-sm">Create New</span>
+                    {errors.smsContent && <span className="text-red-400 text-xs">{errors.smsContent}</span>}
+                    <p className="text-xs text-gray-500">
+                      Standard SMS limit is 160 characters. Messages longer than this may be split or incur extra charges.
+                    </p>
+                  </label>
                 </div>
-              </div>
+              ) : (
+                // Email Template Picker
+                <>
+                  {errors.templateId && (
+                    <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded">{errors.templateId}</div>
+                  )}
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {templates.map((template) => (
+                      <div
+                        key={template._id}
+                        onClick={() => setFormData(prev => ({ ...prev, templateId: template._id }))}
+                        className={`group cursor-pointer relative rounded-xl overflow-hidden border transition-all ${formData.templateId === template._id
+                          ? 'ring-2 ring-blue-500 border-transparent'
+                          : 'border-gray-700 hover:border-gray-500'
+                          }`}
+                      >
+                        <div className="aspect-[3/4] bg-gray-800 relative">
+                          <img src={template.preview} alt={template.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                          {formData.templateId === template._id && (
+                            <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded shadow">
+                              SELECTED
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3 bg-gray-800/80 backdrop-blur-sm absolute bottom-0 left-0 right-0 border-t border-gray-700">
+                          <h3 className="text-sm font-medium text-white truncate">{template.name}</h3>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Add New Template Card */}
+                    <div
+                      onClick={() => navigate('/admin/templates/create')}
+                      className="cursor-pointer rounded-xl border-2 border-dashed border-gray-700 hover:border-blue-500/50 hover:bg-gray-800/30 transition-all flex flex-col items-center justify-center gap-3 aspect-[3/4]"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-xl text-gray-400">
+                        +
+                      </div>
+                      <span className="text-gray-400 font-medium text-sm">Create New</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 

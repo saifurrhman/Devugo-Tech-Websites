@@ -66,7 +66,7 @@ export default function ContactsList() {
 
                 {/* Filters */}
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                    {['all', 'verified', 'unverified', 'bounced'].map(f => (
+                    {['all', 'verified', 'unverified', 'opened', 'clicked', 'replied'].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
@@ -88,9 +88,9 @@ export default function ContactsList() {
                                 <tr>
                                     <th className="px-6 py-3">Name</th>
                                     <th className="px-6 py-3">Email</th>
-                                    <th className="px-6 py-3">Company</th>
                                     <th className="px-6 py-3">Status</th>
-                                    <th className="px-6 py-3">Tags</th>
+                                    <th className="px-6 py-3 text-center">Open %</th>
+                                    <th className="px-6 py-3 text-center">Click %</th>
                                     <th className="px-6 py-3 text-right">Added</th>
                                     <th className="px-6 py-3 text-right">Actions</th>
                                 </tr>
@@ -114,7 +114,6 @@ export default function ContactsList() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-gray-300">{contact.email}</td>
-                                            <td className="px-6 py-4 text-gray-300">{contact.company || '-'}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2 py-1 rounded-full text-xs border ${contact.status === 'Verified' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
                                                     contact.status === 'Bounced' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
@@ -123,13 +122,8 @@ export default function ContactsList() {
                                                     {contact.status || 'Unverified'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex gap-1 flex-wrap">
-                                                    {(contact.tags || []).map(tag => (
-                                                        <span key={tag} className="px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300">{tag}</span>
-                                                    ))}
-                                                </div>
-                                            </td>
+                                            <td className="px-6 py-4 text-center text-gray-300">{contact.openRate || 0}%</td>
+                                            <td className="px-6 py-4 text-center text-gray-300">{contact.clickRate || 0}%</td>
                                             <td className="px-6 py-4 text-right text-gray-400">{contact.date || new Date().toLocaleDateString()}</td>
                                             <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
                                                 <button className="text-gray-400 hover:text-white mx-2">Edit</button>

@@ -6,7 +6,15 @@ module.exports = {
     fromName: process.env.SENDGRID_FROM_NAME || 'Your Company',
     enabled: process.env.SENDGRID_ENABLED === 'true'
   },
-  
+
+  // Brevo Configuration
+  brevo: {
+    apiKey: process.env.BREVO_API_KEY,
+    senderEmail: process.env.BREVO_SENDER_EMAIL || 'noreply@devugo-tech.com',
+    senderName: process.env.BREVO_SENDER_NAME || 'Devugo Tech',
+    enabled: process.env.BREVO_ENABLED === 'true'
+  },
+
   // Backup SMTP Configuration (SMTP)
   smtp: {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -22,20 +30,20 @@ module.exports = {
     },
     enabled: process.env.SMTP_ENABLED === 'true'
   },
-  
+
   // Email sending limits
   limits: {
     perHour: parseInt(process.env.EMAIL_LIMIT_PER_HOUR) || 100,
     perDay: parseInt(process.env.EMAIL_LIMIT_PER_DAY) || 1000,
     batchSize: parseInt(process.env.EMAIL_BATCH_SIZE) || 10
   },
-  
+
   // Retry configuration
   retry: {
     attempts: 3,
     delay: 5000 // ms
   },
-  
+
   // Email tracking
   tracking: {
     enabled: true,

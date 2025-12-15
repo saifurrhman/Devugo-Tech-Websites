@@ -56,6 +56,9 @@ import ProjectsList from '../admin/pages/projects/ProjectsList';
 import InvoicesList from '../admin/pages/invoices/InvoicesList';
 import MeetingsList from '../admin/pages/meetings/MeetingsList';
 import ContactsList from '../admin/pages/contacts/ContactsList';
+import CreateTemplate from '../admin/pages/templates/CreateTemplate';
+import AITemplateGenerator from '../admin/pages/templates/AITemplateGenerator';
+import SMTPSettings from '../admin/pages/SMTPSettings';
 
 export default function PublicRoutes() {
   return (
@@ -133,8 +136,12 @@ export default function PublicRoutes() {
           <Route path="/admin/campaigns/create" element={<ProtectedRoute><CreateCampaign /></ProtectedRoute>} />
           <Route path="/admin/recipients" element={<ProtectedRoute><ContactsList /></ProtectedRoute>} />
           <Route path="/admin/inbox" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
+          <Route path="/admin/inbox" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
           <Route path="/admin/templates" element={<ProtectedRoute><TemplatesList /></ProtectedRoute>} />
+          <Route path="/admin/templates/create" element={<ProtectedRoute><CreateTemplate /></ProtectedRoute>} />
+          <Route path="/admin/templates/ai-generator" element={<ProtectedRoute><AITemplateGenerator /></ProtectedRoute>} />
           <Route path="/admin/email-analytics" element={<ProtectedRoute><EmailAnalytics /></ProtectedRoute>} />
+          <Route path="/admin/settings/email" element={<ProtectedRoute><SMTPSettings /></ProtectedRoute>} />
 
           {/* CRM & Projects Routes */}
           <Route path="/admin/pipeline" element={<ProtectedRoute><PipelineBoard /></ProtectedRoute>} />
