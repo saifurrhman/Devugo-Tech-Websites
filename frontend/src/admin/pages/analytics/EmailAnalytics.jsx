@@ -32,7 +32,8 @@ export default function EmailAnalytics() {
                         { domain: 'outlook.com', openRate: 38, sent: 850 },
                         { domain: 'yahoo.com', openRate: 32, sent: 400 },
                         { domain: 'corporate', openRate: 55, sent: 300 }
-                    ]
+                    ],
+                    dailyStats: [] // Mock empty strictly for fallback
                 });
             } finally {
                 setLoading(false);
@@ -70,6 +71,8 @@ export default function EmailAnalytics() {
     stats.spam = stats.spam || 0;
     const domainPerformance = data.domainPerformance || [];
     const recentActivity = data.recentActivity || [];
+    const dailyStats = data.dailyStats || [];
+    const maxVal = Math.max(...dailyStats.map(d => Math.max(d.opens, d.clicks)), 1); // Avoid 0 division
 
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -87,9 +90,9 @@ export default function EmailAnalytics() {
                         onChange={(e) => setTimeRange(e.target.value)}
                         className="bg-[#1e293b] border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
                     >
-                        <option value="24h">Last 24 Hours</option>
-                        <option value="7d">Last 7 Days</option>
-                        <option value="30d">Last 30 Days</option>
+                        <option value="24h" className="bg-[#0f172a]">Last 24 Hours</option>
+                        <option value="7d" className="bg-[#0f172a]">Last 7 Days</option>
+                        <option value="30d" className="bg-[#0f172a]">Last 30 Days</option>
                     </select>
                 </div>
 
@@ -137,23 +140,36 @@ export default function EmailAnalytics() {
                     </div>
                 </div>
 
-                {/* Opens vs Clicks Chart Placeholder */}
+                {/* Engagement Over Time Chart (Dynamic) */}
                 <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6 mb-6">
                     <h3 className="font-semibold mb-4">Engagement Over Time (Opens vs Clicks)</h3>
                     <div className="h-64 flex items-end justify-between gap-2 px-4 relative">
-                        {/* Fake Line Chart Visual using CSS bars for now as we don't have a chart lib explicitly */}
-                        {[40, 65, 45, 70, 50, 80, 60].map((h, i) => (
-                            <div key={i} className="w-full bg-gray-800/30 h-full relative rounded-t group mx-1">
-                                {/* Open Bar */}
-                                <div className="absolute bottom-0 left-1 right-1 bg-blue-500/80 rounded-t transition-all hover:bg-blue-400" style={{ height: `${h}%` }}>
-                                    <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-xs px-2 py-1 rounded border border-gray-700 whitespace-nowrap z-10">
-                                        Opens: {h * 10}
-                                    </div>
-                                </div>
-                                {/* Click Bar (Lower) */}
-                                <div className="absolute bottom-0 left-1.5 right-1.5 bg-green-500/80 rounded-t transition-all hover:bg-green-400" style={{ height: `${h * 0.4}%` }}></div>
+                        {dailyStats.length === 0 ? (
+                            <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                                No activity data for this period
                             </div>
-                        ))}
+                        ) : (
+                            dailyStats.map((stat, i) => {
+                                const openHeight = (stat.opens / maxVal) * 100;
+                                const clickHeight = (stat.clicks / maxVal) * 100;
+                                return (
+                                    <div key={i} className="w-full bg-gray-800/30 h-full relative rounded-t group mx-1">
+                                        {/* Open Bar */}
+                                        <div className="absolute bottom-0 left-1 right-1 bg-blue-500/80 rounded-t transition-all hover:bg-blue-400" style={{ height: `${openHeight}%` }}>
+                                            <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-xs px-2 py-1 rounded border border-gray-700 whitespace-nowrap z-10">
+                                                Opens: {stat.opens}<br />{stat.date}
+                                            </div>
+                                        </div>
+                                        {/* Click Bar (Lower overlay) */}
+                                        <div className="absolute bottom-0 left-1.5 right-1.5 bg-green-500/80 rounded-t transition-all hover:bg-green-400" style={{ height: `${clickHeight}%` }}>
+                                            <div className="opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-xs px-2 py-1 rounded border border-gray-700 whitespace-nowrap z-10">
+                                                Clicks: {stat.clicks}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
                         {/* Chart Grid Lines */}
                         <div className="absolute inset-0 border-b border-l border-gray-700 pointer-events-none opacity-50"></div>
                     </div>
@@ -192,7 +208,7 @@ export default function EmailAnalytics() {
                         </div>
                     </div>
 
-                    {/* Detailed Activity Table (New Requirement) */}
+                    {/* Recent Activity Table */}
                     <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-5">
                         <h3 className="font-semibold mb-4">Recent Activity</h3>
                         <div className="overflow-x-auto">
@@ -206,10 +222,9 @@ export default function EmailAnalytics() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-800">
-                                    {/* Real Data from API */}
                                     {recentActivity.length === 0 ? (
                                         <tr>
-                                            <td colspan="4" className="px-6 py-8 text-center text-gray-500">
+                                            <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
                                                 No recent activity found.
                                             </td>
                                         </tr>

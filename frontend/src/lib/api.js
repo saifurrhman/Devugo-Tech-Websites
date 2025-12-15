@@ -356,6 +356,7 @@ export const TemplateAPI = {
   update: (id, payload) => api(`/api/templates/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/templates/${id}`, { method: 'DELETE' }),
   generate: (payload) => api('/api/templates/generate', { method: 'POST', body: payload }),
+  generateAI: (payload) => api('/api/templates/generate-ai', { method: 'POST', body: payload }),
 };
 
 // ============================================

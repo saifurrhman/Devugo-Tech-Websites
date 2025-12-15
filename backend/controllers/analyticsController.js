@@ -250,10 +250,45 @@ exports.getEmailStats = async (req, res) => {
     const spamRate = totalSent > 0 ? ((totalComplaints / totalSent) * 100).toFixed(2) : 0;
     const deliveryRate = totalSent > 0 ? ((totalDelivered / totalSent) * 100).toFixed(1) : 0;
 
+    // 4. Daily Stats for Graph (Aggregate by Day)
+    const dailyMap = {};
+    const dayCount = timeRange === '24h' ? 24 : (timeRange === '30d' ? 30 : 7);
+    const splitBy = timeRange === '24h' ? 'hour' : 'day';
+
+    // Initialize map with 0s
+    for (let i = 0; i < dayCount; i++) {
+      const d = new Date();
+      if (splitBy === 'hour') d.setHours(d.getHours() - i);
+      else d.setDate(d.getDate() - i);
+
+      const key = splitBy === 'hour'
+        ? `${d.getHours()}:00`
+        : d.toISOString().split('T')[0]; // YYYY-MM-DD
+
+      dailyMap[key] = { date: key, opens: 0, clicks: 0, sent: 0 };
+    }
+
+    // Populate from Logs
+    const allLogs = await EmailLog.find({ createdAt: { $gte: startDate } });
+    allLogs.forEach(log => {
+      const d = new Date(log.createdAt);
+      const key = splitBy === 'hour'
+        ? `${d.getHours()}:00`
+        : d.toISOString().split('T')[0];
+
+      if (dailyMap[key]) {
+        if (log.status === 'sent') dailyMap[key].sent++;
+        if (log.openedAt) dailyMap[key].opens++;
+        if (log.clickedAt) dailyMap[key].clicks++;
+      }
+    });
+
+    const dailyStats = Object.values(dailyMap).reverse();
+
     res.json({
       stats: {
         sent: totalSent,
-        delivered: Number(deliveryRate), // Keep as number for progress bars if needed, or string
+        delivered: Number(deliveryRate),
         openRate: Number(openRate),
         clickRate: Number(clickRate),
         unsubscribed: Number(unsRate),
@@ -261,7 +296,8 @@ exports.getEmailStats = async (req, res) => {
         complaints: totalComplaints
       },
       domainPerformance,
-      recentActivity: formattedActivity
+      recentActivity: formattedActivity,
+      dailyStats // New field for graph
     });
 
   } catch (error) {

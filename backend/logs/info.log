@@ -1411,3 +1411,23 @@
 {"timestamp":"2025-12-15T17:40:07.763Z","level":"INFO","message":"Updated stats for 0 recipients"}
 {"timestamp":"2025-12-15T17:45:00.052Z","level":"INFO","message":"AI Personalizer job started"}
 {"timestamp":"2025-12-15T17:45:00.227Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-15T17:50:00.027Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2025-12-15T17:50:00.436Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-15T17:50:00.510Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-15T17:50:00.594Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2025-12-15T17:50:00.774Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2025-12-15T17:55:00.062Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-15T17:55:01.203Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-15T18:00:00.046Z","level":"INFO","message":"Follow-up Automation job started"}
+{"timestamp":"2025-12-15T18:00:00.063Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2025-12-15T18:00:00.066Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-15T18:00:00.137Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2025-12-15T18:00:00.229Z","level":"INFO","message":"No-open follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-15T18:00:00.239Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2025-12-15T18:00:00.252Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-15T18:00:00.493Z","level":"INFO","message":"No-click follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-15T18:00:00.660Z","level":"INFO","message":"No-reply follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-15T18:00:00.876Z","level":"INFO","message":"Re-engagement emails sent","data":{"count":0}}
+{"timestamp":"2025-12-15T18:00:00.878Z","level":"INFO","message":"Follow-up automation completed"}
+{"timestamp":"2025-12-15T18:05:00.046Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-15T18:05:00.212Z","level":"INFO","message":"No pending AI personalization requests"}

@@ -8,7 +8,7 @@ class AIService {
       logger.warn('GEMINI_API_KEY is missing. AI features will use mock data.');
     } else {
       this.genAI = new GoogleGenerativeAI(this.apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     }
   }
 
