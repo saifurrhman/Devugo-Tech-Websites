@@ -1409,3 +1409,5 @@
 {"timestamp":"2025-12-15T17:40:00.514Z","level":"INFO","message":"No pending AI personalization requests"}
 {"timestamp":"2025-12-15T17:40:03.530Z","level":"INFO","message":"Updated stats for 0 campaigns"}
 {"timestamp":"2025-12-15T17:40:07.763Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2025-12-15T17:45:00.052Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-15T17:45:00.227Z","level":"INFO","message":"No pending AI personalization requests"}

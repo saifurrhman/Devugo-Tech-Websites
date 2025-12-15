@@ -124,11 +124,11 @@ export default function AITemplateGenerator() {
                                         onChange={handleChange}
                                         className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
                                     >
-                                        <option value="newsletter">Newsletter</option>
-                                        <option value="promotional">Promotional Offer</option>
-                                        <option value="welcome">Welcome Email</option>
-                                        <option value="transactional">Transactional</option>
-                                        <option value="followup">Follow-up</option>
+                                        <option value="newsletter" className="bg-[#0f172a]">Newsletter</option>
+                                        <option value="promotional" className="bg-[#0f172a]">Promotional Offer</option>
+                                        <option value="welcome" className="bg-[#0f172a]">Welcome Email</option>
+                                        <option value="transactional" className="bg-[#0f172a]">Transactional</option>
+                                        <option value="followup" className="bg-[#0f172a]">Follow-up</option>
                                     </select>
                                 </label>
 
@@ -140,11 +140,11 @@ export default function AITemplateGenerator() {
                                         onChange={handleChange}
                                         className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
                                     >
-                                        <option value="lead_generation">Lead Generation</option>
-                                        <option value="sales">Drive Sales</option>
-                                        <option value="engagement">Engagement</option>
-                                        <option value="announcement">Announcement</option>
-                                        <option value="nurture">Nurture Relationship</option>
+                                        <option value="lead_generation" className="bg-[#0f172a]">Lead Generation</option>
+                                        <option value="sales" className="bg-[#0f172a]">Drive Sales</option>
+                                        <option value="engagement" className="bg-[#0f172a]">Engagement</option>
+                                        <option value="announcement" className="bg-[#0f172a]">Announcement</option>
+                                        <option value="nurture" className="bg-[#0f172a]">Nurture Relationship</option>
                                     </select>
                                 </label>
 
@@ -156,11 +156,11 @@ export default function AITemplateGenerator() {
                                         onChange={handleChange}
                                         className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
                                     >
-                                        <option value="professional">Professional</option>
-                                        <option value="friendly">Friendly & Casual</option>
-                                        <option value="urgent">Urgent / Scarcity</option>
-                                        <option value="witty">Witty / Humorous</option>
-                                        <option value="empathetic">Empathetic</option>
+                                        <option value="professional" className="bg-[#0f172a]">Professional</option>
+                                        <option value="friendly" className="bg-[#0f172a]">Friendly & Casual</option>
+                                        <option value="urgent" className="bg-[#0f172a]">Urgent / Scarcity</option>
+                                        <option value="witty" className="bg-[#0f172a]">Witty / Humorous</option>
+                                        <option value="empathetic" className="bg-[#0f172a]">Empathetic</option>
                                     </select>
                                 </label>
 
@@ -172,11 +172,11 @@ export default function AITemplateGenerator() {
                                         onChange={handleChange}
                                         className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
                                     >
-                                        <option value="english">English</option>
-                                        <option value="urdu">Urdu</option>
-                                        <option value="spanish">Spanish</option>
-                                        <option value="french">French</option>
-                                        <option value="german">German</option>
+                                        <option value="english" className="bg-[#0f172a]">English</option>
+                                        <option value="urdu" className="bg-[#0f172a]">Urdu</option>
+                                        <option value="spanish" className="bg-[#0f172a]">Spanish</option>
+                                        <option value="french" className="bg-[#0f172a]">French</option>
+                                        <option value="german" className="bg-[#0f172a]">German</option>
                                     </select>
                                 </label>
                             </div>

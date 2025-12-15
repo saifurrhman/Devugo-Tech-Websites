@@ -61,6 +61,13 @@ export default function EmailAnalytics() {
     );
 
     const stats = data.stats || { sent: 0, delivered: 0, openRate: 0, clickRate: 0, unsubscribed: 0, spam: 0, complaints: 0 };
+    // Ensure all numeric properties exist to prevent crashes
+    stats.sent = stats.sent || 0;
+    stats.delivered = stats.delivered || 0;
+    stats.openRate = stats.openRate || 0;
+    stats.clickRate = stats.clickRate || 0;
+    stats.unsubscribed = stats.unsubscribed || 0;
+    stats.spam = stats.spam || 0;
     const domainPerformance = data.domainPerformance || [];
     const recentActivity = data.recentActivity || [];
 
