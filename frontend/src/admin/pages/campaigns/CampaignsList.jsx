@@ -31,12 +31,6 @@ export default function CampaignsList() {
 
     const filteredCampaigns = filter === 'all' ? campaigns : campaigns.filter(c => (c.status || 'Draft').toLowerCase() === filter);
 
-    if (loading) return (
-        <div className="admin-layout min-h-screen bg-[#0f172a] text-white flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-    );
-
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
             <AdminSidebar />
@@ -72,68 +66,86 @@ export default function CampaignsList() {
                     ))}
                 </div>
 
-                {/* Campaign List */}
-                <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
-                                <tr>
-                                    <th className="px-6 py-3">Campaign Name</th>
-                                    <th className="px-6 py-3">Status</th>
-                                    <th className="px-6 py-3 text-right">Sent</th>
-                                    <th className="px-6 py-3 text-right">Opens %</th>
-                                    <th className="px-6 py-3 text-right">Clicks %</th>
-                                    <th className="px-6 py-3 text-right">Date</th>
-                                    <th className="px-6 py-3 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-800">
-                                {filteredCampaigns.length === 0 ? (
+                {/* Content Area */}
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+                        <p className="text-gray-400">Loading campaigns...</p>
+                    </div>
+                ) : error ? (
+                    <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-6 text-center">
+                        <div className="text-red-400 mb-2 font-medium">{error}</div>
+                        <button
+                            onClick={loadCampaigns}
+                            className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                ) : (
+                    /* Campaign List */
+                    <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
                                     <tr>
-                                        <td colspan="7" className="px-6 py-8 text-center text-gray-500">
-                                            No campaigns found.
-                                        </td>
+                                        <th className="px-6 py-3">Campaign Name</th>
+                                        <th className="px-6 py-3">Status</th>
+                                        <th className="px-6 py-3 text-right">Sent</th>
+                                        <th className="px-6 py-3 text-right">Opens %</th>
+                                        <th className="px-6 py-3 text-right">Clicks %</th>
+                                        <th className="px-6 py-3 text-right">Date</th>
+                                        <th className="px-6 py-3 text-right">Actions</th>
                                     </tr>
-                                ) : (
-                                    filteredCampaigns.map((campaign) => (
-                                        <tr key={campaign.id || campaign._id} className="hover:bg-gray-800/30 transition-colors">
-                                            <td className="px-6 py-4 font-medium text-white">
-                                                {campaign.name}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-2 py-1 rounded-full text-xs border ${campaign.status === 'Sent' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                    campaign.status === 'Active' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                                        campaign.status === 'Draft' ? 'bg-gray-500/10 text-gray-400 border-gray-500/20' :
-                                                            'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-                                                    }`}>
-                                                    {campaign.status || 'Draft'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right text-gray-300">
-                                                {campaign.stats?.sent || 0}
-                                            </td>
-                                            <td className="px-6 py-4 text-right text-gray-300">
-                                                {campaign.stats?.sent > 0
-                                                    ? Math.round(((campaign.stats?.opened || 0) / campaign.stats.sent) * 100) + '%'
-                                                    : '0%'}
-                                            </td>
-                                            <td className="px-6 py-4 text-right text-gray-300">
-                                                {campaign.stats?.sent > 0
-                                                    ? Math.round(((campaign.stats?.clicked || 0) / campaign.stats.sent) * 100) + '%'
-                                                    : '0%'}
-                                            </td>
-                                            <td className="px-6 py-4 text-right text-gray-400">{campaign.date || new Date().toLocaleDateString()}</td>
-                                            <td className="px-6 py-4 text-right">
-                                                <button className="text-gray-400 hover:text-white mx-2">Edit</button>
-                                                <button className="text-gray-400 hover:text-red-400">Delete</button>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800">
+                                    {filteredCampaigns.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                                                No campaigns found.
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                    ) : (
+                                        filteredCampaigns.map((campaign) => (
+                                            <tr key={campaign.id || campaign._id} className="hover:bg-gray-800/30 transition-colors">
+                                                <td className="px-6 py-4 font-medium text-white">
+                                                    {campaign.name}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-2 py-1 rounded-full text-xs border ${campaign.status === 'Sent' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                                        campaign.status === 'Active' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                                            campaign.status === 'Draft' ? 'bg-gray-500/10 text-gray-400 border-gray-500/20' :
+                                                                'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                                        }`}>
+                                                        {campaign.status || 'Draft'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right text-gray-300">
+                                                    {campaign.stats?.sent || 0}
+                                                </td>
+                                                <td className="px-6 py-4 text-right text-gray-300">
+                                                    {campaign.stats?.sent > 0
+                                                        ? Math.round(((campaign.stats?.opened || 0) / campaign.stats.sent) * 100) + '%'
+                                                        : '0%'}
+                                                </td>
+                                                <td className="px-6 py-4 text-right text-gray-300">
+                                                    {campaign.stats?.sent > 0
+                                                        ? Math.round(((campaign.stats?.clicked || 0) / campaign.stats.sent) * 100) + '%'
+                                                        : '0%'}
+                                                </td>
+                                                <td className="px-6 py-4 text-right text-gray-400">{campaign.date || new Date().toLocaleDateString()}</td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <button className="text-gray-400 hover:text-white mx-2">Edit</button>
+                                                    <button className="text-gray-400 hover:text-red-400">Delete</button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                )}
             </main>
         </div>
     );

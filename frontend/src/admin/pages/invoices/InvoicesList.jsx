@@ -31,11 +31,25 @@ export default function InvoicesList() {
 
     const filteredInvoices = filter === 'all' ? invoices : invoices.filter(i => (i.status || 'Draft').toLowerCase() === filter);
 
-    if (loading) return (
-        <div className="admin-layout min-h-screen bg-[#0f172a] text-white flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-    );
+    if (error) {
+        return (
+            <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
+                <AdminSidebar />
+                <main className="admin-content w-full px-4 sm:px-6 lg:px-8 py-6">
+                    <AdminTopbar />
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="text-red-400 mb-2 font-medium">{error}</div>
+                        <button
+                            onClick={loadInvoices}
+                            className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -92,56 +106,63 @@ export default function InvoicesList() {
                     ))}
                 </div>
 
-                {/* Invoices Table */}
-                <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
-                                <tr>
-                                    <th className="px-6 py-3">Invoice ID</th>
-                                    <th className="px-6 py-3">Client</th>
-                                    <th className="px-6 py-3">Amount</th>
-                                    <th className="px-6 py-3">Status</th>
-                                    <th className="px-6 py-3 text-right">Date</th>
-                                    <th className="px-6 py-3 text-right">Due Date</th>
-                                    <th className="px-6 py-3 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-800">
-                                {filteredInvoices.length === 0 ? (
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+                        <p className="text-gray-400">Loading invoices...</p>
+                    </div>
+                ) : (
+                    /* Invoices Table */
+                    <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
                                     <tr>
-                                        <td colspan="7" className="px-6 py-8 text-center text-gray-500">
-                                            No invoices found.
-                                        </td>
+                                        <th className="px-6 py-3">Invoice ID</th>
+                                        <th className="px-6 py-3">Client</th>
+                                        <th className="px-6 py-3">Amount</th>
+                                        <th className="px-6 py-3">Status</th>
+                                        <th className="px-6 py-3 text-right">Date</th>
+                                        <th className="px-6 py-3 text-right">Due Date</th>
+                                        <th className="px-6 py-3 text-right">Actions</th>
                                     </tr>
-                                ) : (
-                                    filteredInvoices.map((inv) => (
-                                        <tr key={inv.id || inv._id} className="hover:bg-gray-800/30 transition-colors cursor-pointer" onClick={() => navigate(`/admin/invoices/${inv.id || inv._id}`)}>
-                                            <td className="px-6 py-4 font-medium text-blue-400">{inv.id || inv._id}</td>
-                                            <td className="px-6 py-4 text-white">{inv.client}</td>
-                                            <td className="px-6 py-4 text-gray-200 font-medium">{inv.amount}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-2 py-1 rounded-full text-xs border ${inv.status === 'Paid' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                    inv.status === 'Overdue' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                                        inv.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
-                                                            'bg-gray-500/10 text-gray-400 border-gray-500/20'
-                                                    }`}>
-                                                    {inv.status || 'Draft'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right text-gray-400">{inv.date || new Date().toLocaleDateString()}</td>
-                                            <td className="px-6 py-4 text-right text-gray-400">{inv.due || '-'}</td>
-                                            <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
-                                                <button className="text-gray-400 hover:text-white mx-2">Edit</button>
-                                                <button className="text-gray-400 hover:text-white">Download</button>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800">
+                                    {filteredInvoices.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                                                No invoices found.
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                    ) : (
+                                        filteredInvoices.map((inv) => (
+                                            <tr key={inv.id || inv._id} className="hover:bg-gray-800/30 transition-colors cursor-pointer" onClick={() => navigate(`/admin/invoices/${inv.id || inv._id}`)}>
+                                                <td className="px-6 py-4 font-medium text-blue-400">{inv.id || inv._id}</td>
+                                                <td className="px-6 py-4 text-white">{inv.client}</td>
+                                                <td className="px-6 py-4 text-gray-200 font-medium">{inv.amount}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-2 py-1 rounded-full text-xs border ${inv.status === 'Paid' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                                        inv.status === 'Overdue' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                                            inv.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+                                                                'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                                                        }`}>
+                                                        {inv.status || 'Draft'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right text-gray-400">{inv.date || new Date().toLocaleDateString()}</td>
+                                                <td className="px-6 py-4 text-right text-gray-400">{inv.due || '-'}</td>
+                                                <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
+                                                    <button className="text-gray-400 hover:text-white mx-2">Edit</button>
+                                                    <button className="text-gray-400 hover:text-white">Download</button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                )}
             </main>
         </div>
     );

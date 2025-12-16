@@ -9,6 +9,7 @@ class ProjectController {
    * Get all projects
    */
   async getAllProjects(req, res) {
+    console.log('🔍 GetAllProjects called:', req.query);
     try {
       const {
         page = 1,
@@ -16,7 +17,7 @@ class ProjectController {
         status,
         client,
         assignedTo,
-        healthStatus, 
+        healthStatus,
         startDate,
         endDate,
         search

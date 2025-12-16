@@ -543,7 +543,7 @@ class PipelineController {
       const stats = await Promise.all(
         pipeline.stages.map(async (stage) => {
           const leads = await EmailRecipient.find({ pipelineStage: stage._id });
-          
+
           return {
             stageId: stage._id,
             stageName: stage.name,
@@ -558,7 +558,7 @@ class PipelineController {
       );
 
       const totalLeads = stats.reduce((sum, s) => sum + s.totalLeads, 0);
-      const conversionRate = totalLeads > 0 
+      const conversionRate = totalLeads > 0
         ? (stats.reduce((sum, s) => sum + s.convertedLeads, 0) / totalLeads) * 100
         : 0;
 
@@ -583,6 +583,76 @@ class PipelineController {
         message: 'Error fetching statistics',
         error: error.message
       });
+    }
+  }
+  /**
+   * Get all deals (leads) with stages
+   * Mapped to /api/pipeline/deals
+   */
+  async getLeads(req, res) {
+    try {
+      const { pipelineId, stageId } = req.query;
+      const query = { pipelineStage: { $exists: true, $ne: null } };
+
+      if (stageId) query.pipelineStage = stageId;
+
+      const leads = await EmailRecipient.find(query)
+        .sort({ updatedAt: -1 })
+        .populate('addedBy', 'name');
+
+      // Map to "Deal" format expected by frontend
+      const deals = leads.map(lead => ({
+        id: lead._id,
+        title: lead.company || lead.name || lead.email,
+        value: lead.customFields?.value || '$0', // Assuming value is stored in customFields
+        stageId: lead.pipelineStage,
+        contact: lead.name || lead.email.split('@')[0],
+        date: new Date(lead.updatedAt).toLocaleDateString(),
+        ...lead.toObject()
+      }));
+
+      res.json(deals); // Return array directly as expected by frontend Promise.all destructuring
+
+    } catch (error) {
+      console.error('Get leads error:', error);
+      res.status(500).json({ error: 'Failed to fetch deals' });
+    }
+  }
+
+  /**
+   * Get stages for pipeline
+   * Mapped to /api/pipeline/stages
+   */
+  async getStages(req, res) {
+    try {
+      // Get default pipeline or first available
+      const pipeline = await Pipeline.findOne({ isDefault: true }) || await Pipeline.findOne();
+
+      if (!pipeline) {
+        // Return default structure if no pipeline exists in DB
+        return res.json([
+          { id: 'new', name: 'New Leads', color: 'blue', items: [] },
+          { id: 'qualified', name: 'Qualified', color: 'purple', items: [] },
+          { id: 'proposal', name: 'Proposal Sent', color: 'yellow', items: [] },
+          { id: 'negotiation', name: 'Negotiation', color: 'orange', items: [] },
+          { id: 'won', name: 'Closed Won', color: 'green', items: [] },
+        ]);
+      }
+
+      // Map DB stages to frontend format
+      const stages = pipeline.stages.map(stage => ({
+        id: stage._id,
+        name: stage.name,
+        color: stage.color || 'blue',
+        order: stage.order,
+        items: [] // Will be populated by frontend logic
+      }));
+
+      res.json(stages);
+
+    } catch (error) {
+      console.error('Get stages error:', error);
+      res.status(500).json({ error: 'Failed to fetch stages' });
     }
   }
 }

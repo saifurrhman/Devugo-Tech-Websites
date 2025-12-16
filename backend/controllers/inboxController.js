@@ -15,8 +15,7 @@ exports.getMessages = async (req, res) => {
         const messages = await Message.find(query)
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
-            .limit(parseInt(limit))
-            .populate('from.email to.email');
+            .limit(parseInt(limit));
 
         const total = await Message.countDocuments(query);
 

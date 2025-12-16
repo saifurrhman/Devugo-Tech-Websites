@@ -64,73 +64,43 @@ export default function CampaignAnalytics() {
     fetchData();
   }, [timeRange]);
 
-  if (loading) return (
-    <div className="admin-layout min-h-screen bg-[#0f172a] text-white flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
+  const renderContent = () => {
+    if (loading) return (
+      <div className="flex flex-col items-center justify-center py-20 h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+        <p className="text-gray-400">Loading analytics...</p>
+      </div>
+    );
 
-  if (error || !data) return (
-    <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
-      <AdminSidebar />
-      <main className="admin-content w-full px-4 sm:px-6 lg:px-8 py-6">
-        <AdminTopbar />
-        <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
-          <div className="text-red-400 text-xl">Failed to load analytics data</div>
-          <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition-colors">Retry</button>
-        </div>
-      </main>
-    </div>
-  );
+    if (error || !data) return (
+      <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
+        <div className="text-red-400 text-xl">Failed to load analytics data</div>
+        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition-colors">Retry</button>
+      </div>
+    );
 
-  return (
-    <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
-      <AdminSidebar />
-      <main className="admin-content w-full px-4 sm:px-6 lg:px-8 py-6">
-        <AdminTopbar />
-
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Campaign Analytics</h1>
-            <p className="text-gray-400 text-sm mt-1">Track the performance of your email campaigns</p>
-          </div>
-
-          <div className="flex bg-[#1e293b] rounded-lg p-1">
-            {['7d', '30d', '90d'].map(range => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${timeRange === range
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-400 hover:text-white'
-                  }`}
-              >
-                {range}
-              </button>
-            ))}
-          </div>
-        </div>
-
+    return (
+      <>
         {/* Key Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard
             label="Total Emails Sent"
-            value={(data.summary?.totalSent || 0).toLocaleString()}
+            value={(data.stats?.totalSent || 0).toLocaleString()}
             trend={5.2}
           />
           <StatCard
             label="Open Rate"
-            value={`${data.summary?.openRate || 0}%`}
+            value={`${data.stats?.openRate || 0}%`}
             trend={2.1}
           />
           <StatCard
             label="Click Rate"
-            value={`${data.summary?.clickRate || 0}%`}
+            value={`${data.stats?.clickRate || 0}%`}
             trend={-0.5}
           />
           <StatCard
-            label="Bounce Rate"
-            value={`${data.summary?.bounceRate || 0}%`}
+            label="Bounce/Unsub Rate"
+            value={`${data.stats?.bounceRate || 0}%`}
             trend={-0.1}
           />
         </div>
@@ -220,8 +190,8 @@ export default function CampaignAnalytics() {
                       <td className="px-6 py-4 font-medium">{campaign.name}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 rounded-full text-xs ${campaign.status === 'Sent' ? 'bg-green-500/20 text-green-400' :
-                            campaign.status === 'Active' ? 'bg-blue-500/20 text-blue-400' :
-                              'bg-gray-500/20 text-gray-400'
+                          campaign.status === 'Active' ? 'bg-blue-500/20 text-blue-400' :
+                            'bg-gray-500/20 text-gray-400'
                           }`}>
                           {campaign.status}
                         </span>
@@ -236,6 +206,39 @@ export default function CampaignAnalytics() {
             </table>
           </div>
         </div>
+      </>
+    );
+  };
+
+  return (
+    <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
+      <AdminSidebar />
+      <main className="admin-content w-full px-4 sm:px-6 lg:px-8 py-6">
+        <AdminTopbar />
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Campaign Analytics</h1>
+            <p className="text-gray-400 text-sm mt-1">Track the performance of your email campaigns</p>
+          </div>
+
+          <div className="flex bg-[#1e293b] rounded-lg p-1">
+            {['7d', '30d', '90d'].map(range => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${timeRange === range
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+                  }`}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {renderContent()}
       </main>
     </div>
   );

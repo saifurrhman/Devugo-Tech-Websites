@@ -164,8 +164,7 @@ exports.realtime = async (req, res) => {
       error: 'Failed to fetch realtime data',
       details: error.message
     });
-  });
-}
+  }
 };
 
 // NEW: Email Analytics
@@ -269,7 +268,10 @@ exports.getEmailStats = async (req, res) => {
     }
 
     // Populate from Logs
-    const allLogs = await EmailLog.find({ createdAt: { $gte: startDate } });
+    const allLogs = await EmailLog.find({
+      createdAt: { $gte: startDate }
+    });
+
     allLogs.forEach(log => {
       const d = new Date(log.createdAt);
       const key = splitBy === 'hour'
@@ -285,19 +287,36 @@ exports.getEmailStats = async (req, res) => {
 
     const dailyStats = Object.values(dailyMap).reverse();
 
+    // 5. Recent Campaigns for Table
+    const recentCampaignsList = await EmailCampaign.find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    const formattedCampaigns = recentCampaignsList.map(c => ({
+      id: c._id,
+      name: c.name,
+      status: c.status,
+      sent: c.stats?.sent || 0,
+      opens: c.stats?.opened || 0,
+      clicks: c.stats?.clicked || 0,
+      date: c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'
+    }));
+
     res.json({
       stats: {
-        sent: totalSent,
+        totalSent: totalSent,
         delivered: Number(deliveryRate),
         openRate: Number(openRate),
         clickRate: Number(clickRate),
-        unsubscribed: Number(unsRate),
+        bounceRate: Number(unsRate), // Using unsub/bounce rate
         spam: Number(spamRate),
         complaints: totalComplaints
       },
       domainPerformance,
       recentActivity: formattedActivity,
-      dailyStats // New field for graph
+      recentCampaigns: formattedCampaigns,
+      performanceOverTime: dailyStats // Renaming to match frontend expectation or keeping generic? Let's match frontend if possible, or mapping in frontend.
     });
 
   } catch (error) {

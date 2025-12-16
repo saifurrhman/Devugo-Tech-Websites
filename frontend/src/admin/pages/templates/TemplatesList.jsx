@@ -28,11 +28,25 @@ export default function TemplatesList() {
         }
     };
 
-    if (loading) return (
-        <div className="admin-layout min-h-screen bg-[#0f172a] text-white flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-    );
+    if (error) {
+        return (
+            <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
+                <AdminSidebar />
+                <main className="admin-content w-full px-4 sm:px-6 lg:px-8 py-6">
+                    <AdminTopbar />
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="text-red-400 mb-2 font-medium">{error}</div>
+                        <button
+                            onClick={loadTemplates}
+                            className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -78,42 +92,51 @@ export default function TemplatesList() {
 
                 {/* Templates Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {templates.length === 0 ? (
-                        <div className="col-span-full text-center py-12 text-gray-500">
-                            No templates found.
+                    {loading ? (
+                        <div className="col-span-full flex flex-col items-center justify-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+                            <p className="text-gray-400">Loading templates...</p>
                         </div>
                     ) : (
-                        templates.map((template) => (
-                            <div key={template.id || template._id} className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden group hover:border-blue-500/50 transition-all">
-                                <div className="relative aspect-video bg-gray-800 overflow-hidden">
-                                    <img src={template.thumbnail || 'https://via.placeholder.com/300x200?text=Template'} alt={template.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button className="px-3 py-1.5 bg-white text-gray-900 rounded text-sm font-medium hover:bg-gray-100">Edit</button>
-                                        <button className="px-3 py-1.5 bg-gray-700 text-white rounded text-sm font-medium hover:bg-gray-600">Preview</button>
-                                    </div>
+                        <>
+                            {templates.length === 0 ? (
+                                <div className="col-span-full text-center py-12 text-gray-500">
+                                    No templates found.
                                 </div>
-                                <div className="p-4">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h3 className="font-semibold truncate pr-2">{template.name}</h3>
-                                        <button className="text-gray-500 hover:text-white">⋮</button>
+                            ) : (
+                                templates.map((template) => (
+                                    <div key={template.id || template._id} className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden group hover:border-blue-500/50 transition-all">
+                                        <div className="relative aspect-video bg-gray-800 overflow-hidden">
+                                            <img src={template.thumbnail || 'https://via.placeholder.com/300x200?text=Template'} alt={template.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button className="px-3 py-1.5 bg-white text-gray-900 rounded text-sm font-medium hover:bg-gray-100">Edit</button>
+                                                <button className="px-3 py-1.5 bg-gray-700 text-white rounded text-sm font-medium hover:bg-gray-600">Preview</button>
+                                            </div>
+                                        </div>
+                                        <div className="p-4">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <h3 className="font-semibold truncate pr-2">{template.name}</h3>
+                                                <button className="text-gray-500 hover:text-white">⋮</button>
+                                            </div>
+                                            <div className="flex justify-between items-center text-xs text-gray-400">
+                                                <span>{template.category || 'General'}</span>
+                                                <span>{template.lastModified || 'Recently'}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between items-center text-xs text-gray-400">
-                                        <span>{template.category || 'General'}</span>
-                                        <span>{template.lastModified || 'Recently'}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    )}
+                                ))
+                            )}
 
-                    {/* Create New Card */}
-                    <button
-                        onClick={() => navigate('/admin/templates/create')}
-                        className="card bg-[#1e293b]/50 rounded-xl border-2 border-dashed border-gray-700 hover:border-blue-500 hover:bg-[#1e293b] transition-all flex flex-col items-center justify-center min-h-[200px] gap-3 group"
-                    >
-                        <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors">+</div>
-                        <span className="font-medium text-gray-400 group-hover:text-white">Create New Template</span>
-                    </button>
+                            {/* Create New Card */}
+                            <button
+                                onClick={() => navigate('/admin/templates/create')}
+                                className="card bg-[#1e293b]/50 rounded-xl border-2 border-dashed border-gray-700 hover:border-blue-500 hover:bg-[#1e293b] transition-all flex flex-col items-center justify-center min-h-[200px] gap-3 group"
+                            >
+                                <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors">+</div>
+                                <span className="font-medium text-gray-400 group-hover:text-white">Create New Template</span>
+                            </button>
+                        </>
+                    )}
                 </div>
             </main>
         </div>

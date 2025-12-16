@@ -33,11 +33,25 @@ export default function InboxList() {
         filter === 'unread' ? conversations.filter(c => (c.status || 'unread') === 'unread') :
             conversations;
 
-    if (loading) return (
-        <div className="admin-layout min-h-screen bg-[#0f172a] text-white flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-    );
+    if (error) {
+        return (
+            <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
+                <AdminSidebar />
+                <main className="admin-content w-full px-4 sm:px-6 lg:px-8 py-6">
+                    <AdminTopbar />
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="text-red-400 mb-2 font-medium">{error}</div>
+                        <button
+                            onClick={loadInbox}
+                            className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -82,7 +96,12 @@ export default function InboxList() {
                         </div>
 
                         <div className="flex-1 overflow-y-auto">
-                            {filteredConversations.length === 0 ? (
+                            {loading ? (
+                                <div className="flex flex-col items-center justify-center py-10">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+                                    <p className="text-gray-400 text-xs">Loading...</p>
+                                </div>
+                            ) : filteredConversations.length === 0 ? (
                                 <div className="p-4 text-center text-gray-500 text-sm">
                                     No conversations found.
                                 </div>

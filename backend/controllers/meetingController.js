@@ -10,8 +10,8 @@ class MeetingController {
    */
   async getAllMeetings(req, res) {
     try {
-      const { 
-        page = 1, 
+      const {
+        page = 1,
         limit = 20,
         status,
         platform,
@@ -41,7 +41,7 @@ class MeetingController {
       const [meetings, total] = await Promise.all([
         Meeting.find(query)
           .populate('host', 'name email')
-          .populate('client', 'email fullName company')
+          .populate('client', 'email name company firstName lastName')
           .populate('project', 'title status')
           .populate('participants.user', 'name email')
           .sort({ scheduledDate: -1 })
@@ -446,7 +446,7 @@ class MeetingController {
       }
 
       meeting.status = 'cancelled';
-      
+
       if (reason) {
         meeting.notes.push({
           text: `Meeting cancelled: ${reason}`,
@@ -521,7 +521,7 @@ class MeetingController {
         status: { $in: ['scheduled', 'confirmed'] }
       })
         .populate('host', 'name email')
-        .populate('client', 'email fullName')
+        .populate('client', 'email name firstName lastName company')
         .populate('project', 'title')
         .sort({ scheduledDate: 1 })
         .limit(parseInt(limit));
