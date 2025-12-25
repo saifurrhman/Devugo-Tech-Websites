@@ -494,8 +494,10 @@ export default function CreateInvoice() {
                                                 <span className="font-medium text-white">{formData.date}</span>
                                             </div>
                                             {/* Status moved here */}
-                                            <div className="w-full flex flex-col sm:flex-row sm:items-center justify-end gap-2 pt-2">
-                                                <span className="text-gray-500 text-sm whitespace-nowrap">Payment Link</span>
+                                            <div className="w-full flex flex-col justify-end gap-2 pt-2">
+                                                <div className="flex justify-end w-full">
+                                                    <span className="text-gray-500 text-sm whitespace-nowrap">Payment Link</span>
+                                                </div>
                                                 {previewMode ? (
                                                     <span className="text-white text-sm break-all text-right">{formData.paymentLink || '-'}</span>
                                                 ) : (
@@ -504,7 +506,7 @@ export default function CreateInvoice() {
                                                         value={formData.paymentLink || ''}
                                                         onChange={e => setFormData({ ...formData, paymentLink: e.target.value })}
                                                         placeholder="https://"
-                                                        className="bg-[rgba(255,255,255,0.08)] border border-white/10 rounded px-3 py-2 text-white placeholder-gray-500 text-sm w-full sm:w-64 outline-none focus:border-blue-500 transition-colors"
+                                                        className="bg-[rgba(255,255,255,0.08)] border border-white/10 rounded px-3 py-2 text-white placeholder-gray-500 text-sm w-full outline-none focus:border-blue-500 transition-colors"
                                                     />
                                                 )}
                                             </div>
