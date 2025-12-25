@@ -64,9 +64,12 @@ import CreateProject from '../admin/pages/projects/CreateProject';
 import CreateInvoice from '../admin/pages/invoices/CreateInvoice';
 import MeetingScheduler from '../admin/pages/meetings/MeetingScheduler';
 
+import DynamicTitle from '../components/DynamicTitle';
+
 export default function PublicRoutes() {
   return (
     <BrowserRouter>
+      <DynamicTitle />
       <NotificationProvider>
         <Routes>
           {/* Public Pages */}

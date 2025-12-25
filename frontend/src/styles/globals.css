@@ -5013,7 +5013,7 @@ body.admin-dark .admin-layout .card {
 
 .admin-search__input {
   width: 100%;
-  padding: .6rem 1rem .6rem 2.2rem;
+  padding: .6rem 1rem .6rem 3rem;
   border-radius: 999px;
   border: 1px solid var(--admin-border);
   background: var(--admin-surface-strong);

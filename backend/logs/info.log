@@ -1816,3 +1816,23 @@
 {"timestamp":"2025-12-25T16:40:00.203Z","level":"INFO","message":"No pending AI personalization requests"}
 {"timestamp":"2025-12-25T16:40:00.300Z","level":"INFO","message":"Updated stats for 0 campaigns"}
 {"timestamp":"2025-12-25T16:40:00.535Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2025-12-25T16:45:00.025Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-25T16:45:00.228Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-25T16:50:00.081Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2025-12-25T16:50:00.090Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-25T16:50:00.376Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-25T16:50:00.381Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2025-12-25T16:50:00.657Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2025-12-25T16:55:00.031Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-25T16:55:00.306Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-25T17:00:00.131Z","level":"INFO","message":"Follow-up Automation job started"}
+{"timestamp":"2025-12-25T17:00:00.212Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2025-12-25T17:00:00.218Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-25T17:00:00.425Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-25T17:00:00.433Z","level":"INFO","message":"No-open follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-25T17:00:00.440Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2025-12-25T17:00:00.632Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2025-12-25T17:00:00.696Z","level":"INFO","message":"No-click follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-25T17:00:01.042Z","level":"INFO","message":"No-reply follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-25T17:00:01.286Z","level":"INFO","message":"Re-engagement emails sent","data":{"count":0}}
+{"timestamp":"2025-12-25T17:00:01.288Z","level":"INFO","message":"Follow-up automation completed"}
