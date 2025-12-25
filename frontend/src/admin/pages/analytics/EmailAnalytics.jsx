@@ -55,7 +55,7 @@ export default function EmailAnalytics() {
                 <AdminTopbar />
                 <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
                     <div className="text-red-400 text-xl">Failed to load analytics data</div>
-                    <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition-colors">Retry</button>
+                    <button onClick={() => setTimeRange(prev => prev === '7d' ? '7d ' : '7d')} className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition-colors">Retry</button>
                 </div>
             </main>
         </div>

@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { ContactAPI } from '../../../lib/api';
 
 export default function ContactsList() {
     const navigate = useNavigate();
+    const { success, error: notifyError } = useNotification();
     const [filter, setFilter] = useState('all');
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,6 +29,18 @@ export default function ContactsList() {
             setError('Failed to load contacts');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this contact?')) return;
+        try {
+            await ContactAPI.delete(id);
+            setContacts(prev => prev.filter(c => (c.id || c._id) !== id));
+            success('Contact deleted successfully');
+        } catch (err) {
+            console.error('Delete failed', err);
+            notifyError('Failed to delete contact');
         }
     };
 
@@ -118,7 +132,7 @@ export default function ContactsList() {
                                 <tbody className="divide-y divide-gray-800">
                                     {filteredContacts.length === 0 ? (
                                         <tr>
-                                            <td colspan="7" className="px-6 py-8 text-center text-gray-500">
+                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
                                                 No contacts found.
                                             </td>
                                         </tr>
@@ -146,8 +160,18 @@ export default function ContactsList() {
                                                 <td className="px-6 py-4 text-center text-gray-300">{contact.clickRate || 0}%</td>
                                                 <td className="px-6 py-4 text-right text-gray-400">{contact.date || new Date().toLocaleDateString()}</td>
                                                 <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
-                                                    <button className="text-gray-400 hover:text-white mx-2">Edit</button>
-                                                    <button className="text-gray-400 hover:text-red-400">Delete</button>
+                                                    <button
+                                                        onClick={() => navigate(`/admin/contacts/${contact.id || contact._id}`)}
+                                                        className="text-gray-400 hover:text-white mx-2 transition-colors"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(contact.id || contact._id)}
+                                                        className="text-gray-400 hover:text-red-400 transition-colors"
+                                                    >
+                                                        Delete
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))

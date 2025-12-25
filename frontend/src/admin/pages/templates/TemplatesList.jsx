@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { TemplateAPI } from '../../../lib/api';
 
 export default function TemplatesList() {
     const navigate = useNavigate();
+    const { success, error: notifyError } = useNotification();
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -25,6 +27,18 @@ export default function TemplatesList() {
             setError('Failed to load templates');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this template?')) return;
+        try {
+            await TemplateAPI.delete(id);
+            setTemplates(prev => prev.filter(t => (t.id || t._id) !== id));
+            success('Template deleted successfully');
+        } catch (err) {
+            console.error('Delete failed', err);
+            notifyError('Failed to delete template');
         }
     };
 
@@ -109,14 +123,31 @@ export default function TemplatesList() {
                                         <div className="relative aspect-video bg-gray-800 overflow-hidden">
                                             <img src={template.thumbnail || 'https://via.placeholder.com/300x200?text=Template'} alt={template.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                                             <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button className="px-3 py-1.5 bg-white text-gray-900 rounded text-sm font-medium hover:bg-gray-100">Edit</button>
-                                                <button className="px-3 py-1.5 bg-gray-700 text-white rounded text-sm font-medium hover:bg-gray-600">Preview</button>
+                                                <button
+                                                    onClick={() => navigate(`/admin/templates/create?id=${template.id || template._id}`)}
+                                                    className="px-3 py-1.5 bg-white text-gray-900 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(template.id || template._id)}
+                                                    className="px-3 py-1.5 bg-red-600/80 text-white rounded text-sm font-medium hover:bg-red-600 transition-colors"
+                                                >
+                                                    Delete
+                                                </button>
                                             </div>
                                         </div>
                                         <div className="p-4">
                                             <div className="flex justify-between items-start mb-1">
                                                 <h3 className="font-semibold truncate pr-2">{template.name}</h3>
-                                                <button className="text-gray-500 hover:text-white">⋮</button>
+                                                <button
+                                                    onClick={() => handleDelete(template.id || template._id)}
+                                                    className="text-gray-500 hover:text-red-400 transition-colors"
+                                                    title="Delete Template"
+                                                >
+                                                    <span className="sr-only">Delete</span>
+                                                    🗑️
+                                                </button>
                                             </div>
                                             <div className="flex justify-between items-center text-xs text-gray-400">
                                                 <span>{template.category || 'General'}</span>

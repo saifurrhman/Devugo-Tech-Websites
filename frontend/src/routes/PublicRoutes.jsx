@@ -59,6 +59,10 @@ import ContactsList from '../admin/pages/contacts/ContactsList';
 import CreateTemplate from '../admin/pages/templates/CreateTemplate';
 import AITemplateGenerator from '../admin/pages/templates/AITemplateGenerator';
 import SMTPSettings from '../admin/pages/SMTPSettings';
+// New imports for Create/Schedule pages
+import CreateProject from '../admin/pages/projects/CreateProject';
+import CreateInvoice from '../admin/pages/invoices/CreateInvoice';
+import MeetingScheduler from '../admin/pages/meetings/MeetingScheduler';
 
 export default function PublicRoutes() {
   return (
@@ -136,7 +140,7 @@ export default function PublicRoutes() {
           <Route path="/admin/campaigns/create" element={<ProtectedRoute><CreateCampaign /></ProtectedRoute>} />
           <Route path="/admin/recipients" element={<ProtectedRoute><ContactsList /></ProtectedRoute>} />
           <Route path="/admin/inbox" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
-          <Route path="/admin/inbox" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
+          <Route path="/admin/inbox/:id" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
           <Route path="/admin/templates" element={<ProtectedRoute><TemplatesList /></ProtectedRoute>} />
           <Route path="/admin/templates/create" element={<ProtectedRoute><CreateTemplate /></ProtectedRoute>} />
           <Route path="/admin/templates/ai-generator" element={<ProtectedRoute><AITemplateGenerator /></ProtectedRoute>} />
@@ -146,8 +150,11 @@ export default function PublicRoutes() {
           {/* CRM & Projects Routes */}
           <Route path="/admin/pipeline" element={<ProtectedRoute><PipelineBoard /></ProtectedRoute>} />
           <Route path="/admin/projects" element={<ProtectedRoute><ProjectsList /></ProtectedRoute>} />
+          <Route path="/admin/projects/create" element={<ProtectedRoute><CreateProject /></ProtectedRoute>} />
           <Route path="/admin/invoices" element={<ProtectedRoute><InvoicesList /></ProtectedRoute>} />
+          <Route path="/admin/invoices/create" element={<ProtectedRoute><CreateInvoice /></ProtectedRoute>} />
           <Route path="/admin/meetings" element={<ProtectedRoute><MeetingsList /></ProtectedRoute>} />
+          <Route path="/admin/meetings/schedule" element={<ProtectedRoute><MeetingScheduler /></ProtectedRoute>} />
         </Routes>
 
         {/* WhatsApp Float - Shows on all pages */}

@@ -1,6 +1,42 @@
 const Invoice = require('../models/Invoice');
 const logger = require('../utils/logger');
 
+exports.getInvoiceStats = async (req, res) => {
+  try {
+    const stats = await Invoice.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$total' },
+          pending: {
+            $sum: {
+              $cond: [{ $eq: ['$status', 'sent'] }, '$total', 0]
+            }
+          },
+          overdue: {
+            $sum: {
+              $cond: [{ $eq: ['$status', 'overdue'] }, '$total', 0]
+            }
+          },
+          drafts: {
+            $sum: {
+              $cond: [{ $eq: ['$status', 'draft'] }, '$total', 0]
+            }
+          }
+        }
+      }
+    ]);
+
+    res.json({
+      success: true,
+      data: stats[0] || { totalRevenue: 0, pending: 0, overdue: 0, drafts: 0 }
+    });
+  } catch (error) {
+    logger.error('Get invoice stats failed', { error: error.message });
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 exports.getAllInvoices = async (req, res) => {
   try {
     const { page = 1, limit = 20, status, client } = req.query;

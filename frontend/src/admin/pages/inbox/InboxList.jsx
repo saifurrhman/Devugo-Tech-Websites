@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { InboxAPI } from '../../../lib/api';
+import ConversationView from './ConversationView';
 
 export default function InboxList() {
     const navigate = useNavigate();
+    const { id } = useParams();
     const [filter, setFilter] = useState('all');
     const [conversations, setConversations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         loadInbox();
     }, []);
 
@@ -71,7 +73,7 @@ export default function InboxList() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-180px)]">
                     {/* Sidebar / List */}
-                    <div className="lg:col-span-1 card bg-[#1e293b] rounded-xl border border-gray-800 flex flex-col overflow-hidden">
+                    <div className={`lg:col-span-1 card bg-[#1e293b] rounded-xl border border-gray-800 flex flex-col overflow-hidden ${id ? 'hidden lg:flex' : 'flex'}`}>
                         <div className="p-4 border-b border-gray-800">
                             <input
                                 type="text"
@@ -110,7 +112,7 @@ export default function InboxList() {
                                     <div
                                         key={conv.id || conv._id}
                                         onClick={() => navigate(`/admin/inbox/${conv.id || conv._id}`)}
-                                        className={`p-4 border-b border-gray-800 cursor-pointer hover:bg-gray-800/50 transition-colors ${conv.status === 'unread' ? 'bg-blue-900/10 border-l-4 border-l-blue-500' : 'border-l-4 border-l-transparent'}`}
+                                        className={`p-4 border-b border-gray-800 cursor-pointer hover:bg-gray-800/50 transition-colors ${conv.status === 'unread' ? 'bg-blue-900/10 border-l-4 border-l-blue-500' : 'border-l-4 border-l-transparent'} ${(id === (conv.id || conv._id)) ? 'bg-gray-800' : ''}`}
                                     >
                                         <div className="flex justify-between items-start mb-1">
                                             <span className={`font-medium text-sm ${conv.status === 'unread' ? 'text-white' : 'text-gray-300'}`}>{conv.user || 'Unknown User'}</span>
@@ -129,15 +131,21 @@ export default function InboxList() {
                         </div>
                     </div>
 
-                    {/* Main Content Placeholder (Empty State) */}
-                    <div className="lg:col-span-3 card bg-[#1e293b] rounded-xl border border-gray-800 flex items-center justify-center text-center p-8 hidden lg:flex">
-                        <div>
-                            <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
-                                📩
+                    {/* Main Content Area */}
+                    <div className={`lg:col-span-3 card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden ${id ? 'flex' : 'hidden lg:flex'}`}>
+                        {id ? (
+                            <ConversationView conversationId={id} />
+                        ) : (
+                            <div className="flex-1 flex items-center justify-center text-center p-8">
+                                <div>
+                                    <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+                                        📩
+                                    </div>
+                                    <h3 className="text-xl font-semibold mb-2">Select a conversation</h3>
+                                    <p className="text-gray-400">Choose a message from the list to view details and reply.</p>
+                                </div>
                             </div>
-                            <h3 className="text-xl font-semibold mb-2">Select a conversation</h3>
-                            <p className="text-gray-400">Choose a message from the list to view details and reply.</p>
-                        </div>
+                        )}
                     </div>
                 </div>
             </main>

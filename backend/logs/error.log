@@ -6,3 +6,6 @@
 {"timestamp":"2025-12-08T04:05:48.013Z","level":"ERROR","message":"AI Personalizer job failed","data":{"error":"getaddrinfo ENOTFOUND ac-ecq9ahn-shard-00-00.mpj2jkj.mongodb.net"}}
 {"timestamp":"2025-12-09T09:25:30.052Z","level":"ERROR","message":"Error processing personalization queue","data":{"error":"getaddrinfo ENOTFOUND ac-ecq9ahn-shard-00-02.mpj2jkj.mongodb.net"}}
 {"timestamp":"2025-12-09T09:25:30.095Z","level":"ERROR","message":"AI Personalizer job failed","data":{"error":"getaddrinfo ENOTFOUND ac-ecq9ahn-shard-00-02.mpj2jkj.mongodb.net"}}
+{"timestamp":"2025-12-25T07:18:29.964Z","level":"ERROR","message":"Create invoice failed","data":{"error":"Invoice validation failed: client: Path `client` is required., items.0.unitPrice: Path `unitPrice` is required., items.1.unitPrice: Path `unitPrice` is required."}}
+{"timestamp":"2025-12-25T07:22:36.394Z","level":"ERROR","message":"Create invoice failed","data":{"error":"Invoice validation failed: client: Path `client` is required., items.0.unitPrice: Path `unitPrice` is required., items.1.unitPrice: Path `unitPrice` is required."}}
+{"timestamp":"2025-12-25T07:22:41.383Z","level":"ERROR","message":"Create invoice failed","data":{"error":"Invoice validation failed: client: Path `client` is required., items.0.unitPrice: Path `unitPrice` is required., items.1.unitPrice: Path `unitPrice` is required."}}

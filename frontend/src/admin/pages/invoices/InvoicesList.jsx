@@ -11,19 +11,26 @@ export default function InvoicesList() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [stats, setStats] = useState({ totalRevenue: 0, pending: 0, overdue: 0, drafts: 0 });
+
     React.useEffect(() => {
-        loadInvoices();
+        loadData();
     }, []);
 
-    const loadInvoices = async () => {
+    const loadData = async () => {
         try {
             setLoading(true);
-            const data = await InvoiceAPI.list();
-            const list = Array.isArray(data) ? data : (data.data || []);
+            const [listData, statsData] = await Promise.all([
+                InvoiceAPI.list(),
+                InvoiceAPI.stats()
+            ]);
+
+            const list = Array.isArray(listData) ? listData : (listData.data || []);
             setInvoices(list);
+            setStats(statsData.data || { totalRevenue: 0, pending: 0, overdue: 0, drafts: 0 });
         } catch (err) {
-            console.error('Failed to load invoices:', err);
-            setError('Failed to load invoices');
+            console.error('Failed to load invoice data:', err);
+            setError('Failed to load data');
         } finally {
             setLoading(false);
         }
@@ -40,7 +47,7 @@ export default function InvoicesList() {
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="text-red-400 mb-2 font-medium">{error}</div>
                         <button
-                            onClick={loadInvoices}
+                            onClick={loadData}
                             className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors"
                         >
                             Retry
@@ -74,19 +81,19 @@ export default function InvoicesList() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div className="card bg-[#1e293b] p-4 rounded-xl border border-gray-800">
                         <div className="text-xs text-gray-400 uppercase">Total Revenue</div>
-                        <div className="text-2xl font-bold mt-1">$45,200</div>
+                        <div className="text-2xl font-bold mt-1">${stats.totalRevenue.toLocaleString()}</div>
                     </div>
                     <div className="card bg-[#1e293b] p-4 rounded-xl border border-gray-800">
                         <div className="text-xs text-gray-400 uppercase">Pending</div>
-                        <div className="text-2xl font-bold mt-1 text-yellow-400">$2,500</div>
+                        <div className="text-2xl font-bold mt-1 text-yellow-400">${stats.pending.toLocaleString()}</div>
                     </div>
                     <div className="card bg-[#1e293b] p-4 rounded-xl border border-gray-800">
                         <div className="text-xs text-gray-400 uppercase">Overdue</div>
-                        <div className="text-2xl font-bold mt-1 text-red-400">$12,000</div>
+                        <div className="text-2xl font-bold mt-1 text-red-400">${stats.overdue.toLocaleString()}</div>
                     </div>
                     <div className="card bg-[#1e293b] p-4 rounded-xl border border-gray-800">
                         <div className="text-xs text-gray-400 uppercase">Drafts</div>
-                        <div className="text-2xl font-bold mt-1 text-gray-400">$8,000</div>
+                        <div className="text-2xl font-bold mt-1 text-gray-400">${stats.drafts.toLocaleString()}</div>
                     </div>
                 </div>
 

@@ -1,42 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminSidebar from '../../components/AdminSidebar';
-import AdminTopbar from '../../components/AdminTopbar';
-import { MeetingAPI } from '../../lib/api';
+import AdminSidebar from '../../../components/AdminSidebar';
+import AdminTopbar from '../../../components/AdminTopbar';
+import { MeetingAPI, ContactAPI, ProjectAPI } from '../../../lib/api';
+import { useNotification } from '../../../contexts/NotificationContext';
 
 export default function MeetingScheduler() {
     const navigate = useNavigate();
+    const { success, error, warning } = useNotification();
     const [loading, setLoading] = useState(false);
+    const [clients, setClients] = useState([]);
+    const [projects, setProjects] = useState([]);
+
+    // Add logic to load clients and projects for dropdowns
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [clientsData, projectsData] = await Promise.all([
+                    ContactAPI.list(),
+                    ProjectAPI.list()
+                ]);
+                setClients(Array.isArray(clientsData) ? clientsData : (clientsData.data || []));
+                setProjects(Array.isArray(projectsData) ? projectsData : (projectsData.data || []));
+            } catch (err) {
+                console.error('Failed to load form data:', err);
+            }
+        };
+        fetchData();
+    }, []);
+
     const [formData, setFormData] = useState({
         title: '',
-        date: '',
-        time: '',
-        duration: '30m',
-        attendees: '',
-        description: ''
+        scheduledDate: new Date().toISOString().split('T')[0],
+        time: '10:00',
+        duration: '30',
+        participants: '',
+        description: '',
+        type: 'discovery',
+        platform: 'zoom',
+        client: '',
+        project: ''
     });
 
-    async function handleSchedule() {
-        if (!formData.title || !formData.date || !formData.time) {
-            alert('Please fill in all required fields (Title, Date, Time)');
+    const handleSchedule = async () => {
+        if (!formData.title || !formData.scheduledDate || !formData.time) {
+            warning('Please fill in all required fields (Title, Date, Time)');
             return;
         }
 
         setLoading(true);
         try {
-            await MeetingAPI.schedule({
+            // Combine date and time
+            const combinedDate = new Date(`${formData.scheduledDate}T${formData.time}`);
+
+            const payload = {
                 ...formData,
-                attendees: formData.attendees.split(',').map(e => e.trim()).filter(e => e)
-            });
-            alert('Meeting scheduled successfully!');
+                scheduledDate: combinedDate,
+                duration: parseInt(formData.duration),
+                // Parse participants emails
+                participants: formData.participants.split(',').map(email => ({
+                    email: email.trim(),
+                    role: 'participant'
+                })).filter(p => p.email)
+            };
+
+            await MeetingAPI.create(payload);
+            success('Meeting scheduled successfully!');
             navigate('/admin/meetings');
-        } catch (error) {
-            console.error('Failed to schedule meeting:', error);
-            alert('Failed to schedule meeting. Please try again.');
+        } catch (err) {
+            console.error('Failed to schedule meeting:', err);
+            error('Failed to schedule meeting. Please try again.');
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -53,33 +90,62 @@ export default function MeetingScheduler() {
                     <div className="lg:col-span-2 card bg-[#1e293b] rounded-xl border border-gray-800 p-6">
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-2">Meeting Title</label>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Meeting Title *</label>
                                 <input
                                     type="text"
                                     placeholder="e.g., Product Demo"
                                     value={formData.title}
                                     onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Client (Optional)</label>
+                                    <select
+                                        value={formData.client}
+                                        onChange={e => setFormData({ ...formData, client: e.target.value })}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
+                                    >
+                                        <option value="">Select Client</option>
+                                        {clients.map(c => (
+                                            <option key={c._id} value={c._id}>{c.firstName} {c.lastName}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Project (Optional)</label>
+                                    <select
+                                        value={formData.project}
+                                        onChange={e => setFormData({ ...formData, project: e.target.value })}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
+                                    >
+                                        <option value="">Select Project</option>
+                                        {projects.map(p => (
+                                            <option key={p._id} value={p._id}>{p.title}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">Date</label>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Date *</label>
                                     <input
                                         type="date"
-                                        value={formData.date}
-                                        onChange={e => setFormData({ ...formData, date: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                        value={formData.scheduledDate}
+                                        onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">Time</label>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Time *</label>
                                     <input
                                         type="time"
                                         value={formData.time}
                                         onChange={e => setFormData({ ...formData, time: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
                                     />
                                 </div>
                             </div>
@@ -87,29 +153,29 @@ export default function MeetingScheduler() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-2">Duration</label>
                                 <div className="flex gap-2">
-                                    {['15m', '30m', '45m', '1h'].map(d => (
+                                    {['15', '30', '45', '60'].map(d => (
                                         <button
                                             key={d}
                                             onClick={() => setFormData({ ...formData, duration: d })}
                                             className={`px-4 py-2 border rounded-lg text-sm transition-colors ${formData.duration === d
-                                                    ? 'bg-blue-600 border-blue-600 text-white'
-                                                    : 'border-gray-700 hover:bg-gray-800 hover:border-gray-600'
+                                                ? 'bg-blue-600 border-blue-600 text-white'
+                                                : 'border-gray-700 hover:bg-gray-800 hover:border-gray-600'
                                                 }`}
                                         >
-                                            {d}
+                                            {d}m
                                         </button>
                                     ))}
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-2">Attendees</label>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Additional Attendees (Email)</label>
                                 <input
                                     type="text"
-                                    placeholder="Add email addresses (comma separated)..."
-                                    value={formData.attendees}
-                                    onChange={e => setFormData({ ...formData, attendees: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                    placeholder="email@example.com, another@example.com"
+                                    value={formData.participants}
+                                    onChange={e => setFormData({ ...formData, participants: e.target.value })}
+                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
                                 />
                             </div>
 
@@ -118,8 +184,8 @@ export default function MeetingScheduler() {
                                 <textarea
                                     value={formData.description}
                                     onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 h-32 resize-none"
-                                    placeholder="Meeting agenda..."
+                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 h-32 resize-none transition-colors"
+                                    placeholder="Meeting agenda and details..."
                                 ></textarea>
                             </div>
 
@@ -143,13 +209,49 @@ export default function MeetingScheduler() {
 
                     <div className="space-y-6">
                         <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6">
-                            <h3 className="font-semibold mb-4">Availability</h3>
+                            <h3 className="font-semibold mb-4 text-white">Settings</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Meeting Type</label>
+                                    <select
+                                        value={formData.type}
+                                        onChange={e => setFormData({ ...formData, type: e.target.value })}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
+                                    >
+                                        <option value="discovery">Discovery</option>
+                                        <option value="proposal">Proposal</option>
+                                        <option value="kickoff">Kickoff</option>
+                                        <option value="review">Review</option>
+                                        <option value="demo">Demo</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Platform</label>
+                                    <select
+                                        value={formData.platform}
+                                        onChange={e => setFormData({ ...formData, platform: e.target.value })}
+                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
+                                    >
+                                        <option value="zoom">Zoom</option>
+                                        <option value="google_meet">Google Meet</option>
+                                        <option value="microsoft_teams">Microsoft Teams</option>
+                                        <option value="phone">Phone Call</option>
+                                        <option value="in_person">In Person</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6">
+                            <h3 className="font-semibold mb-4 text-white">Availability</h3>
                             <div className="text-sm text-gray-400 mb-4">
-                                Checking calendar for conflicts...
+                                {loading ? 'Checking calendar...' : 'Checking calendar for conflicts...'}
                             </div>
-                            <div className="flex items-center gap-2 text-green-400 text-sm">
-                                <span>✓</span> No conflicts found
-                            </div>
+                            {!loading && (
+                                <div className="flex items-center gap-2 text-green-400 text-sm">
+                                    <span>✓</span> No conflicts found
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

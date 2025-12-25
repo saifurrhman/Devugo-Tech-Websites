@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { CampaignAPI } from '../../../lib/api';
 
 export default function CampaignsList() {
     const navigate = useNavigate();
+    const { success, error: notifyError } = useNotification();
     const [filter, setFilter] = useState('all');
     const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,6 +28,18 @@ export default function CampaignsList() {
             setError('Failed to load campaigns');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this campaign?')) return;
+        try {
+            await CampaignAPI.delete(id); // Assuming api.js has delete/remove. If not I will fix api.js or use generic request
+            setCampaigns(prev => prev.filter(c => (c.id || c._id) !== id));
+            success('Campaign deleted successfully');
+        } catch (err) {
+            console.error('Delete failed', err);
+            notifyError('Failed to delete campaign');
         }
     };
 
@@ -135,8 +149,18 @@ export default function CampaignsList() {
                                                 </td>
                                                 <td className="px-6 py-4 text-right text-gray-400">{campaign.date || new Date().toLocaleDateString()}</td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <button className="text-gray-400 hover:text-white mx-2">Edit</button>
-                                                    <button className="text-gray-400 hover:text-red-400">Delete</button>
+                                                    <button
+                                                        onClick={() => navigate(`/admin/campaigns/create?id=${campaign.id || campaign._id}`)}
+                                                        className="text-gray-400 hover:text-white mx-2 transition-colors"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(campaign.id || campaign._id)}
+                                                        className="text-gray-400 hover:text-red-400 transition-colors"
+                                                    >
+                                                        Delete
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))

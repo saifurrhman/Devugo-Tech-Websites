@@ -102,6 +102,7 @@ export const AnalyticsAPI = {
     const q = params.toString();
     return api('/api/analytics/summary' + (q ? `?${q}` : ''));
   },
+  getEmailStats: (range = '7d') => api('/api/analytics/email' + buildQuery({ range })),
 };
 
 // ============================================
@@ -392,6 +393,7 @@ export const InvoiceAPI = {
   create: (payload) => api('/api/invoices', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/invoices/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/invoices/${id}`, { method: 'DELETE' }),
+  stats: () => api('/api/invoices/stats'),
 };
 
 // ============================================

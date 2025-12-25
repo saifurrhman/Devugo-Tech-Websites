@@ -72,7 +72,7 @@ console.log('✅ Allowed CORS Origins:', allowedOrigins);
 const vercelRegex = /^https:\/\/.*\.vercel\.app$/;
 
 app.use(cors({
-  origin: function(origin, callback) {
+  origin: function (origin, callback) {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin) || vercelRegex.test(origin)) {
       return callback(null, true);
@@ -348,6 +348,15 @@ try {
   console.error('  ❌ Webhook routes error:', error.message);
 }
 
+try {
+  console.log('  Loading inbox...');
+  const inboxRoutes = require('./routes/inbox');
+  app.use('/api/inbox', inboxRoutes);
+  console.log('  ✅ Inbox routes loaded');
+} catch (error) {
+  console.error('  ❌ Inbox routes error:', error.message);
+}
+
 console.log('🎯 CRM routes loading complete\n');
 
 // ========================================
@@ -356,7 +365,7 @@ console.log('🎯 CRM routes loading complete\n');
 
 if (process.env.ENABLE_JOBS !== 'false' && process.env.NODE_ENV !== 'test') {
   console.log('⚙️  Starting background jobs...');
-  
+
   try {
     // Start AI Personalizer Job
     require('./jobs/aiPersonalizer');
@@ -453,8 +462,8 @@ app.use((err, req, res, next) => {
   // Default error
   res.status(err.status || 500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
+    message: process.env.NODE_ENV === 'production'
+      ? 'Internal server error'
       : err.message,
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
