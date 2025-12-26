@@ -86,7 +86,20 @@ export const BlogCategoryAPI = {
 // ============================================
 export const ContactAPI = {
   create: (payload) => api('/api/contact', { method: 'POST', body: payload }),
-  list: () => api('/api/contact'),
+  list: (params = {}) => api('/api/contact' + buildQuery(params)),
+  delete: (id) => api(`/api/contact/${id}`, { method: 'DELETE' }),
+  remove: (id) => api(`/api/contact/${id}`, { method: 'DELETE' }), // Alias for compatibility
+  import: (payload) => api('/api/contact/import', { method: 'POST', body: payload }),
+  verify: (id) => api(`/api/contact/${id}/verify`, { method: 'POST' }),
+  verifyBatch: (emails) => api('/api/contact/verify-batch', { method: 'POST', body: { emails } }),
+};
+
+export const ListAPI = {
+  list: () => api('/api/contact-lists').then(res => res.items || res), // Handle different responses
+  create: (payload) => api('/api/contact-lists', { method: 'POST', body: payload }),
+  delete: (id) => api(`/api/contact-lists/${id}`, { method: 'DELETE' }),
+  addContacts: (id, contactIds) => api(`/api/contact-lists/${id}/add`, { method: 'POST', body: { contactIds } }),
+  getContacts: (id) => api(`/api/contact-lists/${id}/contacts`),
 };
 
 // ============================================
@@ -194,6 +207,23 @@ export const UploadAPI = {
       console.error('❌ UploadAPI.image error:', err);
       throw err;
     }
+  }
+};
+
+// ============================================
+// SENDER API
+// ============================================
+export const SenderAPI = {
+  list: () => api('/api/senders'),
+  create: (payload) => api('/api/senders', { method: 'POST', body: payload }),
+  remove: (id) => api(`/api/senders/${id}`, { method: 'DELETE' }),
+  resendVerification: (id) => api(`/api/senders/resend/${id}`, { method: 'POST' }),
+  domains: {
+    list: () => api('/api/senders/domains'),
+    create: (payload) => api('/api/senders/domains', { method: 'POST', body: payload }),
+    remove: (domain) => api(`/api/senders/domains/${domain}`, { method: 'DELETE' }),
+    get: (domain) => api(`/api/senders/domains/${domain}`),
+    verify: (domain) => api(`/api/senders/domains/${domain}/verify`, { method: 'POST' }),
   }
 };
 
@@ -419,4 +449,11 @@ export const SettingsAPI = {
   updateEmail: (payload) => api('/api/settings/email', { method: 'PUT', body: payload }),
   getAI: () => api('/api/settings/ai'),
   updateAI: (payload) => api('/api/settings/ai', { method: 'PUT', body: payload }),
+};
+
+// ============================================
+// AI API
+// ============================================
+export const AIAPI = {
+  generate: (payload) => api('/api/ai/generate', { method: 'POST', body: payload }),
 };

@@ -81,19 +81,15 @@ export default function InboxList() {
                                 className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-blue-500"
                             />
                             <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
-                                <button
-                                    onClick={() => setFilter('all')}
-                                    className={`px-3 py-1 rounded-full text-xs whitespace-nowrap border transition-colors ${filter === 'all' ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-700 text-gray-400'}`}
-                                >
-                                    All
-                                </button>
-                                <button
-                                    onClick={() => setFilter('unread')}
-                                    className={`px-3 py-1 rounded-full text-xs whitespace-nowrap border transition-colors ${filter === 'unread' ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-700 text-gray-400'}`}
-                                >
-                                    Unread
-                                </button>
-                                <button className="px-3 py-1 rounded-full text-xs whitespace-nowrap border border-gray-700 text-gray-400">Starred</button>
+                                {['all', 'unread', 'crm', 'promotions', 'starred'].map(f => (
+                                    <button
+                                        key={f}
+                                        onClick={() => setFilter(f)}
+                                        className={`px-3 py-1 rounded-full text-xs whitespace-nowrap border transition-colors capitalize ${filter === f ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`}
+                                    >
+                                        {f}
+                                    </button>
+                                ))}
                             </div>
                         </div>
 

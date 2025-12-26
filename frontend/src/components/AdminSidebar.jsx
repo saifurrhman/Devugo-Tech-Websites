@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { AuthAPI } from '../lib/api';
 import {
   LayoutDashboard, Briefcase, CreditCard, Image, Star, HelpCircle, FileText,
@@ -12,6 +12,7 @@ export default function AdminSidebar() {
   const [isMobile, setIsMobile] = useState(false);
   const toggle = () => setOpen(v => !v);
   const navigate = useNavigate();
+  const location = useLocation();
   const [theme, setTheme] = useState(() => localStorage.getItem('adminTheme') || 'admin-dark');
 
   useEffect(() => {
@@ -125,7 +126,10 @@ export default function AdminSidebar() {
             <span className="label">Team</span>
           </NavLink>
 
-          <NavLink to="/admin/contacts" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+          <NavLink
+            to="/admin/contacts"
+            className={({ isActive }) => `admin-link ${isActive && !location.pathname.includes('/recipients') ? 'active' : ''}`}
+          >
             <span className="icon"><UserCheck size={20} /></span>
             <span className="label">Contacts</span>
           </NavLink>
@@ -141,7 +145,10 @@ export default function AdminSidebar() {
             <span className="badge badge--new">New</span>
           </NavLink>
 
-          <NavLink to="/admin/recipients" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+          <NavLink
+            to="/admin/recipients"
+            className={({ isActive }) => `admin-link ${isActive || location.pathname.includes('/admin/recipients') ? 'active' : ''}`}
+          >
             <span className="icon"><UserPlus size={20} /></span>
             <span className="label">Recipients</span>
           </NavLink>
@@ -198,9 +205,26 @@ export default function AdminSidebar() {
             <span className="label">Analytics</span>
           </NavLink>
 
-          <NavLink to="/admin/settings" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+
+          <div className="nav-divider">
+            <span className="nav-divider__label">Settings</span>
+          </div>
+
+          <NavLink
+            to="/admin/settings/senders"
+            className={({ isActive }) => `admin-link ${isActive || location.pathname.startsWith('/admin/settings/domains') ? 'active' : ''}`}
+          >
+            <span className="icon"><Users size={20} /></span>
+            <span className="label">Senders & Domains</span>
+          </NavLink>
+
+          <NavLink
+            to="/admin/settings"
+            end
+            className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}
+          >
             <span className="icon"><Settings size={20} /></span>
-            <span className="label">Settings</span>
+            <span className="label">General Settings</span>
           </NavLink>
         </nav>
 

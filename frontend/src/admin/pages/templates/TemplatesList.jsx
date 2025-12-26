@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Sparkles, Plus, Trash2, Edit } from 'lucide-react';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
@@ -11,6 +12,7 @@ export default function TemplatesList() {
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [filter, setFilter] = useState('All');
 
     React.useEffect(() => {
         loadTemplates();
@@ -42,25 +44,7 @@ export default function TemplatesList() {
         }
     };
 
-    if (error) {
-        return (
-            <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
-                <AdminSidebar />
-                <main className="admin-content w-full px-4 sm:px-6 lg:px-8 py-6">
-                    <AdminTopbar />
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="text-red-400 mb-2 font-medium">{error}</div>
-                        <button
-                            onClick={loadTemplates}
-                            className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors"
-                        >
-                            Retry
-                        </button>
-                    </div>
-                </main>
-            </div>
-        );
-    }
+    const filteredTemplates = filter === 'All' ? templates : templates.filter(t => (t.category || 'General') === filter);
 
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -76,15 +60,15 @@ export default function TemplatesList() {
                     <div className="flex gap-3">
                         <button
                             onClick={() => navigate('/admin/templates/ai-generator')}
-                            className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 transition-colors text-sm font-medium flex items-center gap-2"
+                            className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 transition-colors text-sm font-medium flex items-center gap-2 shadow-lg shadow-purple-900/20"
                         >
-                            <span>✨</span> AI Generator
+                            <Sparkles size={16} /> AI Generator
                         </button>
                         <button
                             onClick={() => navigate('/admin/templates/create')}
-                            className="btn-primary bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition-colors text-sm font-medium flex items-center gap-2 shadow-lg shadow-blue-900/20"
                         >
-                            <span>+</span> Create Template
+                            <Plus size={16} /> Create Template
                         </button>
                     </div>
                 </div>
@@ -94,7 +78,8 @@ export default function TemplatesList() {
                     {['All', 'Newsletter', 'Promotional', 'Onboarding', 'Transactional', 'Events'].map(cat => (
                         <button
                             key={cat}
-                            className={`px-4 py-1.5 rounded-full text-sm border transition-colors whitespace-nowrap ${cat === 'All'
+                            onClick={() => setFilter(cat)}
+                            className={`px-4 py-1.5 rounded-full text-sm border transition-colors whitespace-nowrap ${filter === cat
                                 ? 'bg-blue-600 border-blue-600 text-white'
                                 : 'border-gray-700 text-gray-400 hover:border-gray-600 hover:text-white'
                                 }`}
@@ -104,71 +89,83 @@ export default function TemplatesList() {
                     ))}
                 </div>
 
-                {/* Templates Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {loading ? (
-                        <div className="col-span-full flex flex-col items-center justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                            <p className="text-gray-400">Loading templates...</p>
+                {/* Templates Table */}
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+                        <p className="text-gray-400">Loading templates...</p>
+                    </div>
+                ) : error ? (
+                    <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-6 text-center">
+                        <div className="text-red-400 mb-2 font-medium">{error}</div>
+                        <button onClick={loadTemplates} className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors">Retry</button>
+                    </div>
+                ) : (
+                    <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
+                                    <tr>
+                                        <th className="px-6 py-3">Template Name</th>
+                                        <th className="px-6 py-3">Category</th>
+                                        <th className="px-6 py-3 text-right">Last Edited</th>
+                                        <th className="px-6 py-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800">
+                                    {filteredTemplates.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
+                                                No templates found.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredTemplates.map((template) => (
+                                            <tr key={template.id || template._id} className="hover:bg-gray-800/30 transition-colors group">
+                                                <td className="px-6 py-4 font-medium text-white flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded bg-gray-700 flex-shrink-0 overflow-hidden border border-gray-600">
+                                                        {template.thumbnail ? (
+                                                            <img src={template.thumbnail} alt="" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-500">IMG</div>
+                                                        )}
+                                                    </div>
+                                                    {template.name}
+                                                </td>
+                                                <td className="px-6 py-4 text-gray-400">
+                                                    <span className="px-2 py-1 rounded-full bg-gray-700/50 border border-gray-700 text-xs">
+                                                        {template.category || 'General'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right text-gray-400">
+                                                    {template.lastModified || template.updatedAt ? new Date(template.lastModified || template.updatedAt).toLocaleDateString() : 'Recently'}
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex items-center justify-end gap-2 text-gray-400">
+                                                        <button
+                                                            onClick={() => navigate(`/admin/templates/create?id=${template.id || template._id}`)}
+                                                            className="p-1.5 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                                                            title="Edit"
+                                                        >
+                                                            <Edit size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(template.id || template._id)}
+                                                            className="p-1.5 hover:text-red-400 hover:bg-red-900/20 rounded transition-colors"
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-                    ) : (
-                        <>
-                            {templates.length === 0 ? (
-                                <div className="col-span-full text-center py-12 text-gray-500">
-                                    No templates found.
-                                </div>
-                            ) : (
-                                templates.map((template) => (
-                                    <div key={template.id || template._id} className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden group hover:border-blue-500/50 transition-all">
-                                        <div className="relative aspect-video bg-gray-800 overflow-hidden">
-                                            <img src={template.thumbnail || 'https://via.placeholder.com/300x200?text=Template'} alt={template.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => navigate(`/admin/templates/create?id=${template.id || template._id}`)}
-                                                    className="px-3 py-1.5 bg-white text-gray-900 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(template.id || template._id)}
-                                                    className="px-3 py-1.5 bg-red-600/80 text-white rounded text-sm font-medium hover:bg-red-600 transition-colors"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="p-4">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h3 className="font-semibold truncate pr-2">{template.name}</h3>
-                                                <button
-                                                    onClick={() => handleDelete(template.id || template._id)}
-                                                    className="text-gray-500 hover:text-red-400 transition-colors"
-                                                    title="Delete Template"
-                                                >
-                                                    <span className="sr-only">Delete</span>
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                            <div className="flex justify-between items-center text-xs text-gray-400">
-                                                <span>{template.category || 'General'}</span>
-                                                <span>{template.lastModified || 'Recently'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-
-                            {/* Create New Card */}
-                            <button
-                                onClick={() => navigate('/admin/templates/create')}
-                                className="card bg-[#1e293b]/50 rounded-xl border-2 border-dashed border-gray-700 hover:border-blue-500 hover:bg-[#1e293b] transition-all flex flex-col items-center justify-center min-h-[200px] gap-3 group"
-                            >
-                                <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors">+</div>
-                                <span className="font-medium text-gray-400 group-hover:text-white">Create New Template</span>
-                            </button>
-                        </>
-                    )}
-                </div>
+                    </div>
+                )}
             </main>
         </div>
     );

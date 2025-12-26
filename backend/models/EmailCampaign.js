@@ -21,6 +21,12 @@ const emailCampaignSchema = new mongoose.Schema({
     ref: 'EmailTemplate',
     required: false
   },
+  senderName: String,
+  senderEmail: String,
+  replyTo: String,
+  previewText: String,
+  audience: [String],
+  contentHtml: String,
   htmlContent: {
     type: String,
     required: false

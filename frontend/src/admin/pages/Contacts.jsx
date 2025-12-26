@@ -79,7 +79,7 @@ const IconArrowLeft = ({ className = "w-4 h-4" }) => (
 
 const IconWhatsApp = ({ className = "w-4 h-4" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="currentColor"/>
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="currentColor" />
   </svg>
 );
 
@@ -107,7 +107,7 @@ const ContactDetailPage = ({ contact, onBack, onDelete }) => {
     if (!window.confirm(`Are you sure you want to delete this contact from ${contact.name || contact.email}?`)) {
       return;
     }
-    
+
     try {
       await onDelete(contact._id);
       onBack();
@@ -178,7 +178,7 @@ const ContactDetailPage = ({ contact, onBack, onDelete }) => {
             </h2>
 
             {/* Email */}
-            <div className="flex items-center justify-center gap-2 mb-8 px-4 py-3 rounded-xl" style={{ 
+            <div className="flex items-center justify-center gap-2 mb-8 px-4 py-3 rounded-xl" style={{
               color: 'rgba(255, 255, 255, 0.9)',
               background: 'rgba(255, 255, 255, 0.1)',
               border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -358,7 +358,7 @@ const ContactDetailPage = ({ contact, onBack, onDelete }) => {
           {/* Message Card */}
           {contact.message && (
             <div className="card p-4 sm:p-6 md:p-8" style={{
-              color : '#ffffff',
+              color: '#ffffff',
               background: 'rgba(255, 255, 255, 0.08)',
               border: '2px solid rgba(255, 255, 255, 0.15)',
               borderRadius: '20px',
@@ -378,8 +378,8 @@ const ContactDetailPage = ({ contact, onBack, onDelete }) => {
                   <div className="text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3" style={{ color: 'rgba(245, 158, 11, 0.8)' }}>
                     Message
                   </div>
-                  <div className="text-sm sm:text-base md:text-lg leading-relaxed p-3 sm:p-4 rounded-xl" style={{ 
-                    color: 'rgba(255, 255, 255, 0.95)', 
+                  <div className="text-sm sm:text-base md:text-lg leading-relaxed p-3 sm:p-4 rounded-xl" style={{
+                    color: 'rgba(255, 255, 255, 0.95)',
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
                     overflowWrap: 'break-word',
@@ -439,14 +439,14 @@ export default function Contacts() {
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
   const [filterSource, setFilterSource] = useState('all');
-  
+
   // Selection state
   const [selectedIds, setSelectedIds] = useState([]);
-  
+
   // Detail view state
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'detail'
   const [selectedContact, setSelectedContact] = useState(null);
-  
+
   // Dropdown state
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
   const sourceDropdownRef = useRef(null);
@@ -467,9 +467,14 @@ export default function Contacts() {
     (async () => {
       setLoading(true); setError('');
       try {
-        const res = await ContactAPI.list();
+        const res = await ContactAPI.list({ source: 'Manual' });
         const arr = Array.isArray(res) ? res : (res.items || []);
-        if (mounted) setItems((arr || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+        // Strict filter for website leads only
+        const leads = (arr || []).filter(c => {
+          const src = (c.source || '').toLowerCase();
+          return !src.includes('import') && !src.includes('csv') && !src.includes('upload');
+        });
+        if (mounted) setItems(leads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       } catch (err) { if (mounted) setError(err.message || 'Failed to load contacts'); }
       finally { if (mounted) setLoading(false); }
     })();
@@ -502,8 +507,8 @@ export default function Contacts() {
   // Toggle single selection
   const toggleSelect = (id, e) => {
     e.stopPropagation(); // Prevent card click
-    setSelectedIds(prev => 
-      prev.includes(id) 
+    setSelectedIds(prev =>
+      prev.includes(id)
         ? prev.filter(i => i !== id)
         : [...prev, id]
     );
@@ -549,16 +554,16 @@ export default function Contacts() {
       alert('Please select contacts to delete');
       return;
     }
-    
+
     if (!window.confirm(`Delete ${selectedIds.length} selected contact(s)?`)) return;
-    
+
     try {
       await Promise.all(selectedIds.map(id => ContactAPI.remove(id)));
       setItems(prev => prev.filter(c => !selectedIds.includes(c._id)));
       setSelectedIds([]);
       alert('Selected contacts deleted successfully');
-    } catch (err) { 
-      alert(err.message || 'Failed to delete selected contacts'); 
+    } catch (err) {
+      alert(err.message || 'Failed to delete selected contacts');
     }
   }
 
@@ -665,8 +670,8 @@ export default function Contacts() {
         <AdminSidebar />
         <main className="admin-content w-full px-3 sm:px-4 md:px-6 lg:px-8">
           <AdminTopbar />
-          <ContactDetailPage 
-            contact={selectedContact} 
+          <ContactDetailPage
+            contact={selectedContact}
             onBack={backToList}
             onDelete={handleDeleteContact}
           />
@@ -688,8 +693,8 @@ export default function Contacts() {
             <div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-black mb-1 sm:mb-2"
                 style={{
-                  
-                  color:'#ffffff'
+
+                  color: '#ffffff'
                 }}>
                 Contacts
               </h1>
@@ -761,7 +766,7 @@ export default function Contacts() {
             {/* Source Filter Dropdown */}
             <div className="flex items-center gap-2">
               <IconFilter className="w-5 h-5" style={{ color: '#ffffff' }} />
-              <div ref={sourceDropdownRef} style={{position:'relative'}}>
+              <div ref={sourceDropdownRef} style={{ position: 'relative' }}>
                 <button
                   onClick={() => setSourceDropdownOpen(!sourceDropdownOpen)}
                   className="px-4 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-xl transition-all duration-200"
@@ -778,11 +783,11 @@ export default function Contacts() {
                   }}
                 >
                   <span>{selectedSourceOption.label}</span>
-                  <span style={{fontSize:'.75rem'}}>▼</span>
+                  <span style={{ fontSize: '.75rem' }}>▼</span>
                 </button>
-                
+
                 {sourceDropdownOpen && (
-                  <div 
+                  <div
                     style={{
                       position: 'absolute',
                       top: 'calc(100% + .5rem)',
@@ -810,11 +815,11 @@ export default function Contacts() {
                         style={{
                           width: '100%',
                           padding: '.6rem .85rem',
-                          background: filterSource === option.value 
-                            ? 'rgba(59, 130, 246, 0.3)' 
+                          background: filterSource === option.value
+                            ? 'rgba(59, 130, 246, 0.3)'
                             : 'transparent',
-                          border: filterSource === option.value 
-                            ? '1px solid rgba(59, 130, 246, 0.5)' 
+                          border: filterSource === option.value
+                            ? '1px solid rgba(59, 130, 246, 0.5)'
                             : '1px solid transparent',
                           borderRadius: '.375rem',
                           color: '#fff',
@@ -917,22 +922,22 @@ export default function Contacts() {
             backdropFilter: 'blur(12px)',
             boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
           }}>
-            <div style={{display:'flex',gap:'.6rem',alignItems:'center'}}>
-              <input 
-                type="checkbox" 
+            <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center' }}>
+              <input
+                type="checkbox"
                 checked={selectedIds.length === filtered.length && filtered.length > 0}
                 onChange={toggleSelectAll}
-                style={{cursor:'pointer',width:'18px',height:'18px'}}
+                style={{ cursor: 'pointer', width: '18px', height: '18px' }}
               />
-              <span style={{fontSize:'.9rem',color:'#ffffff',fontWeight:'600'}}>
-                {selectedIds.length === filtered.length && filtered.length > 0 
-                  ? 'Deselect All' 
+              <span style={{ fontSize: '.9rem', color: '#ffffff', fontWeight: '600' }}>
+                {selectedIds.length === filtered.length && filtered.length > 0
+                  ? 'Deselect All'
                   : 'Select All'}
               </span>
             </div>
-            
+
             {selectedIds.length > 0 && (
-              <button 
+              <button
                 onClick={handleDeleteSelected}
                 className="text-xs sm:text-sm px-4 py-2.5 flex items-center gap-2 font-bold rounded-lg transition-all duration-200 hover:scale-105"
                 style={{
@@ -991,14 +996,14 @@ export default function Contacts() {
                     {/* Checkbox and Header with Avatar */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           checked={isSelected}
                           onChange={(e) => toggleSelect(c._id, e)}
                           onClick={(e) => e.stopPropagation()}
-                          style={{cursor:'pointer',width:'18px',height:'18px',flexShrink:0}}
+                          style={{ cursor: 'pointer', width: '18px', height: '18px', flexShrink: 0 }}
                         />
-                        
+
                         {/* Glass Avatar */}
                         <div
                           className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex-shrink-0 flex items-center justify-center font-black text-base sm:text-lg"
@@ -1026,7 +1031,7 @@ export default function Contacts() {
                     </div>
 
                     {/* Badges Row */}
-                    <div className="flex gap-2 flex-wrap" style={{paddingLeft:'1.75rem'}}>
+                    <div className="flex gap-2 flex-wrap" style={{ paddingLeft: '1.75rem' }}>
                       {c.subject && (
                         <span className="badge text-xs px-3 py-1.5 flex items-center gap-1.5 font-bold rounded-lg"
                           style={{

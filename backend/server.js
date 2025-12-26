@@ -154,6 +154,7 @@ app.use('/api/blog', blogRoutes);
 // Contact Routes
 const contactRoutes = require('./routes/contact');
 app.use('/api/contact', contactRoutes);
+app.use('/api/contact-lists', require('./routes/listRoutes'));
 
 // Analytics Routes
 const analyticsRoutes = require('./routes/analytics');
@@ -287,6 +288,15 @@ try {
 }
 
 console.log('📧 Email system routes loading complete\n');
+
+try {
+  console.log('  Loading senders...');
+  const senderRoutes = require('./routes/senderRoutes');
+  app.use('/api/senders', senderRoutes);
+  console.log('  ✅ Senders loaded');
+} catch (error) {
+  console.error('  ❌ Senders error:', error.message);
+}
 
 // ========================================
 // CRM FEATURES ROUTES (DEBUG VERSION)
@@ -562,3 +572,5 @@ process.on('uncaughtException', (err) => {
   }
   process.exit(1);
 });
+
+// Forced restart trigger 3 (Schema Update)

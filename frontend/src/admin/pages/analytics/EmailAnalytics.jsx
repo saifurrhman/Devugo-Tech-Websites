@@ -143,35 +143,64 @@ export default function EmailAnalytics() {
                 {/* Engagement Over Time Chart (Dynamic) */}
                 <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6 mb-6">
                     <h3 className="font-semibold mb-4">Engagement Over Time (Opens vs Clicks)</h3>
-                    <div className="h-64 flex items-end justify-between gap-2 px-4 relative">
+                    <div className="h-64 relative w-full pr-4">
                         {dailyStats.length === 0 ? (
                             <div className="absolute inset-0 flex items-center justify-center text-gray-500">
                                 No activity data for this period
                             </div>
                         ) : (
-                            dailyStats.map((stat, i) => {
-                                const openHeight = (stat.opens / maxVal) * 100;
-                                const clickHeight = (stat.clicks / maxVal) * 100;
-                                return (
-                                    <div key={i} className="w-full bg-gray-800/30 h-full relative rounded-t group mx-1">
-                                        {/* Open Bar */}
-                                        <div className="absolute bottom-0 left-1 right-1 bg-blue-500/80 rounded-t transition-all hover:bg-blue-400" style={{ height: `${openHeight}%` }}>
-                                            <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-xs px-2 py-1 rounded border border-gray-700 whitespace-nowrap z-10">
-                                                Opens: {stat.opens}<br />{stat.date}
-                                            </div>
-                                        </div>
-                                        {/* Click Bar (Lower overlay) */}
-                                        <div className="absolute bottom-0 left-1.5 right-1.5 bg-green-500/80 rounded-t transition-all hover:bg-green-400" style={{ height: `${clickHeight}%` }}>
-                                            <div className="opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-xs px-2 py-1 rounded border border-gray-700 whitespace-nowrap z-10">
-                                                Clicks: {stat.clicks}
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })
+                            <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${dailyStats.length * 100} 300`} preserveAspectRatio="none">
+                                {/* Grid Lines */}
+                                {[0, 1, 2, 3, 4].map(i => (
+                                    <line key={i} x1="0" y1={i * 75} x2="100%" y2={i * 75} stroke="#334155" strokeDasharray="4" strokeWidth="1" opacity="0.5" />
+                                ))}
+
+                                {/* Paths */}
+                                <path
+                                    d={`M ${dailyStats.map((d, i) => `${i * 100 + 50},${300 - (d.opens / maxVal) * 300}`).join(' L ')}`}
+                                    fill="none"
+                                    stroke="#3b82f6"
+                                    strokeWidth="4"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                                <path
+                                    d={`M ${dailyStats.map((d, i) => `${i * 100 + 50},${300 - (d.clicks / maxVal) * 300}`).join(' L ')}`}
+                                    fill="none"
+                                    stroke="#22c55e"
+                                    strokeWidth="4"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+
+                                {/* Data Points (for tooltips) */}
+                                {dailyStats.map((d, i) => {
+                                    const x = i * 100 + 50;
+                                    const yOpen = 300 - (d.opens / maxVal) * 300;
+                                    const yClick = 300 - (d.clicks / maxVal) * 300;
+                                    return (
+                                        <g key={i} className="group">
+                                            {/* Open Point */}
+                                            <circle cx={x} cy={yOpen} r="6" fill="#1e293b" stroke="#3b82f6" strokeWidth="3" className="hover:r-8 transition-all" />
+                                            <foreignObject x={x - 60} y={yOpen - 50} width="120" height="40" className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                <div className="bg-gray-900 border border-gray-700 text-xs rounded p-1 text-center shadow-xl">
+                                                    <div className="text-gray-400 mb-0.5">{d.date}</div>
+                                                    <span className="text-blue-400 font-bold">Opens: {d.opens}</span>
+                                                </div>
+                                            </foreignObject>
+
+                                            {/* Click Point */}
+                                            <circle cx={x} cy={yClick} r="6" fill="#1e293b" stroke="#22c55e" strokeWidth="3" className="hover:r-8 transition-all" />
+                                            <foreignObject x={x - 60} y={yClick + 15} width="120" height="40" className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                <div className="bg-gray-900 border border-gray-700 text-xs rounded p-1 text-center shadow-xl">
+                                                    <span className="text-green-400 font-bold">Clicks: {d.clicks}</span>
+                                                </div>
+                                            </foreignObject>
+                                        </g>
+                                    )
+                                })}
+                            </svg>
                         )}
-                        {/* Chart Grid Lines */}
-                        <div className="absolute inset-0 border-b border-l border-gray-700 pointer-events-none opacity-50"></div>
                     </div>
                     <div className="flex justify-center gap-6 mt-4 text-sm">
                         <div className="flex items-center gap-2">

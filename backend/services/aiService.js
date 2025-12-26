@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const logger = require('../utils/logger');
+const PROMPTS = require('../config/aiPrompts');
 
 class AIService {
   constructor() {
@@ -12,45 +13,23 @@ class AIService {
     }
   }
 
-  /**
-   * Generate email content using Google Gemini
-   * @param {Object} params
-   * @param {string} params.type - email type (newsletter, promo, etc)
-   * @param {string} params.goal - goal of email
-   * @param {string} params.tone - tone (professional, friendly)
-   * @param {string} params.language - language
-   * @param {string} [params.prompt] - additional instructions
-   */
-  async generateEmailContent({ type, goal, tone, language, prompt }) {
+  async generateContent(systemPrompt, userVariables) {
     try {
       if (!this.apiKey || !this.model) {
-        return this.getMockResponse(type, goal, tone);
+        throw new Error('AI Service not configured');
       }
 
-      const systemInstruction = `
-        You are an expert email marketing copywriter. 
-        Generate an email template based on the user's request.
-        Return ONLY a JSON object with the following structure:
-        {
-          "subject": "The email subject line",
-          "body": "The HTML content of the email body (use inline CSS)",
-          "followUp": {
-            "subject": "Follow-up email subject",
-            "body": "Follow-up email HTML body"
-          }
-        }
-        The response should be valid JSON and nothing else. No markdown blocks.
-      `;
+      // Replace placeholders in the system prompt with user variables
+      let finalPrompt = systemPrompt;
+      for (const [key, value] of Object.entries(userVariables)) {
+        const regex = new RegExp(`{{${key}}}`, 'g');
+        finalPrompt = finalPrompt.replace(regex, value);
+      }
 
-      const userPrompt = `
-        Type: ${type}
-        Goal: ${goal}
-        Tone: ${tone}
-        Language: ${language}
-        Additional Instructions: ${prompt || 'None'}
-      `;
+      // Combine Master Prompt with Specific Prompt
+      const fullInstruction = `${PROMPTS.MASTER_SYSTEM_PROMPT}\n\n${finalPrompt}`;
 
-      const result = await this.model.generateContent(systemInstruction + "\n\nUser Request:\n" + userPrompt);
+      const result = await this.model.generateContent(fullInstruction);
       const response = await result.response;
       let text = response.text();
 
@@ -61,41 +40,66 @@ class AIService {
         return JSON.parse(text);
       } catch (e) {
         logger.error('Failed to parse Gemini response as JSON', e);
-        // Attempt to clean more aggressively or fallback
         throw new Error('AI response format error');
       }
 
     } catch (error) {
       logger.error('AI Service Error:', error.message);
-      return this.getMockResponse(type, goal, tone);
+      // Provide basic mock fallbacks if AI fails or is missing, relying on the 'goal' or 'type' if present in variables
+      return this.getMockResponse(userVariables.goal || 'General', userVariables.tone || 'Professional');
     }
   }
 
-  getMockResponse(type, goal, tone) {
+  // 1. Campaign Creation
+  async generateCampaign({ goal, audience, tone, service }) {
+    return this.generateContent(PROMPTS.CAMPAIGN_CREATION, { goal, audience, tone, service });
+  }
+
+  // 2. Follow-up Email
+  async generateFollowUp({ topic, days, relationship }) {
+    return this.generateContent(PROMPTS.FOLLOW_UP, { topic, days, relationship });
+  }
+
+  // 3. Inbox Reply Assist
+  async generateReply({ incoming_message, stage, service }) {
+    return this.generateContent(PROMPTS.INBOX_REPLY, { incoming_message, stage, service });
+  }
+
+  // 4. Lead Welcome Email
+  async generateWelcome({ name, company, service }) {
+    return this.generateContent(PROMPTS.LEAD_WELCOME, { name, company, service });
+  }
+
+  // 5. Sales Qualification
+  async classifyLead({ incoming_message }) {
+    return this.generateContent(PROMPTS.SALES_QUALIFICATION, { incoming_message });
+  }
+
+  // 6. Sender Context
+  async rewriteSender({ sender, email_content }) {
+    return this.generateContent(PROMPTS.SENDER_CONTEXT, { sender, email_content });
+  }
+
+  // 7. Auto Follow-up Sequence
+  async generateSequence({ goal, audience }) {
+    return this.generateContent(PROMPTS.AUTO_FOLLOWUP_SEQUENCE, { goal, audience });
+  }
+
+  // Legacy method support (mapped to Campaign)
+  async generateEmailContent({ type, goal, tone, language, prompt }) {
+    // Default to campaign creation for legacy calls
+    return this.generateCampaign({
+      goal: goal,
+      audience: 'Target Audience',
+      tone: tone,
+      service: `Email Type: ${type}. ${prompt || ''}`
+    });
+  }
+
+  getMockResponse(goal, tone) {
     return {
-      subject: `[${type}] Unlock Your Potential with Devugo`,
-      body: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          <h1 style="color: #4f46e5;">Hello there!</h1>
-          <p>This is a <strong>${tone}</strong> email generated for the goal: <strong>${goal}</strong>.</p>
-          <p>We noticed you are interested in <strong>${type}</strong>. Here is what we can offer...</p>
-          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-             <p>This content is a placeholder because the AI service is currently unavailable or misconfigured.</p>
-          </div>
-          <br>
-          <p>Best regards,<br>The Devugo Team</p>
-        </div>
-      `,
-      followUp: {
-        subject: `Re: [${type}] Just checking in`,
-        body: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-            <p>Hi again,</p>
-            <p>I just wanted to follow up on my previous email regarding <strong>${type}</strong>.</p>
-            <p>Let me know if you have any questions!</p>
-          </div>
-        `
-      },
+      subject: `[Mock] Action for ${goal}`,
+      body: `<p>This is a mock response because AI is unavailable. Goal: ${goal}, Tone: ${tone}</p>`,
       isMock: true
     };
   }

@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import './styles/globals.css';
+import './styles/admin-sender-selector.css';
 import PublicRoutes from './routes/PublicRoutes';
 import reportWebVitals from './reportWebVitals';
 
@@ -12,7 +13,7 @@ try {
     document.body.classList.remove('admin-light', 'admin-dark');
     document.body.classList.add(saved);
   }
-} catch (e) {}
+} catch (e) { }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -34,7 +34,7 @@ export default function CampaignsList() {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this campaign?')) return;
         try {
-            await CampaignAPI.delete(id); // Assuming api.js has delete/remove. If not I will fix api.js or use generic request
+            await CampaignAPI.remove(id); // Fixed: changed .delete to .remove based on api.js
             setCampaigns(prev => prev.filter(c => (c.id || c._id) !== id));
             success('Campaign deleted successfully');
         } catch (err) {
@@ -66,7 +66,7 @@ export default function CampaignsList() {
 
                 {/* Filters */}
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                    {['all', 'sent', 'active', 'draft', 'scheduled'].map(f => (
+                    {['all', 'draft', 'scheduled', 'sending', 'sent'].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
@@ -104,6 +104,7 @@ export default function CampaignsList() {
                                 <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
                                     <tr>
                                         <th className="px-6 py-3">Campaign Name</th>
+                                        <th className="px-6 py-3">Sender</th>
                                         <th className="px-6 py-3">Status</th>
                                         <th className="px-6 py-3 text-right">Sent</th>
                                         <th className="px-6 py-3 text-right">Opens %</th>
@@ -115,7 +116,7 @@ export default function CampaignsList() {
                                 <tbody className="divide-y divide-gray-800">
                                     {filteredCampaigns.length === 0 ? (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                                            <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
                                                 No campaigns found.
                                             </td>
                                         </tr>
@@ -125,11 +126,14 @@ export default function CampaignsList() {
                                                 <td className="px-6 py-4 font-medium text-white">
                                                     {campaign.name}
                                                 </td>
+                                                <td className="px-6 py-4 text-gray-400">
+                                                    {campaign.senderEmail || 'info@devugo-tech.com'}
+                                                </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`px-2 py-1 rounded-full text-xs border ${campaign.status === 'Sent' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                        campaign.status === 'Active' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                                            campaign.status === 'Draft' ? 'bg-gray-500/10 text-gray-400 border-gray-500/20' :
-                                                                'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                                    <span className={`px-2 py-1 rounded-full text-xs border ${campaign.status === 'sent' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                                            campaign.status === 'sending' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                                                campaign.status === 'scheduled' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                                                                    'bg-gray-500/10 text-gray-400 border-gray-500/20'
                                                         }`}>
                                                         {campaign.status || 'Draft'}
                                                     </span>
@@ -147,7 +151,7 @@ export default function CampaignsList() {
                                                         ? Math.round(((campaign.stats?.clicked || 0) / campaign.stats.sent) * 100) + '%'
                                                         : '0%'}
                                                 </td>
-                                                <td className="px-6 py-4 text-right text-gray-400">{campaign.date || new Date().toLocaleDateString()}</td>
+                                                <td className="px-6 py-4 text-right text-gray-400">{campaign.date ? new Date(campaign.date).toLocaleDateString() : 'N/A'}</td>
                                                 <td className="px-6 py-4 text-right">
                                                     <button
                                                         onClick={() => navigate(`/admin/campaigns/create?id=${campaign.id || campaign._id}`)}

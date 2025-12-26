@@ -1,0 +1,161 @@
+/* ========================= */
+/* Sender Selector Styles    */
+/* ========================= */
+.sender-selector-wrapper {
+    position: relative;
+    margin-right: 0.75rem;
+}
+
+.sender-selector-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255, 255, 255, 0.08);
+    /* Transparent surface */
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    color: var(--admin-text);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sender-selector-btn:hover,
+.sender-selector-btn.active {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--admin-muted);
+}
+
+.sender-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    text-align: left;
+}
+
+.sender-email {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.sender-chevron {
+    opacity: 0.6;
+    transition: transform 0.2s;
+}
+
+.sender-chevron.rotate {
+    transform: rotate(180deg);
+}
+
+.sender-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 280px;
+    background: var(--admin-card-bg);
+    /* Use card bg for dropdowns */
+    border: 1px solid var(--admin-border);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    padding: 0.5rem;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sender-dropdown-header {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--admin-border);
+    margin-bottom: 0.3rem;
+    color: var(--admin-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.sender-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    background: transparent;
+    width: 100%;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--admin-text);
+    transition: background 0.15s;
+}
+
+.sender-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sender-option.selected {
+    background: rgba(67, 133, 205, 0.15);
+    /* Primary color low opacity */
+    color: var(--color-primary);
+    /* Assuming var exists, or white */
+}
+
+.sender-option-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.sender-opt-email {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.sender-opt-type {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.check-icon {
+    color: var(--color-primary);
+    /* Primary Green/Blue */
+}
+
+/* Light Theme Overrides */
+body.admin-light .sender-selector-btn {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #0f172a;
+}
+
+body.admin-light .sender-selector-btn:hover {
+    background: #e2e8f0;
+}
+
+body.admin-light .sender-dropdown {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+body.admin-light .sender-option {
+    color: #0f172a;
+}
+
+body.admin-light .sender-option:hover {
+    background: #f8fafc;
+}
+
+body.admin-light .sender-option.selected {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+@media (max-width: 640px) {
+    .sender-info.desktop-only {
+        display: none;
+    }
+
+    .sender-selector-wrapper {
+        margin-right: 0.25rem;
+    }
+}

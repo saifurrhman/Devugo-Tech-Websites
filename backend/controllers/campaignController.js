@@ -12,7 +12,6 @@ exports.getAllCampaigns = async (req, res) => {
 
     const campaigns = await EmailCampaign.find(filter)
       .populate('template', 'name subject')
-      .populate('lists', 'name totalRecipients')
       .populate('createdBy', 'name email')
       .sort('-createdAt')
       .limit(limit * 1)
@@ -40,7 +39,6 @@ exports.getCampaignById = async (req, res) => {
   try {
     const campaign = await EmailCampaign.findById(req.params.id)
       .populate('template')
-      .populate('lists')
       .populate('createdBy', 'name email');
 
     if (!campaign) {

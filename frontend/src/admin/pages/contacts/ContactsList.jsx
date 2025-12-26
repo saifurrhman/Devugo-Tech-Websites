@@ -1,32 +1,134 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
-import { ContactAPI } from '../../../lib/api';
+import { ContactAPI, ListAPI } from '../../../lib/api';
+import VerificationDetailsModal from '../../components/verification/VerificationModal';
+import ContactListModal from '../../components/contacts/ContactListModal';
+import { UserPlus, Plus, Download, Upload, List as ListIcon, Trash2, Edit2, CheckCircle, XCircle, ChevronLeft, UserCheck } from 'lucide-react';
 
 export default function ContactsList() {
     const navigate = useNavigate();
     const { success, error: notifyError } = useNotification();
+
+    const location = useLocation();
+
+    // UI State
+    const [activeTab, setActiveTab] = useState(location.pathname.includes('recipients') ? 'subscribers' : 'leads'); // subscribers, leads, lists
     const [filter, setFilter] = useState('all');
+
+    // Data State
     const [contacts, setContacts] = useState([]);
+    const [lists, setLists] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    React.useEffect(() => {
-        loadContacts();
-    }, []);
+    // Modal State
+    const [verifyModalOpen, setVerifyModalOpen] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+    const [verifyData, setVerifyData] = useState(null);
+    const [selectedContactIds, setSelectedContactIds] = useState([]);
+    const [addToListModalOpen, setAddToListModalOpen] = useState(false);
+    const [targetListId, setTargetListId] = useState('');
+    const [listModalOpen, setListModalOpen] = useState(false);
+    const [creatingList, setCreatingList] = useState(false);
+    const [selectedList, setSelectedList] = useState(null);
 
-    const loadContacts = async () => {
+    const toggleSelectAll = () => {
+        if (selectedContactIds.length === filteredContacts.length) {
+            setSelectedContactIds([]);
+        } else {
+            setSelectedContactIds(filteredContacts.map(c => c.id || c._id));
+        }
+    };
+
+    const toggleSelect = (id) => {
+        setSelectedContactIds(prev =>
+            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        );
+    };
+
+    const handleAddToList = async () => {
+        if (!targetListId) return notifyError('Please select a list');
         try {
-            setLoading(true);
-            const data = await ContactAPI.list();
-            // Ensure data is an array, handle potential API response structures
-            const list = Array.isArray(data) ? data : (data.data || []);
-            setContacts(list);
+            await ListAPI.addContacts(targetListId, selectedContactIds);
+            success(`Added ${selectedContactIds.length} contacts to list`);
+            setAddToListModalOpen(false);
+            setSelectedContactIds([]);
+            // Optionally reload list counts if needed, or if we are in list view
+            if (activeTab === 'lists') loadData();
         } catch (err) {
-            console.error('Failed to load contacts:', err);
-            setError('Failed to load contacts');
+            notifyError(err.message || 'Failed to add to list');
+        }
+    };
+
+    // ... rest of imports
+
+    // Add this Modal near the bottom
+
+
+    // ... In render ...
+
+    // Action Bar when selected
+
+
+    // ... Table Headers ...
+
+
+    // ... Table Row ...
+
+
+    React.useEffect(() => {
+        loadData();
+    }, [activeTab, selectedList]);
+
+    const loadData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            if (activeTab === 'lists' && !selectedList) {
+                const data = await ListAPI.list();
+                setLists(Array.isArray(data) ? data : []);
+            } else if (selectedList) {
+                // Load contacts for specific list
+                const data = await ListAPI.getContacts(selectedList._id);
+                setContacts(Array.isArray(data) ? data : []);
+            } else {
+                // Load contacts based on tab
+                let params = {};
+                // Server-side filtering
+                if (activeTab === 'subscribers') {
+                    // Try to fetch only imports from server if supported, 
+                    // otherwise fetch all and filter client-side.
+                    // params.source = 'Import'; 
+                } else if (activeTab === 'leads') {
+                    params.source = 'Manual';
+                }
+
+                const data = await ContactAPI.list(params);
+                let list = Array.isArray(data) ? data : (data.items || data.data || []);
+
+                // Client-side strict separation
+                if (activeTab === 'subscribers') {
+                    // Show Import, CSV, or Upload sources
+                    list = list.filter(c => {
+                        const src = (c.source || '').toLowerCase();
+                        return src.includes('import') || src.includes('csv') || src.includes('upload');
+                    });
+                } else if (activeTab === 'leads') {
+                    // Show Manual or anything that is NOT Import
+                    list = list.filter(c => {
+                        const src = (c.source || '').toLowerCase();
+                        return !src.includes('import') && !src.includes('csv') && !src.includes('upload');
+                    });
+                }
+
+                setContacts(list);
+            }
+        } catch (err) {
+            console.error('Failed to load data:', err);
+            setError('Failed to load data');
         } finally {
             setLoading(false);
         }
@@ -44,6 +146,52 @@ export default function ContactsList() {
         }
     };
 
+    const handleCreateList = async (listData) => {
+        setCreatingList(true);
+        try {
+            await ListAPI.create(listData);
+            success('List created successfully');
+            setListModalOpen(false);
+            loadData(); // Reload lists
+        } catch (err) {
+            notifyError(err.message || 'Failed to create list');
+        } finally {
+            setCreatingList(false);
+        }
+    };
+
+    const handleDeleteList = async (id) => {
+        if (!window.confirm('Delete this list? Contacts inside will NOT be deleted.')) return;
+        try {
+            await ListAPI.delete(id);
+            setLists(prev => prev.filter(l => l._id !== id));
+            success('List deleted');
+        } catch (err) {
+            notifyError('Failed to delete list');
+        }
+    };
+
+    const handleVerify = async (e, contact) => {
+        e.stopPropagation();
+        setVerifyModalOpen(true);
+        setVerifying(true);
+        try {
+            const res = await ContactAPI.verify(contact.id || contact._id);
+            setVerifyData(res);
+            setContacts(prev => prev.map(c =>
+                (c.id || c._id) === (contact.id || contact._id)
+                    ? { ...c, status: res.is_safe_to_send ? 'Verified' : 'Bounced' }
+                    : c
+            ));
+        } catch (err) {
+            console.error(err);
+            notifyError('Verification failed');
+            setVerifyModalOpen(false);
+        } finally {
+            setVerifying(false);
+        }
+    };
+
     const filteredContacts = filter === 'all' ? contacts : contacts.filter(c => (c.status || 'Unverified').toLowerCase() === filter);
 
     if (error) {
@@ -54,12 +202,7 @@ export default function ContactsList() {
                     <AdminTopbar />
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="text-red-400 mb-2 font-medium">{error}</div>
-                        <button
-                            onClick={loadContacts}
-                            className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors"
-                        >
-                            Retry
-                        </button>
+                        <button onClick={loadData} className="text-sm bg-red-500/20 text-red-300 px-4 py-2 rounded-lg">Retry</button>
                     </div>
                 </main>
             </div>
@@ -74,114 +217,303 @@ export default function ContactsList() {
 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold">Contacts</h1>
-                        <p className="text-gray-400 text-sm mt-1">Manage your subscribers and leads</p>
+                        <h1 className="text-2xl font-bold flex items-center gap-3">
+                            {selectedList && (
+                                <button onClick={() => setSelectedList(null)} className="hover:bg-gray-800 p-1 rounded">
+                                    <ChevronLeft size={24} />
+                                </button>
+                            )}
+                            {selectedList ? selectedList.name : 'Contacts'}
+                        </h1>
+                        <p className="text-gray-400 text-sm mt-1">
+                            {selectedList ? 'Manage contacts in this list' : 'Manage your subscribers and leads'}
+                        </p>
                     </div>
                     <div className="flex gap-3">
-                        <button
-                            onClick={() => navigate('/admin/contacts/upload')}
-                            className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm flex items-center gap-2"
-                        >
-                            <span>📥</span> Import CSV
-                        </button>
-                        <button
-                            className="btn-primary bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-                        >
-                            <span>+</span> Add Contact
-                        </button>
+                        {activeTab === 'lists' && !selectedList ? (
+                            <button
+                                onClick={() => setListModalOpen(true)}
+                                className="btn-primary bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                            >
+                                <Plus size={16} /> New list
+                            </button>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => navigate('/admin/recipients/upload')}
+                                    className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm flex items-center gap-2"
+                                >
+                                    <Upload size={16} /> Import CSV
+                                </button>
+                                <button
+                                    className="btn-primary bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Add Contact
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
 
-                {/* Filters */}
-                <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                    {['all', 'verified', 'unverified', 'opened', 'clicked', 'replied'].map(f => (
+                {/* Action Bar when selected */}
+                {selectedContactIds.length > 0 && (
+                    <div className="bg-blue-900/20 border border-blue-900/50 rounded-lg p-3 mb-4 flex justify-between items-center text-sm">
+                        <span className="text-blue-200">{selectedContactIds.length} contacts selected</span>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    if (lists.length === 0) ListAPI.list().then(d => setLists(Array.isArray(d) ? d : []));
+                                    setAddToListModalOpen(true);
+                                }}
+                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
+                            >
+                                Add to List
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (window.confirm(`Delete ${selectedContactIds.length} contacts?`)) {
+                                        Promise.all(selectedContactIds.map(id => ContactAPI.delete(id)))
+                                            .then(() => {
+                                                success('Contacts deleted');
+                                                setSelectedContactIds([]);
+                                                loadData();
+                                            });
+                                    }
+                                }}
+                                className="px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-300 rounded transition-colors"
+                            >
+                                <Trash2 size={14} className="mr-1 inline" /> Delete
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* TABS */}
+                {!selectedList && (
+                    <div className="border-b border-gray-800 mb-6 flex gap-6">
                         <button
-                            key={f}
-                            onClick={() => setFilter(f)}
-                            className={`px-4 py-1.5 rounded-full text-sm border transition-colors capitalize whitespace-nowrap ${filter === f
-                                ? 'bg-blue-600 border-blue-600 text-white'
-                                : 'border-gray-700 text-gray-400 hover:border-gray-600 hover:text-white'
+                            onClick={() => setActiveTab('subscribers')}
+                            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'subscribers' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
                                 }`}
                         >
-                            {f}
+                            Subscribers (CSV)
                         </button>
-                    ))}
-                </div>
+                        <button
+                            onClick={() => setActiveTab('leads')}
+                            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'leads' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
+                                }`}
+                        >
+                            Leads (Website)
+                        </button>
+
+                        <button
+                            onClick={() => setActiveTab('lists')}
+                            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'lists' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
+                                }`}
+                        >
+                            Your lists
+                        </button>
+                    </div>
+                )}
+
+                {/* DEBUG INFO REMOVED */}
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Loading contacts...</p>
+                        <p className="text-gray-400">Loading...</p>
                     </div>
                 ) : (
-                    /* Contacts Table */
-                    <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
-                                    <tr>
-                                        <th className="px-6 py-3">Name</th>
-                                        <th className="px-6 py-3">Email</th>
-                                        <th className="px-6 py-3">Status</th>
-                                        <th className="px-6 py-3 text-center">Open %</th>
-                                        <th className="px-6 py-3 text-center">Click %</th>
-                                        <th className="px-6 py-3 text-right">Added</th>
-                                        <th className="px-6 py-3 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-800">
-                                    {filteredContacts.length === 0 ? (
+                    <>
+                        {/* LISTS VIEW */}
+                        {activeTab === 'lists' && !selectedList && (
+                            <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
-                                                No contacts found.
-                                            </td>
+                                            <th className="px-6 py-3">Name</th>
+                                            <th className="px-6 py-3">Contacts</th>
+                                            <th className="px-6 py-3">Created</th>
+                                            <th className="px-6 py-3 text-right">Actions</th>
                                         </tr>
-                                    ) : (
-                                        filteredContacts.map((contact) => (
-                                            <tr key={contact.id || contact._id} className="hover:bg-gray-800/30 transition-colors cursor-pointer" onClick={() => navigate(`/admin/contacts/${contact.id || contact._id}`)}>
-                                                <td className="px-6 py-4 font-medium text-white">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold">
-                                                            {(contact.name || 'U').charAt(0)}
-                                                        </div>
-                                                        {contact.name || 'Unknown'}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-gray-300">{contact.email}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`px-2 py-1 rounded-full text-xs border ${contact.status === 'Verified' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                        contact.status === 'Bounced' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                                            'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-                                                        }`}>
-                                                        {contact.status || 'Unverified'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-center text-gray-300">{contact.openRate || 0}%</td>
-                                                <td className="px-6 py-4 text-center text-gray-300">{contact.clickRate || 0}%</td>
-                                                <td className="px-6 py-4 text-right text-gray-400">{contact.date || new Date().toLocaleDateString()}</td>
-                                                <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
-                                                    <button
-                                                        onClick={() => navigate(`/admin/contacts/${contact.id || contact._id}`)}
-                                                        className="text-gray-400 hover:text-white mx-2 transition-colors"
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(contact.id || contact._id)}
-                                                        className="text-gray-400 hover:text-red-400 transition-colors"
-                                                    >
-                                                        Delete
-                                                    </button>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-800">
+                                        {lists.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
+                                                    <ListIcon size={48} className="mx-auto mb-4 opacity-20" />
+                                                    <p className="text-lg font-medium text-gray-400">No lists created yet</p>
+                                                    <button onClick={() => setListModalOpen(true)} className="mt-4 text-blue-400 hover:text-blue-300">Create your first list</button>
                                                 </td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                                        ) : (
+                                            lists.map(list => (
+                                                <tr key={list._id} className="hover:bg-gray-800/30 transition-colors cursor-pointer" onClick={() => setSelectedList(list)}>
+                                                    <td className="px-6 py-4 font-medium text-white">{list.name}</td>
+                                                    <td className="px-6 py-4 text-gray-300">
+                                                        <span className="bg-gray-800 px-2 py-1 rounded text-xs">{list.count || 0} contacts</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-gray-400">{new Date(list.createdAt).toLocaleDateString()}</td>
+                                                    <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
+                                                        <button onClick={() => handleDeleteList(list._id)} className="text-gray-500 hover:text-red-400 p-2">
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+
+                        {/* CONTACTS VIEW (Standard) */}
+                        {(activeTab !== 'lists' || selectedList) && (
+                            <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
+                                            <tr>
+                                                <th className="pl-6 py-3 w-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={filteredContacts.length > 0 && selectedContactIds.length === filteredContacts.length}
+                                                        onChange={toggleSelectAll}
+                                                        className="rounded border-gray-700 bg-gray-800"
+                                                    />
+                                                </th>
+                                                <th className="px-6 py-3">Name</th>
+                                                <th className="px-6 py-3">Email</th>
+                                                <th className="px-6 py-3">Lists</th>
+                                                <th className="px-6 py-3">Status</th>
+                                                <th className="px-6 py-3 text-center">Score</th>
+                                                <th className="px-6 py-3 text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-800">
+                                            {filteredContacts.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                                                        No contacts found.
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                filteredContacts.map((contact) => (
+                                                    <tr key={contact.id || contact._id} className="hover:bg-gray-800/30 transition-colors">
+                                                        <td className="pl-6 py-4 w-4" onClick={e => e.stopPropagation()}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedContactIds.includes(contact.id || contact._id)}
+                                                                onChange={() => toggleSelect(contact.id || contact._id)}
+                                                                className="rounded border-gray-700 bg-gray-800"
+                                                            />
+                                                        </td>
+                                                        <td className="px-6 py-4 font-medium text-white">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold">
+                                                                    {(contact.name || 'U').charAt(0)}
+                                                                </div>
+                                                                {contact.name || 'Unknown'}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-gray-300">{contact.email}</td>
+                                                        <td className="px-6 py-4 text-gray-400 text-xs">
+                                                            {contact.lists && contact.lists.length > 0 ? (
+                                                                <div className="flex flex-wrap gap-1">
+                                                                    {contact.lists.map(listId => {
+                                                                        const list = lists.find(l => l._id === listId);
+                                                                        return list ? (
+                                                                            <span key={listId} className="bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">
+                                                                                {list.name}
+                                                                            </span>
+                                                                        ) : null;
+                                                                    })}
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-gray-600">-</span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <span className={`px-2 py-1 rounded-full text-xs border ${contact.status === 'Verified' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                                                contact.status === 'Bounced' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                                                    'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                                                }`}>
+                                                                {contact.status || 'Unverified'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <div className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${(contact.leadScore || 0) > 70 ? 'text-green-400 bg-green-900/20' : 'text-gray-500'}`}>
+                                                                {contact.leadScore || 0}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <button
+                                                                onClick={(e) => handleVerify(e, contact)}
+                                                                className="text-blue-400 hover:text-blue-300 mx-2 text-xs"
+                                                            >
+                                                                Verify
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(contact.id || contact._id)}
+                                                                className="text-gray-500 hover:text-red-400"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </main>
+
+            <VerificationDetailsModal
+                isOpen={verifyModalOpen}
+                onClose={() => setVerifyModalOpen(false)}
+                loading={verifying}
+                data={verifyData}
+            />
+
+            <ContactListModal
+                isOpen={listModalOpen}
+                onClose={() => setListModalOpen(false)}
+                onSave={handleCreateList}
+                loading={creatingList}
+            />
+
+            {addToListModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-[#1e293b] rounded-xl border border-gray-800 w-full max-w-sm shadow-2xl p-6">
+                        <h2 className="text-xl font-bold text-white mb-4">Add directly to List</h2>
+                        <p className="text-gray-400 text-sm mb-4">Adding {selectedContactIds.length} contacts</p>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-400 mb-2">Select List</label>
+                            <select
+                                value={targetListId}
+                                onChange={(e) => setTargetListId(e.target.value)}
+                                className="w-full bg-[#0f172a] border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="">-- Choose a list --</option>
+                                {lists.map(l => (
+                                    <option key={l._id} value={l._id}>{l.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
+                            <button onClick={() => setAddToListModalOpen(false)} className="px-4 py-2 text-gray-400 hover:text-white">Cancel</button>
+                            <button onClick={handleAddToList} className="px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-500">Add</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
+

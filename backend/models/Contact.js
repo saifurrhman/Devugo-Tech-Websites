@@ -9,6 +9,7 @@ const ContactSchema = new mongoose.Schema({
   budget: { type: String, trim: true },
   message: { type: String, required: false, trim: true }, // Message not always required for imported contacts
   source: { type: String, trim: true, default: 'Manual' },
+  lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ContactList' }],
 
   // CRM Fields
   status: {

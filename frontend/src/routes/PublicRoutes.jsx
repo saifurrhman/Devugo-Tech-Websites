@@ -59,8 +59,12 @@ import ContactsList from '../admin/pages/contacts/ContactsList';
 import CreateTemplate from '../admin/pages/templates/CreateTemplate';
 import AITemplateGenerator from '../admin/pages/templates/AITemplateGenerator';
 import SMTPSettings from '../admin/pages/SMTPSettings';
-// New imports for Create/Schedule pages
+import SenderSettings from '../admin/pages/settings/SenderSettings';
+import DomainDNS from '../admin/pages/settings/DomainDNS';
+
+
 import CreateProject from '../admin/pages/projects/CreateProject';
+import ContactsUpload from '../admin/pages/contacts/ContactsUpload';
 import CreateInvoice from '../admin/pages/invoices/CreateInvoice';
 import MeetingScheduler from '../admin/pages/meetings/MeetingScheduler';
 
@@ -117,6 +121,8 @@ export default function PublicRoutes() {
 
           {/* Admin Contacts & Leads */}
           <Route path="/admin/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
+          <Route path="/admin/contacts/upload" element={<ProtectedRoute><ContactsUpload /></ProtectedRoute>} />
+          <Route path="/admin/recipients/upload" element={<ProtectedRoute><ContactsUpload /></ProtectedRoute>} />
           <Route path="/admin/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
           <Route path="/admin/leads/:id" element={<ProtectedRoute><LeadEdit /></ProtectedRoute>} />
           <Route path="/admin/forms" element={<ProtectedRoute><Forms /></ProtectedRoute>} />
@@ -149,6 +155,8 @@ export default function PublicRoutes() {
           <Route path="/admin/templates/ai-generator" element={<ProtectedRoute><AITemplateGenerator /></ProtectedRoute>} />
           <Route path="/admin/email-analytics" element={<ProtectedRoute><EmailAnalytics /></ProtectedRoute>} />
           <Route path="/admin/settings/email" element={<ProtectedRoute><SMTPSettings /></ProtectedRoute>} />
+          <Route path="/admin/settings/senders" element={<ProtectedRoute><SenderSettings /></ProtectedRoute>} />
+          <Route path="/admin/settings/domains/:domain" element={<ProtectedRoute><DomainDNS /></ProtectedRoute>} />
 
           {/* CRM & Projects Routes */}
           <Route path="/admin/pipeline" element={<ProtectedRoute><PipelineBoard /></ProtectedRoute>} />
