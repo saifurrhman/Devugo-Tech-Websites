@@ -3,6 +3,8 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { AnalyticsAPI } from '../../../lib/api';
 
+
+
 export default function EmailAnalytics() {
     const [timeRange, setTimeRange] = useState('7d');
     const [data, setData] = useState(null);
@@ -13,7 +15,6 @@ export default function EmailAnalytics() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // Try to fetch real data
                 const result = await AnalyticsAPI.getEmailStats(timeRange);
 
                 // Ensure stats object exists even if API returns partial
@@ -23,18 +24,8 @@ export default function EmailAnalytics() {
 
                 setData(result);
             } catch (err) {
-                console.warn("API failed, using mock data for demonstration", err);
-                // Fallback to mock data so the UI is visible
-                setData({
-                    stats: { delivered: 98.5, spam: 0.2, unsubscribed: 1.1, complaints: 0.05 },
-                    domainPerformance: [
-                        { domain: 'gmail.com', openRate: 45, sent: 1200 },
-                        { domain: 'outlook.com', openRate: 38, sent: 850 },
-                        { domain: 'yahoo.com', openRate: 32, sent: 400 },
-                        { domain: 'corporate', openRate: 55, sent: 300 }
-                    ],
-                    dailyStats: [] // Mock empty strictly for fallback
-                });
+                console.error("API failed", err);
+                setError("Failed to load analytics data");
             } finally {
                 setLoading(false);
             }
@@ -56,6 +47,7 @@ export default function EmailAnalytics() {
                 <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
                     <div className="text-red-400 text-xl">Failed to load analytics data</div>
                     <button onClick={() => setTimeRange(prev => prev === '7d' ? '7d ' : '7d')} className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition-colors">Retry</button>
+                    <p className="text-gray-500 text-sm">Please ensure the backend is running and the API is accessible.</p>
                 </div>
             </main>
         </div>
@@ -73,6 +65,28 @@ export default function EmailAnalytics() {
     const recentActivity = data.recentActivity || [];
     const dailyStats = data.dailyStats || [];
     const maxVal = Math.max(...dailyStats.map(d => Math.max(d.opens, d.clicks)), 1); // Avoid 0 division
+
+    // Calculate Real Health Score
+    let healthScore = 100;
+    // Penalize for delivery failures (bounces)
+    const bounceRate = 100 - (stats.delivered || 100);
+    healthScore -= bounceRate * 5;
+    // Penalize for spam reports (high impact)
+    healthScore -= (stats.spam || 0) * 20;
+    // Penalize for unsubscribes (medium impact)
+    healthScore -= (stats.unsubscribed || 0) * 5;
+
+    healthScore = Math.max(0, Math.min(100, Math.round(healthScore)));
+
+    let healthGrade = 'A+';
+    let healthColor = 'text-blue-400';
+    let healthText = "Your sending reputation is excellent.";
+
+    if (healthScore < 97) { healthGrade = 'A'; }
+    if (healthScore < 90) { healthGrade = 'B'; healthColor = 'text-green-400'; healthText = "Your sending reputation is good."; }
+    if (healthScore < 80) { healthGrade = 'C'; healthColor = 'text-yellow-400'; healthText = "Your sending reputation needs attention."; }
+    if (healthScore < 60) { healthGrade = 'D'; healthColor = 'text-orange-400'; healthText = "Your sending reputation is poor."; }
+    if (healthScore < 40) { healthGrade = 'F'; healthColor = 'text-red-400'; healthText = "Critical: Your sender reputation is damaged."; }
 
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -100,12 +114,12 @@ export default function EmailAnalytics() {
                 <div className="card bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-800/50 p-6 rounded-xl mb-6 flex items-center justify-between">
                     <div>
                         <h2 className="text-lg font-semibold text-blue-100">Sender Health Score</h2>
-                        <p className="text-blue-300/80 text-sm mt-1">Your sending reputation is excellent.</p>
+                        <p className="text-blue-300/80 text-sm mt-1">{healthText}</p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="text-4xl font-bold text-blue-400">98<span className="text-xl text-blue-500/60">/100</span></div>
+                        <div className={`text-4xl font-bold ${healthColor}`}>{healthScore}<span className="text-xl text-blue-500/60">/100</span></div>
                         <div className="h-12 w-12 rounded-full border-4 border-blue-500 flex items-center justify-center bg-blue-500/20">
-                            <span className="text-xl">A+</span>
+                            <span className="text-xl">{healthGrade}</span>
                         </div>
                     </div>
                 </div>
