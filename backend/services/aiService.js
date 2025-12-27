@@ -1,23 +1,41 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const logger = require('../utils/logger');
 const PROMPTS = require('../config/aiPrompts');
+const Setting = require('../models/Setting');
 
 class AIService {
   constructor() {
-    this.apiKey = process.env.GEMINI_API_KEY;
-    if (!this.apiKey) {
-      logger.warn('GEMINI_API_KEY is missing. AI features will use mock data.');
-    } else {
-      this.genAI = new GoogleGenerativeAI(this.apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    // Initial cleanup of constructor
+  }
+
+  async getApiKey() {
+    if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
+
+    try {
+      const setting = await Setting.findOne({ key: 'ai' });
+      if (setting && setting.value && setting.value.geminiApiKey) {
+        return setting.value.geminiApiKey;
+      }
+    } catch (error) {
+      logger.error('Failed to fetch AI settings:', error);
     }
+    return null;
   }
 
   async generateContent(systemPrompt, userVariables) {
     try {
-      if (!this.apiKey || !this.model) {
-        throw new Error('AI Service not configured');
+      const apiKey = await this.getApiKey();
+
+      if (!apiKey) {
+        logger.warn('Gemini API Key missing. Using mock response.');
+        // Return mock immediately without throwing
+        return this.getMockResponse(userVariables.goal || 'General', userVariables.tone || 'Professional');
       }
+
+      this.genAI = new GoogleGenerativeAI(apiKey);
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+
+
 
       // Replace placeholders in the system prompt with user variables
       let finalPrompt = systemPrompt;

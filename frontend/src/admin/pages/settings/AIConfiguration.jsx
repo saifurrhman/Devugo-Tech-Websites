@@ -8,7 +8,8 @@ export default function AIConfiguration() {
     const [saving, setSaving] = useState(false);
     const [config, setConfig] = useState({
         model: 'GPT-4 Turbo',
-        strictFiltering: true
+        strictFiltering: true,
+        geminiApiKey: ''
     });
 
     useEffect(() => {
@@ -18,14 +19,15 @@ export default function AIConfiguration() {
     async function loadConfig() {
         try {
             setLoading(true);
-            const data = await SettingsAPI.get('ai');
-            if (data) setConfig(data);
+            const data = await SettingsAPI.getAI();
+            if (data) setConfig({ ...data, geminiApiKey: data.geminiApiKey || '' });
         } catch (error) {
             console.error('Failed to load AI configuration:', error);
             // Fallback mock data
             setConfig({
                 model: 'GPT-4 Turbo',
-                strictFiltering: true
+                strictFiltering: true,
+                geminiApiKey: ''
             });
         } finally {
             setLoading(false);
@@ -35,7 +37,7 @@ export default function AIConfiguration() {
     async function handleSave() {
         setSaving(true);
         try {
-            await SettingsAPI.update('ai', config);
+            await SettingsAPI.updateAI(config);
             alert('AI configuration saved successfully!');
         } catch (error) {
             console.error('Failed to save AI configuration:', error);
@@ -57,10 +59,27 @@ export default function AIConfiguration() {
                     <h1 className="text-2xl font-bold flex items-center gap-2">
                         <span className="text-purple-400">✨</span> AI Settings
                     </h1>
-                    <p className="text-gray-400 text-sm mt-1">Configure global AI behavior</p>
+                    <p className="text-gray-400 text-sm mt-1">Configure global AI behavior and keys</p>
                 </div>
 
                 <div className="max-w-3xl space-y-6">
+                    <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6">
+                        <h3 className="font-semibold mb-4">API Configuration</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Gemini API Key</label>
+                                <input
+                                    type="password"
+                                    value={config.geminiApiKey}
+                                    onChange={e => setConfig({ ...config, geminiApiKey: e.target.value })}
+                                    placeholder="AIzaSy..."
+                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-purple-500"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">Leave empty to use system environment variable if set.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6">
                         <h3 className="font-semibold mb-4">Model Selection</h3>
                         <div className="space-y-4">
@@ -74,6 +93,7 @@ export default function AIConfiguration() {
                                     <option value="GPT-4 Turbo">GPT-4 Turbo</option>
                                     <option value="GPT-3.5 Turbo">GPT-3.5 Turbo</option>
                                     <option value="Claude 3 Opus">Claude 3 Opus</option>
+                                    <option value="Gemini Flash 1.5">Gemini Flash 1.5</option>
                                 </select>
                             </div>
                         </div>

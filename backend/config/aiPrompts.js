@@ -1,5 +1,5 @@
 module.exports = {
-    MASTER_SYSTEM_PROMPT: `
+  MASTER_SYSTEM_PROMPT: `
 You are an enterprise-grade CRM and Email Automation assistant.
 
 Your role is to help manage:
@@ -23,13 +23,16 @@ You do NOT send emails.
 You ONLY generate content, suggestions, and follow-ups.
 `,
 
-    CAMPAIGN_CREATION: `
+  CAMPAIGN_CREATION: `
 Write a professional email campaign for the following purpose:
 
 Campaign goal: {{goal}}
 Target audience: {{audience}}
 Tone: {{tone}}
 Company/service: {{service}}
+
+Additional Instructions:
+{{customPrompt}}
 
 Requirements:
 Clear subject line
@@ -46,13 +49,16 @@ Output JSON format:
 }
 `,
 
-    FOLLOW_UP: `
+  FOLLOW_UP: `
 Write a polite follow-up email for a lead who did not reply.
 
 Context:
 Previous email topic: {{topic}}
 Days since last email: {{days}}
 Relationship: {{relationship}}
+
+Additional Instructions:
+{{customPrompt}}
 
 Rules:
 Do not sound pushy
@@ -67,7 +73,7 @@ Output JSON format:
 }
 `,
 
-    INBOX_REPLY: `
+  INBOX_REPLY: `
 Generate a professional reply to the following inbound email.
 
 Email received:
@@ -90,7 +96,7 @@ Output JSON format:
 }
 `,
 
-    LEAD_WELCOME: `
+  LEAD_WELCOME: `
 Write a welcome email for a new lead.
 
 Details:
@@ -111,7 +117,7 @@ Output JSON format:
 }
 `,
 
-    SALES_QUALIFICATION: `
+  SALES_QUALIFICATION: `
 Analyze the following lead message and classify it:
 
 Message:
@@ -125,7 +131,7 @@ Return JSON format:
 }
 `,
 
-    SENDER_CONTEXT: `
+  SENDER_CONTEXT: `
 Rewrite this email based on sender identity.
 
 Sender email: {{sender}}
@@ -144,7 +150,7 @@ Output JSON format:
 }
 `,
 
-    AUTO_FOLLOWUP_SEQUENCE: `
+  AUTO_FOLLOWUP_SEQUENCE: `
 Create a 3-step follow-up sequence for this campaign:
 
 Campaign goal: {{goal}}

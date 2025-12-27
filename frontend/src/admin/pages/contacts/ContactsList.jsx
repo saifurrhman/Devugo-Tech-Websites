@@ -171,6 +171,33 @@ export default function ContactsList() {
         }
     };
 
+    // Add Contact Modal State
+    const [addContactModalOpen, setAddContactModalOpen] = useState(false);
+    const [newContact, setNewContact] = useState({ name: '', email: '', phone: '', company: '' });
+    const [addingContact, setAddingContact] = useState(false);
+
+    const handleCreateContact = async (e) => {
+        e.preventDefault();
+        setAddingContact(true);
+        try {
+            const payload = {
+                ...newContact,
+                source: 'Manual'
+            };
+            const res = await ContactAPI.create(payload);
+            setContacts(prev => [res, ...prev]);
+            success('Contact added successfully');
+            setAddContactModalOpen(false);
+            setNewContact({ name: '', email: '', phone: '', company: '' });
+        } catch (err) {
+            console.error(err);
+            notifyError(err.message || 'Failed to create contact');
+        } finally {
+            setAddingContact(false);
+        }
+    };
+
+
     const handleVerify = async (e, contact) => {
         e.stopPropagation();
         setVerifyModalOpen(true);
@@ -246,6 +273,7 @@ export default function ContactsList() {
                                     <Upload size={16} /> Import CSV
                                 </button>
                                 <button
+                                    onClick={() => setAddContactModalOpen(true)}
                                     className="btn-primary bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                                 >
                                     <Plus size={16} /> Add Contact
@@ -513,6 +541,76 @@ export default function ContactsList() {
                     </div>
                 </div>
             )}
+
+            {/* Add Contact Modal */}
+            {addContactModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-[#1e293b] rounded-xl border border-gray-800 w-full max-w-md shadow-2xl flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+                            <h2 className="text-xl font-bold text-white">Add New Contact</h2>
+                            <button onClick={() => setAddContactModalOpen(false)} className="text-gray-400 hover:text-white">
+                                <XCircle size={24} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateContact} className="p-6 space-y-4 overflow-y-auto">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={newContact.name}
+                                    onChange={e => setNewContact({ ...newContact, name: e.target.value })}
+                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 outline-none"
+                                    placeholder="John Doe"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={newContact.email}
+                                    onChange={e => setNewContact({ ...newContact, email: e.target.value })}
+                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 outline-none"
+                                    placeholder="john@example.com"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Company (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={newContact.company}
+                                    onChange={e => setNewContact({ ...newContact, company: e.target.value })}
+                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 outline-none"
+                                    placeholder="Acme Inc."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Phone (Optional)</label>
+                                <input
+                                    type="tel"
+                                    value={newContact.phone}
+                                    onChange={e => setNewContact({ ...newContact, phone: e.target.value })}
+                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 outline-none"
+                                    placeholder="+1 234 567 8900"
+                                />
+                            </div>
+
+                            <div className="pt-4 flex justify-end gap-3">
+                                <button type="button" onClick={() => setAddContactModalOpen(false)} className="px-4 py-2 text-gray-400 hover:text-white transition-colors">Cancel</button>
+                                <button
+                                    type="submit"
+                                    disabled={addingContact}
+                                    className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                                >
+                                    {addingContact ? 'Adding...' : 'Add Contact'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

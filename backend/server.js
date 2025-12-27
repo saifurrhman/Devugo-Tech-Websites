@@ -305,6 +305,28 @@ try {
 }
 
 // ========================================
+// SETTINGS & AI ROUTES
+// ========================================
+
+try {
+  console.log('⚡ Loading settings routes...');
+  const settingsRoutes = require('./routes/settingsRoutes');
+  app.use('/api/settings', settingsRoutes);
+  console.log('  ✅ Settings routes loaded');
+} catch (error) {
+  console.error('  ❌ Settings routes error:', error.message);
+}
+
+try {
+  console.log('🤖 Loading AI routes...');
+  const aiRoutes = require('./routes/aiRoutes');
+  app.use('/api/ai', aiRoutes);
+  console.log('  ✅ AI routes loaded');
+} catch (error) {
+  console.error('  ❌ AI routes error:', error.message);
+}
+
+// ========================================
 // CRM FEATURES ROUTES (DEBUG VERSION)
 // ========================================
 
