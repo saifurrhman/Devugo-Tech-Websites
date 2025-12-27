@@ -538,6 +538,9 @@ const server = app.listen(PORT, () => {
   console.log('='.repeat(60) + '\n');
 });
 
+// Export for Vercel
+module.exports = app;
+
 // ========================================
 // GRACEFUL SHUTDOWN (FIXED - PROMISE BASED)
 // ========================================
