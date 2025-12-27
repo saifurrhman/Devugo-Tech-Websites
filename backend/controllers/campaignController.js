@@ -60,6 +60,8 @@ exports.getCampaignById = async (req, res) => {
   }
 };
 
+const emailService = require('../services/emailService');
+
 exports.createCampaign = async (req, res) => {
   try {
     const campaign = new EmailCampaign({
@@ -68,6 +70,28 @@ exports.createCampaign = async (req, res) => {
     });
 
     await campaign.save();
+
+    // Check for Immediate Individual Send
+    if (campaign.status === 'sending' &&
+      campaign.audience &&
+      campaign.audience.includes('custom_email') &&
+      campaign.individualEmail) {
+
+      // Send immediately
+      logger.info(`Sending individual campaign to ${campaign.individualEmail}`);
+
+      await emailService.sendEmail({
+        to: campaign.individualEmail,
+        subject: campaign.subject,
+        html: campaign.contentHtml,
+        text: campaign.contentHtml?.replace(/<[^>]*>/g, '') || ''
+      });
+
+      campaign.status = 'completed';
+      campaign.stats.sent = 1;
+      campaign.stats.delivered = 1; // Assumed for now
+      await campaign.save();
+    }
 
     res.status(201).json({
       success: true,

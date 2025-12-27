@@ -4,23 +4,36 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { InboxAPI } from '../../../lib/api';
 import ConversationView from './ConversationView';
+import ComposeModal from '../../components/inbox/ComposeModal';
 
 export default function InboxList() {
     const navigate = useNavigate();
     const { id } = useParams();
     const [filter, setFilter] = useState('all');
+    const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [conversations, setConversations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [composeOpen, setComposeOpen] = useState(false);
+
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(search), 500);
+        return () => clearTimeout(timer);
+    }, [search]);
 
     useEffect(() => {
         loadInbox();
-    }, []);
+    }, [debouncedSearch]);
 
     const loadInbox = async () => {
         try {
             setLoading(true);
-            const data = await InboxAPI.list();
+            const params = {};
+            if (debouncedSearch) params.search = debouncedSearch;
+
+            const data = await InboxAPI.list(params);
             const list = Array.isArray(data) ? data : (data.data || []);
             setConversations(list);
         } catch (err) {
@@ -66,7 +79,10 @@ export default function InboxList() {
                         <h1 className="text-2xl font-bold">Inbox</h1>
                         <p className="text-gray-400 text-sm mt-1">Manage customer conversations</p>
                     </div>
-                    <button className="btn-primary bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    <button
+                        onClick={() => setComposeOpen(true)}
+                        className="btn-primary bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
                         Compose New
                     </button>
                 </div>
@@ -78,9 +94,14 @@ export default function InboxList() {
                             <input
                                 type="text"
                                 placeholder="Search inbox..."
-                                className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-blue-500"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 outline-none focus:border-blue-500 transition-colors"
                             />
-                            <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
+                            <div
+                                className="flex gap-2 mt-3 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+                                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                            >
                                 {['all', 'unread', 'crm', 'promotions', 'starred'].map(f => (
                                     <button
                                         key={f}
@@ -100,7 +121,7 @@ export default function InboxList() {
                                     <p className="text-gray-400 text-xs">Loading...</p>
                                 </div>
                             ) : filteredConversations.length === 0 ? (
-                                <div className="p-4 text-center text-gray-500 text-sm">
+                                <div className="p-4 text-center text-gray-400 text-sm">
                                     No conversations found.
                                 </div>
                             ) : (
@@ -145,6 +166,15 @@ export default function InboxList() {
                     </div>
                 </div>
             </main>
+
+            <ComposeModal
+                isOpen={composeOpen}
+                onClose={() => setComposeOpen(false)}
+                onSent={() => {
+                    loadInbox();
+                    setComposeOpen(false);
+                }}
+            />
         </div>
     );
 }

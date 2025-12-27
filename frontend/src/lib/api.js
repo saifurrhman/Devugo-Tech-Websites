@@ -385,6 +385,7 @@ export const AutomationAPI = {
 export const InboxAPI = {
   list: (params = {}) => api('/api/inbox' + buildQuery(params)),
   get: (id) => api(`/api/inbox/${id}`),
+  send: (payload) => api('/api/inbox/send', { method: 'POST', body: payload }),
   reply: (id, payload) => api(`/api/inbox/${id}/reply`, { method: 'POST', body: payload }),
   markRead: (id) => api(`/api/inbox/${id}/read`, { method: 'POST' }),
 };

@@ -8,6 +8,8 @@ import VerificationDetailsModal from '../../components/verification/Verification
 import ContactListModal from '../../components/contacts/ContactListModal';
 import { UserPlus, Plus, Download, Upload, List as ListIcon, Trash2, Edit2, CheckCircle, XCircle, ChevronLeft, UserCheck } from 'lucide-react';
 
+import CustomSelect from '../../../components/CustomSelect';
+
 export default function ContactsList() {
     const navigate = useNavigate();
     const { success, error: notifyError } = useNotification();
@@ -185,7 +187,8 @@ export default function ContactsList() {
                 source: 'Manual'
             };
             const res = await ContactAPI.create(payload);
-            setContacts(prev => [res, ...prev]);
+            // The API returns { message: '...', contact: {...} }
+            setContacts(prev => [res.contact || res, ...prev]);
             success('Contact added successfully');
             setAddContactModalOpen(false);
             setNewContact({ name: '', email: '', phone: '', company: '' });
@@ -318,29 +321,47 @@ export default function ContactsList() {
 
                 {/* TABS */}
                 {!selectedList && (
-                    <div className="border-b border-gray-800 mb-6 flex gap-6">
-                        <button
-                            onClick={() => setActiveTab('subscribers')}
-                            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'subscribers' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
-                                }`}
-                        >
-                            Subscribers (CSV)
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('leads')}
-                            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'leads' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
-                                }`}
-                        >
-                            Leads (Website)
-                        </button>
+                    <div className="border-b border-gray-800 mb-6 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-between items-end">
+                        <div className="flex gap-6 w-full sm:w-auto overflow-x-auto">
+                            <button
+                                onClick={() => setActiveTab('subscribers')}
+                                className={`pb-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'subscribers' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
+                                    }`}
+                            >
+                                Subscribers (CSV)
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('leads')}
+                                className={`pb-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'leads' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
+                                    }`}
+                            >
+                                Leads (Website)
+                            </button>
 
-                        <button
-                            onClick={() => setActiveTab('lists')}
-                            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'lists' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
-                                }`}
-                        >
-                            Your lists
-                        </button>
+                            <button
+                                onClick={() => setActiveTab('lists')}
+                                className={`pb-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'lists' ? 'border-blue-500 text-white' : 'border-transparent text-gray-400 hover:text-white'
+                                    }`}
+                            >
+                                Your lists
+                            </button>
+                        </div>
+
+                        {/* Status Filter */}
+                        <div className="pb-2">
+                            <select
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                className="bg-[#1e293b] border border-gray-700 text-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-48 p-2"
+                            >
+                                <option value="all">All Status</option>
+                                <option value="verified">Verified</option>
+                                <option value="unverified">Unverified</option>
+                                <option value="bounced">Bounced</option>
+                                <option value="unsubscribed">Unsubscribed</option>
+                                <option value="new">New</option>
+                            </select>
+                        </div>
                     </div>
                 )}
 
@@ -356,42 +377,44 @@ export default function ContactsList() {
                         {/* LISTS VIEW */}
                         {activeTab === 'lists' && !selectedList && (
                             <div className="card bg-[#1e293b] rounded-xl border border-gray-800 overflow-hidden">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
-                                        <tr>
-                                            <th className="px-6 py-3">Name</th>
-                                            <th className="px-6 py-3">Contacts</th>
-                                            <th className="px-6 py-3">Created</th>
-                                            <th className="px-6 py-3 text-right">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-800">
-                                        {lists.length === 0 ? (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="text-xs text-gray-400 uppercase bg-gray-800/50">
                                             <tr>
-                                                <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
-                                                    <ListIcon size={48} className="mx-auto mb-4 opacity-20" />
-                                                    <p className="text-lg font-medium text-gray-400">No lists created yet</p>
-                                                    <button onClick={() => setListModalOpen(true)} className="mt-4 text-blue-400 hover:text-blue-300">Create your first list</button>
-                                                </td>
+                                                <th className="px-6 py-3">Name</th>
+                                                <th className="px-6 py-3">Contacts</th>
+                                                <th className="px-6 py-3">Created</th>
+                                                <th className="px-6 py-3 text-right">Actions</th>
                                             </tr>
-                                        ) : (
-                                            lists.map(list => (
-                                                <tr key={list._id} className="hover:bg-gray-800/30 transition-colors cursor-pointer" onClick={() => setSelectedList(list)}>
-                                                    <td className="px-6 py-4 font-medium text-white">{list.name}</td>
-                                                    <td className="px-6 py-4 text-gray-300">
-                                                        <span className="bg-gray-800 px-2 py-1 rounded text-xs">{list.count || 0} contacts</span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-gray-400">{new Date(list.createdAt).toLocaleDateString()}</td>
-                                                    <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
-                                                        <button onClick={() => handleDeleteList(list._id)} className="text-gray-500 hover:text-red-400 p-2">
-                                                            <Trash2 size={16} />
-                                                        </button>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-800">
+                                            {lists.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
+                                                        <ListIcon size={48} className="mx-auto mb-4 opacity-20" />
+                                                        <p className="text-lg font-medium text-gray-400">No lists created yet</p>
+                                                        <button onClick={() => setListModalOpen(true)} className="mt-4 text-blue-400 hover:text-blue-300">Create your first list</button>
                                                     </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                                            ) : (
+                                                lists.map(list => (
+                                                    <tr key={list._id} className="hover:bg-gray-800/30 transition-colors cursor-pointer" onClick={() => setSelectedList(list)}>
+                                                        <td className="px-6 py-4 font-medium text-white">{list.name}</td>
+                                                        <td className="px-6 py-4 text-gray-300">
+                                                            <span className="bg-gray-800 px-2 py-1 rounded text-xs">{list.count || 0} contacts</span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-gray-400">{new Date(list.createdAt).toLocaleDateString()}</td>
+                                                        <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
+                                                            <button onClick={() => handleDeleteList(list._id)} className="text-gray-500 hover:text-red-400 p-2">
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         )}
 

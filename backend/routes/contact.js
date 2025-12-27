@@ -6,7 +6,11 @@ const Contact = require('../models/Contact');
 router.post('/', async (req, res) => {
   try {
     const { name, email, company, phone, website, budget, message, source } = req.body;
-    if (!name || !email || !message) {
+
+    // Message is only required for Website Form submissions, not for Admin Manual/Import
+    const isPublicSubmission = (!source || source === 'Website Form');
+
+    if (!name || !email || (isPublicSubmission && !message)) {
       return res.status(400).json({ error: 'Name, email and message are required' });
     }
     const created = await Contact.create({ name, email, company, phone, website, budget, message, source });
@@ -20,12 +24,17 @@ router.post('/', async (req, res) => {
 // List contacts with filtering
 router.get('/', async (req, res) => {
   try {
-    const { source } = req.query;
+    const { source, status } = req.query;
     const filter = {};
 
     // exact match for source if provided
     if (source) {
       filter.source = source;
+    }
+
+    // Status Filter
+    if (status && status !== 'All') {
+      filter.status = status;
     }
 
     const items = await Contact.find(filter).sort({ createdAt: -1 }).limit(500);

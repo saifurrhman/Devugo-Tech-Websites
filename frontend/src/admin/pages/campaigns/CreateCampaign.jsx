@@ -42,6 +42,7 @@ export default function CreateCampaign() {
     scheduleType: 'now',
     scheduledDate: '',
     scheduledTime: '',
+    individualEmail: '',
   });
 
   const [lists, setLists] = useState([]);
@@ -248,7 +249,7 @@ export default function CreateCampaign() {
 
           {renderStepIndicator()}
 
-          <div className="bg-[#003560] border border-white/10 rounded-xl p-8 min-h-[400px] shadow-xl">
+          <div className="bg-[#003560] border border-white/10 rounded-xl p-4 sm:p-8 min-h-[400px] shadow-xl">
 
             {/* STEP 1: BASICS */}
             {step === 1 && (
@@ -266,7 +267,7 @@ export default function CreateCampaign() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="form-group">
                     <label className="block text-sm font-medium text-gray-300 mb-2">Sender Name</label>
                     <input
@@ -324,10 +325,13 @@ export default function CreateCampaign() {
                     options={[
                       {
                         label: 'Presets',
-                        options: lists.map(list => ({
-                          value: list._id,
-                          label: `${list.name} (${list.count} contacts)`
-                        }))
+                        options: [
+                          ...lists.map(list => ({
+                            value: list._id,
+                            label: `${list.name} (${list.count} contacts)`
+                          })),
+                          { value: 'custom_email', label: 'Individual Email (Manual)' }
+                        ]
                       },
                       ...(customLists.length > 0 ? [{
                         label: 'Your Lists',
@@ -338,6 +342,22 @@ export default function CreateCampaign() {
                       }] : [])
                     ]}
                   />
+
+                  {formData.audienceList.includes('custom_email') && (
+                    <div className="mt-3 animate-in fade-in slide-in-from-top-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Target Email Address</label>
+                      <input
+                        type="email"
+                        name="individualEmail"
+                        value={formData.individualEmail || ''}
+                        onChange={handleInputChange}
+                        className="w-full bg-gray-800 border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
+                        placeholder="recipient@example.com"
+                        required
+                      />
+                      <p className="text-xs text-gray-500 mt-1">This campaign will only be sent to this single email.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -483,7 +503,7 @@ export default function CreateCampaign() {
               <div className="space-y-6 max-w-2xl mx-auto animate-in fade-in">
                 <h2 className="text-xl font-bold text-white border-b border-gray-700 pb-4">Schedule & Review</h2>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button
                     onClick={() => setFormData(p => ({ ...p, scheduleType: 'now' }))}
                     className={`p-6 border rounded-xl flex flex-col items-center gap-3 transition-all ${formData.scheduleType === 'now' ? 'bg-blue-600/20 border-blue-500 text-white' : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:bg-gray-800'
@@ -503,7 +523,7 @@ export default function CreateCampaign() {
                 </div>
 
                 {formData.scheduleType === 'scheduled' && (
-                  <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 grid grid-cols-2 gap-4 animate-in slide-in-from-top-2">
+                  <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-top-2">
                     <label className="block">
                       <span className="text-sm text-gray-400 mb-1 block">Date</span>
                       <input
