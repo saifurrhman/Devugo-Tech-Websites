@@ -92,7 +92,7 @@ export default function SMTPSettings() {
                                     placeholder="smtp.example.com"
                                     value={formData.host}
                                     onChange={e => setFormData({ ...formData, host: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                    className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                 />
                             </div>
 
@@ -104,7 +104,7 @@ export default function SMTPSettings() {
                                         placeholder="587"
                                         value={formData.port}
                                         onChange={e => setFormData({ ...formData, port: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                     />
                                 </div>
                                 <div>
@@ -112,11 +112,11 @@ export default function SMTPSettings() {
                                     <select
                                         value={formData.encryption}
                                         onChange={e => setFormData({ ...formData, encryption: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                     >
-                                        <option value="TLS">TLS</option>
-                                        <option value="SSL">SSL</option>
-                                        <option value="None">None</option>
+                                        <option value="TLS" className="bg-[#002747] text-white py-2">TLS</option>
+                                        <option value="SSL" className="bg-[#002747] text-white py-2">SSL</option>
+                                        <option value="None" className="bg-[#002747] text-white py-2">None</option>
                                     </select>
                                 </div>
                             </div>
@@ -128,7 +128,7 @@ export default function SMTPSettings() {
                                     placeholder="user@example.com"
                                     value={formData.username}
                                     onChange={e => setFormData({ ...formData, username: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                    className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                 />
                             </div>
 
@@ -139,7 +139,7 @@ export default function SMTPSettings() {
                                     placeholder="••••••••"
                                     value={formData.password}
                                     onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                    className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                 />
                             </div>
 
@@ -150,7 +150,7 @@ export default function SMTPSettings() {
                                     placeholder="Your Company"
                                     value={formData.fromName}
                                     onChange={e => setFormData({ ...formData, fromName: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                    className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                 />
                             </div>
 
@@ -161,7 +161,7 @@ export default function SMTPSettings() {
                                     placeholder="noreply@example.com"
                                     value={formData.fromEmail}
                                     onChange={e => setFormData({ ...formData, fromEmail: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
+                                    className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                 />
                             </div>
 

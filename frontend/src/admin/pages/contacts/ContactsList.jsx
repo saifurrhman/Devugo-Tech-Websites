@@ -497,11 +497,11 @@ export default function ContactsList() {
                             <select
                                 value={targetListId}
                                 onChange={(e) => setTargetListId(e.target.value)}
-                                className="w-full bg-[#0f172a] border border-gray-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                                className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                             >
-                                <option value="">-- Choose a list --</option>
+                                <option value="" className="bg-[#002747] text-white">-- Choose a list --</option>
                                 {lists.map(l => (
-                                    <option key={l._id} value={l._id}>{l.name}</option>
+                                    <option key={l._id} value={l._id} className="bg-[#002747] text-white py-2">{l.name}</option>
                                 ))}
                             </select>
                         </div>

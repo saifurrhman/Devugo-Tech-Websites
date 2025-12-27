@@ -258,35 +258,94 @@ export default function SenderSettings() {
                                         <p>No senders found. Add one to get started.</p>
                                     </div>
                                 )}
-                                {senders.map((sender) => (
-                                    <div key={sender._id || sender.id} className="bg-[#003560] rounded-xl border border-white/10 p-6 shadow-xl shadow-black/20 hover:border-white/20 transition-all group">
-                                        {/* ... Existing Sender Card UI ... */}
-                                        <div className="flex justify-between items-start mb-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-sm font-bold border border-blue-500/20 text-blue-200">
-                                                    {sender.name.charAt(0)}
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-3 mb-1">
-                                                        <span className="font-semibold text-lg text-white">{sender.name}</span>
+                                <div className="space-y-4">
+                                    {senders.map((sender) => {
+                                        // Try to find matching domain status
+                                        const senderDomain = sender.email.split('@')[1];
+                                        const matchingDomain = domains.find(d => d.domain_name === senderDomain);
+                                        const dkimStatus = matchingDomain?.authenticated ? 'Authenticated' : 'Default';
+                                        const dmarcStatus = matchingDomain?.authenticated ? 'DMARC is configured' : 'Value not monitored';
+
+                                        return (
+                                            <div key={sender._id || sender.id} className="bg-[#003560] rounded-xl border border-white/10 overflow-hidden transition-all hover:border-blue-500/30">
+                                                {/* Top Row: Identity & Actions */}
+                                                <div className="p-6 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="font-medium text-white text-base">
+                                                            {sender.name} <span className="text-gray-400 ml-1 font-normal">&lt;{sender.email}&gt;</span>
+                                                        </div>
                                                         {sender.status === 'verified' ? (
-                                                            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-green-400 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">Verified</span>
+                                                            <span className="flex items-center gap-1.5 text-xs font-semibold text-green-400 bg-green-500/10 px-2.5 py-0.5 rounded-full border border-green-500/20">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div> Verified
+                                                            </span>
                                                         ) : (
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/20">Pending</span>
-                                                                <button onClick={() => handleResendSender(sender._id || sender.id)} className="text-xs text-blue-400 hover:text-white underline transition-colors">Resend Email</button>
-                                                            </div>
+                                                            <span className="flex items-center gap-1.5 text-xs font-semibold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div> Not Verified
+                                                            </span>
                                                         )}
                                                     </div>
-                                                    <div className="text-gray-400 font-mono text-xs">{sender.email}</div>
+
+                                                    <div className="flex items-center gap-3">
+                                                        {sender.status !== 'verified' && (
+                                                            <button
+                                                                onClick={() => handleResendSender(sender._id || sender.id)}
+                                                                className="px-4 py-1.5 bg-white text-slate-900 text-sm font-semibold rounded shadow hover:bg-gray-100 transition-colors"
+                                                            >
+                                                                Verify
+                                                            </button>
+                                                        )}
+                                                        <div className="relative group">
+                                                            <button className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                                                                <MoreVertical size={18} />
+                                                            </button>
+                                                            {/* Dropdown Menu */}
+                                                            <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                                                                <button onClick={() => handleDeleteSender(sender._id || sender.id)} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 rounded-lg">Delete Sender</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Bottom Row: Technical Details */}
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-[#002747]/30 text-sm">
+                                                    <div>
+                                                        <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">IP Address</span>
+                                                        <div className="flex items-center gap-2 text-gray-300">
+                                                            {sender.ip || 'Shared IP'}
+                                                            <span className="text-gray-500 cursor-help" title="Using Brevo Shared IPs">
+                                                                <AlertCircle size={14} />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">DKIM Signature</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={matchingDomain?.authenticated ? 'text-green-400 font-medium' : 'text-orange-400 font-medium'}>
+                                                                {matchingDomain ? matchingDomain.domain_name : 'Default'}
+                                                            </span>
+                                                            {matchingDomain?.authenticated ? (
+                                                                <CheckCircle size={14} className="text-green-500" />
+                                                            ) : (
+                                                                <AlertCircle size={14} className="text-orange-500" />
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">DMARC</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={matchingDomain?.authenticated ? 'text-green-400' : 'text-gray-400'}>
+                                                                {dmarcStatus}
+                                                            </span>
+                                                            {matchingDomain?.authenticated && <CheckCircle size={14} className="text-green-500" />}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2">
-                                                <button onClick={() => handleDeleteSender(sender._id || sender.id)} className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><MoreVertical size={16} /></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                        );
+                                    })}
+                                </div>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -341,8 +400,8 @@ export default function SenderSettings() {
                             </div>
                             <form onSubmit={handleAddSender} className="p-6">
                                 <div className="space-y-4">
-                                    <input value={newSender.name} onChange={e => setNewSender({ ...newSender, name: e.target.value })} required type="text" placeholder="Sender Name" className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500" />
-                                    <input value={newSender.email} onChange={e => setNewSender({ ...newSender, email: e.target.value })} required type="email" placeholder="Sender Email" className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500" />
+                                    <input value={newSender.name} onChange={e => setNewSender({ ...newSender, name: e.target.value })} required type="text" placeholder="Sender Name" className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" />
+                                    <input value={newSender.email} onChange={e => setNewSender({ ...newSender, email: e.target.value })} required type="email" placeholder="Sender Email" className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" />
                                 </div>
                                 <div className="flex justify-end gap-3 mt-6">
                                     <button type="button" onClick={() => setIsSenderModalOpen(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
@@ -389,7 +448,7 @@ export default function SenderSettings() {
                                                 required
                                                 type="text"
                                                 placeholder="e.g. usmanricemills.com"
-                                                className="w-full bg-[#002747] border border-white/10 rounded-xl px-5 py-4 text-white text-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-600"
+                                                className="w-full bg-[#002747] border border-white/10 rounded-xl px-5 py-4 text-white text-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-600"
                                             />
                                             <p className="text-xs text-gray-500 mt-2">You will need access to your domain's DNS settings.</p>
                                         </div>

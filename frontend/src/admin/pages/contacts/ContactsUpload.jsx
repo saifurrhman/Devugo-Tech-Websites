@@ -4,6 +4,7 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { ContactAPI, ListAPI } from '../../../lib/api';
+import CustomSelect from '../../../components/CustomSelect';
 import { Upload, X, Check, FileText, ChevronRight } from 'lucide-react';
 
 export default function ContactsUpload() {
@@ -196,18 +197,19 @@ export default function ContactsUpload() {
                                     <label className="block text-sm font-medium text-gray-400 mb-2">
                                         Add to List (Optional)
                                     </label>
-                                    <select
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors appearance-none cursor-pointer"
+                                    <CustomSelect
                                         value={selectedListId}
-                                        onChange={(e) => setSelectedListId(e.target.value)}
-                                    >
-                                        <option value="">-- No specific list --</option>
-                                        {lists.map(list => (
-                                            <option key={list._id} value={list._id}>
-                                                {list.name} ({list.count} contacts)
-                                            </option>
-                                        ))}
-                                    </select>
+                                        onChange={(val) => setSelectedListId(val)}
+                                        placeholder="-- No specific list --"
+                                        options={[
+                                            { value: '', label: '-- No specific list --' },
+                                            ...lists.map(list => ({
+                                                value: list._id,
+                                                label: `${list.name} (${list.count} contacts)`
+                                            }))
+                                        ]}
+                                        className="w-full"
+                                    />
                                 </div>
 
                                 <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-700 rounded-xl p-12 transition-colors hover:border-blue-500 hover:bg-gray-800/50">
@@ -254,22 +256,21 @@ export default function ContactsUpload() {
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-gray-600 text-xs">→</span>
                                                         <select
-                                                            className={`bg - gray - 900 border text - sm rounded px - 3 py - 1.5 outline - none min - w - [140px] transition - colors ${mapping[header] ? 'border-blue-500/50 text-white' : 'border-gray-700 text-gray-500'
-                                                                } `}
+                                                            className={`bg-[#002747] text-sm rounded px-3 py-1.5 outline-none min-w-[140px] transition-colors border ${mapping[header] ? 'border-blue-500 text-white' : 'border-white/10 text-gray-400'}`}
                                                             value={mapping[header] || ''}
                                                             onChange={(e) => handleMapChange(header, e.target.value)}
                                                         >
-                                                            <option value="">Ignore</option>
-                                                            <optgroup label="Contact Fields">
-                                                                <option value="name">Full Name</option>
-                                                                <option value="email">Email Address</option>
-                                                                <option value="phone">Phone Number</option>
-                                                                <option value="company">Company</option>
-                                                                <option value="jobTitle">Job Title</option>
-                                                                <option value="website">Website</option>
-                                                                <option value="city">City</option>
-                                                                <option value="country">Country</option>
-                                                                <option value="tags">Tags</option>
+                                                            <option value="" className="bg-[#002747] text-white">Ignore</option>
+                                                            <optgroup label="Contact Fields" className="bg-[#002747] text-white">
+                                                                <option value="name" className="bg-[#002747] text-white py-2">Full Name</option>
+                                                                <option value="email" className="bg-[#002747] text-white py-2">Email Address</option>
+                                                                <option value="phone" className="bg-[#002747] text-white py-2">Phone Number</option>
+                                                                <option value="company" className="bg-[#002747] text-white py-2">Company</option>
+                                                                <option value="jobTitle" className="bg-[#002747] text-white py-2">Job Title</option>
+                                                                <option value="website" className="bg-[#002747] text-white py-2">Website</option>
+                                                                <option value="city" className="bg-[#002747] text-white py-2">City</option>
+                                                                <option value="country" className="bg-[#002747] text-white py-2">Country</option>
+                                                                <option value="tags" className="bg-[#002747] text-white py-2">Tags</option>
                                                             </optgroup>
                                                         </select>
                                                     </div>

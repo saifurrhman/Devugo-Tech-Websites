@@ -97,11 +97,11 @@ export default function CreateProject() {
                                             required
                                             value={formData.client}
                                             onChange={e => setFormData({ ...formData, client: e.target.value })}
-                                            className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
+                                            className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
                                         >
-                                            <option value="">Select Client</option>
+                                            <option value="" className="bg-[#002747] text-white">Select Client</option>
                                             {clients.map(client => (
-                                                <option key={client._id} value={client._id}>
+                                                <option key={client._id} value={client._id} className="bg-[#002747] text-white py-2">
                                                     {client.firstName} {client.lastName} ({client.email})
                                                 </option>
                                             ))}
@@ -191,12 +191,12 @@ export default function CreateProject() {
                                     <select
                                         value={formData.priority}
                                         onChange={e => setFormData({ ...formData, priority: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
+                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
                                     >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                        <option value="urgent">Urgent</option>
+                                        <option value="low" className="bg-[#002747] text-white py-2">Low</option>
+                                        <option value="medium" className="bg-[#002747] text-white py-2">Medium</option>
+                                        <option value="high" className="bg-[#002747] text-white py-2">High</option>
+                                        <option value="urgent" className="bg-[#002747] text-white py-2">Urgent</option>
                                     </select>
                                 </div>
                                 <div>
@@ -204,11 +204,11 @@ export default function CreateProject() {
                                     <select
                                         value={formData.status}
                                         onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
+                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
                                     >
-                                        <option value="planning">Planning</option>
-                                        <option value="in_progress">In Progress</option>
-                                        <option value="on_hold">On Hold</option>
+                                        <option value="planning" className="bg-[#002747] text-white py-2">Planning</option>
+                                        <option value="in_progress" className="bg-[#002747] text-white py-2">In Progress</option>
+                                        <option value="on_hold" className="bg-[#002747] text-white py-2">On Hold</option>
                                     </select>
                                 </div>
                             </div>

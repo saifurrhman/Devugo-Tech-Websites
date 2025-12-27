@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
+import CustomSelect from '../../../components/CustomSelect';
 import AIPanel from '../../../components/AIPanel';
 import RichTextEditor from '../../components/RichTextEditor';
 import { CampaignAPI, TemplateAPI, ContactAPI, AIAPI, SenderAPI, ListAPI } from '../../../lib/api';
@@ -178,25 +179,57 @@ export default function CreateCampaign() {
 
   // --- Render Steps ---
 
-  const renderStepIndicator = () => (
-    <div className="flex justify-between items-center max-w-3xl mx-auto mb-8 relative">
-      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-700 -z-10"></div>
-      {['Basics', 'Content', 'Follow-ups', 'Schedule'].map((label, idx) => {
-        const num = idx + 1;
-        const active = step >= num;
-        const current = step === num;
-        return (
-          <div key={label} className="flex flex-col items-center gap-2 bg-[#0f172a] px-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 transition-all ${active ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-800 border-gray-600 text-gray-500'
-              } ${current ? 'ring-4 ring-blue-500/20' : ''}`}>
-              {active ? <CheckCircle size={18} /> : num}
-            </div>
-            <span className={`text-xs font-medium uppercase tracking-wider ${active ? 'text-blue-400' : 'text-gray-500'}`}>{label}</span>
-          </div>
-        )
-      })}
-    </div>
-  );
+  const renderStepIndicator = () => {
+    const steps = ['Basics', 'Content', 'Follow-ups', 'Schedule'];
+    return (
+      <div
+        className="w-full max-w-4xl mx-auto mb-12 px-2 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        <div className="flex items-center justify-between relative min-w-[300px] py-4">
+          {steps.map((label, idx) => {
+            const num = idx + 1;
+            const isCompleted = step > num;
+            const isActive = step === num;
+            const isLast = idx === steps.length - 1;
+
+            return (
+              <React.Fragment key={label}>
+                {/* Step Circle & Label */}
+                <div className="flex flex-col items-center relative z-10 group cursor-pointer" onClick={() => step > num ? setStep(num) : null}>
+                  <div
+                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg border-2 transition-all duration-300 ${isActive
+                      ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.5)] scale-110'
+                      : isCompleted
+                        ? 'bg-[#0f172a] border-blue-500 text-blue-500'
+                        : 'bg-[#0f172a] border-gray-700 text-gray-500'
+                      }`}
+                  >
+                    {isCompleted ? <CheckCircle size={18} /> : num}
+                  </div>
+                  <span
+                    className={`absolute -bottom-8 text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-white' : isCompleted ? 'text-blue-400' : 'text-gray-600'} ${isActive ? 'opacity-100' : 'opacity-0 sm:opacity-100'}`}
+                  >
+                    {label}
+                  </span>
+                </div>
+
+                {/* Connector Line */}
+                {!isLast && (
+                  <div className="flex-1 mx-2 sm:mx-4 h-[2px] bg-gray-800 relative rounded-full overflow-hidden">
+                    <div
+                      className={`absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 transition-all duration-500 ease-out`}
+                      style={{ width: isCompleted ? '100%' : '0%' }}
+                    ></div>
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="admin-layout">
@@ -215,7 +248,7 @@ export default function CreateCampaign() {
 
           {renderStepIndicator()}
 
-          <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-8 min-h-[400px]">
+          <div className="bg-[#003560] border border-white/10 rounded-xl p-8 min-h-[400px] shadow-xl">
 
             {/* STEP 1: BASICS */}
             {step === 1 && (
@@ -246,23 +279,30 @@ export default function CreateCampaign() {
                   </div>
                   <div className="form-group">
                     <label className="block text-sm font-medium text-gray-300 mb-2">Sender Email</label>
-                    <select
-                      name="senderEmail"
-                      value={formData.senderEmail}
-                      onChange={handleInputChange}
-                      className="w-full bg-gray-800 border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
-                    >
-                      <option value="">Select a sender...</option>
-                      {senders.map(sender => (
-                        <option key={sender._id} value={sender.email}>
-                          {sender.email}
-                        </option>
-                      ))}
-                      {/* Fallback if no senders found or while loading */}
-                      {senders.length === 0 && (
-                        <option value="info@devugo-tech.com">info@devugo-tech.com (Default)</option>
-                      )}
-                    </select>
+                    {senders.filter(s => s.status === 'verified').length > 0 ? (
+                      <CustomSelect
+                        value={formData.senderEmail}
+                        onChange={(val) => setFormData(prev => ({ ...prev, senderEmail: val }))}
+                        options={senders
+                          .filter(s => s.status === 'verified')
+                          .map(sender => ({ value: sender.email, label: sender.email }))
+                        }
+                        placeholder="Select a verified sender..."
+                      />
+                    ) : (
+                      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 flex items-center justify-between">
+                        <span className="text-yellow-400 text-sm">No verified senders found.</span>
+                        <button
+                          onClick={() => navigate('/admin/settings/senders')}
+                          className="text-xs bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 px-3 py-1.5 rounded transition-colors"
+                        >
+                          Add & Verify Sender
+                        </button>
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">
+                      Only verified emails can be used as senders. <button onClick={() => navigate('/admin/settings/senders')} className="text-blue-400 hover:underline">Manage Senders</button>
+                    </p>
                   </div>
                 </div>
 
@@ -276,32 +316,28 @@ export default function CreateCampaign() {
                       <Upload size={14} /> Import from CSV
                     </button>
                   </div>
-                  <select
+                  <CustomSelect
                     value={formData.audienceList[0] || ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setFormData(prev => ({ ...prev, audienceList: val ? [val] : [] }));
-                    }}
-                    className="w-full bg-gray-800 border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
-                  >
-                    <option value="">Select Audience...</option>
-                    <optgroup label="Presets">
-                      {lists.map(list => (
-                        <option key={list._id} value={list._id}>
-                          {list.name} ({list.count} contacts)
-                        </option>
-                      ))}
-                    </optgroup>
-                    {customLists.length > 0 && (
-                      <optgroup label="Your Lists">
-                        {customLists.map(list => (
-                          <option key={list._id} value={list._id}>
-                            {list.name} ({list.count} contacts)
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
-                  </select>
+                    onChange={(val) => setFormData(prev => ({ ...prev, audienceList: val ? [val] : [] }))}
+                    placeholder="Select Audience..."
+                    groups={true}
+                    options={[
+                      {
+                        label: 'Presets',
+                        options: lists.map(list => ({
+                          value: list._id,
+                          label: `${list.name} (${list.count} contacts)`
+                        }))
+                      },
+                      ...(customLists.length > 0 ? [{
+                        label: 'Your Lists',
+                        options: customLists.map(list => ({
+                          value: list._id,
+                          label: `${list.name} (${list.count} contacts)`
+                        }))
+                      }] : [])
+                    ]}
+                  />
                 </div>
               </div>
             )}

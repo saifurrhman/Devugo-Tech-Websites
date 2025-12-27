@@ -113,14 +113,14 @@ export default function UsersList() {
             <main className="admin-content">
                 <AdminTopbar />
 
-                <div className="toolbar flex justify-between items-center mb-6">
+                <div className="toolbar flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h1 className="text-2xl font-bold mb-1">Users & Roles</h1>
                         <p className="text-gray-400 text-sm">Manage system access and permissions</p>
                     </div>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="btn flex items-center gap-2"
+                        className="btn w-full md:w-auto flex items-center justify-center gap-2"
                     >
                         <UserPlus size={18} />
                         Invite User
@@ -130,7 +130,7 @@ export default function UsersList() {
                 {loading ? (
                     <div className="card p-8 text-center text-gray-400">Loading users...</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {users.map(user => (
                             <div key={user._id} className="card p-5 relative group">
                                 <div className="flex items-start justify-between mb-4">
