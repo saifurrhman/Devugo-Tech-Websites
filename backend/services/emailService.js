@@ -317,6 +317,32 @@ class EmailService {
               <a href="${data.verificationLink}" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Verify Email</a>
             </div>
           `
+        },
+        invitation: {
+          subject: 'You have been invited to join Devugo Tech',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h1 style="color: #333;">Welcome to Devugo Tech!</h1>
+              <p>You have been invited to join the team.</p>
+              <p>Click the button below to accept your invitation and set your password:</p>
+              <a href="${data.invitationLink}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Accept Invitation</a>
+              <p style="color: #666; font-size: 12px; margin-top: 20px;">This link expires in 48 hours.</p>
+            </div>
+          `
+        },
+        otpReset: {
+          subject: 'Password Reset OTP',
+          html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1 style="color: #333;">Password Reset OTP</h1>
+                <p>You requested to reset your password. Use the code below to proceed.</p>
+                <div style="background: #f4f4f4; padding: 15px; border-radius: 5px; font-size: 24px; font-weight: bold; letter-spacing: 5px; text-align: center; margin: 20px 0;">
+                  ${data.otp}
+                </div>
+                <p>This code expires in 15 minutes.</p>
+                <p style="color: #666; font-size: 12px;">If you didn't request this, please ignore this email.</p>
+              </div>
+            `
         }
       };
 

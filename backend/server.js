@@ -143,9 +143,15 @@ app.get('/api/health', async (_req, res) => {
 console.log('📋 Loading existing routes...');
 
 // Auth Routes
+// Auth Routes
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
-console.log('✅ Auth routes loaded');
+
+// Admin Routes (User Management)
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
+
+console.log('✅ Auth & Admin routes loaded');
 
 // Blog Routes
 const blogRoutes = require('./routes/blog');
@@ -500,6 +506,7 @@ const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log('\n' + '='.repeat(60));
   console.log('🚀 SERVER STARTED SUCCESSFULLY');
+  console.log('🔄 Forced Restart Triggered');
   console.log('='.repeat(60));
   console.log(`📍 Port: ${PORT}`);
   console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
@@ -573,4 +580,4 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-// Forced restart trigger 3 (Schema Update)
+// Forced restart trigger 10 (Fix Syntax Error)

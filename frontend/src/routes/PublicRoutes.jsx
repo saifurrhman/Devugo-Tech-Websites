@@ -21,11 +21,13 @@ import BlogEdit from '../admin/pages/BlogEdit';
 import AdminBlogCreate from '../admin/pages/AdminBlogCreate';
 import TeamList from '../admin/pages/TeamList';
 import TeamEdit from '../admin/pages/TeamEdit';
+import UsersList from '../admin/pages/UsersList';
 import Contacts from '../admin/pages/Contacts';
 import Analytics from '../admin/pages/Analytics';
 import Login from '../admin/pages/Login';
 import Signup from '../admin/pages/Signup';
 import ResetPassword from '../admin/pages/ResetPassword';
+import AcceptInvitation from '../admin/pages/AcceptInvitation';
 import ProtectedRoute from './ProtectedRoute';
 import AdminProfile from '../admin/pages/AdminProfile';
 import ServicesList from '../admin/pages/ServicesList';
@@ -99,6 +101,7 @@ export default function PublicRoutes() {
           <Route path="/admin/login" element={<Login />} />
           <Route path="/admin/signup" element={<Signup />} />
           <Route path="/admin/reset-password" element={<ResetPassword />} />
+          <Route path="/admin/invite/:token" element={<AcceptInvitation />} />
           <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
 
           {/* Admin Dashboard */}
@@ -118,6 +121,7 @@ export default function PublicRoutes() {
           {/* Admin Team */}
           <Route path="/admin/team" element={<ProtectedRoute><TeamList /></ProtectedRoute>} />
           <Route path="/admin/team/:id" element={<ProtectedRoute><TeamEdit /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><UsersList /></ProtectedRoute>} />
 
           {/* Admin Contacts & Leads */}
           <Route path="/admin/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
@@ -145,27 +149,27 @@ export default function PublicRoutes() {
           <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
           {/* Email Marketing Routes */}
-          <Route path="/admin/campaigns" element={<ProtectedRoute><CampaignsList /></ProtectedRoute>} />
-          <Route path="/admin/campaigns/create" element={<ProtectedRoute><CreateCampaign /></ProtectedRoute>} />
-          <Route path="/admin/recipients" element={<ProtectedRoute><ContactsList /></ProtectedRoute>} />
-          <Route path="/admin/inbox" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
-          <Route path="/admin/inbox/:id" element={<ProtectedRoute><InboxList /></ProtectedRoute>} />
-          <Route path="/admin/templates" element={<ProtectedRoute><TemplatesList /></ProtectedRoute>} />
-          <Route path="/admin/templates/create" element={<ProtectedRoute><CreateTemplate /></ProtectedRoute>} />
-          <Route path="/admin/templates/ai-generator" element={<ProtectedRoute><AITemplateGenerator /></ProtectedRoute>} />
-          <Route path="/admin/email-analytics" element={<ProtectedRoute><EmailAnalytics /></ProtectedRoute>} />
-          <Route path="/admin/settings/email" element={<ProtectedRoute><SMTPSettings /></ProtectedRoute>} />
-          <Route path="/admin/settings/senders" element={<ProtectedRoute><SenderSettings /></ProtectedRoute>} />
-          <Route path="/admin/settings/domains/:domain" element={<ProtectedRoute><DomainDNS /></ProtectedRoute>} />
+          <Route path="/admin/campaigns" element={<ProtectedRoute allowedRoles={['email_marketing']}><CampaignsList /></ProtectedRoute>} />
+          <Route path="/admin/campaigns/create" element={<ProtectedRoute allowedRoles={['email_marketing']}><CreateCampaign /></ProtectedRoute>} />
+          <Route path="/admin/recipients" element={<ProtectedRoute allowedRoles={['email_marketing']}><ContactsList /></ProtectedRoute>} />
+          <Route path="/admin/inbox" element={<ProtectedRoute allowedRoles={['email_marketing']}><InboxList /></ProtectedRoute>} />
+          <Route path="/admin/inbox/:id" element={<ProtectedRoute allowedRoles={['email_marketing']}><InboxList /></ProtectedRoute>} />
+          <Route path="/admin/templates" element={<ProtectedRoute allowedRoles={['email_marketing']}><TemplatesList /></ProtectedRoute>} />
+          <Route path="/admin/templates/create" element={<ProtectedRoute allowedRoles={['email_marketing']}><CreateTemplate /></ProtectedRoute>} />
+          <Route path="/admin/templates/ai-generator" element={<ProtectedRoute allowedRoles={['email_marketing']}><AITemplateGenerator /></ProtectedRoute>} />
+          <Route path="/admin/email-analytics" element={<ProtectedRoute allowedRoles={['email_marketing']}><EmailAnalytics /></ProtectedRoute>} />
+          <Route path="/admin/settings/email" element={<ProtectedRoute allowedRoles={['email_marketing']}><SMTPSettings /></ProtectedRoute>} />
+          <Route path="/admin/settings/senders" element={<ProtectedRoute allowedRoles={['email_marketing']}><SenderSettings /></ProtectedRoute>} />
+          <Route path="/admin/settings/domains/:domain" element={<ProtectedRoute allowedRoles={['email_marketing']}><DomainDNS /></ProtectedRoute>} />
 
           {/* CRM & Projects Routes */}
-          <Route path="/admin/pipeline" element={<ProtectedRoute><PipelineBoard /></ProtectedRoute>} />
-          <Route path="/admin/projects" element={<ProtectedRoute><ProjectsList /></ProtectedRoute>} />
-          <Route path="/admin/projects/create" element={<ProtectedRoute><CreateProject /></ProtectedRoute>} />
-          <Route path="/admin/invoices" element={<ProtectedRoute><InvoicesList /></ProtectedRoute>} />
-          <Route path="/admin/invoices/create" element={<ProtectedRoute><CreateInvoice /></ProtectedRoute>} />
-          <Route path="/admin/meetings" element={<ProtectedRoute><MeetingsList /></ProtectedRoute>} />
-          <Route path="/admin/meetings/schedule" element={<ProtectedRoute><MeetingScheduler /></ProtectedRoute>} />
+          <Route path="/admin/pipeline" element={<ProtectedRoute allowedRoles={['crm']}><PipelineBoard /></ProtectedRoute>} />
+          <Route path="/admin/projects" element={<ProtectedRoute allowedRoles={['crm']}><ProjectsList /></ProtectedRoute>} />
+          <Route path="/admin/projects/create" element={<ProtectedRoute allowedRoles={['crm']}><CreateProject /></ProtectedRoute>} />
+          <Route path="/admin/invoices" element={<ProtectedRoute allowedRoles={['crm']}><InvoicesList /></ProtectedRoute>} />
+          <Route path="/admin/invoices/create" element={<ProtectedRoute allowedRoles={['crm']}><CreateInvoice /></ProtectedRoute>} />
+          <Route path="/admin/meetings" element={<ProtectedRoute allowedRoles={['crm']}><MeetingsList /></ProtectedRoute>} />
+          <Route path="/admin/meetings/schedule" element={<ProtectedRoute allowedRoles={['crm']}><MeetingScheduler /></ProtectedRoute>} />
         </Routes>
 
         {/* WhatsApp Float - Shows on all pages */}

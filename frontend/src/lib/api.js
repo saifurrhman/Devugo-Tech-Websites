@@ -55,6 +55,18 @@ export const AuthAPI = {
   resetPassword: (token, password) => api('/api/auth/reset-password-confirm', { method: 'POST', body: { token, password } }),
   updateMe: (payload) => api('/api/auth/me', { method: 'PATCH', body: payload }),
   changePassword: (payload) => api('/api/auth/change-password', { method: 'POST', body: payload }),
+  sendOTP: (email) => api('/api/auth/send-otp', { method: 'POST', body: { email } }),
+  resetPasswordWithOTP: (payload) => api('/api/auth/reset-password-otp', { method: 'POST', body: payload }),
+
+  // Admin User Management
+  getUsers: () => api('/api/auth/users'),
+  inviteUser: (payload) => api('/api/admin/invite', { method: 'POST', body: payload }),
+  resendInvitation: (id) => api(`/api/admin/invite/${id}/resend`, { method: 'POST' }),
+  acceptInvitation: (payload) => api('/api/auth/invite/accept', { method: 'POST', body: payload }),
+
+  // User Management
+  deleteUser: (id) => api(`/api/admin/users/${id}`, { method: 'DELETE' }),
+  toggleUserStatus: (id) => api(`/api/admin/users/${id}/status`, { method: 'PATCH' }),
 };
 
 // ============================================

@@ -4,7 +4,7 @@ import { AuthAPI } from '../lib/api';
 import {
   LayoutDashboard, Briefcase, CreditCard, Image, Star, HelpCircle, FileText,
   Share2, Edit, Users, UserCheck, Send, UserPlus, Inbox, Layout, BarChart,
-  GitMerge, Folder, Calendar, PieChart, Settings, User, LogOut, Menu
+  GitMerge, Folder, Calendar, PieChart, Settings, User, LogOut, Menu, Shield
 } from 'lucide-react';
 
 export default function AdminSidebar() {
@@ -20,6 +20,15 @@ export default function AdminSidebar() {
     document.body.classList.add(theme);
     localStorage.setItem('adminTheme', theme);
   }, [theme]);
+
+  // Get current user role
+  const user = JSON.parse(localStorage.getItem('adminUser') || '{}');
+  const role = user.role || 'user';
+  const isSuperAdmin = role === 'admin';
+  const isEmailAdmin = role === 'email_marketing' || isSuperAdmin;
+  const isCrmAdmin = role === 'crm' || isSuperAdmin;
+  const isBlogWriter = role === 'blog_writer' || isSuperAdmin;
+  const isWebsiteManager = role === 'website_manager' || isSuperAdmin;
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 920px)');
@@ -81,151 +90,183 @@ export default function AdminSidebar() {
             <span className="label">Dashboard</span>
           </NavLink>
 
-          <NavLink to="/admin/services" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Briefcase size={20} /></span>
-            <span className="label">Services</span>
-          </NavLink>
+          {isWebsiteManager && (
+            <>
+              <NavLink to="/admin/services" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Briefcase size={20} /></span>
+                <span className="label">Services</span>
+              </NavLink>
 
-          <NavLink to="/admin/pricing" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><CreditCard size={20} /></span>
-            <span className="label">Pricing</span>
-          </NavLink>
+              <NavLink to="/admin/pricing" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><CreditCard size={20} /></span>
+                <span className="label">Pricing</span>
+              </NavLink>
 
-          <NavLink to="/admin/portfolio" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Image size={20} /></span>
-            <span className="label">Portfolio</span>
-          </NavLink>
+              <NavLink to="/admin/portfolio" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Image size={20} /></span>
+                <span className="label">Portfolio</span>
+              </NavLink>
 
-          <NavLink to="/admin/reviews" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Star size={20} /></span>
-            <span className="label">Reviews</span>
-          </NavLink>
+              <NavLink to="/admin/reviews" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Star size={20} /></span>
+                <span className="label">Reviews</span>
+              </NavLink>
 
-          <NavLink to="/admin/faqs" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><HelpCircle size={20} /></span>
-            <span className="label">FAQs</span>
-          </NavLink>
+              <NavLink to="/admin/faqs" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><HelpCircle size={20} /></span>
+                <span className="label">FAQs</span>
+              </NavLink>
 
-          <NavLink to="/admin/forms" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><FileText size={20} /></span>
-            <span className="label">Forms</span>
-          </NavLink>
+              <NavLink to="/admin/forms" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><FileText size={20} /></span>
+                <span className="label">Forms</span>
+              </NavLink>
 
-          <NavLink to="/admin/social-links" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Share2 size={20} /></span>
-            <span className="label">Social Links</span>
-          </NavLink>
+              <NavLink to="/admin/social-links" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Share2 size={20} /></span>
+                <span className="label">Social Links</span>
+              </NavLink>
 
-          <NavLink to="/admin/blog" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Edit size={20} /></span>
-            <span className="label">Blog</span>
-          </NavLink>
+              <NavLink to="/admin/team" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Users size={20} /></span>
+                <span className="label">Team</span>
+              </NavLink>
+            </>
+          )}
 
-          <NavLink to="/admin/team" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Users size={20} /></span>
-            <span className="label">Team</span>
-          </NavLink>
+          {isBlogWriter && (
+            <>
+              <NavLink to="/admin/blog" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Edit size={20} /></span>
+                <span className="label">Blog</span>
+              </NavLink>
+            </>
+          )}
 
-          <NavLink
-            to="/admin/contacts"
-            className={({ isActive }) => `admin-link ${isActive && !location.pathname.includes('/recipients') ? 'active' : ''}`}
-          >
-            <span className="icon"><UserCheck size={20} /></span>
-            <span className="label">Contacts</span>
-          </NavLink>
+          {isSuperAdmin && (
+            <NavLink to="/admin/users" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+              <span className="icon"><Shield size={20} /></span>
+              <span className="label">Users & Roles</span>
+            </NavLink>
+          )}
+
+          {/* CONTACTS - Visible to Admin & Email Marketing */}
+          {isEmailAdmin && (
+            <NavLink
+              to="/admin/contacts"
+              className={({ isActive }) => `admin-link ${isActive && !location.pathname.includes('/recipients') ? 'active' : ''}`}
+            >
+              <span className="icon"><UserCheck size={20} /></span>
+              <span className="label">Contacts</span>
+            </NavLink>
+          )}
 
           {/* 🔥 EMAIL MARKETING SECTION 🔥 */}
-          <div className="nav-divider">
-            <span className="nav-divider__label">Email Marketing</span>
-          </div>
+          {isEmailAdmin && (
+            <>
+              <div className="nav-divider">
+                <span className="nav-divider__label">Email Marketing</span>
+              </div>
 
-          <NavLink to="/admin/campaigns" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Send size={20} /></span>
-            <span className="label">Campaigns</span>
-            <span className="badge badge--new">New</span>
-          </NavLink>
+              <NavLink to="/admin/campaigns" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Send size={20} /></span>
+                <span className="label">Campaigns</span>
+                <span className="badge badge--new">New</span>
+              </NavLink>
 
-          <NavLink
-            to="/admin/recipients"
-            className={({ isActive }) => `admin-link ${isActive || location.pathname.includes('/admin/recipients') ? 'active' : ''}`}
-          >
-            <span className="icon"><UserPlus size={20} /></span>
-            <span className="label">Recipients</span>
-          </NavLink>
+              <NavLink
+                to="/admin/recipients"
+                className={({ isActive }) => `admin-link ${isActive || location.pathname.includes('/admin/recipients') ? 'active' : ''}`}
+              >
+                <span className="icon"><UserPlus size={20} /></span>
+                <span className="label">Recipients</span>
+              </NavLink>
 
-          <NavLink to="/admin/inbox" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Inbox size={20} /></span>
-            <span className="label">Inbox</span>
-          </NavLink>
+              <NavLink to="/admin/inbox" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Inbox size={20} /></span>
+                <span className="label">Inbox</span>
+              </NavLink>
 
-          <NavLink to="/admin/templates" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Layout size={20} /></span>
-            <span className="label">Templates</span>
-          </NavLink>
+              <NavLink to="/admin/templates" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Layout size={20} /></span>
+                <span className="label">Templates</span>
+              </NavLink>
 
-          <NavLink to="/admin/email-analytics" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><BarChart size={20} /></span>
-            <span className="label">Email Analytics</span>
-          </NavLink>
+              <NavLink to="/admin/email-analytics" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><BarChart size={20} /></span>
+                <span className="label">Email Analytics</span>
+              </NavLink>
+            </>
+          )}
 
           {/* 🔥 CRM & PROJECTS SECTION 🔥 */}
-          <div className="nav-divider">
-            <span className="nav-divider__label">CRM & Projects</span>
-          </div>
+          {isCrmAdmin && (
+            <>
+              <div className="nav-divider">
+                <span className="nav-divider__label">CRM & Projects</span>
+              </div>
 
-          <NavLink to="/admin/pipeline" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><GitMerge size={20} /></span>
-            <span className="label">Pipeline</span>
-            <span className="badge badge--new">New</span>
-          </NavLink>
+              <NavLink to="/admin/pipeline" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><GitMerge size={20} /></span>
+                <span className="label">Pipeline</span>
+                <span className="badge badge--new">New</span>
+              </NavLink>
 
-          <NavLink to="/admin/projects" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Folder size={20} /></span>
-            <span className="label">Projects</span>
-            <span className="badge badge--new">New</span>
-          </NavLink>
+              <NavLink to="/admin/projects" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Folder size={20} /></span>
+                <span className="label">Projects</span>
+                <span className="badge badge--new">New</span>
+              </NavLink>
 
-          <NavLink to="/admin/invoices" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><FileText size={20} /></span>
-            <span className="label">Invoices</span>
-            <span className="badge badge--new">New</span>
-          </NavLink>
+              <NavLink to="/admin/invoices" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><FileText size={20} /></span>
+                <span className="label">Invoices</span>
+                <span className="badge badge--new">New</span>
+              </NavLink>
 
-          <NavLink to="/admin/meetings" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Calendar size={20} /></span>
-            <span className="label">Meetings</span>
-            <span className="badge badge--new">New</span>
-          </NavLink>
+              <NavLink to="/admin/meetings" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Calendar size={20} /></span>
+                <span className="label">Meetings</span>
+                <span className="badge badge--new">New</span>
+              </NavLink>
+            </>
+          )}
 
-          {/* DIVIDER BEFORE ANALYTICS */}
-          <div className="nav-divider"></div>
+          {/* GENERAL ANALYTICS - Hidden for CRM Role */}
+          {isSuperAdmin && (
+            <NavLink to="/admin/analytics" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+              <span className="icon"><PieChart size={20} /></span>
+              <span className="label">Analytics</span>
+            </NavLink>
+          )}
 
-          <NavLink to="/admin/analytics" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-            <span className="icon"><PieChart size={20} /></span>
-            <span className="label">Analytics</span>
-          </NavLink>
+          {/* SETTINGS SECTION */}
+          {(isEmailAdmin || isSuperAdmin || isWebsiteManager) && (
+            <div className="nav-divider">
+              <span className="nav-divider__label">Settings</span>
+            </div>
+          )}
 
+          {isEmailAdmin && (
+            <NavLink
+              to="/admin/settings/senders"
+              className={({ isActive }) => `admin-link ${isActive || location.pathname.startsWith('/admin/settings/domains') ? 'active' : ''}`}
+            >
+              <span className="icon"><Users size={20} /></span>
+              <span className="label">Senders & Domains</span>
+            </NavLink>
+          )}
 
-          <div className="nav-divider">
-            <span className="nav-divider__label">Settings</span>
-          </div>
-
-          <NavLink
-            to="/admin/settings/senders"
-            className={({ isActive }) => `admin-link ${isActive || location.pathname.startsWith('/admin/settings/domains') ? 'active' : ''}`}
-          >
-            <span className="icon"><Users size={20} /></span>
-            <span className="label">Senders & Domains</span>
-          </NavLink>
-
-          <NavLink
-            to="/admin/settings"
-            end
-            className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}
-          >
-            <span className="icon"><Settings size={20} /></span>
-            <span className="label">General Settings</span>
-          </NavLink>
+          {(isSuperAdmin || isWebsiteManager) && (
+            <NavLink
+              to="/admin/settings"
+              end
+              className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}
+            >
+              <span className="icon"><Settings size={20} /></span>
+              <span className="label">General Settings</span>
+            </NavLink>
+          )}
         </nav>
 
         <div className="admin-sidebar__footer">
