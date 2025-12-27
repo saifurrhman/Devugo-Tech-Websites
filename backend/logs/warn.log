@@ -1,1 +1,6 @@
 {"timestamp":"2025-12-26T06:37:40.525Z","level":"WARN","message":"GEMINI_API_KEY is missing. AI features will use mock data."}
+{"timestamp":"2025-12-27T17:16:23.683Z","level":"WARN","message":"Zoom not configured"}
+{"timestamp":"2025-12-27T17:16:29.500Z","level":"WARN","message":"Zoom not configured"}
+{"timestamp":"2025-12-27T17:16:34.358Z","level":"WARN","message":"Zoom not configured"}
+{"timestamp":"2025-12-27T17:16:46.107Z","level":"WARN","message":"Zoom not configured"}
+{"timestamp":"2025-12-27T17:16:52.269Z","level":"WARN","message":"Zoom not configured"}

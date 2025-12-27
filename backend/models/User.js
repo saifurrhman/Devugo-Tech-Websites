@@ -63,8 +63,19 @@ const userSchema = new mongoose.Schema({
     id: String,
     email: String,
     name: String,
+  },
+  linkedin: {
+    id: String,
+    email: String,
+    name: String,
     picture: String
-  }
+  },
+  // Integration Tokens
+  zoomAccessToken: { type: String, select: false },
+  zoomRefreshToken: { type: String, select: false },
+  googleAccessToken: { type: String, select: false },
+  googleRefreshToken: { type: String, select: false },
+  calendlyToken: { type: String, select: false }
 }, {
   timestamps: true
 });

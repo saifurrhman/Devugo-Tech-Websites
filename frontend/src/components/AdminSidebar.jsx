@@ -267,6 +267,16 @@ export default function AdminSidebar() {
               <span className="label">General Settings</span>
             </NavLink>
           )}
+
+          {(isSuperAdmin || isCrmAdmin) && (
+            <NavLink
+              to="/admin/settings/integrations"
+              className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}
+            >
+              <span className="icon"><GitMerge size={20} /></span>
+              <span className="label">Integrations</span>
+            </NavLink>
+          )}
         </nav>
 
         <div className="admin-sidebar__footer">

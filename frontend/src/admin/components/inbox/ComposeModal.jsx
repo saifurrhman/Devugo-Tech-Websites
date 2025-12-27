@@ -11,7 +11,7 @@ export default function ComposeModal({ isOpen, onClose, onSent }) {
         subject: '',
         content: ''
     });
-
+        
     if (!isOpen) return null;
 
     const handleSubmit = async (e) => {

@@ -130,38 +130,38 @@ export default function UsersList() {
                 {loading ? (
                     <div className="card p-8 text-center text-gray-400">Loading users...</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         {users.map(user => (
-                            <div key={user._id} className="card p-5 relative group">
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${user.isActive ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`}>
+                            <div key={user._id} className="card p-4 sm:p-5 relative group flex flex-col h-full">
+                                <div className="flex items-start justify-between mb-4 gap-3">
+                                    <div className="flex items-center gap-3 min-w-0 overflow-hidden">
+                                        <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-lg ${user.isActive ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`}>
                                             {user.name?.charAt(0).toUpperCase()}
                                         </div>
-                                        <div>
-                                            <h3 className="font-semibold text-white leading-tight">{user.name}</h3>
-                                            <p className="text-sm text-gray-400">{user.email}</p>
+                                        <div className="min-w-0 flex-1">
+                                            <h3 className="font-semibold text-white leading-tight truncate text-sm sm:text-base" title={user.name}>{user.name}</h3>
+                                            <p className="text-xs sm:text-sm text-gray-400 truncate" title={user.email}>{user.email}</p>
                                         </div>
                                     </div>
-                                    <span className={`px-2 py-1 rounded text-xs border ${getRoleColor(user.role)}`}>
+                                    <span className={`flex-shrink-0 px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs border font-medium ${getRoleColor(user.role)}`}>
                                         {formatRole(user.role)}
                                     </span>
                                 </div>
 
-                                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-700/50">
+                                <div className="mt-auto pt-4 border-t border-gray-700/50 flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-xs">
                                         {user.isActive ? (
-                                            <span className="text-green-500 flex items-center gap-1">
+                                            <span className="text-green-500 flex items-center gap-1 font-medium">
                                                 <CheckCircle size={14} /> Active
                                             </span>
                                         ) : (
-                                            <span className="text-amber-500 flex items-center gap-1">
+                                            <span className="text-amber-500 flex items-center gap-1 font-medium">
                                                 <Clock size={14} /> {user.invitationToken ? 'Pending' : 'Blocked'}
                                             </span>
                                         )}
                                     </div>
 
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1 sm:gap-2">
                                         {/* Don't allow modifying self */}
                                         {user._id !== JSON.parse(localStorage.getItem('adminUser') || '{}')._id && (
                                             <>

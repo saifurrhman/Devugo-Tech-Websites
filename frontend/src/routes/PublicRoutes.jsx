@@ -71,6 +71,7 @@ import CreateInvoice from '../admin/pages/invoices/CreateInvoice';
 import MeetingScheduler from '../admin/pages/meetings/MeetingScheduler';
 
 import DynamicTitle from '../components/DynamicTitle';
+import Integrations from '../admin/pages/settings/Integrations';
 
 export default function PublicRoutes() {
   return (
@@ -161,6 +162,7 @@ export default function PublicRoutes() {
           <Route path="/admin/settings/email" element={<ProtectedRoute allowedRoles={['email_marketing']}><SMTPSettings /></ProtectedRoute>} />
           <Route path="/admin/settings/senders" element={<ProtectedRoute allowedRoles={['email_marketing']}><SenderSettings /></ProtectedRoute>} />
           <Route path="/admin/settings/domains/:domain" element={<ProtectedRoute allowedRoles={['email_marketing']}><DomainDNS /></ProtectedRoute>} />
+          <Route path="/admin/settings/integrations" element={<ProtectedRoute allowedRoles={['crm']}><Integrations /></ProtectedRoute>} />
 
           {/* CRM & Projects Routes */}
           <Route path="/admin/pipeline" element={<ProtectedRoute allowedRoles={['crm']}><PipelineBoard /></ProtectedRoute>} />

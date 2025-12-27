@@ -326,6 +326,14 @@ try {
   console.error('  ❌ AI routes error:', error.message);
 }
 
+try {
+  console.log('🔗 Loading integration routes...');
+  app.use('/api/integrations', require('./routes/integrationRoutes'));
+  console.log('  ✅ Integration routes loaded');
+} catch (error) {
+  console.error('  ❌ Integration routes error:', error.message);
+}
+
 // ========================================
 // CRM FEATURES ROUTES (DEBUG VERSION)
 // ========================================

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
-import { MeetingAPI, ContactAPI, ProjectAPI } from '../../../lib/api';
+import { MeetingAPI, ContactAPI, ProjectAPI, api } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
 
 export default function MeetingScheduler() {
@@ -53,16 +53,57 @@ export default function MeetingScheduler() {
             // Combine date and time
             const combinedDate = new Date(`${formData.scheduledDate}T${formData.time}`);
 
+            let meetingLink = '';
+            let additionalData = {};
+
+            // 1. Create External Meeting (Zoom / Google)
+            if (formData.platform === 'zoom' || formData.platform === 'google_meet') {
+                const integPlatform = formData.platform === 'google_meet' ? 'google' : 'zoom';
+                try {
+                    const res = await api('/api/integrations/create-meeting', {
+                        method: 'POST',
+                        body: {
+                            platform: integPlatform,
+                            topic: formData.title,
+                            startTime: combinedDate.toISOString(),
+                            duration: parseInt(formData.duration)
+                        }
+                    });
+
+                    if (res.success && res.data) {
+                        meetingLink = res.data.joinUrl;
+                        if (formData.platform === 'zoom') {
+                            additionalData.zoomMeetingId = res.data.id;
+                            additionalData.meetingPassword = res.data.password;
+                        } else {
+                            additionalData.googleCalendarEventId = res.data.id;
+                        }
+                        success(`Created ${formData.platform} meeting successfully`);
+                    }
+                } catch (integErr) {
+                    console.error('Integration Error:', integErr);
+                    warning(`Failed to create ${formData.platform} meeting, proceeding with local record.`);
+                }
+            }
+
+            // 2. Create Local Meeting Record
             const payload = {
                 ...formData,
                 scheduledDate: combinedDate,
                 duration: parseInt(formData.duration),
+                meetingLink: meetingLink, // Save generated link
+                ...additionalData,
                 // Parse participants emails
                 participants: formData.participants.split(',').map(email => ({
                     email: email.trim(),
                     role: 'participant'
                 })).filter(p => p.email)
             };
+
+            // Remove empty optional fields to prevent ObjectId cast errors
+            if (!payload.client) delete payload.client;
+            if (!payload.project) delete payload.project;
+            if (!payload.campaign) delete payload.campaign;
 
             await MeetingAPI.create(payload);
             success('Meeting scheduled successfully!');
