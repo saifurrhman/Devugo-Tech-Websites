@@ -4,12 +4,18 @@ const path = require('path');
 class Logger {
   constructor() {
     this.logDir = path.join(__dirname, '../logs');
+    this.fileLoggingDisabled = false;
     this.ensureLogDir();
   }
 
   ensureLogDir() {
-    if (!fs.existsSync(this.logDir)) {
-      fs.mkdirSync(this.logDir, { recursive: true });
+    try {
+      if (!fs.existsSync(this.logDir)) {
+        fs.mkdirSync(this.logDir, { recursive: true });
+      }
+    } catch (error) {
+      console.warn('⚠️ Logger: Cannot create log directory (likely read-only fs). File logging disabled.');
+      this.fileLoggingDisabled = true;
     }
   }
 
@@ -25,8 +31,18 @@ class Logger {
   }
 
   writeLog(filename, message) {
-    const logFile = path.join(this.logDir, filename);
-    fs.appendFileSync(logFile, message + '\n');
+    if (this.fileLoggingDisabled) return;
+    try {
+      const logFile = path.join(this.logDir, filename);
+      fs.appendFileSync(logFile, message + '\n');
+    } catch (error) {
+      if (error.code === 'EROFS') {
+        this.fileLoggingDisabled = true;
+        console.warn('⚠️ Logger: Read-only file system detected. disabling file logging.');
+      } else {
+        console.error('Logger write error:', error.message);
+      }
+    }
   }
 
   info(message, data = null) {
