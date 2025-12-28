@@ -137,6 +137,12 @@ app.get('/api/health', async (_req, res) => {
 });
 
 // ========================================
+// ACTIVITY LOGGING
+// ========================================
+// app.use(require('./middleware/activityLogger')); // MOVED TO AUTH MIDDLEWARE
+
+
+// ========================================
 // EXISTING ROUTES
 // ========================================
 

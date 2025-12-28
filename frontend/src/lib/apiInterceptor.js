@@ -154,7 +154,7 @@ export async function fetchWithAuth(url, options = {}) {
         if (window.location.pathname !== '/admin/login') {
           window.location.href = '/admin/login';
         }
-        throw new Error(errorData.message || 'Unauthorized');
+        throw new Error(errorData.error || errorData.message || 'Unauthorized');
       }
     }
 

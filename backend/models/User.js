@@ -59,11 +59,7 @@ const userSchema = new mongoose.Schema({
     name: String,
     picture: String
   },
-  linkedin: {
-    id: String,
-    email: String,
-    name: String,
-  },
+
   linkedin: {
     id: String,
     email: String,

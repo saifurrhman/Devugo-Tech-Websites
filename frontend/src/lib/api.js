@@ -61,6 +61,7 @@ export const AuthAPI = {
   // Admin User Management
   getUsers: () => api('/api/auth/users'),
   inviteUser: (payload) => api('/api/admin/invite', { method: 'POST', body: payload }),
+  getUserActivity: (id) => api(`/api/admin/users/${id}/activity`),
   resendInvitation: (id) => api(`/api/admin/invite/${id}/resend`, { method: 'POST' }),
   acceptInvitation: (payload) => api('/api/auth/invite/accept', { method: 'POST', body: payload }),
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { AuthAPI } from '../../lib/api';
-import { UserPlus, Mail, Shield, RefreshCw, Trash2, CheckCircle, Clock } from 'lucide-react';
+import { UserPlus, Mail, Shield, RefreshCw, Trash2, CheckCircle, Clock, Activity, X, Eye } from 'lucide-react';
 import { useNotification } from '../../contexts/NotificationContext';
 
 export default function UsersList() {
@@ -165,6 +165,15 @@ export default function UsersList() {
                                         {/* Don't allow modifying self */}
                                         {user._id !== JSON.parse(localStorage.getItem('adminUser') || '{}')._id && (
                                             <>
+                                                {/* View Activity */}
+                                                <button
+                                                    onClick={() => navigate(`/admin/users/${user._id}`)}
+                                                    className="p-1.5 text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 rounded transition-colors"
+                                                    title="View Activity & Profile"
+                                                >
+                                                    <Eye size={14} />
+                                                </button>
+
                                                 {/* Resend Invite (only if pending) */}
                                                 {!user.isActive && user.invitationToken && (
                                                     <button

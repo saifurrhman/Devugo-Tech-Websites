@@ -14,5 +14,6 @@ router.post('/invite/:id/resend', adminController.resendInvitation);
 // User Management
 router.delete('/users/:id', adminController.deleteUser);
 router.patch('/users/:id/status', adminController.toggleUserStatus);
+router.get('/users/:id/activity', adminController.getUserActivity);
 
 module.exports = router;

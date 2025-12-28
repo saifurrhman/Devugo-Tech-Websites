@@ -56,12 +56,14 @@ exports.inviteUser = async (req, res) => {
                 name: user.name
             });
         } catch (emailError) {
-            console.error('Failed to send invitation email:', emailError);
+            console.error('❌ Failed to send invitation email:', emailError);
+            console.error('   Stack:', emailError.stack);
             // We still return success but warn about email
             return res.status(201).json({
                 success: true,
-                message: 'User created but failed to send email. Check logs for link.',
-                invitationLink: process.env.NODE_ENV === 'development' ? invitationLink : undefined
+                message: 'User created but failed to send email. Check server logs.',
+                invitationLink: process.env.NODE_ENV === 'development' ? invitationLink : undefined,
+                emailError: emailError.message
             });
         }
 
@@ -185,5 +187,71 @@ exports.toggleUserStatus = async (req, res) => {
     } catch (err) {
         console.error('❌ Toggle status error:', err);
         res.status(500).json({ success: false, error: 'Server error' });
+    }
+};
+
+// ==========================================
+// GET USER ACTIVITY STATS
+// ==========================================
+exports.getUserActivity = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const ActivityLog = require('../models/ActivityLog');
+
+        // 1. Fetch recent logs (last 100)
+        const logs = await ActivityLog.find({ user: id })
+            .sort({ timestamp: -1 })
+            .limit(100);
+
+        // 2. Calculate Active Time (Approximation)
+        // We group logs by "session" (gaps > 30 mins start new session)
+        const allLogs = await ActivityLog.find({ user: id }).sort({ timestamp: 1 });
+        let totalDurationMs = 0;
+
+        if (allLogs.length > 1) {
+            for (let i = 0; i < allLogs.length - 1; i++) {
+                const current = new Date(allLogs[i].timestamp);
+                const next = new Date(allLogs[i + 1].timestamp);
+                const diff = next - current;
+
+                // If logs are within 30 mins of each other, count it as active time
+                if (diff < 30 * 60 * 1000) {
+                    totalDurationMs += diff;
+                }
+            }
+        }
+
+        // Convert to hours/minutes
+        const hours = Math.floor(totalDurationMs / (1000 * 60 * 60));
+        const minutes = Math.floor((totalDurationMs % (1000 * 60 * 60)) / (1000 * 60));
+        const activeTime = `${hours}h ${minutes}m`;
+
+        // 3. Get frequent IPs
+        const ipMap = {};
+        allLogs.forEach(log => {
+            if (log.ip) {
+                ipMap[log.ip] = (ipMap[log.ip] || 0) + 1;
+            }
+        });
+        // Sort IPs by frequency
+        const topIPs = Object.entries(ipMap)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 3)
+            .map(([ip]) => ip);
+
+        res.json({
+            success: true,
+            logs,
+            stats: {
+                activeTime,
+                topIPs,
+                lastActive: logs[0]?.timestamp || null,
+                totalActions: allLogs.length
+            }
+        });
+
+    } catch (error) {
+        console.error('Get Activity Error:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch activity logs' });
     }
 };

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const ActivityLog = require('../models/ActivityLog');
 const crypto = require('crypto');
 const emailService = require('../services/emailService');
 
@@ -103,26 +104,42 @@ exports.signup = async (req, res) => {
     // Set cookies
     setAuthCookies(res, { accessToken, refreshToken });
 
-    // Return user data (excluding sensitive fields)
-    const userData = user.toObject();
-    delete userData.passwordHash;
-    delete userData.password;
-    delete userData.__v;
+    // Send Welcome Email
+    try {
+      await emailService.sendTransactionalEmail('welcome', user.email, {
+        name: user.name
+      });
+      console.log('📨 Welcome email sent to:', user.email);
+    } catch (emailErr) {
+      console.error('⚠️ Failed to send welcome email:', emailErr.message);
+    }
+
+    // Log Activity (Signup)
+    ActivityLog.create({
+      user: user._id,
+      action: 'POST /api/auth/signup',
+      method: 'POST',
+      path: '/api/auth/signup',
+      ip: req.ip || (req.socket && req.socket.remoteAddress) || '0.0.0.0',
+      userAgent: req.headers['user-agent']
+    }).catch(err => console.error('Log Error:', err));
+
+
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful',
-      user: userData,
-      accessToken: accessToken
+      message: 'Account created successfully',
+      accessToken,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
     });
-
   } catch (err) {
-    console.error('❌ Signup error:', err);
-    res.status(500).json({
-      success: false,
-      error: 'Server error',
-      details: err.message
-    });
+    console.error('❌ Signup error:', err.message);
+    res.status(500).json({ success: false, error: err.message || 'Server error' });
   }
 };
 
@@ -133,7 +150,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('🔐 Login attempt:', { email, hasPassword: !!password });
+    console.log('🔑 Login request:', { email });
 
     // Validate input
     if (!email || !password) {
@@ -143,71 +160,95 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Find user with password hash
+    // Check for user
     const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordHash');
-
-    console.log('👤 User found:', !!user);
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid email or password'
+        error: 'Invalid credentials'
       });
     }
 
-    // Check if user is active
+    // Check user status
     if (!user.isActive) {
-      return res.status(401).json({
+      return res.status(403).json({
         success: false,
-        error: 'Account is inactive. Please contact support.'
+        error: 'Account is blocked. Please contact support.'
       });
     }
 
-    console.log('🔍 Has passwordHash:', !!user.passwordHash);
-
-    // Verify password
-    const isMatch = await user.correctPassword(password);
-
-    console.log('🔐 Password match:', isMatch);
-
+    // Check password
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid email or password'
+        error: 'Invalid credentials'
       });
     }
 
-    // Generate tokens
-    const accessToken = signAccess(user);
-    const refreshToken = signRefresh(user);
-
-    // Set cookies
-    setAuthCookies(res, { accessToken, refreshToken });
-
     // Update last login
-    user.lastLogin = new Date();
-    await user.save({ validateBeforeSave: false });
+    // Update last login
+    try {
+      user.lastLogin = Date.now();
+      await user.save({ validateBeforeSave: false }); // Skip validation for efficiency
+    } catch (saveErr) {
+      console.error('⚠️ User save error (non-fatal):', saveErr.message);
+    }
 
-    // Return user data
-    const userData = user.toObject();
-    delete userData.passwordHash;
-    delete userData.password;
-    delete userData.__v;
+    // Log Activity (Login) - Wrapped in try/catch so it doesn't block login
+    try {
+      if (ActivityLog) {
+        ActivityLog.create({
+          user: user._id,
+          action: 'POST /api/auth/login',
+          method: 'POST',
+          path: '/api/auth/login',
+          ip: req.ip || (req.socket && req.socket.remoteAddress) || '0.0.0.0',
+          userAgent: req.headers['user-agent']
+        }).catch(e => console.error('Activity Log Async Error:', e.message));
+      } else {
+        console.error('ActivityLog model is undefined');
+      }
+    } catch (logErr) {
+      console.error('Activity Log Sync Error:', logErr);
+    }
 
-    res.status(200).json({
+    // Generate tokens
+    let accessToken, refreshToken;
+    try {
+      accessToken = signAccess(user);
+      refreshToken = signRefresh(user);
+    } catch (tokenErr) {
+      console.error('❌ Token generation error:', tokenErr);
+      throw new Error('Token generation failed');
+    }
+
+    try {
+      setAuthCookies(res, { accessToken, refreshToken });
+    } catch (cookieErr) {
+      console.error('❌ Cookie setting error:', cookieErr);
+      // Don't throw, just log
+    }
+
+    // DEBUG: Confirm new code is running
+    res.set('X-Debug-Version', 'v2-logging-fix');
+
+    res.json({
       success: true,
       message: 'Login successful',
-      user: userData,
-      accessToken: accessToken
+      accessToken,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive
+      }
     });
-
   } catch (err) {
     console.error('❌ Login error:', err);
-    res.status(500).json({
-      success: false,
-      error: 'Server error',
-      details: err.message
-    });
+    res.status(500).json({ success: false, error: err.message || 'Server error' });
   }
 };
 
@@ -474,11 +515,20 @@ exports.requestPasswordReset = async (req, res) => {
 
     console.log('🔑 Password reset token:', resetToken);
 
-    // In production, send email here
+    console.log('🔑 Password reset token:', resetToken);
+
+    // Send Reset Email
+    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+
+    await emailService.sendTransactionalEmail('passwordReset', user.email, {
+      resetLink,
+      name: user.name
+    });
 
     res.json({
       success: true,
       message: 'Password reset email sent',
+
       // Only send token in development
       ...(process.env.NODE_ENV === 'development' && { resetToken })
     });
@@ -667,6 +717,8 @@ exports.sendResetOTP = async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase() });
 
+    console.log('🔍 OTP Request - User Found:', !!user, 'Email:', email);
+
     // Always return success to prevent email enumeration, but log internally
     if (!user) {
       console.log('⚠️ OTP Request for non-existent email:', email);
@@ -689,7 +741,18 @@ exports.sendResetOTP = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     // Send Email
-    await emailService.sendTransactionalEmail('otpReset', user.email, { otp });
+    console.log('📨 Sending OTP email to:', user.email, 'OTP:', otp);
+    const result = await emailService.sendTransactionalEmail('otpReset', user.email, { otp });
+    console.log('📨 OTP Email Result:', result);
+
+    if (!result.success) {
+      console.error('❌ Failed to send OTP email:', result.message);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to send OTP email',
+        details: process.env.NODE_ENV === 'development' ? result.message : undefined
+      });
+    }
 
     res.json({ success: true, message: 'OTP sent to your email.' });
 

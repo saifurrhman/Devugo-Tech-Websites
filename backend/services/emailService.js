@@ -7,7 +7,28 @@ let transporter = null;
 // Create transporter only if SMTP is enabled and credentials exist
 function createTransporter() {
   try {
-    // Check Brevo Configuration first
+    // Check if SMTP is enabled and has credentials (PRIORITY)
+    if (smtpConfig.smtp.enabled && smtpConfig.smtp.auth.user && smtpConfig.smtp.auth.pass) {
+      const transporter = nodemailer.createTransport({
+        host: smtpConfig.smtp.host,
+        port: smtpConfig.smtp.port,
+        secure: smtpConfig.smtp.secure,
+        auth: smtpConfig.smtp.auth
+      });
+
+      // Verify connection
+      transporter.verify((error, success) => {
+        if (error) {
+          logger.error('Email transporter error:', error);
+        } else {
+          logger.info('✅ Email server is ready to send messages (SMTP/Gmail)');
+        }
+      });
+
+      return transporter;
+    }
+
+    // Check Brevo Configuration (Fallback)
     if (smtpConfig.brevo && smtpConfig.brevo.enabled) {
       if (smtpConfig.brevo.apiKey) {
         logger.info('✅ Brevo Email Service is active');
@@ -15,25 +36,6 @@ function createTransporter() {
       }
       logger.warn('Brevo enabled but API Key is missing');
     }
-
-    // Check if SMTP is enabled and has credentials
-    if (!smtpConfig.smtp.enabled) {
-      logger.info('SMTP is disabled');
-      return null;
-    }
-
-    // Check if credentials exist
-    if (!smtpConfig.smtp.auth.user || !smtpConfig.smtp.auth.pass) {
-      logger.warn('SMTP credentials missing - email sending disabled');
-      return null;
-    }
-
-    const transporter = nodemailer.createTransport({
-      host: smtpConfig.smtp.host,
-      port: smtpConfig.smtp.port,
-      secure: smtpConfig.smtp.secure,
-      auth: smtpConfig.smtp.auth
-    });
 
     // Verify connection
     transporter.verify((error, success) => {
@@ -77,6 +79,8 @@ class EmailService {
           email: smtpConfig.brevo.senderEmail
         };
 
+        const axios = require('axios'); // Ensure axios is imported or require it here if not at top
+
         const payload = {
           sender,
           to: recipients,
@@ -86,34 +90,26 @@ class EmailService {
         };
 
         try {
-          const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-            method: 'POST',
+          const response = await axios.post('https://api.brevo.com/v3/smtp/email', payload, {
             headers: {
               'accept': 'application/json',
               'api-key': smtpConfig.brevo.apiKey,
               'content-type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+            }
           });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.message || 'Failed to send email via Brevo');
-          }
 
           logger.info('Email sent successfully via Brevo', {
             to: emailData.to,
-            messageId: data.messageId
+            messageId: response.data.messageId
           });
 
           return {
             success: true,
-            messageId: data.messageId
+            messageId: response.data.messageId
           };
         } catch (err) {
-          logger.error('Brevo API Error:', err.message);
-          throw err;
+          logger.error('Brevo API Error:', err.response?.data?.message || err.message);
+          throw new Error(err.response?.data?.message || err.message);
         }
       }
 
