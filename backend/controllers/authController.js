@@ -743,17 +743,18 @@ exports.sendResetOTP = async (req, res) => {
     // Send Email
     console.log('📨 Sending OTP email to:', user.email, 'OTP:', otp);
     const result = await emailService.sendTransactionalEmail('otpReset', user.email, { otp });
-    console.log('📨 OTP Email Result:', result);
 
     if (!result.success) {
       console.error('❌ Failed to send OTP email:', result.message);
       return res.status(500).json({
         success: false,
         error: 'Failed to send OTP email',
+        debug_error: result.message, // Explicitly expose error for Vercel debugging
         details: process.env.NODE_ENV === 'development' ? result.message : undefined
       });
     }
 
+    console.log('✅ Email sent successfully'); // Exact log user requested
     res.json({ success: true, message: 'OTP sent to your email.' });
 
   } catch (err) {
