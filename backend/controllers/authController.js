@@ -84,51 +84,108 @@ exports.signup = async (req, res) => {
       });
     }
 
-    // Create new user
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const salt = await require('bcryptjs').genSalt(10);
+    const otpHash = await require('bcryptjs').hash(otp, salt);
+
+    // Create new user (Inactive)
     const user = new User({
       name: name.trim(),
       email: email.toLowerCase(),
       password: password,
-      role: 'admin', // Change to 'user' after creating first admin
-      isActive: true
+      role: 'admin',
+      isActive: false, // Inactive until verified
+      resetOTP: otpHash, // Storing signup OTP here
+      resetOTP: otpHash, // Storing signup OTP here
+      resetOTPExpires: Date.now() + 1 * 60 * 1000 // 1 min
     });
 
-    console.log('💾 Saving user...');
+    console.log('💾 Saving inactive user...');
     await user.save();
-    console.log('✅ User saved successfully');
+    console.log('✅ User saved (inactive). Sending OTP.');
+
+    // Send OTP Email
+    try {
+      await emailService.sendTransactionalEmail('signupOTP', user.email, { otp });
+      console.log('📨 Signup OTP sent to:', user.email);
+    } catch (emailErr) {
+      console.error('⚠️ Failed to send signup OTP:', emailErr.message);
+      // We still return success but frontend might want to know? 
+      // User can resend OTP later if needed (using Forgot Password flow or Resend endpoint - simplistic approach for now)
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Signup successful. Please verify your email.',
+      step: 'verification',
+      email: user.email
+    });
+  } catch (err) {
+    console.error('❌ Signup error:', err.message);
+    res.status(500).json({ success: false, error: err.message || 'Server error' });
+  }
+};
+
+// ==========================================
+// VERIFY SIGNUP OTP
+// ==========================================
+exports.verifySignup = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, error: 'Email and OTP are required' });
+    }
+
+    // Find user (inactive included)
+    // Note: User.findOne finds documents regardless of isActive unless filtered
+    const user = await User.findOne({
+      email: email.toLowerCase(),
+      resetOTPExpires: { $gt: Date.now() }
+    }).select('+isActive'); // explicitly selecting just in case, though default is included
+
+    if (!user) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired OTP' });
+    }
+
+    // Verify OTP
+    const isMatch = await require('bcryptjs').compare(otp, user.resetOTP);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, error: 'Invalid OTP' });
+    }
+
+    // Activate User
+    user.isActive = true;
+    user.resetOTP = undefined;
+    user.resetOTPExpires = undefined;
+    await user.save();
 
     // Generate tokens
     const accessToken = signAccess(user);
     const refreshToken = signRefresh(user);
-
-    // Set cookies
     setAuthCookies(res, { accessToken, refreshToken });
 
     // Send Welcome Email
     try {
-      await emailService.sendTransactionalEmail('welcome', user.email, {
-        name: user.name
-      });
-      console.log('📨 Welcome email sent to:', user.email);
-    } catch (emailErr) {
-      console.error('⚠️ Failed to send welcome email:', emailErr.message);
+      await emailService.sendTransactionalEmail('welcome', user.email, { name: user.name });
+    } catch (e) {
+      console.error('Welcome email failed:', e.message);
     }
 
-    // Log Activity (Signup)
+    // Log Activity
     ActivityLog.create({
       user: user._id,
-      action: 'POST /api/auth/signup',
+      action: 'Signup Verified',
       method: 'POST',
-      path: '/api/auth/signup',
-      ip: req.ip || (req.socket && req.socket.remoteAddress) || '0.0.0.0',
+      path: '/api/auth/verify-signup',
+      ip: req.ip || '0.0.0.0',
       userAgent: req.headers['user-agent']
-    }).catch(err => console.error('Log Error:', err));
+    }).catch(e => console.error(e));
 
-
-
-    res.status(201).json({
+    res.json({
       success: true,
-      message: 'Account created successfully',
+      message: 'Email verified successfully!',
       accessToken,
       user: {
         _id: user._id,
@@ -137,8 +194,9 @@ exports.signup = async (req, res) => {
         role: user.role
       }
     });
+
   } catch (err) {
-    console.error('❌ Signup error:', err.message);
+    console.error('Verify Signup Error:', err);
     res.status(500).json({ success: false, error: err.message || 'Server error' });
   }
 };
@@ -737,7 +795,8 @@ exports.sendResetOTP = async (req, res) => {
     const otpHash = await require('bcryptjs').hash(otp, salt);
 
     user.resetOTP = otpHash;
-    user.resetOTPExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+    user.resetOTP = otpHash;
+    user.resetOTPExpires = Date.now() + 1 * 60 * 1000; // 1 min
     await user.save({ validateBeforeSave: false });
 
     // Send Email

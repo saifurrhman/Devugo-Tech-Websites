@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
+import { Eye, EyeOff, Check, X } from 'lucide-react';
 
 export default function AcceptInvitation() {
     const { token } = useParams();
@@ -14,6 +15,29 @@ export default function AcceptInvitation() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    // Password Validation Logic
+    const validations = {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[@$!%*?&]/.test(password)
+    };
+
+    const isPasswordValid = Object.values(validations).every(Boolean);
+
+    function getStrengthColor() {
+        const passed = Object.values(validations).filter(Boolean).length;
+        if (passed <= 2) return 'bg-red-500';
+        if (passed <= 4) return 'bg-yellow-500';
+        return 'bg-green-500';
+    }
+
+    function getStrengthWidth() {
+        const passed = Object.values(validations).filter(Boolean).length;
+        return `${(passed / 5) * 100}%`;
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -22,8 +46,8 @@ export default function AcceptInvitation() {
             return;
         }
 
-        if (password.length < 6) {
-            showError('Password must be at least 6 characters');
+        if (!isPasswordValid) {
+            showError('Password does not meet requirements');
             return;
         }
 
@@ -123,17 +147,45 @@ export default function AcceptInvitation() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
-                                            minLength={6}
-                                            className="w-full pl-10 pr-16 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-400"
+                                            className="w-full pl-10 pr-10 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-400"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(v => !v)}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-600 hover:text-blue-700 text-xs font-medium transition-colors"
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
                                         >
-                                            {showPassword ? 'HIDE' : 'SHOW'}
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
                                     </div>
+
+                                    {/* Password Strength Meter */}
+                                    {password && (
+                                        <div className="mt-2 space-y-2 animate-fadeIn">
+                                            <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full transition-all duration-300 ${getStrengthColor()}`}
+                                                    style={{ width: getStrengthWidth() }}
+                                                ></div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-1 text-[10px] text-gray-600">
+                                                <div className={`flex items-center gap-1 ${validations.length ? 'text-green-600' : 'text-gray-500'}`}>
+                                                    {validations.length ? <Check size={10} /> : <div className="w-2.5 h-2.5 rounded-full border border-gray-400"></div>} Min 8 chars
+                                                </div>
+                                                <div className={`flex items-center gap-1 ${validations.upper ? 'text-green-600' : 'text-gray-500'}`}>
+                                                    {validations.upper ? <Check size={10} /> : <div className="w-2.5 h-2.5 rounded-full border border-gray-400"></div>} Uppercase
+                                                </div>
+                                                <div className={`flex items-center gap-1 ${validations.lower ? 'text-green-600' : 'text-gray-500'}`}>
+                                                    {validations.lower ? <Check size={10} /> : <div className="w-2.5 h-2.5 rounded-full border border-gray-400"></div>} Lowercase
+                                                </div>
+                                                <div className={`flex items-center gap-1 ${validations.number ? 'text-green-600' : 'text-gray-500'}`}>
+                                                    {validations.number ? <Check size={10} /> : <div className="w-2.5 h-2.5 rounded-full border border-gray-400"></div>} Number
+                                                </div>
+                                                <div className={`flex items-center gap-1 ${validations.special ? 'text-green-600' : 'text-gray-500'}`}>
+                                                    {validations.special ? <Check size={10} /> : <div className="w-2.5 h-2.5 rounded-full border border-gray-400"></div>} Special
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Confirm Password Input */}
@@ -151,22 +203,21 @@ export default function AcceptInvitation() {
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             required
-                                            minLength={6}
-                                            className="w-full pl-10 pr-16 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-400"
+                                            className="w-full pl-10 pr-10 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-400"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowConfirmPassword(v => !v)}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-600 hover:text-blue-700 text-xs font-medium transition-colors"
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
                                         >
-                                            {showConfirmPassword ? 'HIDE' : 'SHOW'}
+                                            {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
                                     </div>
                                 </div>
 
                                 <button
                                     type="submit"
-                                    disabled={loading}
+                                    disabled={loading || !isPasswordValid}
                                     className="w-full text-white font-medium py-2.5 rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed mt-4"
                                     style={{ background: 'linear-gradient(90deg, #0A65CC 0%, #083B8A 100%)' }}
                                 >

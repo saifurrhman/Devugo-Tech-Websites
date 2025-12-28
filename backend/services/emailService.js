@@ -335,8 +335,21 @@ class EmailService {
                 <div style="background: #f4f4f4; padding: 15px; border-radius: 5px; font-size: 24px; font-weight: bold; letter-spacing: 5px; text-align: center; margin: 20px 0;">
                   ${data.otp}
                 </div>
-                <p>This code expires in 15 minutes.</p>
+                <p>This code expires in 1 minute.</p>
                 <p style="color: #666; font-size: 12px;">If you didn't request this, please ignore this email.</p>
+              </div>
+            `
+        },
+        signupOTP: {
+          subject: 'Verify Your Email - OTP',
+          html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1 style="color: #333;">Verify Your Email</h1>
+                <p>Thank you for signing up! Use the code below to verify your account.</p>
+                <div style="background: #e6f7ff; color: #0050b3; padding: 15px; border-radius: 5px; font-size: 24px; font-weight: bold; letter-spacing: 5px; text-align: center; margin: 20px 0; border: 1px solid #91d5ff;">
+                  ${data.otp}
+                </div>
+                <p>This code expires in 1 minute.</p>
               </div>
             `
         }

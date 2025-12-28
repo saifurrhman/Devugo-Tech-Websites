@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthAPI } from '../../lib/api';
 import { Check, X, Eye, EyeOff } from 'lucide-react';
@@ -12,6 +12,18 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+
+  const [timer, setTimer] = useState(60);
+
+  useEffect(() => {
+    let interval;
+    if (step === 2 && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [step, timer]);
 
   // Password Validation Logic
   const validations = {
@@ -37,13 +49,14 @@ export default function ResetPassword() {
   }
 
   async function handleSendOTP(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     setMessage('');
     setIsError(false);
     try {
       const res = await AuthAPI.sendOTP(email);
       setStep(2);
+      setTimer(60); // Reset timer
       setMessage(res.message || 'OTP sent! Please check your email.');
       setIsError(false);
     } catch (err) {
@@ -52,6 +65,10 @@ export default function ResetPassword() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleResend() {
+    await handleSendOTP();
   }
 
   async function handleResetPassword(e) {
@@ -204,6 +221,21 @@ export default function ResetPassword() {
                   disabled={loading || !isPasswordValid}
                   className={`w-full text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl hover:brightness-110 ${(!isPasswordValid || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >{loading ? 'Verifying...' : 'Reset Password'}</button>
+
+                <div className="text-center pt-2">
+                  {timer > 0 ? (
+                    <p className="text-gray-500 text-sm">Resend code in <span className="font-bold text-gray-800">{timer}s</span></p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      disabled={loading}
+                      className="text-blue-600 hover:text-blue-800 font-bold hover:underline text-sm disabled:opacity-50"
+                    >
+                      Resend Code
+                    </button>
+                  )}
+                </div>
               </form>
             )}
 

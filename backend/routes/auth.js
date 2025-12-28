@@ -13,6 +13,7 @@ console.log('📋 Loading auth routes...');
 // @desc    Register new user
 // @access  Public
 router.post('/signup', ctrl.signup);
+router.post('/verify-signup', ctrl.verifySignup);
 
 // @route   POST /api/auth/register (alias)
 router.post('/register', ctrl.signup);

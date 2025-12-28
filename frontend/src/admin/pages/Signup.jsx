@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthAPI } from '../../lib/api';
 import { Check, X, Eye, EyeOff } from 'lucide-react';
 
 export default function Signup() {
+  const [step, setStep] = useState(1); // 1: Form, 2: OTP
   const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  const [timer, setTimer] = useState(60);
+
+  useEffect(() => {
+    let interval;
+    if (step === 2 && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [step, timer]);
 
   function onChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -35,29 +49,42 @@ export default function Signup() {
     return `${(passed / 5) * 100}%`;
   }
 
-  async function onSubmit(e) {
-    e.preventDefault();
+  async function handleSignup(e) {
+    if (e) e.preventDefault();
     setLoading(true);
     setMessage('');
     try {
       const data = await AuthAPI.signup(form);
-
-      // Check if we got the real token and user from the server
-      if (!data.accessToken || !data.user) {
-        throw new Error(data.message || 'Signup response missing token or user.');
+      if (data.step === 'verification') {
+        setStep(2);
+        setTimer(60); // Reset timer
+        setMessage('OTP sent to your email. Please verify.');
       }
-
-      // Store real token and user data
-      localStorage.setItem('adminToken', data.accessToken);
-      localStorage.setItem('adminUser', JSON.stringify(data.user));
-
-      if (!localStorage.getItem('adminTheme')) localStorage.setItem('adminTheme', 'admin-dark');
-
-      // Redirect to admin dashboard
-      window.location.assign('/admin');
-
     } catch (err) {
       setMessage(err.message || 'Signup failed');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResend() {
+    await handleSignup(); // Re-trigger signup to send new OTP
+  }
+
+  async function handleVerify(e) {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    try {
+      const data = await AuthAPI.verifySignup({ email: form.email, otp });
+
+      localStorage.setItem('adminToken', data.accessToken);
+      localStorage.setItem('adminUser', JSON.stringify(data.user));
+      if (!localStorage.getItem('adminTheme')) localStorage.setItem('adminTheme', 'admin-dark');
+
+      window.location.assign('/admin');
+    } catch (err) {
+      setMessage(err.message || 'Verification failed');
     } finally {
       setLoading(false);
     }
@@ -106,67 +133,117 @@ export default function Signup() {
             <h2 className="text-4xl font-bold text-gray-900 mb-3">Sign Up</h2>
             <p className="text-gray-500 mb-8">Create your administrator account</p>
 
-            <form onSubmit={onSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
-                <input name="name" placeholder="Devugo Admin" value={form.name} onChange={onChange} required className="w-full px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                <input name="email" type="email" placeholder="you@company.com" value={form.email} onChange={onChange} required className="w-full px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-                <div className="relative">
-                  <input name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={onChange} required className="w-full pr-20 px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
-                  <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-blue-600">
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
+            {step === 1 ? (
+              <form onSubmit={handleSignup} className="space-y-5 animate-fadeIn">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                  <input name="name" placeholder="Devugo Admin" value={form.name} onChange={onChange} required className="w-full px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                  <input name="email" type="email" placeholder="you@company.com" value={form.email} onChange={onChange} required className="w-full px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                  <div className="relative">
+                    <input name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={form.password} onChange={onChange} required className="w-full pr-20 px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-400" />
+                    <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-blue-600">
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+
+                  {/* Password Strength Meter */}
+                  {form.password && (
+                    <div className="mt-3 space-y-2">
+                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 ${getStrengthColor()}`}
+                          style={{ width: getStrengthWidth() }}
+                        ></div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                        <div className={`flex items-center gap-1.5 ${validations.length ? 'text-green-600' : 'text-gray-500'}`}>
+                          {validations.length ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
+                          Min 8 chars
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${validations.upper ? 'text-green-600' : 'text-gray-500'}`}>
+                          {validations.upper ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
+                          Uppercase
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${validations.lower ? 'text-green-600' : 'text-gray-500'}`}>
+                          {validations.lower ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
+                          Lowercase
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${validations.number ? 'text-green-600' : 'text-gray-500'}`}>
+                          {validations.number ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
+                          Number
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${validations.special ? 'text-green-600' : 'text-gray-500'}`}>
+                          {validations.special ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
+                          Special (@$!%*?&)
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <button
+                  style={{ background: 'linear-gradient(90deg, #0A65CC 0%, #083B8A 100%)' }}
+                  type="submit"
+                  disabled={loading || !isPasswordValid}
+                  className={`w-full text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl hover:brightness-110 ${(!isPasswordValid || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >{loading ? 'Creating...' : 'Create Account'}</button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerify} className="space-y-6 animate-fadeIn">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full mb-4">
+                    <Check className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Verify Email</h3>
+                  <p className="text-gray-500 text-sm mt-2">Enter the verification code sent to <br /><span className="font-semibold text-gray-900">{form.email}</span></p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 text-center">Verification Code</label>
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="123456"
+                    className="w-full px-4 py-4 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-gray-900 placeholder-gray-300 text-center text-3xl font-bold tracking-[0.5em]"
+                    required
+                    maxLength={6}
+                    autoFocus
+                  />
+                </div>
+                <button
+                  style={{ background: 'linear-gradient(90deg, #0A65CC 0%, #083B8A 100%)' }}
+                  type="submit"
+                  disabled={loading || otp.length < 6}
+                  className={`w-full text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl hover:brightness-110 ${loading || otp.length < 6 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >{loading ? 'Verifying...' : 'Verify & Login'}</button>
+
+
+                <div className="text-center pt-2">
+                  {timer > 0 ? (
+                    <p className="text-gray-500 text-sm">Resend code in <span className="font-bold text-gray-800">{timer}s</span></p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      disabled={loading}
+                      className="text-blue-600 hover:text-blue-800 font-bold hover:underline text-sm disabled:opacity-50"
+                    >
+                      Resend Code
+                    </button>
+                  )}
                 </div>
 
-                {/* Password Strength Meter */}
-                {form.password && (
-                  <div className="mt-3 space-y-2">
-                    <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${getStrengthColor()}`}
-                        style={{ width: getStrengthWidth() }}
-                      ></div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                      <div className={`flex items-center gap-1.5 ${validations.length ? 'text-green-600' : 'text-gray-500'}`}>
-                        {validations.length ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
-                        Min 8 chars
-                      </div>
-                      <div className={`flex items-center gap-1.5 ${validations.upper ? 'text-green-600' : 'text-gray-500'}`}>
-                        {validations.upper ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
-                        Uppercase
-                      </div>
-                      <div className={`flex items-center gap-1.5 ${validations.lower ? 'text-green-600' : 'text-gray-500'}`}>
-                        {validations.lower ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
-                        Lowercase
-                      </div>
-                      <div className={`flex items-center gap-1.5 ${validations.number ? 'text-green-600' : 'text-gray-500'}`}>
-                        {validations.number ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
-                        Number
-                      </div>
-                      <div className={`flex items-center gap-1.5 ${validations.special ? 'text-green-600' : 'text-gray-500'}`}>
-                        {validations.special ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-400"></div>}
-                        Special (@$!%*?&)
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <button
-                style={{ background: 'linear-gradient(90deg, #0A65CC 0%, #083B8A 100%)' }}
-                type="submit"
-                disabled={loading || !isPasswordValid}
-                className={`w-full text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl hover:brightness-110 ${(!isPasswordValid || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >{loading ? 'Creating...' : 'Create Account'}</button>
-              {message && <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg">{message}</div>}
-            </form>
+                <div className="text-center">
+                  <button type="button" onClick={() => { setStep(1); setMessage(''); }} className="text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors">Change details</button>
+                </div>
+              </form>
+            )}
             <p className="text-center text-sm text-gray-600 mt-6 pt-4 border-t border-gray-200">Already have an account? <a href="/admin/login" className="text-blue-600 hover:text-blue-800 font-bold hover:underline">Login</a></p>
           </div>
         </div>

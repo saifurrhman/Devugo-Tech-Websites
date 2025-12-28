@@ -34,6 +34,11 @@ export const AuthAPI = {
     if (data.accessToken) saveToken(data.accessToken);
     return data;
   },
+  verifySignup: async (payload) => {
+    const data = await api('/api/auth/verify-signup', { method: 'POST', body: payload });
+    if (data.accessToken) saveToken(data.accessToken);
+    return data;
+  },
   login: async (payload) => {
     const data = await api('/api/auth/login', { method: 'POST', body: payload });
     if (data.accessToken) saveToken(data.accessToken);
