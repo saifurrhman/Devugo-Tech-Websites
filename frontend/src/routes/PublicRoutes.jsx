@@ -22,6 +22,7 @@ import AdminBlogCreate from '../admin/pages/AdminBlogCreate';
 import TeamList from '../admin/pages/TeamList';
 import TeamEdit from '../admin/pages/TeamEdit';
 import UsersList from '../admin/pages/UsersList';
+import InviteUser from '../admin/pages/InviteUser';
 import UserProfile from '../admin/pages/UserProfile';
 import Contacts from '../admin/pages/Contacts';
 import Analytics from '../admin/pages/Analytics';
@@ -124,6 +125,7 @@ export default function PublicRoutes() {
           <Route path="/admin/team" element={<ProtectedRoute><TeamList /></ProtectedRoute>} />
           <Route path="/admin/team/:id" element={<ProtectedRoute><TeamEdit /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><UsersList /></ProtectedRoute>} />
+          <Route path="/admin/users/invite" element={<ProtectedRoute allowedRoles={['admin']}><InviteUser /></ProtectedRoute>} />
           <Route path="/admin/users/:id" element={<ProtectedRoute allowedRoles={['admin']}><UserProfile /></ProtectedRoute>} />
 
           {/* Admin Contacts & Leads */}

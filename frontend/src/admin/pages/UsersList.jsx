@@ -13,13 +13,13 @@ export default function UsersList() {
     const [loading, setLoading] = useState(true);
 
     // Modal State
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        role: 'email_marketing'
-    });
-    const [inviting, setInviting] = useState(false);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [formData, setFormData] = useState({
+    //     name: '',
+    //     email: '',
+    //     role: 'email_marketing'
+    // });
+    // const [inviting, setInviting] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -38,21 +38,6 @@ export default function UsersList() {
         }
     };
 
-    const handleInvite = async (e) => {
-        e.preventDefault();
-        setInviting(true);
-        try {
-            await AuthAPI.inviteUser(formData);
-            showSuccess('Invitation sent successfully');
-            setIsModalOpen(false);
-            setFormData({ name: '', email: '', role: 'email_marketing' });
-            fetchUsers();
-        } catch (err) {
-            showError(err.message || 'Failed to send invitation');
-        } finally {
-            setInviting(false);
-        }
-    };
 
     const handleResend = async (id) => {
         try {
@@ -119,7 +104,7 @@ export default function UsersList() {
                         <p className="text-gray-400 text-sm">Manage system access and permissions</p>
                     </div>
                     <button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => navigate('/admin/users/invite')}
                         className="btn w-full md:w-auto flex items-center justify-center gap-2"
                     >
                         <UserPlus size={18} />
@@ -132,7 +117,7 @@ export default function UsersList() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         {users.map(user => (
-                            <div key={user._id} className="card p-4 sm:p-5 relative group flex flex-col h-full">
+                            <div key={user._id} className="bg-[#003560] border border-white/10 rounded-xl p-5 relative group flex flex-col h-full shadow-lg hover:border-white/20 transition-all">
                                 <div className="flex items-start justify-between mb-4 gap-3">
                                     <div className="flex items-center gap-3 min-w-0 overflow-hidden">
                                         <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-lg ${user.isActive ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`}>
@@ -148,15 +133,15 @@ export default function UsersList() {
                                     </span>
                                 </div>
 
-                                <div className="mt-auto pt-4 border-t border-gray-700/50 flex items-center justify-between">
+                                <div className="mt-auto pt-4 border-t border-gray-800 flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-xs">
                                         {user.isActive ? (
-                                            <span className="text-green-500 flex items-center gap-1 font-medium">
-                                                <CheckCircle size={14} /> Active
+                                            <span className="text-green-500 flex items-center gap-1 font-medium bg-green-500/10 px-2 py-1 rounded-full border border-green-500/20">
+                                                <CheckCircle size={12} /> Active
                                             </span>
                                         ) : (
-                                            <span className="text-amber-500 flex items-center gap-1 font-medium">
-                                                <Clock size={14} /> {user.invitationToken ? 'Pending' : 'Blocked'}
+                                            <span className="text-amber-500 flex items-center gap-1 font-medium bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20">
+                                                <Clock size={12} /> {user.invitationToken ? 'Pending' : 'Blocked'}
                                             </span>
                                         )}
                                     </div>
@@ -211,142 +196,7 @@ export default function UsersList() {
                     </div>
                 )}
 
-                {/* INVITE MODAL */}
-                {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                        <div className="bg-[#1e293b] border border-gray-700 rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-                            <div className="p-6 border-b border-gray-700 bg-gray-800/50">
-                                <h3 className="text-xl font-semibold text-white flex items-center gap-2">
-                                    <Mail className="text-blue-500" size={24} />
-                                    Invite New User
-                                </h3>
-                            </div>
 
-                            <form onSubmit={handleInvite} className="p-6 space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                        placeholder="e.g. John Doe"
-                                        value={formData.name}
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
-                                    <input
-                                        type="email"
-                                        required
-                                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                        placeholder="e.g. john@company.com"
-                                        value={formData.email}
-                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Role / Access Level</label>
-                                    <div className="space-y-2">
-                                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${formData.role === 'email_marketing' ? 'bg-blue-500/10 border-blue-500/50' : 'bg-gray-800 border-gray-700 hover:border-gray-600'}`}>
-                                            <input
-                                                type="radio"
-                                                name="role"
-                                                value="email_marketing"
-                                                checked={formData.role === 'email_marketing'}
-                                                onChange={e => setFormData({ ...formData, role: e.target.value })}
-                                                className="mt-1"
-                                            />
-                                            <div>
-                                                <span className="block font-medium text-white">Email Marketing</span>
-                                                <span className="text-xs text-gray-400">Campaigns, Templates, Recipients</span>
-                                            </div>
-                                        </label>
-
-                                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${formData.role === 'crm' ? 'bg-green-500/10 border-green-500/50' : 'bg-gray-800 border-gray-700 hover:border-gray-600'}`}>
-                                            <input
-                                                type="radio"
-                                                name="role"
-                                                value="crm"
-                                                checked={formData.role === 'crm'}
-                                                onChange={e => setFormData({ ...formData, role: e.target.value })}
-                                                className="mt-1"
-                                            />
-                                            <div>
-                                                <span className="block font-medium text-white">CRM & Projects</span>
-                                                <span className="text-xs text-gray-400">Pipeline, Projects, Invoices, Meetings</span>
-                                            </div>
-                                        </label>
-
-                                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${formData.role === 'website_manager' ? 'bg-pink-500/10 border-pink-500/50' : 'bg-gray-800 border-gray-700 hover:border-gray-600'}`}>
-                                            <input
-                                                type="radio"
-                                                name="role"
-                                                value="website_manager"
-                                                checked={formData.role === 'website_manager'}
-                                                onChange={e => setFormData({ ...formData, role: e.target.value })}
-                                                className="mt-1"
-                                            />
-                                            <div>
-                                                <span className="block font-medium text-white">Website Manager</span>
-                                                <span className="text-xs text-gray-400">Manage public site content (Services, Portfolio, Team etc)</span>
-                                            </div>
-                                        </label>
-
-                                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${formData.role === 'admin' ? 'bg-purple-500/10 border-purple-500/50' : 'bg-gray-800 border-gray-700 hover:border-gray-600'}`}>
-                                            <input
-                                                type="radio"
-                                                name="role"
-                                                value="admin"
-                                                checked={formData.role === 'admin'}
-                                                onChange={e => setFormData({ ...formData, role: e.target.value })}
-                                                className="mt-1"
-                                            />
-                                            <div>
-                                                <span className="block font-medium text-white">Super Admin</span>
-                                                <span className="text-xs text-gray-400">Full access to all systems</span>
-                                            </div>
-                                        </label>
-
-                                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${formData.role === 'blog_writer' ? 'bg-orange-500/10 border-orange-500/50' : 'bg-gray-800 border-gray-700 hover:border-gray-600'}`}>
-                                            <input
-                                                type="radio"
-                                                name="role"
-                                                value="blog_writer"
-                                                checked={formData.role === 'blog_writer'}
-                                                onChange={e => setFormData({ ...formData, role: e.target.value })}
-                                                className="mt-1"
-                                            />
-                                            <div>
-                                                <span className="block font-medium text-white">Blog Writer</span>
-                                                <span className="text-xs text-gray-400">Can manage blog posts only</span>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 flex gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsModalOpen(false)}
-                                        className="flex-1 px-4 py-2.5 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={inviting}
-                                        className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                    >
-                                        {inviting ? 'Sending...' : 'Send Invitation'}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
             </main>
         </div>
     );

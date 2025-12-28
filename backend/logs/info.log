@@ -3981,3 +3981,23 @@
 {"timestamp":"2025-12-28T13:43:51.144Z","level":"INFO","message":"Email sent successfully","data":{"to":"saifurrehman7726@gmail.com","messageId":"<549bcd68-222e-7694-3942-5d2d1e733aa3@gmail.com>"}}
 {"timestamp":"2025-12-28T13:45:00.053Z","level":"INFO","message":"AI Personalizer job started"}
 {"timestamp":"2025-12-28T13:45:00.238Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-28T13:50:00.048Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2025-12-28T13:50:00.336Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-28T13:50:00.507Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-28T13:50:00.670Z","level":"INFO","message":"Updated stats for 1 campaigns"}
+{"timestamp":"2025-12-28T13:50:00.836Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2025-12-28T13:55:00.082Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-28T13:55:00.274Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-28T14:00:00.060Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2025-12-28T14:00:00.064Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-28T14:00:00.068Z","level":"INFO","message":"Follow-up Automation job started"}
+{"timestamp":"2025-12-28T14:00:00.221Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2025-12-28T14:00:00.253Z","level":"INFO","message":"No-open follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-28T14:00:00.605Z","level":"INFO","message":"Updated stats for 1 campaigns"}
+{"timestamp":"2025-12-28T14:00:00.608Z","level":"INFO","message":"No-click follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-28T14:00:00.773Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2025-12-28T14:00:00.775Z","level":"INFO","message":"No-reply follow-ups sent","data":{"count":0}}
+{"timestamp":"2025-12-28T14:00:01.079Z","level":"INFO","message":"Re-engagement emails sent","data":{"count":0}}
+{"timestamp":"2025-12-28T14:00:01.080Z","level":"INFO","message":"Follow-up automation completed"}
+{"timestamp":"2025-12-28T14:05:00.040Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2025-12-28T14:05:00.207Z","level":"INFO","message":"No pending AI personalization requests"}
