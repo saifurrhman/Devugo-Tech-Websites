@@ -46,7 +46,7 @@ const routeTitles = {
     '/admin/inbox': 'Inbox - Devugo Admin',
     '/admin/templates': 'Templates - Devugo Admin',
     '/admin/email-analytics': 'Email Analytics - Devugo Admin',
-    '/admin/settings/email': 'SMTP Settings - Devugo Admin',
+    '/admin/settings/integrations': 'Integrations & API - Devugo Admin',
 
     // CRM & Projects
     '/admin/pipeline': 'Pipeline - Devugo Admin',

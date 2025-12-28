@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/Home';
 import About from '../pages/About';
 import Services from '../pages/Services';
@@ -163,10 +163,10 @@ export default function PublicRoutes() {
           <Route path="/admin/templates/create" element={<ProtectedRoute allowedRoles={['email_marketing']}><CreateTemplate /></ProtectedRoute>} />
           <Route path="/admin/templates/ai-generator" element={<ProtectedRoute allowedRoles={['email_marketing']}><AITemplateGenerator /></ProtectedRoute>} />
           <Route path="/admin/email-analytics" element={<ProtectedRoute allowedRoles={['email_marketing']}><EmailAnalytics /></ProtectedRoute>} />
-          <Route path="/admin/settings/email" element={<ProtectedRoute allowedRoles={['email_marketing']}><SMTPSettings /></ProtectedRoute>} />
+          <Route path="/admin/settings/email" element={<Navigate to="/admin/settings/integrations" replace />} />
           <Route path="/admin/settings/senders" element={<ProtectedRoute allowedRoles={['email_marketing']}><SenderSettings /></ProtectedRoute>} />
           <Route path="/admin/settings/domains/:domain" element={<ProtectedRoute allowedRoles={['email_marketing']}><DomainDNS /></ProtectedRoute>} />
-          <Route path="/admin/settings/integrations" element={<ProtectedRoute allowedRoles={['crm']}><Integrations /></ProtectedRoute>} />
+          <Route path="/admin/settings/integrations" element={<ProtectedRoute allowedRoles={['crm', 'email_marketing']}><Integrations /></ProtectedRoute>} />
 
           {/* CRM & Projects Routes */}
           <Route path="/admin/pipeline" element={<ProtectedRoute allowedRoles={['crm']}><PipelineBoard /></ProtectedRoute>} />

@@ -88,7 +88,7 @@ export default function Settings() {
             <p>Manage your company information and WhatsApp integration</p>
           </div>
           <button
-            onClick={() => navigate('/admin/settings/email')}
+            onClick={() => navigate('/admin/settings/integrations')}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white text-sm font-medium transition-colors flex items-center gap-2 mb-1"
           >
             <span>🔌</span> Integrations

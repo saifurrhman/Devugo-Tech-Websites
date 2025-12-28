@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { AnalyticsAPI, ContactAPI, ServiceAPI, PricingAPI, PortfolioAPI, TeamAPI, BlogAPI } from '../../lib/api';
+import { AnalyticsAPI, ContactAPI, ServiceAPI, PricingAPI, PortfolioAPI, TeamAPI, BlogAPI, N8nAPI } from '../../lib/api';
 
 // Compact number formatter
 const __fmtCompactIntl = typeof Intl !== 'undefined' ? new Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 }) : null;
@@ -173,6 +173,48 @@ function AreaChart({ data = [], labels = [], height = 180, color = '#7aa8ff', sh
           <div className="tt-value">{fmtCompact(Number(data[hover.i] || 0))}</div>
         </div>
       )}
+    </div>
+  );
+}
+
+
+
+function TrafficWidget({ range }) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true);
+        const res = await N8nAPI.getMetrics('traffic', 30);
+        if (res.success) {
+          setData(res.data.map(d => d.value));
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [range]);
+
+  if (!data.length && !loading) return null;
+
+  return (
+    <div className="charts-grid grid grid-cols-1 gap-3 sm:gap-4 mb-3 sm:mb-4 md:mb-6">
+      <div className="card p-3 sm:p-4 md:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 sm:gap-2 mb-2 sm:mb-3">
+          <strong className="text-sm sm:text-base md:text-lg">Network Traffic (Integration)</strong>
+          <span className="muted text-xs sm:text-sm flex items-center gap-1 sm:gap-2 flex-wrap">
+            {loading ? 'loading...' : 'Realtime'}
+          </span>
+        </div>
+        <div className="chart-body overflow-x-auto -mx-1 sm:mx-0">
+          <AreaChart data={data} labels={data.map((_, i) => i + 1)} height={180} color="#f59e0b" showValues />
+        </div>
+      </div>
     </div>
   );
 }
@@ -559,6 +601,12 @@ export default function Dashboard() {
             <div className="muted text-xs sm:text-sm text-center py-4">No recent activity.</div>
           )}
         </div>
+
+        {/* N8N Traffic Widget */}
+        {(isSuperAdmin || isWebsiteManager) && (
+          <TrafficWidget range={range} />
+        )}
+
       </main>
     </div>
   );

@@ -31,6 +31,9 @@ exports.generateEmailTemplate = async (req, res) => {
             case 'sequence':
                 result = await aiService.generateSequence(params);
                 break;
+            case 'blog':
+                result = await aiService.generateBlog(params);
+                break;
             default:
                 // Fallback to legacy logic if action is missing or generic
                 // If the client sends type/goal without action, this handles it.

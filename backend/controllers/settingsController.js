@@ -45,3 +45,68 @@ exports.updateAIConfig = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// ==========================================
+// SMTP SETTINGS
+// ==========================================
+exports.getSMTP = async (req, res) => {
+    try {
+        const setting = await Setting.findOne({ key: 'smtp' });
+        if (!setting) {
+            // Return defaults or environment variables if any
+            return res.json({
+                host: process.env.SMTP_HOST || '',
+                port: process.env.SMTP_PORT || 587,
+                auth: {
+                    user: process.env.SMTP_USER || '',
+                    pass: process.env.SMTP_PASS || ''
+                },
+                fromName: process.env.EMAIL_FROM_NAME || '',
+                fromEmail: process.env.EMAIL_FROM_ADDRESS || ''
+            });
+        }
+        res.json(setting.value);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateSMTP = async (req, res) => {
+    try {
+        const config = req.body;
+        const setting = await Setting.findOneAndUpdate(
+            { key: 'smtp' },
+            { $set: { key: 'smtp', value: config, updatedAt: Date.now() } },
+            { upsert: true, new: true }
+        );
+        res.json({ success: true, data: setting.value });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// ==========================================
+// INTEGRATIONS (Connected Apps)
+// ==========================================
+exports.getIntegrations = async (req, res) => {
+    try {
+        const setting = await Setting.findOne({ key: 'integrations' });
+        res.json(setting ? setting.value : {});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateIntegrations = async (req, res) => {
+    try {
+        const config = req.body;
+        const setting = await Setting.findOneAndUpdate(
+            { key: 'integrations' },
+            { $set: { key: 'integrations', value: config, updatedAt: Date.now() } },
+            { upsert: true, new: true }
+        );
+        res.json({ success: true, data: setting.value });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

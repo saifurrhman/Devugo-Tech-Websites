@@ -162,5 +162,23 @@ Return JSON format:
   "followUp2": { "delay": "5 days", "subject": "Subject 2", "body": "Body 2" },
   "followUp3": { "delay": "10 days", "subject": "Subject 3", "body": "Body 3" }
 }
+`,
+
+  BLOG_POST: `
+Write a high-quality, SEO-optimized blog post about: {{topic}}.
+Keywords to target: {{keywords}}.
+Tone: {{tone}}.
+Structure:
+- Engaging Title
+- Introduction
+- Key Points/Subheadings
+- Conclusion
+Return JSON with:
+{
+  "title": "Blog Title",
+  "content": "Full HTML content...",
+  "excerpt": "Short summary",
+  "seo": { "metaTitle": "...", "metaDescription": "...", "metaKeywords": ["..."] }
+}
 `
 };

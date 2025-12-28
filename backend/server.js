@@ -381,6 +381,22 @@ try {
   console.error('  ❌ Integration routes error:', error.message);
 }
 
+try {
+  console.log('⚡ Loading n8n automation routes...');
+  app.use('/api/n8n', require('./routes/n8nRoutes'));
+  console.log('  ✅ n8n routes loaded');
+} catch (error) {
+  console.error('  ❌ n8n routes error:', error.message);
+}
+
+try {
+  console.log('🔑 Loading API Key management routes...');
+  app.use('/api/apikeys', require('./routes/apiKeyRoutes'));
+  console.log('  ✅ API Key routes loaded');
+} catch (error) {
+  console.error('  ❌ API Key routes error:', error.message);
+}
+
 // ========================================
 // CRM FEATURES ROUTES (DEBUG VERSION)
 // ========================================

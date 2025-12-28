@@ -476,3 +476,19 @@ export const SettingsAPI = {
 export const AIAPI = {
   generate: (payload) => api('/api/ai/generate', { method: 'POST', body: payload }),
 };
+
+// ============================================
+// API KEYS (n8n Integration)
+// ============================================
+export const ApiKeyAPI = {
+  list: () => api('/api/apikeys'),
+  create: (payload) => api('/api/apikeys', { method: 'POST', body: payload }),
+  revoke: (id) => api(`/api/apikeys/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// N8N INTEGRATION API
+// ============================================
+export const N8nAPI = {
+  getMetrics: (metric = 'traffic', limit = 30) => api('/api/n8n/metrics' + buildQuery({ metric, limit })),
+};
