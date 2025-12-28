@@ -4,7 +4,7 @@ module.exports = {
     apiKey: process.env.SENDGRID_API_KEY,
     fromEmail: process.env.SENDGRID_FROM_EMAIL || 'noreply@yourcompany.com',
     fromName: process.env.SENDGRID_FROM_NAME || 'Your Company',
-    enabled: process.env.SENDGRID_ENABLED === 'true'
+    enabled: String(process.env.SENDGRID_ENABLED).toLowerCase() === 'true'
   },
 
   // Brevo Configuration
@@ -12,14 +12,14 @@ module.exports = {
     apiKey: process.env.BREVO_API_KEY,
     senderEmail: process.env.BREVO_SENDER_EMAIL || 'noreply@devugo-tech.com',
     senderName: process.env.BREVO_SENDER_NAME || 'Devugo Tech',
-    enabled: process.env.BREVO_ENABLED === 'true'
+    enabled: String(process.env.BREVO_ENABLED).toLowerCase() === 'true'
   },
 
   // Backup SMTP Configuration (SMTP)
   smtp: {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    secure: String(process.env.SMTP_SECURE).toLowerCase() === 'true', // true for 465, false for other ports
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
@@ -28,7 +28,7 @@ module.exports = {
       email: process.env.SMTP_FROM_EMAIL || 'noreply@yourcompany.com',
       name: process.env.SMTP_FROM_NAME || 'Your Company'
     },
-    enabled: process.env.SMTP_ENABLED === 'true'
+    enabled: String(process.env.SMTP_ENABLED).toLowerCase() === 'true'
   },
 
   // Email sending limits

@@ -137,6 +137,47 @@ app.get('/api/health', async (_req, res) => {
 });
 
 // ========================================
+// DEBUG SMTP ROUTE (Temporary)
+// ========================================
+app.get('/api/debug-smtp', async (req, res) => {
+  const emailService = require('./services/emailService');
+  const smtpConfig = require('./config/smtp');
+
+  const debugInfo = {
+    env_vars: {
+      SMTP_ENABLED: process.env.SMTP_ENABLED,
+      SMTP_USER_SET: !!process.env.SMTP_USER,
+      SMTP_HOST: process.env.SMTP_HOST,
+      BREVO_ENABLED: process.env.BREVO_ENABLED,
+      BREVO_API_KEY_SET: !!process.env.BREVO_API_KEY,
+      NODE_ENV: process.env.NODE_ENV
+    },
+    config_parsed: {
+      smtp_enabled: smtpConfig.smtp.enabled,
+      brevo_enabled: smtpConfig.brevo.enabled,
+      smtp_host: smtpConfig.smtp.host
+    },
+    transporter_ready: emailService.isAvailable()
+  };
+
+  try {
+    // Attempt to verify connection live
+    if (emailService.isAvailable()) {
+      // Note: we can't easily reach into the closure-hidden transporter object of emailService
+      // unless we export it or methods.
+      // But we know isAvailable() checks if transporter !== null.
+      debugInfo.status = "Transporter is initialized (Environment vars OK)";
+    } else {
+      debugInfo.status = "Transporter is NULL (Environment vars missing or invalid)";
+    }
+  } catch (e) {
+    debugInfo.error = e.message;
+  }
+
+  res.json(debugInfo);
+});
+
+// ========================================
 // ACTIVITY LOGGING
 // ========================================
 // app.use(require('./middleware/activityLogger')); // MOVED TO AUTH MIDDLEWARE
