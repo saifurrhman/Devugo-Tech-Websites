@@ -218,7 +218,7 @@ body.admin-dark .editor-toolbar button {
 
 /* Fields remain high-contrast */
 body.admin-dark .form-label {
-  color: #0f172a
+  color: #f1f5f9
 }
 
 body.admin-dark .form-field input,
@@ -395,6 +395,46 @@ body.admin-dark .badge {
   min-height: 100vh;
 }
 
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--admin-border);
+  background: var(--admin-bg);
+}
+
+.admin-sidebar__nav {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--admin-border) transparent;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-thumb {
+  background: var(--admin-border);
+  border-radius: 4px;
+}
+
+.admin-sidebar__footer {
+  flex-shrink: 0;
+  padding: 1rem;
+  background: var(--admin-bg);
+  border-top: 1px solid var(--admin-border);
+  z-index: 10;
+}
+
 .admin-content {
   min-width: 0
 }
@@ -412,16 +452,7 @@ body.admin-dark .badge {
     grid-template-columns: 1fr;
   }
 
-  .admin-sidebar {
-    position: sticky;
-    top: 8px;
-    z-index: 20;
-    background: var(--admin-surface);
-    border: 1px solid var(--admin-border);
-    border-radius: 14px;
-    padding: .35rem;
-    overflow: auto;
-  }
+  /* Conflicting mobile sidebar styles removed */
 
   .admin-sidebar .admin-link {
     padding: .55rem .6rem;

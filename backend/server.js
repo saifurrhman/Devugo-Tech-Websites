@@ -267,7 +267,12 @@ app.use('/api/social-links', socialLinkRoutes);
 
 // Company Info Routes
 const companyInfoRoutes = require('./routes/companyInfo');
+
 app.use('/api/company-info', companyInfoRoutes);
+
+// Brand Routes
+console.log('Mounting /api/brands...');
+app.use('/api/brands', require('./routes/brands'));
 
 console.log('✅ All existing routes loaded');
 
@@ -676,4 +681,4 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-// Forced restart trigger 11 (Enable Brevo)
+// Forced restart trigger 12 (Brands Route Debug)

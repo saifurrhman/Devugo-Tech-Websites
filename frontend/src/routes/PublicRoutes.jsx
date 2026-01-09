@@ -14,6 +14,7 @@ import PrivacyPolicy from '../pages/PrivacyPolicy';
 import Solutions from '../pages/Solutions';
 import Pricing from '../pages/Pricing';
 import Dashboard from '../admin/pages/Dashboard';
+import Brands from '../admin/pages/Brands';
 import PortfolioList from '../admin/pages/PortfolioList';
 import PortfolioEdit from '../admin/pages/PortfolioEdit';
 import BlogList from '../admin/pages/BlogList';
@@ -139,6 +140,9 @@ export default function PublicRoutes() {
           {/* Admin Services */}
           <Route path="/admin/services" element={<ProtectedRoute><ServicesList /></ProtectedRoute>} />
           <Route path="/admin/services/:id" element={<ProtectedRoute><ServiceEdit /></ProtectedRoute>} />
+
+          {/* Admin Brands */}
+          <Route path="/admin/brands" element={<ProtectedRoute><Brands /></ProtectedRoute>} />
 
           {/* Admin Content */}
           <Route path="/admin/pricing" element={<ProtectedRoute><PricingPlans /></ProtectedRoute>} />

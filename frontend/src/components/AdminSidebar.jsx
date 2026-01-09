@@ -97,6 +97,11 @@ export default function AdminSidebar() {
                 <span className="label">Services</span>
               </NavLink>
 
+              <NavLink to="/admin/brands" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Star size={20} /></span>
+                <span className="label">Brands</span>
+              </NavLink>
+
               <NavLink to="/admin/pricing" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
                 <span className="icon"><CreditCard size={20} /></span>
                 <span className="label">Pricing</span>

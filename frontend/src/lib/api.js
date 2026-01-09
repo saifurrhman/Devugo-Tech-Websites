@@ -363,6 +363,16 @@ export const CompanyInfoAPI = {
 };
 
 // ============================================
+// BRAND API
+// ============================================
+export const BrandAPI = {
+  list: (params = {}) => api('/api/brands' + buildQuery(params)),
+  create: (payload) => api('/api/brands', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/brands/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/brands/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
 // CAMPAIGN API
 // ============================================
 export const CampaignAPI = {

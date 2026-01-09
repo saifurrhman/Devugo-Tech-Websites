@@ -467,7 +467,7 @@ export default function Contacts() {
     (async () => {
       setLoading(true); setError('');
       try {
-        const res = await ContactAPI.list({ source: 'Manual' });
+        const res = await ContactAPI.list({});
         const arr = Array.isArray(res) ? res : (res.items || []);
         // Strict filter for website leads only
         const leads = (arr || []).filter(c => {

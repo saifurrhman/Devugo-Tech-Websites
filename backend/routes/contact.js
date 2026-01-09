@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Contact = require('../models/Contact');
+const Message = require('../models/Message');
+const EmailRecipient = require('../models/EmailRecipient');
+const EmailList = require('../models/EmailList');
 
 // Create contact submission
 router.post('/', async (req, res) => {
@@ -14,6 +17,84 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Name, email and message are required' });
     }
     const created = await Contact.create({ name, email, company, phone, website, budget, message, source });
+
+    // Handle Newsletter Subscription
+    if (source === 'Newsletter') {
+      try {
+        // 1. Find or Create Newsletter List
+        let newsletterList = await EmailList.findOne({ name: 'Newsletter' });
+        if (!newsletterList) {
+          newsletterList = await EmailList.create({
+            name: 'Newsletter',
+            description: 'Subscribers from website footer',
+            isActive: true
+          });
+        }
+
+        // 2. Find or Create Recipient
+        let recipient = await EmailRecipient.findOne({ email: email.toLowerCase() });
+        if (!recipient) {
+          recipient = await EmailRecipient.create({
+            email: email,
+            name: name || 'Subscriber',
+            source: 'form',
+            status: 'active'
+          });
+        }
+
+        // 3. Add to List if not present
+        if (!recipient.lists.includes(newsletterList._id)) {
+          recipient.lists.push(newsletterList._id);
+          await recipient.save();
+
+          // Add recipient to list's recipients array if needed (though often one-way or two-way sync depends on schema)
+          if (!newsletterList.recipients.includes(recipient._id)) {
+            newsletterList.recipients.push(recipient._id);
+            await newsletterList.save();
+          }
+        }
+      } catch (subErr) {
+        console.error('Failed to process newsletter subscription:', subErr);
+      }
+    }
+
+    // Also create a Message in Inbox
+    try {
+      const newMessage = new Message({
+        type: 'email',
+        direction: 'inbound',
+        from: {
+          email: email,
+          name: name
+        },
+        to: [{
+          email: process.env.DEFAULT_FROM_EMAIL || 'support@devugo.com',
+          name: 'Support'
+        }],
+        subject: `New Contact Form Submission from ${name}`,
+        body: {
+          text: `${message}\n\nDetails:\nPhone: ${phone || 'N/A'}\nCompany: ${company || 'N/A'}\nWebsite: ${website || 'N/A'}\nBudget: ${budget || 'N/A'}`,
+          html: `<p>${message.replace(/\n/g, '<br>')}</p>
+                       <hr>
+                       <p><strong>Contact Details:</strong></p>
+                       <ul>
+                        <li><strong>Phone:</strong> ${phone || 'N/A'}</li>
+                        <li><strong>Company:</strong> ${company || 'N/A'}</li>
+                        <li><strong>Website:</strong> ${website || 'N/A'}</li>
+                        <li><strong>Budget:</strong> ${budget || 'N/A'}</li>
+                       </ul>`
+        },
+        source: 'manual', // or 'api'
+        status: 'delivered',
+        isRead: false
+      });
+      await newMessage.save();
+      console.log('Created corresponding message for contact:', created._id);
+    } catch (msgErr) {
+      console.error('Failed to create message for contact submission:', msgErr);
+      // Do not fail the request if message creation fails, as contact is already saved
+    }
+
     return res.status(201).json({ message: 'Submitted', contact: created });
   } catch (err) {
     console.error('Contact create error:', err.message);

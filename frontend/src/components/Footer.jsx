@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SocialLinksAPI } from '../services/socialLinks';
+import { ContactAPI } from '../lib/api';
 import { CompanyInfoAPI } from '../services/companyInfo';
 import SocialIcon from './SocialIcon';
 
@@ -17,16 +18,31 @@ export default function Footer() {
         ]);
         setLinks(socialRes.items || []);
         setInfo(infoRes.info);
-      } catch (_e) {}
+      } catch (_e) { }
     })();
   }, []);
 
-  function submitNewsletter(e) {
+  async function submitNewsletter(e) {
     e.preventDefault();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) 
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       return alert('Please enter a valid email');
-    alert(`Subscribed with: ${email}`);
-    setEmail('');
+
+    try {
+      // Import ContactAPI if not already available or ensure it is imported
+      const { ContactAPI } = require('../lib/api');
+      await ContactAPI.create({
+        name: 'Newsletter Subscriber', // Placeholder name
+        email,
+        source: 'Newsletter',
+        message: 'Newsletter subscription request',
+        status: 'New'
+      });
+      alert('Thanks for subscribing!');
+      setEmail('');
+    } catch (err) {
+      console.error(err);
+      alert('Subscription failed. Please try again.');
+    }
   }
 
   return (
@@ -47,7 +63,7 @@ export default function Footer() {
             <li>
               <span className="icon" aria-hidden>
                 <svg viewBox="0 0 24 24">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.15 9.81 19.86 19.86 0 0 1 .08 1.18 2 2 0 0 1 2.06 0h3a2 2 0 0 1 2 1.72c.12.9.32 1.77.59 2.61a2 2 0 0 1-.45 2.11L6 7a16 16 0 0 0 7 7l.56-.2a2 2 0 0 1 2.11.45c.84.27 1.71.47 2.61.59A2 2 0 0 1 22 16.92z"/>
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.15 9.81 19.86 19.86 0 0 1 .08 1.18 2 2 0 0 1 2.06 0h3a2 2 0 0 1 2 1.72c.12.9.32 1.77.59 2.61a2 2 0 0 1-.45 2.11L6 7a16 16 0 0 0 7 7l.56-.2a2 2 0 0 1 2.11.45c.84.27 1.71.47 2.61.59A2 2 0 0 1 22 16.92z" />
                 </svg>
               </span>
               <a href={`tel:${info?.phone || '+923001234567'}`}>
@@ -57,7 +73,7 @@ export default function Footer() {
             <li>
               <span className="icon" aria-hidden>
                 <svg viewBox="0 0 24 24">
-                  <path d="M4 4h16a2 2 0 0 1 2 2v.4l-10 6.25L2 6.4V6a2 2 0 0 1 2-2Zm18 5.2V18a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.2l10 6.25 10-6.25Z"/>
+                  <path d="M4 4h16a2 2 0 0 1 2 2v.4l-10 6.25L2 6.4V6a2 2 0 0 1 2-2Zm18 5.2V18a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.2l10 6.25 10-6.25Z" />
                 </svg>
               </span>
               <a href={`mailto:${info?.email || 'hello@devugo.tech'}`}>
@@ -67,7 +83,7 @@ export default function Footer() {
             <li>
               <span className="icon" aria-hidden>
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
+                  <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
                 </svg>
               </span>
               <a href="https://maps.google.com/?q=Devugo" target="_blank" rel="noreferrer">
@@ -109,12 +125,12 @@ export default function Footer() {
           <h4>Follow us</h4>
           <div className="social-row">
             {links.map(link => (
-              <a 
-                key={link._id} 
-                href={link.url} 
-                target="_blank" 
-                rel="noreferrer" 
-                aria-label={link.platform} 
+              <a
+                key={link._id}
+                href={link.url}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={link.platform}
                 className="social-btn"
               >
                 <SocialIcon name={link.platform} size={20} />
