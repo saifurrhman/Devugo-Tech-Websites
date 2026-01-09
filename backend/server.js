@@ -56,6 +56,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'https://devugo-tech-websites.vercel.app',
+  'https://www.devugotechsolution.store',
+  'https://devugotechsolution.store',
 ];
 
 if (process.env.CORS_ORIGINS) {
