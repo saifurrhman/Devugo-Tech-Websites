@@ -20,6 +20,7 @@ import PortfolioEdit from '../admin/pages/PortfolioEdit';
 import BlogList from '../admin/pages/BlogList';
 import BlogEdit from '../admin/pages/BlogEdit';
 import AdminBlogCreate from '../admin/pages/AdminBlogCreate';
+
 import TeamList from '../admin/pages/TeamList';
 import TeamEdit from '../admin/pages/TeamEdit';
 import UsersList from '../admin/pages/UsersList';
@@ -119,6 +120,7 @@ export default function PublicRoutes() {
           {/* Admin Blog */}
           <Route path="/admin/blog" element={<ProtectedRoute><BlogList /></ProtectedRoute>} />
           <Route path="/admin/blog/create" element={<ProtectedRoute><AdminBlogCreate /></ProtectedRoute>} />
+
           <Route path="/admin/blog/:id" element={<ProtectedRoute><BlogEdit /></ProtectedRoute>} />
           <Route path="/admin/blog/categories" element={<ProtectedRoute><BlogCategories /></ProtectedRoute>} />
 

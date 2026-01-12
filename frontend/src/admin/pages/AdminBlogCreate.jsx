@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import AIPanel from '../../components/AIPanel';
+import BlogGeneratorModal from '../../components/BlogGeneratorModal';
 import { BlogAPI, UploadAPI, BlogCategoryAPI, AIAPI } from '../../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -27,7 +28,8 @@ export default function AdminBlogCreate() {
   const [shareToSocial, setShareToSocial] = useState(false);
   const editorRef = useRef(null);
   const [categories, setCategories] = useState([]);
-  const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [generatorOpen, setGeneratorOpen] = useState(false);
+  const [aiPanelOpen, setAiPanelOpen] = useState(false); // Legacy support if needed
   const [aiPrompt, setAiPrompt] = useState('');
 
   useEffect(() => {
@@ -189,18 +191,30 @@ export default function AdminBlogCreate() {
   }
 
   function handleAIAccept(data) {
-    // Expecting logic from AI response
-    setForm(prev => ({
-      ...prev,
-      title: data.title || prev.title,
-      content: data.content || prev.content,
-      excerpt: data.excerpt || prev.excerpt,
-      // If AI returns SEO data
-      seoTitle: data.seo?.metaTitle || prev.seoTitle,
-      seoDescription: data.seo?.metaDescription || prev.seoDescription,
-    }));
-    setAiPanelOpen(false);
-    setMessage('Content auto-generated!');
+    console.log('🤖 AI Data Accepted:', data);
+    setForm(prev => {
+      // Safe merge of categories: If AI sends strings, we might need to find IDs or just ignore for now.
+      // Assuming AI sends an array of strings for tags/categories
+      const incomingTags = Array.isArray(data.categories) ? data.categories.join(', ') : '';
+      const mergedTags = prev.tags ? `${prev.tags}, ${incomingTags}` : incomingTags;
+
+      return {
+        ...prev,
+        title: data.title || prev.title,
+        content: data.content || prev.content,
+        excerpt: data.excerpt || prev.excerpt,
+        // Map Images if present
+        featuredImage: data.featuredImage || prev.featuredImage,
+        coverImage: data.coverImage || prev.coverImage,
+        // Map SEO
+        seoTitle: data.seo?.metaTitle || prev.seoTitle,
+        seoDescription: data.seo?.metaDescription || prev.seoDescription,
+        // Append suggested categories to tags (since we need IDs for real categories)
+        tags: mergedTags
+      };
+    });
+    setGeneratorOpen(false);
+    setMessage('Content & Images applied successfully! 🚀');
   }
 
   return (
@@ -224,12 +238,17 @@ export default function AdminBlogCreate() {
           <h1 className="page-title">Create a New Post</h1>
           <button
             type="button"
-            onClick={() => { setAiPrompt(`Write a blog post about: ${form.title || '...'}`); setAiPanelOpen(true); }}
+            onClick={() => {
+              console.log('Auto-Generate clicked');
+              setAiPrompt(form.title || '');
+              setGeneratorOpen(true);
+            }}
             className="btn-secondary flex items-center gap-2"
             style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)', color: 'white', border: 'none' }}
           >
             <span>✨ Auto-Generate with AI</span>
           </button>
+
         </div>
 
         {error && (<div className="chip chip-error" style={{ marginTop: '.5rem' }}>{error}</div>)}
@@ -532,6 +551,12 @@ export default function AdminBlogCreate() {
         prompt={aiPrompt}
         onGenerate={handleAIGenerate}
         onAccept={handleAIAccept}
+      />
+      <BlogGeneratorModal
+        isOpen={generatorOpen}
+        onClose={() => setGeneratorOpen(false)}
+        onAccept={handleAIAccept}
+        initialTopic={aiPrompt}
       />
     </div>
   );
