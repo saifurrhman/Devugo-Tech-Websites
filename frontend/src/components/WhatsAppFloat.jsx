@@ -44,7 +44,7 @@ export default function WhatsAppFloat() {
 
   const buttonStyle = {
     position: 'fixed',
-    bottom: '24px',
+    bottom: '110px',
     right: '24px',
     width: '60px',
     height: '60px',
@@ -54,17 +54,17 @@ export default function WhatsAppFloat() {
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
-    zIndex: 9999,
+    zIndex: 40,
     textDecoration: 'none',
     cursor: 'pointer',
   };
 
   return (
-    <a 
-      href={whatsappLink} 
-      target="_blank" 
-      rel="noreferrer" 
-      aria-label="Chat on WhatsApp" 
+    <a
+      href={whatsappLink}
+      target="_blank"
+      rel="noreferrer"
+      aria-label="Chat on WhatsApp"
       style={buttonStyle}
     >
       <svg viewBox="0 0 24 24" width="28" height="28" fill="#fff">

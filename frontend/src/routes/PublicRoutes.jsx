@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/Home';
 import About from '../pages/About';
@@ -77,7 +77,11 @@ import MeetingScheduler from '../admin/pages/meetings/MeetingScheduler';
 import DynamicTitle from '../components/DynamicTitle';
 import Integrations from '../admin/pages/settings/Integrations';
 
+import ChatWidget from '../components/ChatWidget';
+
 export default function PublicRoutes() {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
   return (
     <BrowserRouter>
       <DynamicTitle />
@@ -184,8 +188,11 @@ export default function PublicRoutes() {
           <Route path="/admin/meetings/schedule" element={<ProtectedRoute allowedRoles={['crm']}><MeetingScheduler /></ProtectedRoute>} />
         </Routes>
 
-        {/* WhatsApp Float - Shows on all pages */}
-        <WhatsAppFloat />
+        {/* Floating Widgets */}
+        {/* Hide WhatsApp when Chat is Open */}
+        {!isChatOpen && <WhatsAppFloat />}
+        <ChatWidget isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
+
       </NotificationProvider>
     </BrowserRouter>
   );

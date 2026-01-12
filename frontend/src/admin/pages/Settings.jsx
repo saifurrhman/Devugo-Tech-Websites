@@ -16,6 +16,8 @@ export default function Settings() {
     whatsappMessage: '',
     workingHours: '',
     showWhatsappFloat: true,
+    showChatBot: true,
+    chatBotWelcomeMessage: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,7 +30,7 @@ export default function Settings() {
     setLoading(true);
     try {
       const { info } = await CompanyInfoAPI.get();
-      if (info) setForm(info);
+      if (info) setForm(prev => ({ ...prev, ...info }));
     } catch (e) {
       console.error(e);
     }
@@ -253,6 +255,51 @@ export default function Settings() {
             </div>
           </div>
 
+          {/* Chatbot Settings Card */}
+          <div className="card settings-card chatbot-card">
+            <div className="card-header chatbot-header">
+              <div className="header-content">
+                <div className="chatbot-icon">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2>Chatbot Integration</h2>
+                  <p>Configure website AI chatbot settings</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-body">
+              <div className="form-grid">
+                <div className="form-group toggle-group full-width">
+                  <label>Show Chatbot</label>
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, showChatBot: !f.showChatBot }))}
+                    className={`toggle-btn ${form.showChatBot ? 'active' : ''}`}
+                  >
+                    <span className="toggle-slider" />
+                  </button>
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Welcome Message</label>
+                  <textarea
+                    className="form-input"
+                    name="chatBotWelcomeMessage"
+                    value={form.chatBotWelcomeMessage}
+                    onChange={onChange}
+                    rows="3"
+                    placeholder="Hi there! 👋 How can I help you today?"
+                  />
+                  <p className="field-hint">The first message the bot sends to visitors</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Save Buttons */}
           <div className="form-actions">
             <button type="button" onClick={() => load()} className="btn-reset">
@@ -314,6 +361,10 @@ export default function Settings() {
           background: linear-gradient(135deg, rgba(37, 211, 102, 0.1), rgba(34, 197, 94, 0.1));
         }
 
+        .chatbot-header {
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+        }
+
         .header-content {
           display: flex;
           align-items: center;
@@ -328,6 +379,17 @@ export default function Settings() {
           height: 40px;
           border-radius: 50%;
           background: #25d366;
+          flex-shrink: 0;
+        }
+
+        .chatbot-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: #2563eb;
           flex-shrink: 0;
         }
 

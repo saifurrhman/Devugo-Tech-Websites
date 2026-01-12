@@ -11,6 +11,8 @@ const CompanyInfoSchema = new mongoose.Schema(
     whatsappMessage: { type: String, default: 'Hello! I would like to discuss a project.' },
     workingHours: { type: String, default: 'Mon–Fri · 9am–6pm PKT' },
     showWhatsappFloat: { type: Boolean, default: true },
+    showChatBot: { type: Boolean, default: true },
+    chatBotWelcomeMessage: { type: String, default: 'Hi there! 👋 How can I help you today?' },
   },
   { timestamps: true }
 );

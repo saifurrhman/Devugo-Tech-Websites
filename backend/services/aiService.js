@@ -65,6 +65,7 @@ class AIService {
 
   async generateContent(systemPrompt, userVariables, scope = 'general') {
     try {
+      console.log(`🔍 generateContent called. Scope: ${scope}, Variables:`, userVariables);
       // 1. Check for External Agent
       const agent = await this.getActionAgent(scope);
       if (agent) {
@@ -76,12 +77,15 @@ class AIService {
 
       if (!apiKey) {
         logger.warn('Gemini API Key missing. Using mock response.');
-        // Return mock immediately without throwing
-        return this.getMockResponse(userVariables.goal || 'General', userVariables.tone || 'Professional');
+        // DEBUG: Return actual error to user
+        return {
+          reply: "Error: Gemini API Key is missing or invalid in settings/env.",
+          isMock: true
+        };
       }
 
       this.genAI = new GoogleGenerativeAI(apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 
 
@@ -106,13 +110,17 @@ class AIService {
         return JSON.parse(text);
       } catch (e) {
         logger.error('Failed to parse Gemini response as JSON', e);
-        throw new Error('AI response format error');
+        throw new Error('AI response format error: ' + text);
       }
 
     } catch (error) {
       logger.error('AI Service Error:', error.message);
-      // Provide basic mock fallbacks if AI fails or is missing, relying on the 'goal' or 'type' if present in variables
-      return this.getMockResponse(userVariables.goal || 'General', userVariables.tone || 'Professional');
+      // DEBUG: Return actual error to user
+      return {
+        reply: `AI Error: ${error.message} (Model: gemini-1.5-flash)`,
+        isMock: true
+      };
+      // return this.getMockResponse(userVariables.goal || 'General', userVariables.tone || 'Professional');
     }
   }
 
@@ -168,6 +176,7 @@ class AIService {
   }
 
   getMockResponse(goal, tone) {
+    console.log(`⚠️ getMockResponse called. Goal: ${goal}`);
     return {
       subject: `[Mock] Action for ${goal}`,
       body: `<p>This is a mock response because AI is unavailable. Goal: ${goal}, Tone: ${tone}</p>`,

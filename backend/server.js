@@ -276,6 +276,11 @@ app.use('/api/company-info', companyInfoRoutes);
 console.log('Mounting /api/brands...');
 app.use('/api/brands', require('./routes/brands'));
 
+// Chat Routes (Public)
+console.log('💬 Loading chat routes...');
+app.use('/api/chat', require('./routes/chatRoutes'));
+console.log('✅ Chat routes loaded');
+
 console.log('✅ All existing routes loaded');
 
 // ========================================
@@ -683,4 +688,4 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-// Forced restart trigger 12 (Brands Route Debug)
+// Forced restart trigger 14 (AI Key Debug)
