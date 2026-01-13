@@ -55,15 +55,10 @@ const ChatWidget = ({ isOpen, setIsOpen }) => {
 
         try {
             // Determine API URL based on environment
-            // Assuming the backend runs on port 5000 locally or relative path in prod
-            const apiUrl = process.env.NODE_ENV === 'production'
-                ? 'https://devugo-tech-websites.vercel.app/api/chat/message' // Update if needed
+            // Using absolute path to ensure connectivity across custom domains
+            const endpoint = process.env.NODE_ENV === 'production'
+                ? 'https://devugo-tech-websites.vercel.app/api/chat/message'
                 : 'http://localhost:5000/api/chat/message';
-
-            // Check if we are on the same domain or development
-            const endpoint = window.location.hostname === 'localhost'
-                ? 'http://localhost:5000/api/chat/message'
-                : '/api/chat/message';
 
             const response = await fetch(endpoint, {
                 method: 'POST',
