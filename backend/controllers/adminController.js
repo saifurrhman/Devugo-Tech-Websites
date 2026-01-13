@@ -48,6 +48,8 @@ exports.inviteUser = async (req, res) => {
         // Log for dev environment
         if (process.env.NODE_ENV !== 'production') {
             console.log('📨 Invitation Link:', invitationLink);
+        } else if (!process.env.FRONTEND_URL) {
+            console.warn('⚠️ WARNING: FRONTEND_URL not set in production. Invitation link will use localhost.');
         }
 
         try {
