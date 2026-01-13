@@ -4812,3 +4812,8 @@
 {"timestamp":"2026-01-13T19:40:46.162Z","level":"INFO","message":"✅ Email server is ready to send messages (SMTP/Gmail)"}
 {"timestamp":"2026-01-13T19:45:00.025Z","level":"INFO","message":"AI Personalizer job started"}
 {"timestamp":"2026-01-13T19:45:00.101Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-01-13T19:50:00.041Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-01-13T19:50:00.046Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-01-13T19:50:00.218Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-01-13T19:50:00.449Z","level":"INFO","message":"Updated stats for 1 campaigns"}
+{"timestamp":"2026-01-13T19:50:01.106Z","level":"INFO","message":"Updated stats for 0 recipients"}
