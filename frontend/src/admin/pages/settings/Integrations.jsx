@@ -31,6 +31,7 @@ export default function Integrations() {
         model: 'GPT-4 Turbo',
         strictFiltering: true,
         geminiApiKey: '',
+        chatbotApiKey: '',
         agents: [] // { id, name, tool: 'make'|'zapier'|'n8n'|'custom', webhook: '', apiKey: '', model: '' }
     });
     const [savingAI, setSavingAI] = useState(false);
@@ -123,6 +124,7 @@ export default function Integrations() {
                     ...prev,
                     ...aiData,
                     geminiApiKey: aiData.geminiApiKey || '',
+                    chatbotApiKey: aiData.chatbotApiKey || '',
                     agents: Array.isArray(aiData.agents) ? aiData.agents : []
                 }));
             } catch (e) { console.error('AI settings load error', e); }
@@ -242,6 +244,26 @@ export default function Integrations() {
                             </div>
                             <input type="checkbox" checked={aiConfig.strictFiltering} onChange={e => setAiConfig({ ...aiConfig, strictFiltering: e.target.checked })} className="w-5 h-5 accent-purple-500" />
                         </div>
+                    </div>
+                </div>
+
+                {/* Chatbot AI (Dedicated) */}
+                <div className="space-y-6 max-w-3xl mb-8 border-b border-gray-800 pb-8">
+                    <h3 className="tex-lg font-semibold text-white mb-4">Chatbot AI (Dedicated)</h3>
+                    <div>
+                        <label className="text-sm text-gray-400 mb-1 block">Chatbot API Key</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="password"
+                                placeholder="AIzaSy... (Dedicated key for chatbot)"
+                                value={aiConfig.chatbotApiKey || ''}
+                                onChange={e => setAiConfig({ ...aiConfig, chatbotApiKey: e.target.value })}
+                                className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-purple-500"
+                            />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Current Model: <span className="text-purple-400">{detectModel(aiConfig.chatbotApiKey || aiConfig.geminiApiKey)}</span>
+                        </p>
                     </div>
                 </div>
 
@@ -566,6 +588,26 @@ export default function Integrations() {
                                                         <input type="checkbox" checked={aiConfig.strictFiltering} onChange={e => setAiConfig({ ...aiConfig, strictFiltering: e.target.checked })} className="w-5 h-5 accent-blue-500" />
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Chatbot AI (Dedicated) */}
+                                        <div className="space-y-6 max-w-3xl mb-8 border-b border-white/10 pb-8">
+                                            <h3 className="text-lg font-semibold text-white mb-4">Chatbot AI (Dedicated)</h3>
+                                            <div>
+                                                <label className="text-sm text-blue-200/80 mb-1 block">Chatbot API Key</label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="password"
+                                                        placeholder="AIzaSy... (Dedicated key for chatbot)"
+                                                        value={aiConfig.chatbotApiKey || ''}
+                                                        onChange={e => setAiConfig({ ...aiConfig, chatbotApiKey: e.target.value })}
+                                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2 text-white focus:border-blue-500 placeholder-blue-200/20"
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-blue-300/60 mt-1">
+                                                    Current Model: <span className="text-blue-400">{detectModel(aiConfig.chatbotApiKey || aiConfig.geminiApiKey)}</span>
+                                                </p>
                                             </div>
                                         </div>
 

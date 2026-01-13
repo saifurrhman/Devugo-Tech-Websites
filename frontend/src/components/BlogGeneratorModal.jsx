@@ -69,10 +69,10 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
 
     return (
         <div
-            className="fixed inset-0 z-[9999] overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300"
+            className="fixed inset-0 z-[9999] overflow-y-auto bg-black/70 backdrop-blur-sm flex items-start md:items-center justify-center p-4 transition-all duration-300"
             style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
         >
-            <div className="bg-[#002747] rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row relative animate-in fade-in zoom-in-95 duration-300 border border-white/10 ring-1 ring-black/20">
+            <div className="bg-[#002747] rounded-xl md:rounded-2xl shadow-2xl w-full max-w-6xl md:max-h-[90vh] md:overflow-hidden overflow-visible flex flex-col md:flex-row relative animate-in fade-in zoom-in-95 duration-300 border border-white/10 ring-1 ring-black/20 my-4 md:my-0">
 
                 {/* Close Button - Enhanced Visibility */}
                 <button
@@ -187,7 +187,7 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                 </div>
 
                 {/* Right Panel: Preview (Maintains Paper Look) */}
-                <div className="flex-1 bg-[#f8fafc] relative flex flex-col min-h-[500px]">
+                <div className="flex-1 bg-[#f8fafc] relative flex flex-col min-h-[300px] md:min-h-[500px]">
                     {!result ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#f1f5f9]">
                             <div className="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-6 border border-slate-200">

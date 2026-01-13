@@ -9,9 +9,20 @@ class AIService {
     // Initial cleanup of constructor
   }
 
-  async getApiKey() {
+  async getApiKey(scope) {
+    // 1. Specific Chatbot Key from Env (Highest Priority for Chat)
+    if (scope === 'chat' && process.env.CHATBOT_API_KEY) {
+      return process.env.CHATBOT_API_KEY;
+    }
+
     try {
       const setting = await Setting.findOne({ key: 'ai' });
+
+      // 2. Chatbot Key from DB (Second Priority)
+      if (scope === 'chat' && setting && setting.value && setting.value.chatbotApiKey) {
+        return setting.value.chatbotApiKey;
+      }
+
       if (setting && setting.value && setting.value.geminiApiKey) {
         return setting.value.geminiApiKey;
       }
@@ -73,7 +84,9 @@ class AIService {
         if (agentResult) return agentResult;
       }
 
-      const apiKey = await this.getApiKey();
+
+
+      const apiKey = await this.getApiKey(scope);
 
       if (!apiKey) {
         logger.warn('Gemini API Key missing. Using mock response.');
@@ -85,7 +98,8 @@ class AIService {
       }
 
       this.genAI = new GoogleGenerativeAI(apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // Using 'gemini-flash-latest' for better stability and quota handling
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
 
 
@@ -99,7 +113,23 @@ class AIService {
       // Combine Master Prompt with Specific Prompt
       const fullInstruction = `${PROMPTS.MASTER_SYSTEM_PROMPT}\n\n${finalPrompt}`;
 
-      const result = await this.model.generateContent(fullInstruction);
+      // Retry Logic for Rate Limits (429)
+      let result;
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          result = await this.model.generateContent(fullInstruction);
+          break; // Success, exit loop
+        } catch (err) {
+          if (err.message.includes('429') && retries > 1) {
+            console.warn(`⚠️ AI Rate Limit (429). Retrying in 4s... (${retries - 1} left)`);
+            await new Promise(r => setTimeout(r, 4000));
+            retries--;
+          } else {
+            throw err; // Other error, throw immediately
+          }
+        }
+      }
       const response = await result.response;
       let text = response.text();
 

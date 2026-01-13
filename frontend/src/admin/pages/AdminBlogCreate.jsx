@@ -234,7 +234,7 @@ export default function AdminBlogCreate() {
           </div>
         </div>
 
-        <div className="flex justify-between items-center mt-1">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 mt-1">
           <h1 className="page-title">Create a New Post</h1>
           <button
             type="button"
