@@ -57,7 +57,9 @@ export default function CreateInvoice() {
     const currencySymbols = {
         'USD': '$',
         'EUR': '€',
-        'GBP': '£'
+        'GBP': '£',
+        'PKR': '₨',
+        'INR': '₹'
     };
 
     const handleItemChange = (index, field, value) => {
@@ -796,6 +798,8 @@ export default function CreateInvoice() {
                                         <option value="USD">USD ($)</option>
                                         <option value="EUR">EUR (€)</option>
                                         <option value="GBP">GBP (£)</option>
+                                        <option value="PKR">PKR (₨)</option>
+                                        <option value="INR">INR (₹)</option>
                                     </select>
                                 </div>
                             </div>
