@@ -93,6 +93,27 @@ exports.submit = async (req, res) => {
             status: 'New'
         });
         await contact.save();
+
+        // Try to send email to Admin
+        const emailService = require('../services/emailService');
+        try {
+            await emailService.sendEmail({
+                to: process.env.ADMIN_EMAIL || 'devugo.tech@gmail.com',
+                subject: `New Lead: ${contact.name}`,
+                html: `
+                    <h2>New Form Submission</h2>
+                    <p><strong>Name:</strong> ${contact.name}</p>
+                    <p><strong>Email:</strong> ${contact.email}</p>
+                    <p><strong>Phone:</strong> ${contact.phone || 'N/A'}</p>
+                    <p><strong>Service Requested:</strong> ${contact.service || 'N/A'}</p>
+                    <p><strong>Message:</strong> ${contact.message || 'N/A'}</p>
+                `,
+                text: `New Form Submission\nName: ${contact.name}\nEmail: ${contact.email}\nPhone: ${contact.phone || 'N/A'}\nMessage: ${contact.message || 'N/A'}`
+            });
+        } catch (emailErr) {
+            console.error('Failed to send admin notification email:', emailErr);
+        }
+
         res.status(201).json({ ok: true, message: 'Message sent successfully' });
     } catch (err) {
         res.status(400).json({ ok: false, error: err.message });
