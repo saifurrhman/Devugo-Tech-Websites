@@ -117,8 +117,8 @@ export default function Pricing(){
   return (
     <>
       <SEO
-        title="Pricing | Transparent SaaS & Development Packages"
-        description="Choose the right package for your business. Affordable web development, AI automation, and SaaS pricing with zero hidden fees."
+        title="Pricing | Custom AI SaaS & MVP Packages"
+        description="Transparent pricing for software startups. Choose the right package for custom MVP development, AI SaaS platforms, and MERN stack applications."
         url="/pricing"
       />
       <Navbar />

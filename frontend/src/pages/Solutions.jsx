@@ -35,8 +35,8 @@ export default function Solutions(){
   return (
     <>
       <SEO
-        title="Solutions | Tech Solutions for Scale - Devugo Tech"
-        description="Discover custom technical solutions for startups and enterprises. We provide robust AI tools, high-performance web platforms, and tailored full-stack development."
+        title="AI SaaS & Custom MVP Solutions | Devugo Tech"
+        description="Launch your software startup fast. We provide custom MVP development and AI SaaS solutions tailored for software companies and tech founders."
         url="/solutions"
       />
       <Navbar />

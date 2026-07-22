@@ -15,9 +15,9 @@ export default function Services() {
   return (
     <>
       <SEO
-        title="Our Services | Web Development, AI Automation & SaaS | Devugo Tech"
-        description="Explore our services: full-stack web development, AI agent integration, n8n automation, CRM systems, and SaaS MVP development for startups worldwide."
-        keywords="web development services, AI agent development, SaaS MVP development"
+        title="AI SaaS & MVP Development Services | Devugo Tech"
+        description="Explore our specialized services for the software industry: AI SaaS development, custom MVP builder, scalable MERN stack apps, and AI automations."
+        keywords="AI SaaS development, custom MVP development, software industry solutions, scalable web apps"
         url="/services"
       />
       <Navbar />

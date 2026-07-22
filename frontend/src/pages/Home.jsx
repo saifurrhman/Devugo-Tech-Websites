@@ -22,9 +22,9 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="Devugo Tech Solutions | AI Automation & SaaS Development"
-        description="We build AI-powered SaaS platforms, automation systems, and full-stack web apps for startups and global businesses. Book a free 15-min call today."
-        keywords="AI automation agency, SaaS development company, full-stack development services"
+        title="Devugo Tech | Custom AI SaaS & MVP Development Agency"
+        description="We build high-performance AI SaaS platforms, custom MVPs, and software solutions for startups and enterprises. Ship your product fast with our MERN stack experts."
+        keywords="AI SaaS development, custom MVP builder, software development agency, MERN stack developers"
         url="/"
       />
       <Navbar />
