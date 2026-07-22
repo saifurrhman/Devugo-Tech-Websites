@@ -2,7 +2,7 @@ const { BetaAnalyticsDataClient } = require('@google-analytics/data');
 const path = require('path');
 
 // Google Analytics Configuration
-const propertyId = '13007590044'; // Your Property ID from screenshot
+const propertyId = '546640964'; 
 const keyFilePath = path.join(__dirname, '../config/google-analytics-key.json');
 
 // Initialize Analytics Client
