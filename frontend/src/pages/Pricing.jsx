@@ -5,6 +5,7 @@ import PricingQuoteModal from '../components/PricingQuoteModal';
 import HomeFaq from '../components/HomeFaq';
 import './Pricing.css';
 import { PricingAPI } from '../lib/api';
+import SEO from '../components/SEO';
 
 export default function Pricing(){
   const [open, setOpen] = useState(false);
@@ -12,10 +13,6 @@ export default function Pricing(){
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState('All');
-
-  useEffect(() => {
-    document.title = 'Pricing - Devugo Tech';
-  }, []);
 
   // Animate cards on scroll
   useEffect(()=>{
@@ -119,6 +116,11 @@ export default function Pricing(){
 
   return (
     <>
+      <SEO
+        title="Pricing | Transparent SaaS & Development Packages"
+        description="Choose the right package for your business. Affordable web development, AI automation, and SaaS pricing with zero hidden fees."
+        url="/pricing"
+      />
       <Navbar />
       <main className="pricing-page">
         {/* Hero Section */}

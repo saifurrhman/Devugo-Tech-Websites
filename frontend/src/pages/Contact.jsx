@@ -7,6 +7,7 @@ import { ContactAPI, FormAPI } from '../lib/api';
 import { SocialLinksAPI } from '../services/socialLinks';
 import { CompanyInfoAPI } from '../services/companyInfo';
 import SocialIcon from '../components/SocialIcon';
+import SEO from '../components/SEO';
 
 export default function Contact() {
   const [cfg, setCfg] = useState(null);
@@ -23,10 +24,6 @@ export default function Contact() {
   });
   const [socialLinks, setSocialLinks] = useState([]);
   const [info, setInfo] = useState(null);
-
-  useEffect(() => {
-    document.title = 'Contact Us - Devugo Tech';
-  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -120,6 +117,11 @@ export default function Contact() {
 
   return (
     <>
+      <SEO
+        title="Contact Devugo Tech | Start Your Project"
+        description="Get in touch with Devugo Tech to discuss your next web development, AI automation, or SaaS project. We are ready to help you scale."
+        url="/contact"
+      />
       <Navbar />
       <ContactHero />
       <main className="contact-page">

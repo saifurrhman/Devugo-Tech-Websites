@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import FaqHero from '../components/FaqHero';
 import { ClientFaqAPI, CompanyInfoAPI } from '../lib/api';
 import '../components/HomeFaq.css';
+import SEO from '../components/SEO';
 
 export default function Faq() {
   const [items, setItems] = useState([]);
@@ -11,10 +12,6 @@ export default function Faq() {
   const [error, setError] = useState('');
   const [openKey, setOpenKey] = useState('');
   const [email, setEmail] = useState('hello@devugo.tech');
-
-  useEffect(() => {
-    document.title = 'FAQ - Devugo Tech';
-  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -50,6 +47,11 @@ export default function Faq() {
 
   return (
     <>
+      <SEO
+        title="FAQ | Frequently Asked Questions - Devugo Tech"
+        description="Find answers to common questions about our web development process, AI integration, pricing, and support."
+        url="/faq"
+      />
       <Navbar />
       <FaqHero />
 

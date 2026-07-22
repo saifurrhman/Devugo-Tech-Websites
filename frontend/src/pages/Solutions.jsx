@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Solutions.css';
+import SEO from '../components/SEO';
 
 export default function Solutions(){
   const solutions = [
@@ -21,9 +22,6 @@ export default function Solutions(){
       href: '#custom'
     },
   ];
-  useEffect(() => {
-  document.title = 'Solutions - Devugo Tech';
-}, []);
 
   useEffect(()=>{
     const els = Array.from(document.querySelectorAll('.reveal'));
@@ -36,6 +34,11 @@ export default function Solutions(){
 
   return (
     <>
+      <SEO
+        title="Solutions | Tech Solutions for Scale - Devugo Tech"
+        description="Discover custom technical solutions for startups and enterprises. We provide robust AI tools, high-performance web platforms, and tailored full-stack development."
+        url="/solutions"
+      />
       <Navbar />
       <section className="sol-hero" aria-labelledby="sol-title">
         <div className="container">

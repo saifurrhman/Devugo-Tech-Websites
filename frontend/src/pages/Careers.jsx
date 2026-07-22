@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { CareerAPI, TeamAPI, CompanyInfoAPI } from '../lib/api';
 import { Rocket, Globe, DollarSign, Target, Search, Briefcase, MapPin, ArrowRight, Calendar } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const TYPE_COLOR = {
   'Full-Time':  { bg: 'rgba(67,133,205,0.18)', border: 'rgba(67,133,205,0.5)', color: '#60a5fa', glow: 'rgba(67,133,205,0.3)' },
@@ -29,8 +30,6 @@ export default function Careers() {
   const [hoveredJob, setHoveredJob] = useState(null);
   const [teamCount, setTeamCount] = useState('50+');
   const [countriesCount, setCountriesCount] = useState('12+');
-
-  useEffect(() => { document.title = 'Careers — Devugo Tech Solutions'; }, []);
 
   useEffect(() => {
     CareerAPI.list()
@@ -63,6 +62,11 @@ export default function Careers() {
 
   return (
     <>
+      <SEO
+        title="Careers | Join Devugo Tech Solutions"
+        description="We're actively hiring! Join a team of brilliant minds building next-generation digital products, AI solutions, and SaaS platforms."
+        url="/careers"
+      />
       <Navbar />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
