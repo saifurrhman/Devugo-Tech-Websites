@@ -6,15 +6,14 @@ import { PortfolioAPI } from '../lib/api';
 import ReviewsSection from '../components/ReviewsSection';
 import PortfolioCategories from '../components/PortfolioCategories';
 import PageHero from '../components/PageHero';
+import SEO from '../components/SEO';
 
 export default function Portfolio() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
-  useEffect(() => {
-    document.title = 'Portfolio - Devugo Tech';
-  }, []);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -40,6 +39,11 @@ export default function Portfolio() {
 
   return (
     <>
+      <SEO
+        title="Portfolio | Devugo Tech Case Studies & Client Projects"
+        description="See real results — SaaS platforms, automation systems, and web apps we've built for startups and businesses globally."
+        url="/portfolio"
+      />
       <Navbar />
       <PageHero
         eyebrow="Portfolio"

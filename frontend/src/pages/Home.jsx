@@ -13,17 +13,20 @@ import HomePortfolio from '../components/HomePortfolio';
 import ReviewsSection from '../components/ReviewsSection';
 import BrandMarquee from '../components/BrandMarquee';
 
+import SEO from '../components/SEO';
 
 export default function Home() {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  useEffect(() => {
-    document.title = 'Home - Devugo Tech';
-  }, []);
-
   return (
     <>
+      <SEO
+        title="Devugo Tech Solutions | AI Automation & SaaS Development"
+        description="We build AI-powered SaaS platforms, automation systems, and full-stack web apps for startups and global businesses. Book a free 15-min call today."
+        keywords="AI automation agency, SaaS development company, full-stack development services"
+        url="/"
+      />
       <Navbar />
       <SocialFloating />
       <Hero />

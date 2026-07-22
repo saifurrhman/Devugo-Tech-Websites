@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import './index.css';
 import './styles/globals.css';
 import './styles/admin-sender-selector.css';
@@ -18,7 +19,9 @@ try {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <PublicRoutes />
+    <HelmetProvider>
+      <PublicRoutes />
+    </HelmetProvider>
   </React.StrictMode>
 );
 

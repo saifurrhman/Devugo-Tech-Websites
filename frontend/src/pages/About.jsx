@@ -2,15 +2,13 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './About.css';
-import { TeamAPI } from '../lib/api';
+import { TeamAPI } from '../lib/api';import SEO from '../components/SEO';
 
 export default function About() {
   const [team, setTeam] = useState([]);
   const [teamLoading, setTeamLoading] = useState(true);
   const [teamError, setTeamError] = useState('');
-  useEffect(() => {
-    document.title = 'About Us - Devugo Tech';
-  }, []);
+
   useEffect(()=>{
     const els = Array.from(document.querySelectorAll('.about-page .reveal'));
     const io = new IntersectionObserver((entries)=>{
@@ -54,6 +52,11 @@ export default function About() {
 
   return (
     <>
+      <SEO
+        title="About Devugo Tech | Our Story & Mission"
+        description="Learn how Devugo Tech Solutions helps startups scale through custom web development, AI automation, and SaaS engineering."
+        url="/about"
+      />
       <Navbar />
       <main className="about-page">
         {/* 1. Hero */}

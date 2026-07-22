@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { BlogAPI } from '../lib/api';
+import SEO from '../components/SEO';
 
 export default function BlogDetail() {
   const { id } = useParams();
@@ -17,7 +18,6 @@ export default function BlogDetail() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    document.title = 'Blog Detail - Devugo Tech';
     window.scrollTo(0, 0);
   }, [id]);
 
@@ -46,10 +46,6 @@ export default function BlogDetail() {
         if (!mounted) return;
         
         setPost(fetchedPost);
-        
-        if (fetchedPost?.title) {
-          document.title = `${fetchedPost.title} - Devugo Tech Blog`;
-        }
 
         const { posts: allPosts } = await BlogAPI.list();
         
@@ -188,6 +184,12 @@ export default function BlogDetail() {
 
   return (
     <>
+      <SEO
+        title={`${post.title} | Devugo Tech Blog`}
+        description={post.excerpt || post.metaDescription || "Read our latest blog post on Devugo Tech."}
+        url={`/blog/${post.slug || id}`}
+        image={post.coverImage || post.featuredImage}
+      />
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }

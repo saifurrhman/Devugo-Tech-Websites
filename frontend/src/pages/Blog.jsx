@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import BlogHeroSection from '../components/BlogHeroSection';  
 import Footer from '../components/Footer';
 import { BlogAPI } from '../lib/api';
+import SEO from '../components/SEO';
 
 export default function Blog() {
   const navigate = useNavigate();
@@ -20,10 +21,6 @@ export default function Blog() {
   // Pagination - 10 posts per page
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1);
   const postsPerPage = 10; // Changed from 9 to 10
-
-  useEffect(() => {
-    document.title = 'Blog - Devugo Tech';
-  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -197,6 +194,11 @@ export default function Blog() {
 
   return (
     <>
+      <SEO
+        title="Devugo Tech Blog | AI, SaaS & Web Development Insights"
+        description="Read the latest insights on AI automation, SaaS development, and modern web technologies from the Devugo Tech team."
+        url="/blog"
+      />
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
