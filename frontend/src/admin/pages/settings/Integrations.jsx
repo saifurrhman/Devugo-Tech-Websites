@@ -196,6 +196,7 @@ export default function Integrations() {
         if (key.startsWith('sk-proj')) return 'GPT-4o (Detected)';
         if (key.startsWith('sk-')) return 'GPT-4 Turbo (Detected)';
         if (key.startsWith('AIza')) return 'Gemini 1.5 Pro (Detected)';
+        if (key.startsWith('AQ.')) return 'Gemini (New Format - Detected)';
         return 'Unknown Model';
     };
 

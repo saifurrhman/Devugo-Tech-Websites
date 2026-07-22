@@ -74,9 +74,40 @@ class AIService {
     }
   }
 
+  // Auto-detect which Gemini model works with this API key
+  async getWorkingModel(genAI) {
+    // Try newest models first, then fallbacks
+    const modelsToTry = [
+      'gemini-3.5-flash',
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-001',
+      'gemini-flash-latest',
+      'gemini-1.5-flash',
+      'gemini-1.5-pro',
+      'gemini-pro-latest',
+    ];
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        // Quick test call
+        await model.generateContent('hi');
+        logger.info(`✅ Working Gemini model found: ${modelName}`);
+        return model;
+      } catch (err) {
+        if (err.message.includes('403') || err.message.includes('suspended') || err.message.includes('SUSPENDED')) {
+          logger.error(`❌ API Key suspended/blocked. Cannot use Gemini.`);
+          return null; // Key is bad, stop trying
+        }
+        // 404 = model not available for this key, try next
+        logger.warn(`Model ${modelName} not available, trying next...`);
+      }
+    }
+    return null; // No working model found
+  }
+
   async generateContent(systemPrompt, userVariables, scope = 'general') {
     try {
-      console.log(`🔍 generateContent called. Scope: ${scope}, Variables:`, userVariables);
+      console.log(`🔍 generateContent called. Scope: ${scope}`);
       // 1. Check for External Agent
       const agent = await this.getActionAgent(scope);
       if (agent) {
@@ -84,24 +115,29 @@ class AIService {
         if (agentResult) return agentResult;
       }
 
-
-
       const apiKey = await this.getApiKey(scope);
 
       if (!apiKey) {
-        logger.warn('Gemini API Key missing. Using mock response.');
-        // DEBUG: Return actual error to user
+        logger.warn('Gemini API Key missing.');
         return {
-          reply: "Error: Gemini API Key is missing or invalid in settings/env.",
+          reply: "AI is not configured. Please add a Gemini API Key in Admin → Integrations → AI Configuration.",
           isMock: true
         };
       }
 
       this.genAI = new GoogleGenerativeAI(apiKey);
-      // Using 'gemini-flash-latest' for better stability and quota handling
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
 
+      // Auto-detect working model instead of hardcoding
+      const workingModel = await this.getWorkingModel(this.genAI);
 
+      if (!workingModel) {
+        return {
+          reply: "The configured API Key is not working (suspended or invalid). Please update it in Admin → Integrations → AI Configuration.",
+          isMock: true
+        };
+      }
+
+      this.model = workingModel;
 
       // Replace placeholders in the system prompt with user variables
       let finalPrompt = systemPrompt;
@@ -126,7 +162,7 @@ class AIService {
             await new Promise(r => setTimeout(r, 4000));
             retries--;
           } else {
-            throw err; // Other error, throw immediately
+            throw err;
           }
         }
       }
@@ -145,12 +181,10 @@ class AIService {
 
     } catch (error) {
       logger.error('AI Service Error:', error.message);
-      // DEBUG: Return actual error to user
       return {
-        reply: `AI Error: ${error.message} (Model: gemini-1.5-flash)`,
+        reply: `Sorry, I encountered an error. Please contact us at support@devugotechsolution.store`,
         isMock: true
       };
-      // return this.getMockResponse(userVariables.goal || 'General', userVariables.tone || 'Professional');
     }
   }
 
