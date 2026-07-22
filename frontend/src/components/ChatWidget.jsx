@@ -3,6 +3,8 @@ import { MessageCircle, X, Send, Loader2, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CompanyInfoAPI } from '../services/companyInfo';
 
+import { API_BASE } from '../lib/api';
+
 const ChatWidget = ({ isOpen, setIsOpen }) => {
     // const [isOpen, setIsOpen] = useState(false); // Controlled by parent now
     const [messages, setMessages] = useState([]);
@@ -54,11 +56,7 @@ const ChatWidget = ({ isOpen, setIsOpen }) => {
         setIsLoading(true);
 
         try {
-            // Determine API URL based on environment
-            // Using absolute path to ensure connectivity across custom domains
-            const endpoint = process.env.NODE_ENV === 'production'
-                ? 'https://devugo-tech-websites.vercel.app/api/chat/message'
-                : 'http://localhost:5000/api/chat/message';
+            const endpoint = `${API_BASE}/chat/message`;
 
             const response = await fetch(endpoint, {
                 method: 'POST',
