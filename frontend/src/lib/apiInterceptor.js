@@ -88,7 +88,8 @@ export async function fetchWithAuth(url, options = {}) {
 
   // CRITICAL FIX: Only set Content-Type if it's not explicitly provided
   // For FormData uploads, Content-Type should NOT be set (browser sets it automatically with boundary)
-  if (!headers.hasOwnProperty('Content-Type') && options.body && !(options.body instanceof FormData)) {
+  const isFormData = options.body instanceof FormData || (options.body && typeof options.body.append === 'function');
+  if (!headers.hasOwnProperty('Content-Type') && options.body && !isFormData) {
     headers['Content-Type'] = 'application/json';
   }
 
@@ -169,9 +170,10 @@ export async function fetchWithAuth(url, options = {}) {
 export async function apiWithRefresh(path, { method = 'GET', body, token } = {}) {
   const url = `${API_BASE}${path}`;
 
+  const isFormData = body instanceof FormData || (body && typeof body.append === 'function');
   const options = {
     method,
-    body: body ? JSON.stringify(body) : undefined
+    body: isFormData ? body : (body ? JSON.stringify(body) : undefined)
   };
 
   if (token) {

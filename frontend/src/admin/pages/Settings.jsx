@@ -18,6 +18,8 @@ export default function Settings() {
     showWhatsappFloat: true,
     showChatBot: true,
     chatBotWelcomeMessage: '',
+    teamMembersCount: '50+',
+    countriesCount: '12+',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -175,6 +177,36 @@ export default function Settings() {
                     value={form.address}
                     onChange={onChange}
                     placeholder="Lahore, Pakistan"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Team Members Count <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    name="teamMembersCount"
+                    value={form.teamMembersCount || '50+'}
+                    onChange={onChange}
+                    placeholder="e.g., 50+"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Countries Count <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    name="countriesCount"
+                    value={form.countriesCount || '12+'}
+                    onChange={onChange}
+                    placeholder="e.g., 12+"
                     required
                   />
                 </div>

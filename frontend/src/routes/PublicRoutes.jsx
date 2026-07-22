@@ -13,6 +13,8 @@ import Contact from '../pages/Contact';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
 import Solutions from '../pages/Solutions';
 import Pricing from '../pages/Pricing';
+import Careers from '../pages/Careers';
+import CareerDetail from '../pages/CareerDetail';
 import Dashboard from '../admin/pages/Dashboard';
 import Brands from '../admin/pages/Brands';
 import PortfolioList from '../admin/pages/PortfolioList';
@@ -20,6 +22,9 @@ import PortfolioEdit from '../admin/pages/PortfolioEdit';
 import BlogList from '../admin/pages/BlogList';
 import BlogEdit from '../admin/pages/BlogEdit';
 import AdminBlogCreate from '../admin/pages/AdminBlogCreate';
+import CareersList from '../admin/pages/CareersList';
+import CareerEdit from '../admin/pages/CareerEdit';
+import JobApplications from '../admin/pages/JobApplications';
 
 import TeamList from '../admin/pages/TeamList';
 import TeamEdit from '../admin/pages/TeamEdit';
@@ -60,6 +65,8 @@ import EmailAnalytics from '../admin/pages/analytics/EmailAnalytics';
 import PipelineBoard from '../admin/pages/pipeline/PipelineBoard';
 import ProjectsList from '../admin/pages/projects/ProjectsList';
 import InvoicesList from '../admin/pages/invoices/InvoicesList';
+import ProposalsList from '../admin/pages/proposals/ProposalsList';
+import ProposalEdit from '../admin/pages/proposals/ProposalEdit';
 import MeetingsList from '../admin/pages/meetings/MeetingsList';
 import ContactsList from '../admin/pages/contacts/ContactsList';
 import CreateTemplate from '../admin/pages/templates/CreateTemplate';
@@ -100,6 +107,8 @@ export default function PublicRoutes() {
           {/* ✅ BLOG ROUTES - IMPORTANT: /blog must come before /blog/:id */}
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<BlogDetail />} /> {/* ✅ ADD THIS ROUTE */}
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/careers/:id" element={<CareerDetail />} />
 
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -147,6 +156,11 @@ export default function PublicRoutes() {
           <Route path="/admin/services" element={<ProtectedRoute><ServicesList /></ProtectedRoute>} />
           <Route path="/admin/services/:id" element={<ProtectedRoute><ServiceEdit /></ProtectedRoute>} />
 
+          {/* Admin Careers */}
+          <Route path="/admin/careers" element={<ProtectedRoute><CareersList /></ProtectedRoute>} />
+          <Route path="/admin/careers/:id" element={<ProtectedRoute><CareerEdit /></ProtectedRoute>} />
+          <Route path="/admin/careers/:id/applications" element={<ProtectedRoute><JobApplications /></ProtectedRoute>} />
+
           {/* Admin Brands */}
           <Route path="/admin/brands" element={<ProtectedRoute><Brands /></ProtectedRoute>} />
 
@@ -184,6 +198,8 @@ export default function PublicRoutes() {
           <Route path="/admin/projects/create" element={<ProtectedRoute allowedRoles={['crm']}><CreateProject /></ProtectedRoute>} />
           <Route path="/admin/invoices" element={<ProtectedRoute allowedRoles={['crm']}><InvoicesList /></ProtectedRoute>} />
           <Route path="/admin/invoices/create" element={<ProtectedRoute allowedRoles={['crm']}><CreateInvoice /></ProtectedRoute>} />
+          <Route path="/admin/proposals" element={<ProtectedRoute allowedRoles={['crm']}><ProposalsList /></ProtectedRoute>} />
+          <Route path="/admin/proposals/:id" element={<ProtectedRoute allowedRoles={['crm']}><ProposalEdit /></ProtectedRoute>} />
           <Route path="/admin/meetings" element={<ProtectedRoute allowedRoles={['crm']}><MeetingsList /></ProtectedRoute>} />
           <Route path="/admin/meetings/schedule" element={<ProtectedRoute allowedRoles={['crm']}><MeetingScheduler /></ProtectedRoute>} />
         </Routes>

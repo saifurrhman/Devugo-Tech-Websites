@@ -13,6 +13,8 @@ const CompanyInfoSchema = new mongoose.Schema(
     showWhatsappFloat: { type: Boolean, default: true },
     showChatBot: { type: Boolean, default: true },
     chatBotWelcomeMessage: { type: String, default: 'Hi there! 👋 How can I help you today?' },
+    teamMembersCount: { type: String, default: '50+' },
+    countriesCount: { type: String, default: '12+' },
   },
   { timestamps: true }
 );

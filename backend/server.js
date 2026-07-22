@@ -239,6 +239,14 @@ app.use('/api/portfolio', portfolioRoutes);
 const teamRoutes = require('./routes/team');
 app.use('/api/team', teamRoutes);
 
+// Careers Routes
+const careersRoutes = require('./routes/careers');
+app.use('/api/careers', careersRoutes);
+
+// Job Applications Routes
+const jobApplicationsRoutes = require('./routes/jobApplications');
+app.use('/api/applications', jobApplicationsRoutes);
+
 // Portfolio Category Routes
 const portfolioCategoryRoutes = require('./routes/portfolioCategories');
 app.use('/api/portfolio-categories', portfolioCategoryRoutes);
@@ -449,6 +457,15 @@ try {
   console.log('  ✅ Project routes loaded');
 } catch (error) {
   console.error('  ❌ Project routes error:', error.message);
+}
+
+try {
+  console.log('  Loading proposals...');
+  const proposalRoutes = require('./routes/proposals');
+  app.use('/api/proposals', proposalRoutes);
+  console.log('  ✅ Proposal routes loaded');
+} catch (error) {
+  console.error('  ❌ Proposal routes error:', error.message);
 }
 
 try {

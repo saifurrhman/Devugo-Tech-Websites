@@ -136,6 +136,11 @@ export default function AdminSidebar() {
                 <span className="icon"><Users size={20} /></span>
                 <span className="label">Team</span>
               </NavLink>
+
+              <NavLink to="/admin/careers" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Briefcase size={20} /></span>
+                <span className="label">Careers</span>
+              </NavLink>
             </>
           )}
 
@@ -227,6 +232,12 @@ export default function AdminSidebar() {
               <NavLink to="/admin/invoices" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
                 <span className="icon"><FileText size={20} /></span>
                 <span className="label">Invoices</span>
+                <span className="badge badge--new">New</span>
+              </NavLink>
+
+              <NavLink to="/admin/proposals" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><FileText size={20} /></span>
+                <span className="label">Proposals</span>
                 <span className="badge badge--new">New</span>
               </NavLink>
 

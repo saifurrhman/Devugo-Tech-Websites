@@ -73,6 +73,7 @@ export default function Navbar() {
                 <div className="dropdown-menu" role="menu" aria-label="About submenu">
                   <Link to="/about" onClick={close}>About Us</Link>
                   <Link to="/team" onClick={close}>Team</Link>
+                  <Link to="/careers" onClick={close}>Careers</Link>
                 </div>
               )}
             </div>
@@ -125,6 +126,7 @@ export default function Navbar() {
           <div className={`mobile-submenu ${aboutOpen? 'open':''}`}>
             <Link to="/about" onClick={close}>About Us</Link>
             <Link to="/team" onClick={close}>Team</Link>
+            <Link to="/careers" onClick={close}>Careers</Link>
           </div>
           {/* Mobile: Services collapsible */}
           <button

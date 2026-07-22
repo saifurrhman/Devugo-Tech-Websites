@@ -335,6 +335,28 @@ export const TeamAPI = {
 };
 
 // ============================================
+// CAREER API
+// ============================================
+export const CareerAPI = {
+  list: () => api('/api/careers'),
+  get: (id) => api(`/api/careers/${id}`),
+  create: (payload) => api('/api/careers', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/careers/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/careers/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// JOB APPLICATION API
+// ============================================
+export const JobApplicationAPI = {
+  create: (payload) => api('/api/applications', { method: 'POST', body: payload }),
+  list: (params = {}) => api('/api/applications' + buildQuery(params)),
+  updateStatus: (id, status) => api(`/api/applications/${id}/status`, { method: 'PATCH', body: { status } }),
+  sendEmail: (id, payload) => api(`/api/applications/${id}/email`, { method: 'POST', body: payload }),
+  remove: (id) => api(`/api/applications/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
 // FORMS CONFIG API
 // ============================================
 export const FormAPI = {
@@ -501,4 +523,15 @@ export const ApiKeyAPI = {
 // ============================================
 export const N8nAPI = {
   getMetrics: (metric = 'traffic', limit = 30) => api('/api/n8n/metrics' + buildQuery({ metric, limit })),
+};
+
+// ============================================
+// PROPOSAL API
+// ============================================
+export const ProposalAPI = {
+  list: (params = {}) => api('/api/proposals' + buildQuery(params)),
+  get: (id) => api(`/api/proposals/${id}`),
+  create: (payload) => api('/api/proposals', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/proposals/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/proposals/${id}`, { method: 'DELETE' }),
 };
