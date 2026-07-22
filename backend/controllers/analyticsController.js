@@ -61,10 +61,37 @@ exports.summary = async (_req, res) => {
     const pageviews = gaData.totals.pageviews;
     const conversions = Math.max(0, Math.round(totalLeads * 0.3));
 
-    // Mock contacts data for last 7 days (can be improved with real DB queries)
+    // Fetch REAL contacts data for last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const recentContacts = await Contact.aggregate([
+      { $match: { createdAt: { $gte: sevenDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const contactCountsMap = {};
+    recentContacts.forEach(item => {
+      contactCountsMap[item._id] = item.count;
+    });
+
+    const realContactsLast7 = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateString = d.toISOString().split('T')[0];
+      realContactsLast7.push(contactCountsMap[dateString] || 0);
+    }
+
     const last7 = {
       visitors: gaData.last7.visitors,
-      contacts: [2, 1, 3, 4, 5, 6, 7], // Placeholder - improve this with real DB data
+      contacts: realContactsLast7,
     };
 
     res.json({
