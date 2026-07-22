@@ -99,7 +99,7 @@ class AIService {
 
       this.genAI = new GoogleGenerativeAI(apiKey);
       // Using 'gemini-flash-latest' for better stability and quota handling
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
 
 
 
