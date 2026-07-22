@@ -249,10 +249,10 @@ export default function Dashboard() {
         if (mounted) setSummary(s);
       } catch (e) {
         if (mounted) setSummary({
-          totals: { visitors: 15230, pageviews: 39210, contacts: 84, conversions: 27, blogs: 0, leads: 0, emailsSent: 0, socialPosts: 0 },
+          totals: { visitors: 0, pageviews: 0, contacts: 0, conversions: 0, blogs: 0, leads: 0, emailsSent: 0, socialPosts: 0 },
           last7: {
-            visitors: [210, 260, 230, 280, 300, 340, 390],
-            contacts: [2, 1, 3, 4, 5, 6, 7]
+            visitors: [0, 0, 0, 0, 0, 0, 0],
+            contacts: [0, 0, 0, 0, 0, 0, 0]
           },
           recent: { blog: null, lead: null, email: null, social: null }
         });
