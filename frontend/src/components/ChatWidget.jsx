@@ -56,7 +56,7 @@ const ChatWidget = ({ isOpen, setIsOpen }) => {
         setIsLoading(true);
 
         try {
-            const endpoint = `${API_BASE}/chat/message`;
+            const endpoint = `${API_BASE}/api/chat/message`;
 
             const response = await fetch(endpoint, {
                 method: 'POST',

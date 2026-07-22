@@ -78,10 +78,10 @@ class AIService {
   async getWorkingModel(genAI) {
     // Try newest models first, then fallbacks
     const modelsToTry = [
+      'gemini-flash-latest',    // Try this first - works with new AQ. keys
       'gemini-3.5-flash',
       'gemini-2.0-flash',
       'gemini-2.0-flash-001',
-      'gemini-flash-latest',
       'gemini-1.5-flash',
       'gemini-1.5-pro',
       'gemini-pro-latest',

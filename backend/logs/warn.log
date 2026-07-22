@@ -4,3 +4,23 @@
 {"timestamp":"2025-12-27T17:16:34.358Z","level":"WARN","message":"Zoom not configured"}
 {"timestamp":"2025-12-27T17:16:46.107Z","level":"WARN","message":"Zoom not configured"}
 {"timestamp":"2025-12-27T17:16:52.269Z","level":"WARN","message":"Zoom not configured"}
+{"timestamp":"2026-07-22T17:30:54.145Z","level":"WARN","message":"Model gemini-3.5-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:30:54.420Z","level":"WARN","message":"Model gemini-2.0-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:30:54.993Z","level":"WARN","message":"Model gemini-2.0-flash-001 not available, trying next..."}
+{"timestamp":"2026-07-22T17:36:28.601Z","level":"WARN","message":"Model gemini-3.5-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:36:39.209Z","level":"WARN","message":"Model gemini-2.0-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:36:39.449Z","level":"WARN","message":"Model gemini-2.0-flash-001 not available, trying next..."}
+{"timestamp":"2026-07-22T17:41:27.415Z","level":"WARN","message":"Model gemini-3.5-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:41:27.643Z","level":"WARN","message":"Model gemini-2.0-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:41:28.263Z","level":"WARN","message":"Model gemini-2.0-flash-001 not available, trying next..."}
+{"timestamp":"2026-07-22T17:41:41.298Z","level":"WARN","message":"Model gemini-3.5-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:41:41.624Z","level":"WARN","message":"Model gemini-2.0-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:41:42.189Z","level":"WARN","message":"Model gemini-2.0-flash-001 not available, trying next..."}
+{"timestamp":"2026-07-22T17:43:38.915Z","level":"WARN","message":"Model gemini-3.5-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:43:39.139Z","level":"WARN","message":"Model gemini-2.0-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:43:39.692Z","level":"WARN","message":"Model gemini-2.0-flash-001 not available, trying next..."}
+{"timestamp":"2026-07-22T17:44:49.816Z","level":"WARN","message":"Model gemini-3.5-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:44:50.064Z","level":"WARN","message":"Model gemini-2.0-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:45:50.489Z","level":"WARN","message":"Model gemini-3.5-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:45:50.721Z","level":"WARN","message":"Model gemini-2.0-flash not available, trying next..."}
+{"timestamp":"2026-07-22T17:45:51.262Z","level":"WARN","message":"Model gemini-2.0-flash-001 not available, trying next..."}
