@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { PortfolioAPI, api } from '../lib/api';
+import SEO from '../components/SEO';
 
 export default function PortfolioDetail() {
   const { slug } = useParams();
@@ -10,9 +11,7 @@ export default function PortfolioDetail() {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  useEffect(() => {
-    document.title = item ? `${item.title} - Devugo Tech` : 'Project - Devugo Tech';
-  }, [item]);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -31,6 +30,14 @@ export default function PortfolioDetail() {
 
   return (
     <>
+      {item && (
+        <SEO
+          title={`${item.title} | Devugo Tech Portfolio`}
+          description={item.description ? item.description.substring(0, 160) : `View the ${item.title} project crafted by Devugo Tech Solutions.`}
+          url={`/portfolio/${slug}`}
+          image={item.thumbnails?.[0]}
+        />
+      )}
       <Navbar />
       <main className="container" style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <div className="breadcrumbs" style={{ marginBottom: '.75rem' }}>

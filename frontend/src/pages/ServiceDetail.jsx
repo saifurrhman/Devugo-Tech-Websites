@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { api } from '../lib/api';
+import SEO from '../components/SEO';
 
 export default function ServiceDetail(){
   const { slug } = useParams();
@@ -10,9 +11,7 @@ export default function ServiceDetail(){
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [plans, setPlans] = useState([]);
-useEffect(() => {
-  document.title = service ? `${service.title} - Devugo Tech` : 'Service - Devugo Tech';
-}, [service]);
+
   useEffect(()=>{
     let mounted = true;
     (async()=>{
@@ -35,6 +34,13 @@ useEffect(() => {
 
   return (
     <>
+      {service && (
+        <SEO
+          title={`${service.title} | Devugo Tech Services`}
+          description={service.description ? service.description.substring(0, 160) : `Learn more about our ${service.title} services.`}
+          url={`/services/${slug}`}
+        />
+      )}
       <Navbar />
       <main className="container" style={{paddingTop:'2rem', paddingBottom:'2rem'}}>
         <div className="breadcrumbs" style={{marginBottom:'.75rem', color:'rgba(255,255,255,0.7)'}}>

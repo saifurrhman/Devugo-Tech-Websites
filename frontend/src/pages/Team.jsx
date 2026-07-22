@@ -3,15 +3,12 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { TeamAPI } from '../lib/api';
 import PageHero from '../components/PageHero';
+import SEO from '../components/SEO';
 
 export default function Team() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    document.title = 'Our Team - Devugo Tech';
-  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -32,6 +29,11 @@ export default function Team() {
 
   return (
     <>
+      <SEO
+        title="Our Team | The Experts Behind Devugo Tech"
+        description="Meet our team of senior designers and engineers who build cutting-edge SaaS platforms, AI solutions, and premium web apps."
+        url="/team"
+      />
       <Navbar />
       <PageHero
         eyebrow="Our Team"

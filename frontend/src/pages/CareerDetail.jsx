@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { CareerAPI, JobApplicationAPI } from '../lib/api';
 import { Briefcase, MapPin, Search, ArrowLeft, Info, CheckCircle, Gift, User, Mail, Phone, Calendar, Linkedin, Link as LinkIcon, FileText, Send, AlertTriangle } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const TYPE_COLOR = {
   'Full-Time':  { bg: 'rgba(67,133,205,0.18)', border: 'rgba(67,133,205,0.5)', color: '#60a5fa', glow: 'rgba(67,133,205,0.25)' },
@@ -28,7 +29,7 @@ export default function CareerDetail() {
 
   useEffect(() => {
     CareerAPI.get(id)
-      .then(data => { setJob(data); document.title = `${data.title} — Careers at Devugo`; })
+      .then(data => { setJob(data); })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id]);
@@ -88,6 +89,11 @@ export default function CareerDetail() {
 
   return (
     <>
+      <SEO
+        title={`${job.title} | Careers at Devugo Tech`}
+        description={`Apply for the ${job.title} position at Devugo Tech. Join our remote-friendly team and build amazing software.`}
+        url={`/careers/${job.slug || job._id}`}
+      />
       <Navbar />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
