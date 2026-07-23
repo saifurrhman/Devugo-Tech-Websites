@@ -80,6 +80,8 @@ import CreateProject from '../admin/pages/projects/CreateProject';
 import ContactsUpload from '../admin/pages/contacts/ContactsUpload';
 import CreateInvoice from '../admin/pages/invoices/CreateInvoice';
 import MeetingScheduler from '../admin/pages/meetings/MeetingScheduler';
+import PipelineSettings from '../admin/pages/pipeline/PipelineSettings';
+import LeadDetails from '../admin/pages/pipeline/LeadDetails';
 
 import DynamicTitle from '../components/DynamicTitle';
 import Integrations from '../admin/pages/settings/Integrations';
@@ -194,6 +196,8 @@ export default function PublicRoutes() {
 
           {/* CRM & Projects Routes */}
           <Route path="/admin/pipeline" element={<ProtectedRoute allowedRoles={['crm']}><PipelineBoard /></ProtectedRoute>} />
+          <Route path="/admin/pipeline/settings" element={<ProtectedRoute allowedRoles={['crm']}><PipelineSettings /></ProtectedRoute>} />
+          <Route path="/admin/pipeline/leads/:id" element={<ProtectedRoute allowedRoles={['crm']}><LeadDetails /></ProtectedRoute>} />
           <Route path="/admin/projects" element={<ProtectedRoute allowedRoles={['crm']}><ProjectsList /></ProtectedRoute>} />
           <Route path="/admin/projects/create" element={<ProtectedRoute allowedRoles={['crm']}><CreateProject /></ProtectedRoute>} />
           <Route path="/admin/invoices" element={<ProtectedRoute allowedRoles={['crm']}><InvoicesList /></ProtectedRoute>} />

@@ -10,7 +10,7 @@ export default function StageManagement() {
     ];
 
     return (
-        <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6">
+        <div className="card bg-[#1e293b]/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 shadow-xl">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="font-semibold">Pipeline Stages</h3>
                 <button className="text-sm text-blue-400 hover:text-blue-300">+ Add Stage</button>

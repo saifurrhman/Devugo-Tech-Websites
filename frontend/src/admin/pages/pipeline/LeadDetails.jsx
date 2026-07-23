@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import AdminSidebar from '../../components/AdminSidebar';
-import AdminTopbar from '../../components/AdminTopbar';
-import { PipelineAPI } from '../../lib/api';
-import { useNotification } from '../../contexts/NotificationContext';
+import AdminSidebar from '../../../components/AdminSidebar';
+import AdminTopbar from '../../../components/AdminTopbar';
+import { PipelineAPI } from '../../../lib/api';
+import { useNotification } from '../../../contexts/NotificationContext';
 
 export default function LeadDetails() {
     const { id } = useParams();

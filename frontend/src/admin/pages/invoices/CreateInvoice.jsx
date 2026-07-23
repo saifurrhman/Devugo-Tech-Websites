@@ -41,7 +41,13 @@ export default function CreateInvoice() {
         const loadContacts = async () => {
             try {
                 const res = await ContactAPI.list();
-                setExistingContacts(res.data || res || []);
+                let contactsList = [];
+                if (Array.isArray(res)) contactsList = res;
+                else if (res && Array.isArray(res.data)) contactsList = res.data;
+                else if (res && res.data && Array.isArray(res.data.data)) contactsList = res.data.data;
+                else if (res && Array.isArray(res.contacts)) contactsList = res.contacts;
+                
+                setExistingContacts(contactsList);
             } catch (err) {
                 console.error('Failed to load contacts', err);
             }
@@ -287,17 +293,17 @@ export default function CreateInvoice() {
         setLoading(true);
         try {
             let clientId;
-            const existingClient = existingContacts.find(c => c.email.toLowerCase() === formData.clientEmail.toLowerCase());
+            const existingClient = existingContacts.find(c => c.email?.toLowerCase() === formData.clientEmail?.toLowerCase());
 
             if (existingClient) {
                 clientId = existingClient._id;
             } else {
                 const newContact = await ContactAPI.create({
+                    name: formData.clientName,
                     email: formData.clientEmail,
-                    firstName: formData.clientName.split(' ')[0],
-                    lastName: formData.clientName.split(' ').slice(1).join(' ') || 'Client',
                     phone: formData.clientPhone,
                     address: formData.clientAddress,
+                    source: 'Admin Manual',
                     status: 'active'
                 });
                 clientId = newContact.data?._id || newContact._id;

@@ -64,14 +64,21 @@ export default function AdminTopbar() {
   return (
     <div className="admin-topbar">
       <div className="admin-topbar__inner">
-        <div className="admin-search">
-          <span className="admin-search__icon" aria-hidden="true">
+        <div className="relative flex items-center w-full max-w-xs sm:max-w-sm md:max-w-md h-9 group">
+          <span className="absolute left-3 text-slate-400 group-focus-within:text-blue-500 transition-colors pointer-events-none" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
-              <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+              <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </span>
-          <input className="admin-search__input" placeholder="Search..." />
+          <input 
+            className="w-full h-full border border-slate-700/60 text-sm text-slate-200 placeholder-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm" 
+            style={{ paddingLeft: '2.5rem', paddingRight: '3rem', borderRadius: '9999px', backgroundColor: '#0a1629' }}
+            placeholder="Search..." 
+          />
+          <span className="absolute right-2 px-1.5 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-400 text-[10px] font-medium tracking-wider pointer-events-none hidden sm:block">
+            ⌘K
+          </span>
         </div>
 
         <div className="admin-topbar__actions">

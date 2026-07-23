@@ -9,6 +9,9 @@ export default function PipelineBoard() {
     const [stages, setStages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isAddDealOpen, setIsAddDealOpen] = useState(false);
+    const [dealForm, setDealForm] = useState({ title: '', value: '', contact: '', stageId: 'new' });
+    const [saving, setSaving] = useState(false);
 
     React.useEffect(() => {
         loadPipeline();
@@ -58,6 +61,22 @@ export default function PipelineBoard() {
         }
     };
 
+    const handleAddDeal = async (e) => {
+        e.preventDefault();
+        try {
+            setSaving(true);
+            await PipelineAPI.createDeal(dealForm);
+            setIsAddDealOpen(false);
+            setDealForm({ title: '', value: '', contact: '', stageId: 'new' });
+            loadPipeline();
+        } catch (err) {
+            console.error('Failed to create deal:', err);
+            alert('Failed to create deal');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (error) {
         return (
             <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
@@ -96,7 +115,9 @@ export default function PipelineBoard() {
                         >
                             ⚙️ Settings
                         </button>
-                        <button className="btn-primary bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                        <button 
+                            onClick={() => setIsAddDealOpen(true)}
+                            className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm flex items-center gap-2">
                             <span>+</span> Add Deal
                         </button>
                     </div>
@@ -137,7 +158,9 @@ export default function PipelineBoard() {
                                             </div>
                                         </div>
                                     ))}
-                                    <button className="w-full py-2 border border-dashed border-gray-700 rounded-lg text-sm text-gray-500 hover:text-white hover:border-gray-500 hover:bg-gray-800/50 transition-colors">
+                                    <button 
+                                        onClick={() => { setDealForm(prev => ({ ...prev, stageId: stage.id })); setIsAddDealOpen(true); }}
+                                        className="w-full py-2 border border-dashed border-gray-700 rounded-lg text-sm text-gray-500 hover:text-white hover:border-gray-500 hover:bg-gray-800/50 transition-colors">
                                         + Add Deal
                                     </button>
                                 </div>
@@ -146,6 +169,44 @@ export default function PipelineBoard() {
                     </div>
                 )}
             </main>
+
+            {/* Add Deal Modal */}
+            {isAddDealOpen && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-[#1e293b] rounded-xl w-full max-w-md border border-gray-700 shadow-2xl overflow-hidden">
+                        <div className="flex justify-between items-center p-4 border-b border-gray-700">
+                            <h3 className="text-lg font-semibold text-white">Add New Deal</h3>
+                            <button onClick={() => setIsAddDealOpen(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+                        </div>
+                        <form onSubmit={handleAddDeal} className="p-5 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Deal Title</label>
+                                <input required value={dealForm.title} onChange={e => setDealForm({...dealForm, title: e.target.value})} type="text" className="w-full px-3 py-2 bg-[#0f172a] border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500" placeholder="e.g. Website Redesign" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Deal Value (Amount)</label>
+                                <input required value={dealForm.value} onChange={e => setDealForm({...dealForm, value: e.target.value})} type="text" className="w-full px-3 py-2 bg-[#0f172a] border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500" placeholder="e.g. $5,000" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Contact Name</label>
+                                <input required value={dealForm.contact} onChange={e => setDealForm({...dealForm, contact: e.target.value})} type="text" className="w-full px-3 py-2 bg-[#0f172a] border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500" placeholder="e.g. John Doe" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Pipeline Stage</label>
+                                <select value={dealForm.stageId} onChange={e => setDealForm({...dealForm, stageId: e.target.value})} className="w-full px-3 py-2 bg-[#0f172a] border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                                    {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                </select>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button type="button" onClick={() => setIsAddDealOpen(false)} className="flex-1 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors">Cancel</button>
+                                <button type="submit" disabled={saving} className="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors disabled:opacity-50">
+                                    {saving ? 'Saving...' : 'Create Deal'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

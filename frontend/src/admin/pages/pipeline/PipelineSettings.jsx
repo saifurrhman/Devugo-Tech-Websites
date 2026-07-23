@@ -1,9 +1,11 @@
 import React from 'react';
-import AdminSidebar from '../../components/AdminSidebar';
-import AdminTopbar from '../../components/AdminTopbar';
+import { useNavigate } from 'react-router-dom';
+import AdminSidebar from '../../../components/AdminSidebar';
+import AdminTopbar from '../../../components/AdminTopbar';
 import StageManagement from './StageManagement';
 
 export default function PipelineSettings() {
+    const navigate = useNavigate();
     return (
         <div className="admin-layout min-h-screen bg-[#0f172a] text-white">
             <AdminSidebar />
@@ -11,6 +13,9 @@ export default function PipelineSettings() {
                 <AdminTopbar />
 
                 <div className="mb-6">
+                    <button onClick={() => navigate('/admin/pipeline')} className="text-sm text-gray-400 hover:text-white mb-4 flex items-center gap-2 transition-colors">
+                        <span>←</span> Back to Pipeline
+                    </button>
                     <h1 className="text-2xl font-bold">Pipeline Settings</h1>
                     <p className="text-gray-400 text-sm mt-1">Configure your sales process and stages</p>
                 </div>
@@ -21,8 +26,8 @@ export default function PipelineSettings() {
                     </div>
 
                     <div className="space-y-6">
-                        <div className="card bg-[#1e293b] rounded-xl border border-gray-800 p-6">
-                            <h3 className="font-semibold mb-4">General Settings</h3>
+                        <div className="card bg-[#1e293b]/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 shadow-xl">
+                            <h3 className="font-semibold mb-4 text-white">General Settings</h3>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <div>
