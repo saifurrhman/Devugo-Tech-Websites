@@ -26,7 +26,7 @@ export default function CreateInvoice() {
         clientPhone: '',
         clientAddress: '',
         invoiceNumber: 'INV-' + Math.floor(1000 + Math.random() * 9000),
-        status: 'pending',
+        status: 'draft',
         date: new Date().toISOString().split('T')[0],
         dueDate: '',
         currency: 'USD',
@@ -353,7 +353,7 @@ export default function CreateInvoice() {
                     clientPhone: '',
                     clientAddress: '',
                     invoiceNumber: 'INV-' + Math.floor(1000 + Math.random() * 9000),
-                    status: 'pending',
+                    status: 'draft',
                     dueDate: '',
                     paymentLink: '',
                     notes: '',
@@ -524,11 +524,23 @@ export default function CreateInvoice() {
                                                         onChange={e => setFormData({ ...formData, status: e.target.value })}
                                                         className={`rounded px-2 py-0.5 text-xs font-bold uppercase cursor-pointer outline-none border ${formData.status === 'paid'
                                                             ? 'bg-green-500/10 text-green-400 border-green-500/30'
-                                                            : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
+                                                            : formData.status === 'overdue'
+                                                            ? 'bg-red-500/10 text-red-400 border-red-500/30'
+                                                            : formData.status === 'sent'
+                                                            ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
+                                                            : formData.status === 'partial'
+                                                            ? 'bg-orange-500/10 text-orange-400 border-orange-500/30'
+                                                            : formData.status === 'cancelled'
+                                                            ? 'bg-gray-500/10 text-gray-500 border-gray-500/30'
+                                                            : 'bg-gray-500/10 text-gray-400 border-gray-500/30'
                                                             }`}
                                                     >
-                                                        <option value="pending" className="bg-[#002747]">Unpaid</option>
+                                                        <option value="draft" className="bg-[#002747]">Draft</option>
+                                                        <option value="sent" className="bg-[#002747]">Sent (Unpaid)</option>
                                                         <option value="paid" className="bg-[#002747]">Paid</option>
+                                                        <option value="partial" className="bg-[#002747]">Partial</option>
+                                                        <option value="overdue" className="bg-[#002747]">Overdue</option>
+                                                        <option value="cancelled" className="bg-[#002747]">Cancelled</option>
                                                     </select>
                                                 )}
                                             </div>

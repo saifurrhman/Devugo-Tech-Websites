@@ -19,14 +19,19 @@ const invoiceSchema = new mongoose.Schema({
     email: String,
     phone: String,
     company: String,
-    address: {
-      street: String,
-      city: String,
-      state: String,
-      zipCode: String,
-      country: String
-    }
+    address: String
   },
+
+  // Sender Details
+  senderDetails: {
+    name: String,
+    email: String,
+    phone: String,
+    address: String
+  },
+
+  // Payment Link
+  paymentLink: String,
 
   // Project Reference
   project: {
