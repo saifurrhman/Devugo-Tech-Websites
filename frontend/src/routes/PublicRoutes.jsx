@@ -20,6 +20,7 @@ import Brands from '../admin/pages/Brands';
 import PortfolioList from '../admin/pages/PortfolioList';
 import PortfolioEdit from '../admin/pages/PortfolioEdit';
 import BlogList from '../admin/pages/BlogList';
+import BlogAutomationPage from '../admin/pages/BlogAutomationPage';
 import BlogEdit from '../admin/pages/BlogEdit';
 import AdminBlogCreate from '../admin/pages/AdminBlogCreate';
 import CareersList from '../admin/pages/CareersList';
@@ -134,6 +135,7 @@ export default function PublicRoutes() {
 
           {/* Admin Blog */}
           <Route path="/admin/blog" element={<ProtectedRoute><BlogList /></ProtectedRoute>} />
+          <Route path="/admin/blog/automation" element={<ProtectedRoute><BlogAutomationPage /></ProtectedRoute>} />
           <Route path="/admin/blog/create" element={<ProtectedRoute><AdminBlogCreate /></ProtectedRoute>} />
 
           <Route path="/admin/blog/:id" element={<ProtectedRoute><BlogEdit /></ProtectedRoute>} />

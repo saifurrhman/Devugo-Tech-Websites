@@ -186,3 +186,42 @@ exports.updateIntegrations = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// ==========================================
+// BLOG AUTOMATION SETTINGS
+// ==========================================
+exports.getBlogAutomation = async (req, res) => {
+    try {
+        const setting = await Setting.findOne({ key: 'blogAutomation' });
+        const defaultSettings = {
+            isAutomationEnabled: false,
+            postsPerDay: 1,
+            publishTimes: ['09:00'],
+            saveAsDraft: true,
+            topics: ''
+        };
+        res.json(setting ? setting.value : defaultSettings);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateBlogAutomation = async (req, res) => {
+    try {
+        const config = req.body;
+        if (config.isAutomationEnabled) {
+            const postsPerDay = config.postsPerDay || 1;
+            if (!config.publishTimes || config.publishTimes.length !== postsPerDay) {
+                return res.status(400).json({ message: `Please provide exactly ${postsPerDay} publish times to match your posts per day.` });
+            }
+        }
+        const setting = await Setting.findOneAndUpdate(
+            { key: 'blogAutomation' },
+            { $set: { key: 'blogAutomation', value: config, updatedAt: Date.now() } },
+            { upsert: true, new: true }
+        );
+        res.json({ success: true, data: setting.value });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

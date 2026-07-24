@@ -24,4 +24,8 @@ router.put('/email', settingsController.updateSMTP); // Alias
 router.get('/integrations', settingsController.getIntegrations);
 router.put('/integrations', settingsController.updateIntegrations);
 
+// Blog Automation
+router.get('/blog-automation', settingsController.getBlogAutomation);
+router.put('/blog-automation', settingsController.updateBlogAutomation);
+
 module.exports = router;

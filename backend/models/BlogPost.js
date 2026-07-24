@@ -18,6 +18,7 @@ const BlogPostSchema = new mongoose.Schema(
     },
     published: { type: Boolean, default: false },
     publishedAt: Date,
+    source: { type: String, default: 'manual' },
   },
   { timestamps: true }
 );

@@ -319,9 +319,16 @@ export default function Integrations() {
                                 className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-purple-500"
                             />
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                            Current Model: <span className="text-purple-400">{detectModel(aiConfig.chatbotApiKey || aiConfig.geminiApiKey)}</span>
-                        </p>
+                        <div className="flex items-center justify-between mt-1">
+                            <p className="text-xs text-gray-500">
+                                Current Model: <span className="text-purple-400">{detectModel(aiConfig.chatbotApiKey || aiConfig.geminiApiKey)}</span>
+                            </p>
+                            {aiConfig.chatbotApiKey && (
+                                <span className="text-xs text-green-400 font-medium flex items-center gap-1 bg-green-500/10 px-2 py-0.5 rounded-full">
+                                    <CheckCircle size={12} /> API Attached
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -663,9 +670,16 @@ export default function Integrations() {
                                                         className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2 text-white focus:border-blue-500 placeholder-blue-200/20"
                                                     />
                                                 </div>
-                                                <p className="text-xs text-blue-300/60 mt-1">
-                                                    Current Model: <span className="text-blue-400">{detectModel(aiConfig.chatbotApiKey || aiConfig.geminiApiKey)}</span>
-                                                </p>
+                                                <div className="flex items-center justify-between mt-1">
+                                                    <p className="text-xs text-blue-300/60">
+                                                        Current Model: <span className="text-blue-400">{detectModel(aiConfig.chatbotApiKey || aiConfig.geminiApiKey)}</span>
+                                                    </p>
+                                                    {aiConfig.chatbotApiKey && (
+                                                        <span className="text-xs text-green-400 font-medium flex items-center gap-1 bg-green-500/10 px-2 py-0.5 rounded-full">
+                                                            <CheckCircle size={12} /> API Attached
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                             
                                             <div className="mt-4 pt-4 border-t border-white/10">

@@ -108,11 +108,22 @@ class AIService {
     }
   }
 
-  async generateContent(systemPrompt, userVariables, scope = 'general') {
+  async generateContent(systemPrompt, userVariables, scope = 'general', forceAgentId = null) {
     try {
-      console.log(`🔍 generateContent called. Scope: ${scope}`);
+      console.log(`🔍 generateContent called. Scope: ${scope}, AgentId: ${forceAgentId || 'none'}`);
+      
       // 1. Check for External Agent
-      const agent = await this.getActionAgent(scope);
+      let agent = null;
+      if (forceAgentId) {
+        const setting = await Setting.findOne({ key: 'ai' });
+        if (setting && setting.value && Array.isArray(setting.value.agents)) {
+          agent = setting.value.agents.find(a => (a._id && a._id.toString() === forceAgentId) || a.name === forceAgentId);
+        }
+      } 
+      
+      if (!agent) {
+        agent = await this.getActionAgent(scope);
+      }
       if (agent) {
         const agentResult = await this.callExternalAgent(agent, systemPrompt, userVariables);
         if (agentResult) return agentResult;
@@ -226,8 +237,8 @@ class AIService {
   }
 
   // 8. Blog Post Generation
-  async generateBlog({ topic, keywords, tone }) {
-    return this.generateContent(PROMPTS.BLOG_POST, { topic, keywords, tone }, 'blog');
+  async generateBlog({ topic, keywords, tone, agentId }) {
+    return this.generateContent(PROMPTS.BLOG_POST, { topic, keywords, tone }, 'blog', agentId);
   }
 
   // Legacy method support (mapped to Campaign)

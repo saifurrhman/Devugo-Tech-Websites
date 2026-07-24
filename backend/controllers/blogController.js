@@ -157,3 +157,59 @@ exports.remove = async (req, res) => {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
+
+exports.getAutomationStats = async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const [todayCount, weekCount, monthCount, allTimeCount] = await Promise.all([
+      BlogPost.countDocuments({ source: 'auto', createdAt: { $gte: startOfToday } }),
+      BlogPost.countDocuments({ source: 'auto', createdAt: { $gte: startOfWeek } }),
+      BlogPost.countDocuments({ source: 'auto', createdAt: { $gte: startOfMonth } }),
+      BlogPost.countDocuments({ source: 'auto' })
+    ]);
+
+    // Aggregate last 7 days chart data
+    const last7DaysData = await BlogPost.aggregate([
+      { 
+        $match: { 
+          source: 'auto', 
+          createdAt: { $gte: startOfWeek } 
+        } 
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Format chart data to ensure all 7 days are present
+    const chartData = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const match = last7DaysData.find(x => x._id === dateStr);
+      chartData.push({
+        date: dateStr,
+        count: match ? match.count : 0
+      });
+    }
+
+    res.json({
+      today: todayCount,
+      thisWeek: weekCount,
+      thisMonth: monthCount,
+      allTime: allTimeCount,
+      last7Days: chartData
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+};

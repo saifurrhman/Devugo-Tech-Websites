@@ -86,6 +86,7 @@ export const BlogAPI = {
   create: (payload) => api('/api/blog', { method: 'POST', body: payload }),
   update: (id, payload) => api(`/api/blog/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/blog/${id}`, { method: 'DELETE' }),
+  getAutomationStats: () => api('/api/blog/automation-stats'),
 };
 
 // ============================================
@@ -500,6 +501,8 @@ export const SettingsAPI = {
   updateEmail: (payload) => api('/api/settings/email', { method: 'PUT', body: payload }),
   getAI: () => api('/api/settings/ai'),
   updateAI: (payload) => api('/api/settings/ai', { method: 'PUT', body: payload }),
+  getBlogAutomation: () => api('/api/settings/blog-automation'),
+  updateBlogAutomation: (payload) => api('/api/settings/blog-automation', { method: 'PUT', body: payload }),
 };
 
 // ============================================

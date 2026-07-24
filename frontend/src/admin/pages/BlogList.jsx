@@ -18,6 +18,9 @@ export default function BlogList(){
   // Dropdown state
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef(null);
+
+
+
 useEffect(() => {
     document.title = 'Blog List - Devugo Tech';
   }, []);
@@ -231,6 +234,9 @@ useEffect(() => {
               )}
             </div>
 
+            <button onClick={() => navigate('/admin/blog/automation')} className="btn-secondary" style={{display:'flex', alignItems:'center', gap:'0.4rem'}}>
+              ⚙️ Automation
+            </button>
             <Link to="/admin/blog/categories" className="btn-secondary">Categories</Link>
             <Link to="/admin/blog/create" className="btn">New Post</Link>
           </div>
@@ -363,6 +369,8 @@ useEffect(() => {
           )
         )}
       </main>
+
+
     </div>
   );
 }
