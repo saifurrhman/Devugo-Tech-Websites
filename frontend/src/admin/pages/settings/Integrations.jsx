@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api, ApiKeyAPI, SettingsAPI } from '../../../lib/api';
+import { api, ApiKeyAPI, SettingsAPI, API_BASE } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
 import {
     Video, Calendar, Link as LinkIcon, CheckCircle, ExternalLink,
@@ -36,6 +36,8 @@ export default function Integrations() {
     });
     const [savingAI, setSavingAI] = useState(false);
     const [newAgent, setNewAgent] = useState(null); // Form state
+    const [uploadingPdf, setUploadingPdf] = useState(false);
+    const [pdfFile, setPdfFile] = useState(null);
 
     // ===========================
     // APPS & INTEGRATIONS STATE
@@ -100,6 +102,61 @@ export default function Integrations() {
     };
 
     // ...
+
+    // ===========================
+    // AI LOGIC
+    // ===========================
+    const handleUploadPdf = async () => {
+        if (!pdfFile || pdfFile.length === 0) return notifyError('Please select PDF files first');
+        setUploadingPdf(true);
+        const formData = new FormData();
+        Array.from(pdfFile).forEach(file => {
+            formData.append('pdfs', file);
+        });
+        
+        try {
+            const token = localStorage.getItem('token'); 
+            const res = await fetch(`${API_BASE}/api/settings/ai/train-pdf`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                success('PDFs trained successfully!');
+                setPdfFile(null);
+                setAiConfig(prev => ({ ...prev, pdfNames: data.data.pdfNames }));
+                // document.getElementById('pdf-upload').value = ''; // We can't do this directly easily, but setPdfFile(null) is fine
+            } else {
+                notifyError(data.message || 'Failed to train PDFs');
+            }
+        } catch (error) {
+            notifyError('Error uploading PDFs');
+        } finally {
+            setUploadingPdf(false);
+        }
+    };
+
+    const handleClearPdf = async () => {
+        if (!window.confirm("Are you sure you want to clear all PDF training data?")) return;
+        
+        try {
+            const token = localStorage.getItem('token'); 
+            const res = await fetch(`${API_BASE}/api/settings/ai/clear-training`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success) {
+                success('Training data cleared!');
+                setAiConfig(prev => ({ ...prev, pdfNames: [] }));
+            }
+        } catch (e) {
+            notifyError('Failed to clear data');
+        }
+    };
 
     // INITIAL LOAD
     // ===========================
@@ -609,6 +666,50 @@ export default function Integrations() {
                                                 <p className="text-xs text-blue-300/60 mt-1">
                                                     Current Model: <span className="text-blue-400">{detectModel(aiConfig.chatbotApiKey || aiConfig.geminiApiKey)}</span>
                                                 </p>
+                                            </div>
+                                            
+                                            <div className="mt-4 pt-4 border-t border-white/10">
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <label className="text-sm text-blue-200/80 block">Upload Training PDFs</label>
+                                                    {aiConfig.pdfNames && aiConfig.pdfNames.length > 0 && (
+                                                        <button 
+                                                            onClick={handleClearPdf}
+                                                            className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+                                                        >
+                                                            <Trash2 size={12} /> Clear Data
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-blue-300/60 mb-3">Upload PDF files with your company knowledge base to train the chatbot.</p>
+                                                
+                                                {aiConfig.pdfNames && aiConfig.pdfNames.length > 0 && (
+                                                    <div className="mb-3 text-xs bg-blue-500/10 p-2 rounded border border-blue-500/20 text-blue-200">
+                                                        <span className="font-semibold block mb-1">Currently trained on {aiConfig.pdfNames.length} file(s):</span>
+                                                        <ul className="list-disc pl-4 space-y-0.5">
+                                                            {aiConfig.pdfNames.map((name, i) => (
+                                                                <li key={i} className="truncate" title={name}>{name}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                <div className="flex gap-2 items-center">
+                                                    <input 
+                                                        type="file" 
+                                                        accept=".pdf"
+                                                        multiple
+                                                        onChange={(e) => setPdfFile(e.target.files)}
+                                                        className="flex-1 bg-[#002747] border border-white/10 rounded-lg px-4 py-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30"
+                                                    />
+                                                    <button 
+                                                        onClick={handleUploadPdf}
+                                                        disabled={!pdfFile || pdfFile.length === 0 || uploadingPdf}
+                                                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
+                                                    >
+                                                        {uploadingPdf ? <RefreshCw size={18} className="animate-spin" /> : <Plus size={18} />}
+                                                        Train AI
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 

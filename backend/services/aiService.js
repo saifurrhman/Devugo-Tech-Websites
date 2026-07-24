@@ -3,6 +3,13 @@ const axios = require('axios');
 const logger = require('../utils/logger');
 const PROMPTS = require('../config/aiPrompts');
 const Setting = require('../models/Setting');
+const Bottleneck = require('bottleneck');
+
+const limiter = new Bottleneck({
+  minTime: 4000, // 15 RPM ~ 4 sec gap per request
+  maxConcurrent: 1
+});
+
 
 class AIService {
   constructor() {
@@ -74,35 +81,31 @@ class AIService {
     }
   }
 
-  // Auto-detect which Gemini model works with this API key
   async getWorkingModel(genAI) {
-    // Try newest models first, then fallbacks
-    const modelsToTry = [
-      'gemini-flash-latest',    // Try this first - works with new AQ. keys
-      'gemini-3.5-flash',
-      'gemini-2.0-flash',
-      'gemini-2.0-flash-001',
-      'gemini-1.5-flash',
-      'gemini-1.5-pro',
-      'gemini-pro-latest',
-    ];
-    for (const modelName of modelsToTry) {
-      try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        // Quick test call
-        await model.generateContent('hi');
-        logger.info(`✅ Working Gemini model found: ${modelName}`);
-        return model;
-      } catch (err) {
-        if (err.message.includes('403') || err.message.includes('suspended') || err.message.includes('SUSPENDED')) {
-          logger.error(`❌ API Key suspended/blocked. Cannot use Gemini.`);
-          return null; // Key is bad, stop trying
-        }
-        // 404 = model not available for this key, try next
-        logger.warn(`Model ${modelName} not available, trying next...`);
+    try {
+      const setting = await Setting.findOne({ key: 'ai' });
+      let selectedModel = 'gemini-1.5-flash';
+      
+      if (setting && setting.value && setting.value.model) {
+        const dbModel = setting.value.model.toLowerCase();
+        if (dbModel.includes('flash')) selectedModel = 'gemini-1.5-flash';
+        if (dbModel.includes('pro')) selectedModel = 'gemini-1.5-pro';
+        if (dbModel.includes('gpt')) selectedModel = 'gemini-1.5-flash'; // Fallback for GPT configs on Gemini API
       }
+
+      logger.info(`✅ Using Gemini model: ${selectedModel}`);
+      // Return model with JSON generation config for better stability
+      return genAI.getGenerativeModel({ 
+        model: selectedModel,
+        generationConfig: { responseMimeType: "application/json" }
+      });
+    } catch (e) {
+      logger.error('Error selecting model:', e.message);
+      return genAI.getGenerativeModel({ 
+        model: 'gemini-1.5-flash',
+        generationConfig: { responseMimeType: "application/json" }
+      });
     }
-    return null; // No working model found
   }
 
   async generateContent(systemPrompt, userVariables, scope = 'general') {
@@ -149,23 +152,22 @@ class AIService {
       // Combine Master Prompt with Specific Prompt
       const fullInstruction = `${PROMPTS.MASTER_SYSTEM_PROMPT}\n\n${finalPrompt}`;
 
-      // Retry Logic for Rate Limits (429)
-      let result;
-      let retries = 3;
-      while (retries > 0) {
+      const callGeminiWithRetry = async (prompt, retries = 5, delay = 2000) => {
         try {
-          result = await this.model.generateContent(fullInstruction);
-          break; // Success, exit loop
+          return await limiter.schedule(() => 
+             this.model.generateContent(prompt)
+          );
         } catch (err) {
-          if (err.message.includes('429') && retries > 1) {
-            console.warn(`⚠️ AI Rate Limit (429). Retrying in 4s... (${retries - 1} left)`);
-            await new Promise(r => setTimeout(r, 4000));
-            retries--;
-          } else {
-            throw err;
+          if (err.message.includes('429') && retries > 0) {
+            logger.warn(`⚠️ AI Rate Limit (429). Retrying in ${delay}ms... (${retries} left)`);
+            await new Promise(r => setTimeout(r, delay));
+            return callGeminiWithRetry(prompt, retries - 1, delay * 2);
           }
+          throw err;
         }
-      }
+      };
+
+      const result = await callGeminiWithRetry(fullInstruction);
       const response = await result.response;
       let text = response.text();
 

@@ -1,5 +1,6 @@
 const Setting = require('../models/Setting');
-
+const fs = require('fs');
+const pdfParse = require('pdf-parse');
 // Get AI Configuration
 exports.getAIConfig = async (req, res) => {
     try {
@@ -43,6 +44,81 @@ exports.updateAIConfig = async (req, res) => {
         res.json({ success: true, data: setting.value });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+// Upload AI Training PDF
+exports.uploadAITrainingPDF = async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ success: false, message: 'No PDF files uploaded.' });
+        }
+
+        let extractedText = '';
+        let fileNames = [];
+
+        // Parse all uploaded PDFs
+        for (const file of req.files) {
+            const dataBuffer = fs.readFileSync(file.path);
+            const data = await pdfParse(dataBuffer);
+            extractedText += `\n\n--- Content from ${file.originalname} ---\n\n` + data.text;
+            fileNames.push(file.originalname);
+        }
+
+        // Save to AI Settings in DB
+        const setting = await Setting.findOne({ key: 'ai' });
+        const currentConfig = setting ? setting.value : {};
+        
+        // Append to existing training data if it exists
+        if (currentConfig.trainingData) {
+            currentConfig.trainingData += '\n' + extractedText;
+        } else {
+            currentConfig.trainingData = extractedText;
+        }
+        
+        if (currentConfig.pdfNames) {
+            currentConfig.pdfNames = [...currentConfig.pdfNames, ...fileNames];
+        } else {
+            currentConfig.pdfNames = fileNames;
+        }
+
+        const updatedSetting = await Setting.findOneAndUpdate(
+            { key: 'ai' },
+            {
+                $set: {
+                    key: 'ai',
+                    value: currentConfig,
+                    updatedAt: Date.now()
+                }
+            },
+            { upsert: true, new: true }
+        );
+
+        res.json({ success: true, message: 'PDFs processed and AI trained successfully.', data: updatedSetting.value });
+    } catch (error) {
+        console.error('Error processing PDFs:', error);
+        res.status(500).json({ success: false, message: 'Failed to process PDF files: ' + error.message });
+    }
+};
+
+exports.clearAITrainingData = async (req, res) => {
+    try {
+        const setting = await Setting.findOne({ key: 'ai' });
+        if (setting && setting.value) {
+            const currentConfig = setting.value;
+            currentConfig.trainingData = '';
+            currentConfig.pdfNames = [];
+            
+            const updatedSetting = await Setting.findOneAndUpdate(
+                { key: 'ai' },
+                { $set: { value: currentConfig, updatedAt: Date.now() } },
+                { new: true }
+            );
+            return res.json({ success: true, message: 'Training data cleared successfully.', data: updatedSetting.value });
+        }
+        res.json({ success: true, message: 'No data to clear.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to clear data: ' + error.message });
     }
 };
 

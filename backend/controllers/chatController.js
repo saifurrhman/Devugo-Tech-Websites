@@ -1,5 +1,6 @@
 const aiService = require('../services/aiService');
 const PROMPTS = require('../config/aiPrompts');
+const Setting = require('../models/Setting');
 
 // Smart rule-based fallback chatbot - works WITHOUT AI key
 function getFallbackReply(message) {
@@ -76,7 +77,14 @@ exports.handleChatMessage = async (req, res) => {
 
         // Try AI first
         try {
-            const result = await aiService.generateContent(PROMPTS.PUBLIC_CHAT, { question: message }, 'chat');
+            let customTrainingData = "";
+            const setting = await Setting.findOne({ key: 'ai' });
+            if (setting && setting.value && setting.value.trainingData) {
+                // Limit to 15,000 characters to prevent 20-second API delays from Gemini when processing massive PDFs
+                customTrainingData = setting.value.trainingData.substring(0, 15000);
+            }
+
+            const result = await aiService.generateContent(PROMPTS.PUBLIC_CHAT, { question: message, customTrainingData }, 'chat');
             const replyText = result.reply || result.body;
 
             // If AI returned a real reply (not mock/error), use it

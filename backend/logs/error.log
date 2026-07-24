@@ -1,1 +1,2 @@
 {"timestamp":"2026-07-22T17:44:50.919Z","level":"ERROR","message":"❌ API Key suspended/blocked. Cannot use Gemini."}
+{"timestamp":"2026-07-24T08:09:33.453Z","level":"ERROR","message":"AI Service Error:","data":"[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent: [503 Service Unavailable] This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later."}

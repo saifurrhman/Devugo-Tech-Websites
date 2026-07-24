@@ -15,26 +15,24 @@ const ChatWidget = ({ isOpen, setIsOpen }) => {
     // Fetch Company Info on mount
     useEffect(() => {
         const fetchSettings = async () => {
+            const defaultWelcome = 'Assalam-o-Alaikum! 👋 I\'m Devugo, your AI assistant.\n\nHow can I help you today? Ask about our services, pricing, products, or anything else!';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             try {
                 const { info } = await CompanyInfoAPI.getPublic();
-                // Default to true if undefined, strictly check for false to hide
                 if (info && info.showChatBot !== false) {
                     setIsVisible(true);
-                    setMessages([
-                        { type: 'bot', text: info.chatBotWelcomeMessage || 'Hi there! 👋 How can I help you today?' }
-                    ]);
+                    setMessages([{ type: 'bot', text: info.chatBotWelcomeMessage || defaultWelcome, timestamp: time }]);
                 }
             } catch (error) {
                 console.error("Failed to load chat settings", error);
-                // Fallback defaults
                 setIsVisible(true);
-                setMessages([
-                    { type: 'bot', text: 'Hi there! 👋 How can I help you today?' }
-                ]);
+                setMessages([{ type: 'bot', text: defaultWelcome, timestamp: time }]);
             }
         };
         fetchSettings();
     }, []);
+
+    const QUICK_REPLIES = ["Services", "Pricing", "Products", "Book Demo", "Contact"];
 
     const messagesEndRef = useRef(null);
 
@@ -46,39 +44,40 @@ const ChatWidget = ({ isOpen, setIsOpen }) => {
         scrollToBottom();
     }, [messages]);
 
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if (!inputText.trim()) return;
-
-        const userMessage = inputText.trim();
+    const sendMessage = async (userMessage) => {
+        if (!userMessage.trim()) return;
+        
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         setInputText('');
-        setMessages(prev => [...prev, { type: 'user', text: userMessage }]);
+        setMessages(prev => [...prev, { type: 'user', text: userMessage, timestamp: time }]);
         setIsLoading(true);
 
         try {
             const endpoint = `${API_BASE}/api/chat/message`;
-
             const response = await fetch(endpoint, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMessage }),
             });
-
             const data = await response.json();
-
+            const botTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
             if (data.success) {
-                setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
+                setMessages(prev => [...prev, { type: 'bot', text: data.reply, timestamp: botTime }]);
             } else {
-                setMessages(prev => [...prev, { type: 'bot', text: "I'm having a bit of trouble connecting. Please try again." }]);
+                setMessages(prev => [...prev, { type: 'bot', text: "I'm having a bit of trouble connecting. Please try again.", timestamp: botTime }]);
             }
         } catch (error) {
             console.error('Chat error:', error);
-            setMessages(prev => [...prev, { type: 'bot', text: "Sorry, I couldn't reach the server. Please check your connection." }]);
+            setMessages(prev => [...prev, { type: 'bot', text: "Sorry, I couldn't reach the server. Please check your connection.", timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleSendMessage = (e) => {
+        e.preventDefault();
+        sendMessage(inputText);
     };
 
     if (!isVisible) return null;
@@ -91,80 +90,102 @@ const ChatWidget = ({ isOpen, setIsOpen }) => {
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                        className="w-[350px] md:w-[380px] h-[500px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100 dark:border-gray-800"
+                        className="w-[calc(100vw-3rem)] sm:w-[380px] h-[70vh] sm:h-[550px] max-h-[600px] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-200"
                     >
                         {/* Header */}
-                        <div className="p-4 bg-blue-600 flex items-center justify-between text-white shadow-md">
+                        <div className="px-5 py-4 bg-[var(--chat-header-bg)] flex items-center justify-between text-white shadow-sm relative z-10">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                                    <Bot size={24} className="text-white" />
+                                <div className="w-10 h-10 bg-[var(--chat-primary)] rounded-full flex items-center justify-center shadow-md">
+                                    <Bot size={22} className="text-white" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-sm md:text-base">Devugo support</h3>
-                                    <span className="text-xs text-blue-100 flex items-center gap-1">
-                                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                                    <h3 className="font-bold text-[15px] tracking-wide leading-tight">Devugo Support</h3>
+                                    <span className="text-[11px] text-gray-300 flex items-center gap-1.5 mt-0.5">
+                                        <span className="w-2 h-2 bg-[var(--chat-primary)] rounded-full animate-pulse"></span>
                                         Online
                                     </span>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                                className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors text-gray-300 hover:text-white"
                             >
-                                <X size={20} />
+                                <X size={16} />
                             </button>
                         </div>
 
                         {/* Messages Area */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-slate-950/50">
+                        <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-[#f8fafc]">
                             {messages.map((msg, idx) => (
                                 <div
                                     key={idx}
-                                    className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                                    className={`flex flex-col ${msg.type === 'user' ? 'items-end' : 'items-start'}`}
                                 >
                                     <div
                                         className={`
-                                            max-w-[80%] p-3 rounded-2xl text-sm leading-relaxed shadow-sm
+                                            max-w-[85%] p-4 text-[13.5px] leading-relaxed shadow-sm whitespace-pre-wrap
                                             ${msg.type === 'user'
-                                                ? 'bg-blue-600 text-white rounded-tr-none'
-                                                : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-100 rounded-tl-none border border-gray-100 dark:border-gray-700'
+                                                ? 'bg-[var(--chat-user-bubble)] text-white rounded-2xl rounded-tr-sm'
+                                                : 'bg-[var(--chat-bot-bubble)] text-[var(--chat-text-dark)] rounded-2xl rounded-tl-sm border border-gray-200'
                                             }
                                         `}
                                     >
                                         {msg.text}
                                     </div>
+                                    {msg.timestamp && (
+                                        <span className={`text-[10px] text-gray-400 mt-1.5 ${msg.type === 'user' ? 'mr-1' : 'ml-1'}`}>
+                                            {msg.timestamp}
+                                        </span>
+                                    )}
                                 </div>
                             ))}
                             {isLoading && (
                                 <div className="flex justify-start">
-                                    <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none border border-gray-100 dark:border-gray-700 flex items-center gap-2">
-                                        <Loader2 size={16} className="animate-spin text-blue-600" />
-                                        <span className="text-xs text-gray-500">Typing...</span>
+                                    <div className="bg-[var(--chat-bot-bubble)] p-4 rounded-2xl rounded-tl-sm border border-gray-200 flex items-center gap-2 shadow-sm">
+                                        <Loader2 size={14} className="animate-spin text-[var(--chat-primary)]" />
+                                        <span className="text-[12px] text-gray-500">Typing...</span>
                                     </div>
+                                </div>
+                            )}
+
+                            {messages.length === 1 && !isLoading && (
+                                <div className="flex flex-wrap gap-2 mt-2 ml-1">
+                                    {QUICK_REPLIES.map((reply, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => sendMessage(reply)}
+                                            className="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-[var(--chat-primary)] text-[12px] font-medium rounded-full transition-colors border border-blue-100"
+                                        >
+                                            {reply}
+                                        </button>
+                                    ))}
                                 </div>
                             )}
                             <div ref={messagesEndRef} />
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-4 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-gray-800">
-                            <form onSubmit={handleSendMessage} className="relative flex items-center gap-2">
+                        <div className="p-3 bg-white border-t border-gray-100">
+                            <form onSubmit={handleSendMessage} className="relative flex items-center gap-2 mb-1">
                                 <input
                                     type="text"
                                     value={inputText}
                                     onChange={(e) => setInputText(e.target.value)}
-                                    placeholder="Type your message..."
-                                    className="w-full bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-4 py-3 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all border border-transparent focus:border-blue-500"
+                                    placeholder="Type your question..."
+                                    className="flex-1 bg-[#f8fafc] text-gray-900 px-4 py-3 rounded-full text-[13px] focus:outline-none focus:ring-1 focus:ring-[var(--chat-primary)] transition-all border border-gray-200"
                                     disabled={isLoading}
                                 />
                                 <button
                                     type="submit"
                                     disabled={!inputText.trim() || isLoading}
-                                    className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-blue-500/30 active:scale-95"
+                                    className="w-11 h-11 flex items-center justify-center bg-[var(--chat-primary)] text-white rounded-full hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0 shadow-sm"
                                 >
-                                    <Send size={18} />
+                                    <Send size={16} className="ml-0.5" />
                                 </button>
                             </form>
+                            <div className="text-center">
+                                <span className="text-[9px] text-gray-400">Powered by Devugo AI</span>
+                            </div>
                         </div>
                     </motion.div>
                 )}
@@ -175,12 +196,12 @@ const ChatWidget = ({ isOpen, setIsOpen }) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-blue-500/40 flex items-center justify-center transition-all duration-300 z-50 group"
+                className="w-14 h-14 bg-[var(--chat-primary)] text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 z-50 group"
             >
                 {isOpen ? (
-                    <X size={28} className="transform group-hover:rotate-90 transition-transform duration-300" />
+                    <X size={26} className="transform group-hover:rotate-90 transition-transform duration-300" />
                 ) : (
-                    <MessageCircle size={28} className="transform group-hover:scale-110 transition-transform duration-300" />
+                    <MessageCircle size={26} className="transform group-hover:scale-110 transition-transform duration-300" />
                 )}
             </motion.button>
         </div>

@@ -21,6 +21,14 @@
   --radius: 14px;
   --shadow: 0 10px 20px rgba(0, 0, 0, .2), 0 6px 6px rgba(0, 0, 0, .15);
 
+  /* Chatbot Variables */
+  --chat-primary: var(--color-primary);
+  --chat-bg: #ffffff;
+  --chat-header-bg: var(--color-bg);
+  --chat-user-bubble: var(--color-primary);
+  --chat-bot-bubble: #f1f5f9;
+  --chat-text-dark: #0f172a;
+
   /* Admin Theme (defaults to dark) */
   --admin-bg: #002747;
   /* Deep Blue */

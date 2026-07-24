@@ -58,8 +58,20 @@ class AIPersonalizerJob {
 
       logger.info(`Processing ${pendingRequests.length} AI personalization requests`);
 
-      for (const request of pendingRequests) {
-        await this.generatePersonalizedContent(request);
+      const chunkSize = 5;
+      for (let i = 0; i < pendingRequests.length; i += chunkSize) {
+        const chunk = pendingRequests.slice(i, i + chunkSize);
+        
+        // Process requests sequentially within the chunk
+        for (const request of chunk) {
+          await this.generatePersonalizedContent(request);
+        }
+        
+        // If there are more chunks to process, wait 10 seconds before continuing
+        if (i + chunkSize < pendingRequests.length) {
+           logger.info(`Processed chunk, waiting 10 seconds before next to prevent rate limits...`);
+           await new Promise(resolve => setTimeout(resolve, 10000));
+        }
       }
 
       logger.info('AI personalization batch completed');
