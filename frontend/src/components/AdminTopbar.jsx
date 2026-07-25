@@ -112,12 +112,7 @@ export default function AdminTopbar() {
               </svg>
             )}
           </button>
-          <button className="icon-btn" title="System" aria-label="System">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z" stroke="currentColor" strokeWidth="1.6" />
-              <path d="M4 12h2.2M17.8 12H20M12 20v-2.2M12 6.2V4M6.7 6.7l1.6 1.6M15.7 15.7l1.6 1.6M6.7 17.3l1.6-1.6M15.7 8.3l1.6-1.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-          </button>
+
           <button className="icon-btn" title="Notifications" aria-label="Notifications">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M6 9a6 6 0 1 1 12 0v4.2l1.3 2.6c.2.41-.09.9-.54.9H5.24c-.45 0-.74-.49-.54-.9L6 13.2V9z" stroke="currentColor" strokeWidth="1.6" />
