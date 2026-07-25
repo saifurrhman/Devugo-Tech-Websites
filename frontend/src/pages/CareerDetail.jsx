@@ -113,13 +113,14 @@ export default function CareerDetail() {
           .content-grid { display: flex !important; flex-direction: column-reverse !important; gap: 3.5rem !important; }
           .hero-meta { flex-direction: column; gap: 0.75rem !important; }
           .form-row { grid-template-columns: 1fr !important; }
+          .hero-section { padding-top: 50px !important; padding-bottom: 30px !important; }
         }
       `}</style>
 
       <div className="career-detail">
 
         {/* ─── HERO ─── */}
-        <section style={{ paddingTop:'120px', paddingBottom:'52px', position:'relative', overflow:'hidden' }}>
+        <section className="hero-section" style={{ paddingTop:'120px', paddingBottom:'52px', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:'1000px', height:'450px', background:`radial-gradient(ellipse at center, ${tc.glow} 0%, transparent 65%)`, animation:'pulse-glow 3s ease infinite' }} />
           </div>

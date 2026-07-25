@@ -92,16 +92,18 @@ export default function Careers() {
         @media (max-width: 768px) {
           .hero-stats { gap: 1rem !important; }
           .stat-box { width: 100%; }
-          .job-card { flex-direction: column !important; align-items: flex-start !important; }
+          .job-card { flex-direction: column !important; align-items: flex-start !important; padding: 1.25rem !important; }
           .job-card-right { width: 100%; justify-content: space-between !important; margin-top: 0.5rem; }
           .perk-card { min-width: 100% !important; }
+          .hero-section { padding-top: 60px !important; padding-bottom: 40px !important; }
+          .job-title { white-space: normal !important; overflow: visible !important; }
         }
       `}</style>
 
       <div className="careers-page">
 
         {/* ─── HERO ─── */}
-        <section style={{ paddingTop: '130px', paddingBottom: '80px', position: 'relative', overflow: 'hidden', textAlign: 'center' }}>
+        <section className="hero-section" style={{ paddingTop: '130px', paddingBottom: '80px', position: 'relative', overflow: 'hidden', textAlign: 'center' }}>
           {/* Background blobs */}
           <div style={{ position:'absolute', inset:0, pointerEvents:'none', overflow:'hidden' }}>
             <div style={{ position:'absolute', top:'-80px', left:'50%', transform:'translateX(-50%)', width:'900px', height:'500px', background:'radial-gradient(ellipse, rgba(67,133,205,0.2) 0%, transparent 65%)', animation:'pulse-glow 4s ease infinite' }} />
@@ -232,7 +234,7 @@ export default function Careers() {
 
                       {/* Info */}
                       <div style={{ flex:1, minWidth:0 }}>
-                        <h3 style={{ margin:'0 0 .5rem', fontSize:'1.2rem', fontWeight:800, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', letterSpacing:'-0.01em' }}>
+                        <h3 className="job-title" style={{ margin:'0 0 .5rem', fontSize:'1.2rem', fontWeight:800, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', letterSpacing:'-0.01em' }}>
                           {job.title}
                         </h3>
                         <div style={{ display:'flex', gap:'.9rem', flexWrap:'wrap' }}>
