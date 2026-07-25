@@ -24,7 +24,29 @@ exports.submitApplication = async (req, res) => {
     }
     let resume = null;
     if (req.file) {
-      resume = `/uploads/resumes/${req.file.filename}`;
+      const cloudinary = require('cloudinary').v2;
+      cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+      });
+
+      const uploadResult = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: 'devugo-tech/resumes', resource_type: 'auto' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        const { Readable } = require('stream');
+        const readableStream = new Readable();
+        readableStream._read = () => {};
+        readableStream.push(req.file.buffer);
+        readableStream.push(null);
+        readableStream.pipe(uploadStream);
+      });
+      resume = uploadResult.secure_url;
     }
 
     const application = await JobApplication.create({
