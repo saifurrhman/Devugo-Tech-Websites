@@ -45,6 +45,9 @@ export default function Careers() {
         }
       })
       .catch(() => {});
+
+    document.body.classList.add('careers-theme');
+    return () => { document.body.classList.remove('careers-theme'); };
   }, []);
 
   const types = useMemo(() => ['All', ...new Set(jobs.map(j => j.type))], [jobs]);

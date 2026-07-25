@@ -32,6 +32,9 @@ export default function CareerDetail() {
       .then(data => { setJob(data); })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
+
+    document.body.classList.add('careers-theme');
+    return () => { document.body.classList.remove('careers-theme'); };
   }, [id]);
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
