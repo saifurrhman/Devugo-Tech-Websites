@@ -114,6 +114,7 @@ export default function CareerDetail() {
           .hero-meta { flex-direction: column; gap: 0.75rem !important; }
           .form-row { grid-template-columns: 1fr !important; }
           .hero-section { padding-top: 50px !important; padding-bottom: 30px !important; }
+          .form-wrapper { position: static !important; }
         }
       `}</style>
 
@@ -228,7 +229,7 @@ export default function CareerDetail() {
           </div>
 
           {/* RIGHT: Application Form */}
-          <div style={{ position:'sticky', top:'100px' }}>
+          <div className="form-wrapper" style={{ position:'sticky', top:'100px' }}>
             {submitted ? (
               <div style={{ padding:'3rem 2rem', borderRadius:'20px', border:'1px solid rgba(52,211,153,0.35)', background:'linear-gradient(135deg, rgba(52,211,153,0.07), rgba(16,185,129,0.04))', textAlign:'center', animation:'fadeUp .4s ease' }}>
                 <div style={{ width:72, height:72, borderRadius:'50%', background:'rgba(52,211,153,0.15)', border:'2px solid rgba(52,211,153,0.4)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.25rem', color:'#34d399' }}>
