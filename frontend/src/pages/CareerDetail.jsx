@@ -32,9 +32,6 @@ export default function CareerDetail() {
       .then(data => { setJob(data); })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-
-    document.body.classList.add('careers-theme');
-    return () => { document.body.classList.remove('careers-theme'); };
   }, [id]);
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -113,7 +110,7 @@ export default function CareerDetail() {
         .back-link { transition:all .15s; }
         .back-link:hover { color:#4385cd !important; transform:translateX(-2px); }
         @media (max-width: 900px) {
-          .content-grid { grid-template-columns: 1fr !important; }
+          .content-grid { display: flex !important; flex-direction: column-reverse !important; gap: 3.5rem !important; }
           .hero-meta { flex-direction: column; gap: 0.75rem !important; }
           .form-row { grid-template-columns: 1fr !important; }
         }

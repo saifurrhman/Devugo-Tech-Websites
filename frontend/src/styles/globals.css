@@ -2867,38 +2867,23 @@ body.admin-light .badge {
     background: #0b2647 !important;
   }
 
-  /* Transparent navbar with full width inner on mobile */
+  /* Transparent navbar with white pill inner on mobile */
   .navbar {
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     border-bottom: 0;
     box-shadow: none;
-    padding: 0 !important;
-    top: 0 !important;
+    padding: .15rem .4rem !important;
+    top: 10px !important;
   }
 
   body .nav-inner {
     background: #ffffff !important;
-    border-radius: 0 !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, .15) !important;
-    border: none !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-    padding: .5rem 1rem !important;
-  }
-
-  /* Dark navbar for dark theme pages (Careers) */
-  body.careers-theme .nav-inner {
-    background: #061c39 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-  
-  body.careers-theme .navbar .logo {
-    color: #ffffff !important;
-  }
-  
-  body.careers-theme .mobile-toggle span {
-    background: #ffffff !important;
+    border-radius: 999px !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .10) !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding: .25rem .5rem !important;
   }
 
   /* Dark logo/toggle for contrast on white pill */
@@ -4587,26 +4572,13 @@ body.admin-dark .admin-layout .card {
     box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
     border: 1px solid rgba(0, 0, 0, 0.06);
   }
-  
-  body.careers-theme .nav-inner {
-    background: #061c39;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
 
   .navbar .logo {
     color: #061c39
   }
 
-  body.careers-theme .navbar .logo {
-    color: #ffffff;
-  }
-
   .mobile-toggle span {
     background: #061c39
-  }
-
-  body.careers-theme .mobile-toggle span {
-    background: #ffffff;
   }
 
   /* Keep mobile dropdown (glass) as-is */
