@@ -495,6 +495,16 @@ try {
   console.error('  ❌ Inbox routes error:', error.message);
 }
 
+try {
+  console.log('  Loading notifications...');
+  const notificationRoutes = require('./routes/notificationRoutes');
+  app.use('/api/notifications', notificationRoutes);
+  console.log('  ✅ Notification routes loaded');
+} catch (error) {
+  console.error('  ❌ Notification routes error:', error.message);
+}
+
+
 console.log('🎯 CRM routes loading complete\n');
 
 // ========================================

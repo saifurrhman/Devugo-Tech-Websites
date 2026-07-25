@@ -1,5 +1,6 @@
 const JobApplication = require('../models/JobApplication');
 const Career = require('../models/Career');
+const Notification = require('../models/Notification');
 
 // @desc  Submit job application
 // @route POST /api/applications
@@ -41,6 +42,19 @@ exports.submitApplication = async (req, res) => {
     sendApplicantConfirmation(application, career).catch(err =>
       console.error('Applicant confirmation email failed:', err)
     );
+
+    // Create in-app notification
+    try {
+      await Notification.create({
+        title: 'New Job Application',
+        message: `${application.fullName} applied for ${career.title}.`,
+        type: 'application',
+        link: `/admin/careers/applications`, // Assuming this is the applications route
+        data: { applicationId: application._id, careerId: career._id }
+      });
+    } catch (notifErr) {
+      console.error('Failed to create in-app notification:', notifErr);
+    }
 
     res.status(201).json({
       success: true,

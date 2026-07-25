@@ -1,4 +1,5 @@
 const Contact = require('../models/Contact');
+const Notification = require('../models/Notification');
 
 exports.list = async (req, res) => {
     try {
@@ -115,6 +116,19 @@ exports.submit = async (req, res) => {
         }
 
         res.status(201).json({ ok: true, message: 'Message sent successfully' });
+
+        // Create in-app notification
+        try {
+            await Notification.create({
+                title: 'New Lead Submission',
+                message: `${contact.name} (${contact.email}) submitted a new inquiry.`,
+                type: 'contact',
+                link: `/admin/inbox`,
+                data: { contactId: contact._id }
+            });
+        } catch (notifErr) {
+            console.error('Failed to create in-app notification:', notifErr);
+        }
     } catch (err) {
         res.status(400).json({ ok: false, error: err.message });
     }

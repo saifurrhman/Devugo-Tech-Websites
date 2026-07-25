@@ -538,3 +538,13 @@ export const ProposalAPI = {
   update: (id, payload) => api(`/api/proposals/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => api(`/api/proposals/${id}`, { method: 'DELETE' }),
 };
+
+// ============================================
+// NOTIFICATION API
+// ============================================
+export const NotificationAPI = {
+  list: (params = {}) => api('/api/notifications' + buildQuery(params)),
+  markRead: (id) => api(`/api/notifications/${id}/read`, { method: 'PUT' }),
+  markAllRead: () => api('/api/notifications/mark-all-read', { method: 'PUT' }),
+  remove: (id) => api(`/api/notifications/${id}`, { method: 'DELETE' }),
+};
