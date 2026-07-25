@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Career = require('./models/Career');
 const JobApplication = require('./models/JobApplication');
 const http = require('http');
+const FormData = require('form-data');
+const fs = require('fs');
 
 mongoose.connect('mongodb+srv://devugotech:devugotech34%40@devugotech.mpj2jkj.mongodb.net/DevugoTech?retryWrites=true&w=majority&appName=DevugoTech')
   .then(async () => {
@@ -14,21 +16,20 @@ mongoose.connect('mongodb+srv://devugotech:devugotech34%40@devugotech.mpj2jkj.mo
     
     await JobApplication.deleteOne({ email: 'test500@example.com' });
 
-    const data = JSON.stringify({
-      careerId: career._id.toString(),
-      fullName: 'Test User',
-      email: 'test500@example.com'
-    });
+    const form = new FormData();
+    form.append('careerId', career._id.toString());
+    form.append('fullName', 'Test User');
+    form.append('email', 'test500@example.com');
+    // Simulate a file upload
+    fs.writeFileSync('test-resume.pdf', 'dummy content');
+    form.append('resume', fs.createReadStream('test-resume.pdf'));
 
     const options = {
       hostname: 'localhost',
       port: 5000,
       path: '/api/applications',
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(data)
-      }
+      headers: form.getHeaders()
     };
 
     const req = http.request(options, res => {
@@ -46,6 +47,5 @@ mongoose.connect('mongodb+srv://devugotech:devugotech34%40@devugotech.mpj2jkj.mo
       process.exit(1);
     });
 
-    req.write(data);
-    req.end();
+    form.pipe(req);
   });
