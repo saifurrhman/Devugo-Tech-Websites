@@ -545,6 +545,16 @@ if (process.env.ENABLE_JOBS !== 'false' && process.env.NODE_ENV !== 'test') {
 
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err);
+  
+  // LOG ERROR TO FILE FOR DEBUGGING
+  try {
+    const fs = require('fs');
+    const logPath = require('path').join(__dirname, 'error.log');
+    const logMsg = `[${new Date().toISOString()}] ${req.method} ${req.url}\nError Name: ${err.name}\nError Message: ${err.message}\nStack: ${err.stack}\n\n`;
+    fs.appendFileSync(logPath, logMsg);
+  } catch (e) {
+    console.error('Failed to write to error.log', e);
+  }
 
   // Multer errors
   if (err.name === 'MulterError') {
@@ -614,9 +624,7 @@ app.use((err, req, res, next) => {
   // Default error
   res.status(err.status || 500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production'
-      ? 'Internal server error'
-      : err.message,
+    message: err.message || 'Internal server error',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });

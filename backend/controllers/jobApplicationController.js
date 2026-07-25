@@ -63,7 +63,7 @@ exports.submitApplication = async (req, res) => {
     });
   } catch (error) {
     console.error('Error submitting application:', error);
-    res.status(500).json({ message: 'Server error submitting application.' });
+    res.status(500).json({ message: 'Server error submitting application.', error: error.message });
   }
 };
 
