@@ -4613,13 +4613,12 @@ body.admin-dark .admin-layout .card {
   }
 
   .admin-topbar__inner {
-    flex-wrap: wrap;
-    gap: .6rem
+    gap: .6rem;
+    border-radius: 20px;
   }
 
   .admin-search {
-    flex-basis: 100%;
-    max-width: 100%
+    flex: 1;
   }
 
   .admin-topbar__actions {
