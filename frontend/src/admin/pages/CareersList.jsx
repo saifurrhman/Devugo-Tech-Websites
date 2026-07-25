@@ -170,8 +170,8 @@ export default function CareersList() {
 
         {!loading && !error && (
           filtered.length ? (
-            <div className="card" style={{ marginTop: '1rem', padding: 0, overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="card" style={{ marginTop: '1rem', padding: 0, overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}>
                     <th style={{ padding: '.75rem 1rem', textAlign: 'left', width: 36 }}>

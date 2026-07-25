@@ -105,9 +105,15 @@ export default function CareerDetail() {
         .career-detail select option { background-color: #0b1121; color: #ffffff; }
         .submit-btn:hover:not(:disabled) { transform:translateY(-2px) !important; }
         .req-item { transition:all .15s; }
+        .req-item { transition:all .15s; }
         .req-item:hover { transform:translateX(4px); }
         .back-link { transition:all .15s; }
         .back-link:hover { color:#4385cd !important; transform:translateX(-2px); }
+        @media (max-width: 900px) {
+          .content-grid { grid-template-columns: 1fr !important; }
+          .hero-meta { flex-direction: column; gap: 0.75rem !important; }
+          .form-row { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div className="career-detail">
@@ -144,7 +150,7 @@ export default function CareerDetail() {
             </h1>
 
             {/* Meta */}
-            <div style={{ display:'flex', gap:'1.5rem', flexWrap:'wrap', marginBottom:'2rem' }}>
+            <div className="hero-meta" style={{ display:'flex', gap:'1.5rem', flexWrap:'wrap', marginBottom:'2rem' }}>
               {job.department && (
                 <div style={{ display:'flex', alignItems:'center', gap:'.4rem', color:'rgba(255,255,255,0.5)', fontSize:'.9rem' }}>
                   <Briefcase size={15} />
@@ -168,7 +174,7 @@ export default function CareerDetail() {
         </section>
 
         {/* ─── BODY ─── */}
-        <section style={{ maxWidth:'1200px', margin:'0 auto', padding:'0 2rem 6rem', display:'grid', gridTemplateColumns:'1fr 420px', gap:'2rem', alignItems:'start' }}>
+        <section className="content-grid" style={{ maxWidth:'1200px', margin:'0 auto', padding:'0 2rem 6rem', display:'grid', gridTemplateColumns:'1fr 420px', gap:'2rem', alignItems:'start' }}>
 
           {/* LEFT: Job Details */}
           <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
@@ -272,7 +278,7 @@ export default function CareerDetail() {
                   ))}
 
                   {/* Phone + Experience (2 col) */}
-                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'.75rem' }}>
+                  <div className="form-row" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'.75rem' }}>
                     <div>
                       <label style={{ display:'flex', alignItems:'center', gap:'.35rem', marginBottom:'.4rem', fontSize:'.78rem', fontWeight:700, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.05em' }}>
                         <Phone size={13} /> Phone

@@ -89,6 +89,13 @@ export default function Careers() {
         .type-pill:hover { opacity:1 !important; transform:scale(1.03); }
         .apply-btn { transition: all .2s ease; }
         .apply-btn:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(67,133,205,0.4) !important; }
+        @media (max-width: 768px) {
+          .hero-stats { gap: 1rem !important; }
+          .stat-box { width: 100%; }
+          .job-card { flex-direction: column !important; align-items: flex-start !important; }
+          .job-card-right { width: 100%; justify-content: space-between !important; margin-top: 0.5rem; }
+          .perk-card { min-width: 100% !important; }
+        }
       `}</style>
 
       <div className="careers-page">
@@ -121,7 +128,7 @@ export default function Careers() {
             </p>
 
             {/* Stats */}
-            <div style={{ display:'flex', justifyContent:'center', gap:'2.5rem', flexWrap:'wrap', marginBottom:'2.5rem' }}>
+            <div className="hero-stats" style={{ display:'flex', justifyContent:'center', gap:'2.5rem', flexWrap:'wrap', marginBottom:'2.5rem' }}>
               {[{ n: jobs.length || '0', l: 'Open Roles' }, { n: teamCount, l: 'Team Members' }, { n: countriesCount, l: 'Countries' }].map(s => (
                 <div key={s.l} className="stat-box" style={{ textAlign:'center', padding:'1.5rem 2.5rem', borderRadius:'20px', background:'rgba(255,255,255,0.03)' }}>
                   <div style={{ fontSize:'2.2rem', fontWeight:800, background:'linear-gradient(135deg, #fff, #a78bfa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', lineHeight:1 }}>{s.n}</div>
@@ -251,7 +258,7 @@ export default function Careers() {
                       </div>
 
                       {/* Right */}
-                      <div style={{ display:'flex', alignItems:'center', gap:'.85rem', flexShrink:0 }}>
+                      <div className="job-card-right" style={{ display:'flex', alignItems:'center', gap:'.85rem', flexShrink:0 }}>
                         <span style={{ padding:'.28rem .8rem', borderRadius:'999px', fontSize:'.77rem', fontWeight:700, background:tc.bg, border:`1px solid ${tc.border}`, color:tc.color, letterSpacing:'.02em' }}>
                           {job.type}
                         </span>
