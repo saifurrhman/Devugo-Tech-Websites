@@ -285,7 +285,7 @@ export default function TechnologiesList() {
         <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-4 mb-6 shadow-xl">
           <div className="flex flex-col md:flex-row justify-between gap-4 items-center">
             
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-hide">
+            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
               {['All', ...CATEGORIES].map(cat => (
                 <button 
                   key={cat}
