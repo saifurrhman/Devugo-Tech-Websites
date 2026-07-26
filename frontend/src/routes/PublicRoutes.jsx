@@ -48,6 +48,7 @@ import LeadEdit from '../admin/pages/LeadEdit';
 import PortfolioCategories from '../admin/pages/PortfolioCategories';
 import BlogCategories from '../admin/pages/BlogCategories';
 import TechStack from '../admin/pages/TechStack';
+import TechnologiesList from '../admin/pages/TechnologiesList';
 import ReviewsList from '../admin/pages/ReviewsList';
 import ReviewEdit from '../admin/pages/ReviewEdit';
 import FAQsList from '../admin/pages/FAQsList';
@@ -171,6 +172,7 @@ export default function PublicRoutes() {
           {/* Admin Content */}
           <Route path="/admin/pricing" element={<ProtectedRoute><PricingPlans /></ProtectedRoute>} />
           <Route path="/admin/tech-stack" element={<ProtectedRoute><TechStack /></ProtectedRoute>} />
+          <Route path="/admin/technologies" element={<ProtectedRoute><TechnologiesList /></ProtectedRoute>} />
           <Route path="/admin/reviews" element={<ProtectedRoute><ReviewsList /></ProtectedRoute>} />
           <Route path="/admin/reviews/:id" element={<ProtectedRoute><ReviewEdit /></ProtectedRoute>} />
           <Route path="/admin/faqs" element={<ProtectedRoute><FAQsList /></ProtectedRoute>} />

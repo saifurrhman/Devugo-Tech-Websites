@@ -4,7 +4,7 @@ import { AuthAPI } from '../lib/api';
 import {
   LayoutDashboard, Briefcase, CreditCard, Image, Star, HelpCircle, FileText,
   Share2, Edit, Users, UserCheck, Send, UserPlus, Inbox, Layout, BarChart,
-  GitMerge, Folder, Calendar, PieChart, Settings, User, LogOut, Menu, Shield
+  GitMerge, Folder, Calendar, PieChart, Settings, User, LogOut, Menu, Shield, Wrench
 } from 'lucide-react';
 
 export default function AdminSidebar() {
@@ -110,6 +110,11 @@ export default function AdminSidebar() {
               <NavLink to="/admin/portfolio" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
                 <span className="icon"><Image size={20} /></span>
                 <span className="label">Portfolio</span>
+              </NavLink>
+
+              <NavLink to="/admin/technologies" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Wrench size={20} /></span>
+                <span className="label">Tools & Tech</span>
               </NavLink>
 
               <NavLink to="/admin/reviews" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>

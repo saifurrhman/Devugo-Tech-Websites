@@ -292,6 +292,19 @@ export const PortfolioCategoryAPI = {
 };
 
 // ============================================
+// TECHNOLOGY API (New)
+// ============================================
+export const TechnologyAPI = {
+  list: (params = {}) => api('/api/technologies' + buildQuery(params)),
+  get: (id) => api(`/api/technologies/${id}`),
+  create: (payload) => api('/api/technologies', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/technologies/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/technologies/${id}`, { method: 'DELETE' }),
+  reorder: (items) => api('/api/technologies/reorder', { method: 'PATCH', body: { items } }),
+  toggleStatus: (id) => api(`/api/technologies/${id}/status`, { method: 'PATCH' }),
+};
+
+// ============================================
 // TECH STACK API
 // ============================================
 export const TechStackAPI = {

@@ -251,9 +251,13 @@ app.use('/api/applications', jobApplicationsRoutes);
 const portfolioCategoryRoutes = require('./routes/portfolioCategories');
 app.use('/api/portfolio-categories', portfolioCategoryRoutes);
 
-// Tech Stack Routes
+// Tech Stack Routes (Legacy)
 const techStackRoutes = require('./routes/techStack');
 app.use('/api/tech-stack', techStackRoutes);
+
+// Technology Routes (New)
+const technologyRoutes = require('./routes/technologyRoutes');
+app.use('/api/technologies', technologyRoutes);
 
 // Review Routes
 const reviewRoutes = require('./routes/reviews');

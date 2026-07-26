@@ -12,6 +12,7 @@ import SocialFloating from '../components/SocialFloating';
 import HomePortfolio from '../components/HomePortfolio';
 import ReviewsSection from '../components/ReviewsSection';
 import BrandMarquee from '../components/BrandMarquee';
+import TechnologiesSection from '../components/TechnologiesSection';
 
 import SEO from '../components/SEO';
 
@@ -45,6 +46,8 @@ export default function Home() {
 
       <WhyChoose />
       <ServicesSection variant="home" />
+
+      <TechnologiesSection />
 
       <PricingSection showCustom={true} limit={6} />
 
