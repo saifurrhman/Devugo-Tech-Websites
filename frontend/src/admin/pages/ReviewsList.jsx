@@ -5,6 +5,7 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { ClientReviewAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function ReviewsList(){
   const confirm = useConfirm();
@@ -20,20 +21,9 @@ export default function ReviewsList(){
   // Filter state
   const [ratingFilter, setRatingFilter] = useState('all'); // 'all', '5', '4', '3', '2', '1'
   
-  // Dropdown state
-  const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
-  const ratingDropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (ratingDropdownRef.current && !ratingDropdownRef.current.contains(event.target)) {
-        setRatingDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
+
 
   async function fetchAll(){
     setLoading(true); setError('');
@@ -166,90 +156,12 @@ export default function ReviewsList(){
               <input className="admin-search__input" placeholder="Search reviews..." value={q} onChange={e=>setQ(e.target.value)} />
             </div>
 
-            {/* Rating Filter Dropdown */}
-            <div ref={ratingDropdownRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setRatingDropdownOpen(!ratingDropdownOpen)}
-                style={{
-                  padding: '.5rem .75rem',
-                  borderRadius: '.375rem',
-                  border: '1px solid rgba(55, 65, 81, 0.5)',
-                  background: 'rgba(31, 41, 55, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '.5rem',
-                  minWidth: '140px',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>{selectedRatingOption.label}</span>
-                <span style={{fontSize:'.75rem'}}>▼</span>
-              </button>
-              
-              {ratingDropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + .5rem)',
-                    right: 0,
-                    minWidth: '160px',
-                    padding: '.4rem',
-                    zIndex: 1000,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '.5rem',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {ratingOptions.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setRatingFilter(option.value);
-                        setRatingDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '.6rem .85rem',
-                        background: ratingFilter === option.value 
-                          ? 'rgba(59, 130, 246, 0.3)' 
-                          : 'transparent',
-                        border: ratingFilter === option.value 
-                          ? '1px solid rgba(59, 130, 246, 0.5)' 
-                          : '1px solid transparent',
-                        borderRadius: '.375rem',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all .2s',
-                        fontSize: '.9rem',
-                        fontWeight: ratingFilter === option.value ? '500' : '400',
-                        marginBottom: '.25rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (ratingFilter !== option.value) {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (ratingFilter !== option.value) {
-                          e.target.style.background = 'transparent';
-                          e.target.style.borderColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div style={{ width: '160px' }}>
+              <CustomSelect
+                options={ratingOptions}
+                value={ratingFilter}
+                onChange={setRatingFilter}
+              />
             </div>
 
             <Link to="/admin/reviews/new" className="btn">Add Review</Link>

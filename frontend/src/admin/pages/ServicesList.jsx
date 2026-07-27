@@ -6,6 +6,7 @@ import { ServiceAPI } from '../../lib/api';
 import { API_BASE } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function ServicesList() {
   const confirm = useConfirm();
@@ -21,21 +22,10 @@ export default function ServicesList() {
   
   // NEW: Filter state
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'published', 'draft'
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
   
   const publishedCount = useMemo(() => items.filter(s => s.published !== false).length, [items]);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
 
   async function fetchServices() {
     setLoading(true);
@@ -186,90 +176,12 @@ export default function ServicesList() {
         <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem',flexWrap:'wrap'}}>
           <h1>Services</h1>
           <div style={{display:'flex',gap:'.6rem',alignItems:'center'}}>
-            {/* NEW: Custom Card-Style Dropdown */}
-            <div ref={dropdownRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                style={{
-                  padding: '.5rem .75rem',
-                  borderRadius: '.375rem',
-                  border: '1px solid rgba(55, 65, 81, 0.5)',
-                  background: 'rgba(31, 41, 55, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '.5rem',
-                  minWidth: '160px',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>{selectedOption.label}</span>
-                <span style={{fontSize:'.75rem'}}>▼</span>
-              </button>
-              
-              {dropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + .5rem)',
-                    right: 0,
-                    minWidth: '180px',
-                    padding: '.4rem',
-                    zIndex: 1000,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '.5rem',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {statusOptions.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setStatusFilter(option.value);
-                        setDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '.6rem .85rem',
-                        background: statusFilter === option.value 
-                          ? 'rgba(59, 130, 246, 0.3)' 
-                          : 'transparent',
-                        border: statusFilter === option.value 
-                          ? '1px solid rgba(59, 130, 246, 0.5)' 
-                          : '1px solid transparent',
-                        borderRadius: '.375rem',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all .2s',
-                        fontSize: '.9rem',
-                        fontWeight: statusFilter === option.value ? '500' : '400',
-                        marginBottom: '.25rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (statusFilter !== option.value) {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (statusFilter !== option.value) {
-                          e.target.style.background = 'transparent';
-                          e.target.style.borderColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div style={{ width: '160px' }}>
+              <CustomSelect
+                options={statusOptions}
+                value={statusFilter}
+                onChange={setStatusFilter}
+              />
             </div>
 
             <Link to="/admin/services/new" className="btn">Add Service</Link>

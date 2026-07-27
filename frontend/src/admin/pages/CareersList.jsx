@@ -5,6 +5,7 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { CareerAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function CareersList() {
   const navigate = useNavigate();
@@ -13,21 +14,11 @@ export default function CareersList() {
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
-  const typeDropdownRef = useRef(null);
   const { success: notifySuccess, error: notifyError } = useNotification();
   const confirm = useConfirm();
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target)) {
-        setTypeDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
 
   useEffect(() => { fetchCareers(); }, []);
 
@@ -132,24 +123,12 @@ export default function CareersList() {
               <input className="admin-search__input" placeholder="Search jobs..." value={q} onChange={e => setQ(e.target.value)} />
             </div>
 
-            <div ref={typeDropdownRef} style={{ position: 'relative' }}>
-              <button
-                onClick={() => setTypeDropdownOpen(!typeDropdownOpen)}
-                style={{ padding: '.5rem .75rem', borderRadius: '.375rem', border: '1px solid rgba(55,65,81,0.5)', background: 'rgba(31,41,55,0.4)', backdropFilter: 'blur(10px)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '.5rem', minWidth: '140px', justifyContent: 'space-between' }}
-              >
-                <span>{typeFilter === 'all' ? 'All Types' : typeFilter}</span>
-                <span style={{ fontSize: '.75rem' }}>▼</span>
-              </button>
-              {typeDropdownOpen && (
-                <div style={{ position: 'absolute', top: 'calc(100% + .5rem)', right: 0, minWidth: '180px', padding: '.4rem', zIndex: 1000, background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '.5rem', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
-                  {types.map(t => (
-                    <button key={t} onClick={() => { setTypeFilter(t); setTypeDropdownOpen(false); }}
-                      style={{ width: '100%', padding: '.6rem .85rem', marginBottom: '.25rem', background: typeFilter === t ? 'rgba(59,130,246,0.3)' : 'transparent', border: typeFilter === t ? '1px solid rgba(59,130,246,0.5)' : '1px solid transparent', borderRadius: '.375rem', color: '#fff', cursor: 'pointer', textAlign: 'left', fontSize: '.9rem', fontWeight: typeFilter === t ? '500' : '400' }}>
-                      {t === 'all' ? 'All Types' : t}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div style={{ width: '160px' }}>
+              <CustomSelect
+                options={types.map(t => ({ label: t === 'all' ? 'All Types' : t, value: t }))}
+                value={typeFilter}
+                onChange={setTypeFilter}
+              />
             </div>
 
             <Link to="/admin/careers/new" className="btn">Add Job</Link>

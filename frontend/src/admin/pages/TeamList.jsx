@@ -5,6 +5,7 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { TeamAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function TeamList(){
   const confirm = useConfirm();
@@ -21,23 +22,12 @@ export default function TeamList(){
   // Filter state
   const [roleFilter, setRoleFilter] = useState('all');
   
-  // Dropdown state
-  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
-  const roleDropdownRef = useRef(null);
+
   
   // ✅ Track broken images
   const [brokenImages, setBrokenImages] = useState(new Set());
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (roleDropdownRef.current && !roleDropdownRef.current.contains(event.target)) {
-        setRoleDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
 
   useEffect(()=>{
     let mounted = true;
@@ -165,92 +155,12 @@ export default function TeamList(){
               <input className="admin-search__input" placeholder="Search members..." value={q} onChange={e=>setQ(e.target.value)} />
             </div>
 
-            {/* Role Filter Dropdown */}
-            <div ref={roleDropdownRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-                style={{
-                  padding: '.5rem .75rem',
-                  borderRadius: '.375rem',
-                  border: '1px solid rgba(55, 65, 81, 0.5)',
-                  background: 'rgba(31, 41, 55, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '.5rem',
-                  minWidth: '140px',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>{roleFilter === 'all' ? 'All Roles' : roleFilter}</span>
-                <span style={{fontSize:'.75rem'}}>▼</span>
-              </button>
-              
-              {roleDropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + .5rem)',
-                    right: 0,
-                    minWidth: '180px',
-                    padding: '.4rem',
-                    zIndex: 1000,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '.5rem',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
-                    maxHeight: '300px',
-                    overflowY: 'auto'
-                  }}
-                >
-                  {roles.map(role => (
-                    <button
-                      key={role}
-                      onClick={() => {
-                        setRoleFilter(role);
-                        setRoleDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '.6rem .85rem',
-                        background: roleFilter === role 
-                          ? 'rgba(59, 130, 246, 0.3)' 
-                          : 'transparent',
-                        border: roleFilter === role 
-                          ? '1px solid rgba(59, 130, 246, 0.5)' 
-                          : '1px solid transparent',
-                        borderRadius: '.375rem',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all .2s',
-                        fontSize: '.9rem',
-                        fontWeight: roleFilter === role ? '500' : '400',
-                        marginBottom: '.25rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (roleFilter !== role) {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (roleFilter !== role) {
-                          e.target.style.background = 'transparent';
-                          e.target.style.borderColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {role === 'all' ? 'All Roles' : role}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div style={{ width: '160px' }}>
+              <CustomSelect
+                options={roles.map(r => ({ label: r === 'all' ? 'All Roles' : r, value: r }))}
+                value={roleFilter}
+                onChange={setRoleFilter}
+              />
             </div>
 
             <Link to="/admin/team/new" className="btn">Add Member</Link>

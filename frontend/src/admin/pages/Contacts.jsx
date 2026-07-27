@@ -4,6 +4,7 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { ContactAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 // Professional SVG Icons
 const IconPhone = ({ className = "w-4 h-4" }) => (
@@ -460,20 +461,8 @@ export default function Contacts() {
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'detail'
   const [selectedContact, setSelectedContact] = useState(null);
 
-  // Dropdown state
-  const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
-  const sourceDropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (sourceDropdownRef.current && !sourceDropdownRef.current.contains(event.target)) {
-        setSourceDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
 
   useEffect(() => {
     let mounted = true;
@@ -785,88 +774,12 @@ export default function Contacts() {
             {/* Source Filter Dropdown */}
             <div className="flex items-center gap-2">
               <IconFilter className="w-5 h-5" style={{ color: '#ffffff' }} />
-              <div ref={sourceDropdownRef} style={{ position: 'relative' }}>
-                <button
-                  onClick={() => setSourceDropdownOpen(!sourceDropdownOpen)}
-                  className="px-4 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-xl transition-all duration-200"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1.5px solid rgba(255, 255, 255, 0.12)',
-                    color: '#ffffff',
-                    outline: 'none',
-                    minWidth: '150px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '.5rem'
-                  }}
-                >
-                  <span>{selectedSourceOption.label}</span>
-                  <span style={{ fontSize: '.75rem' }}>▼</span>
-                </button>
-
-                {sourceDropdownOpen && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 'calc(100% + .5rem)',
-                      right: 0,
-                      minWidth: '200px',
-                      padding: '.4rem',
-                      zIndex: 1000,
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '.5rem',
-                      boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
-                      maxHeight: '300px',
-                      overflowY: 'auto'
-                    }}
-                  >
-                    {sourceOptions.map(option => (
-                      <button
-                        key={option.value}
-                        onClick={() => {
-                          setFilterSource(option.value);
-                          setSourceDropdownOpen(false);
-                        }}
-                        style={{
-                          width: '100%',
-                          padding: '.6rem .85rem',
-                          background: filterSource === option.value
-                            ? 'rgba(59, 130, 246, 0.3)'
-                            : 'transparent',
-                          border: filterSource === option.value
-                            ? '1px solid rgba(59, 130, 246, 0.5)'
-                            : '1px solid transparent',
-                          borderRadius: '.375rem',
-                          color: '#fff',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'all .2s',
-                          fontSize: '.9rem',
-                          fontWeight: filterSource === option.value ? '500' : '400',
-                          marginBottom: '.25rem'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (filterSource !== option.value) {
-                            e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                            e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (filterSource !== option.value) {
-                            e.target.style.background = 'transparent';
-                            e.target.style.borderColor = 'transparent';
-                          }
-                        }}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div style={{ width: '160px' }}>
+                <CustomSelect
+                  options={sourceOptions}
+                  value={filterSource}
+                  onChange={setFilterSource}
+                />
               </div>
             </div>
           </div>

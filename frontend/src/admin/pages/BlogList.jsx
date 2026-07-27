@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BlogAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function BlogList(){
   const confirm = useConfirm();
@@ -19,25 +20,12 @@ export default function BlogList(){
   // Selection state
   const [selectedIds, setSelectedIds] = useState([]);
   
-  // Dropdown state
-  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
-  const statusDropdownRef = useRef(null);
-
 
 
 useEffect(() => {
     document.title = 'Blog List - Devugo Tech';
   }, []);
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
-        setStatusDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
 
   useEffect(()=>{
     let mounted = true;
@@ -165,90 +153,12 @@ useEffect(() => {
               <input className="admin-search__input" placeholder="Search posts..." value={q} onChange={e=>setQ(e.target.value)} />
             </div>
             
-            {/* Status Filter Dropdown */}
-            <div ref={statusDropdownRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-                style={{
-                  padding: '.5rem .75rem',
-                  borderRadius: '.375rem',
-                  border: '1px solid rgba(55, 65, 81, 0.5)',
-                  background: 'rgba(31, 41, 55, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '.5rem',
-                  minWidth: '160px',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>{selectedStatusOption.label}</span>
-                <span style={{fontSize:'.75rem'}}>▼</span>
-              </button>
-              
-              {statusDropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + .5rem)',
-                    right: 0,
-                    minWidth: '180px',
-                    padding: '.4rem',
-                    zIndex: 1000,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '.5rem',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {statusOptions.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setStatus(option.value);
-                        setStatusDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '.6rem .85rem',
-                        background: status === option.value 
-                          ? 'rgba(59, 130, 246, 0.3)' 
-                          : 'transparent',
-                        border: status === option.value 
-                          ? '1px solid rgba(59, 130, 246, 0.5)' 
-                          : '1px solid transparent',
-                        borderRadius: '.375rem',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all .2s',
-                        fontSize: '.9rem',
-                        fontWeight: status === option.value ? '500' : '400',
-                        marginBottom: '.25rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (status !== option.value) {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (status !== option.value) {
-                          e.target.style.background = 'transparent';
-                          e.target.style.borderColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div style={{ width: '160px' }}>
+              <CustomSelect
+                options={statusOptions}
+                value={status}
+                onChange={setStatus}
+              />
             </div>
 
             <button onClick={() => navigate('/admin/blog/automation')} className="btn-secondary" style={{display:'flex', alignItems:'center', gap:'0.4rem'}}>
