@@ -167,7 +167,7 @@ export default function Brands() {
                     <strong>Add New Brand</strong>
                     <form onSubmit={onCreate} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
+                        <div className="grid two form-grid" style={{ gap: '1.5rem' }}>
                             <label className="form-label" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <span style={{ fontWeight: 500 }}>Brand Name *</span>
                                 <input className="form-field" name="name" value={form.name} onChange={onChange} placeholder="e.g. Acme Corp" required style={{ width: '100%' }} />
