@@ -11,9 +11,7 @@ import { CSS } from '@dnd-kit/utilities';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import CustomSelect from '../../components/CustomSelect';
-import { TechnologyAPI, UploadAPI } from '../../lib/api';
-
-const CATEGORIES = ['Frontend', 'Backend', 'Database', 'AI & Automation', 'DevOps', 'CMS/E-commerce', 'Other'];
+import { TechnologyAPI, UploadAPI, TechnologyCategoryAPI } from '../../lib/api';
 
 // Sortable Row Component
 function SortableRow({ id, item, selectedIds, toggleSelect, handleEdit, handleDelete, handleToggleStatus }) {
@@ -75,6 +73,7 @@ function SortableRow({ id, item, selectedIds, toggleSelect, handleEdit, handleDe
 
 export default function TechnologiesList() {
   const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
@@ -97,19 +96,23 @@ export default function TechnologiesList() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  async function fetchAll() {
+  async function fetchData() {
     setLoading(true); setError('');
     try {
-      const res = await TechnologyAPI.list();
-      setItems(res.items || []);
+      const [techRes, catRes] = await Promise.all([
+        TechnologyAPI.list(),
+        TechnologyCategoryAPI.list()
+      ]);
+      setItems(techRes.items || []);
+      setCategories(catRes.items || []);
     } catch(err) {
-      setError(err.message || 'Failed to load technologies');
+      setError(err.message || 'Failed to load data');
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const filteredItems = useMemo(() => {
     let result = items;
@@ -269,9 +272,14 @@ export default function TechnologiesList() {
             <h1>Tools & Technologies</h1>
             <p className="sub">Manage the tech stack displayed on your website.</p>
           </div>
-          <button onClick={() => openModal()} className="btn">
-            + Add New Tool
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Link to="/admin/technology-categories" className="btn-secondary">
+              Manage Categories
+            </Link>
+            <button onClick={() => openModal()} className="btn">
+              + Add New Tool
+            </button>
+          </div>
         </div>
 
         {/* Totals strip */}
@@ -290,7 +298,7 @@ export default function TechnologiesList() {
         <div className="card" style={{marginTop:'.75rem', padding:'.5rem 1rem', display:'flex', gap:'1rem', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap'}}>
           
           <div style={{display:'flex', gap:'.5rem', flexWrap:'wrap', alignItems:'center'}}>
-            {['All', ...CATEGORIES].map(cat => (
+            {['All', ...categories.map(c => c.name)].map(cat => (
               <button 
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
@@ -433,7 +441,7 @@ export default function TechnologiesList() {
               <label className="form-label" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <span style={{ fontWeight: 500 }}>Category</span>
                 <CustomSelect 
-                  options={CATEGORIES.map(c => ({ label: c, value: c }))} 
+                  options={categories.map(c => ({ label: c.name, value: c.name }))} 
                   value={formData.category} 
                   onChange={val => setFormData({...formData, category: val})} 
                 />

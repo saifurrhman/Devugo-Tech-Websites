@@ -1,30 +1,41 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TechnologyAPI } from '../lib/api';
+import { TechnologyAPI, TechnologyCategoryAPI } from '../lib/api';
 
 export default function TechnologiesSection() {
   const [technologies, setTechnologies] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
 
   useEffect(() => {
-    async function fetchTech() {
+    async function fetchData() {
       try {
-        const res = await TechnologyAPI.list({ status: true });
-        setTechnologies(res.items || []);
+        const [techRes, catRes] = await Promise.all([
+          TechnologyAPI.list({ status: true }),
+          TechnologyCategoryAPI.list({ status: true })
+        ]);
+        setTechnologies(techRes.items || []);
+        
+        // Use the ordered categories from the API, but only those that have at least one active technology
+        const fetchedCats = catRes.items || [];
+        const activeTechCats = new Set((techRes.items || []).map(t => t.category));
+        
+        // Filter fetched categories to only show ones that have tech, preserving the order from the API
+        const displayCats = fetchedCats
+          .map(c => c.name)
+          .filter(name => activeTechCats.has(name));
+
+        setCategories(['All', ...displayCats]);
       } catch (err) {
-        console.error('Failed to load technologies', err);
+        console.error('Failed to load data', err);
       } finally {
         setLoading(false);
       }
     }
-    fetchTech();
+    fetchData();
   }, []);
 
-  const categories = useMemo(() => {
-    const cats = new Set(technologies.map(t => t.category));
-    return ['All', ...Array.from(cats).sort()];
-  }, [technologies]);
 
   const filteredTech = useMemo(() => {
     if (activeCategory === 'All') return technologies;
