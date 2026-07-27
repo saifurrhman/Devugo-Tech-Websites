@@ -3,8 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ContactAPI } from '../../../lib/api';
+import { useConfirm } from '../../../contexts/ConfirmContext';
+import { useNotification } from '../../../contexts/NotificationContext';
 
 export default function ContactDetails() {
+    const confirm = useConfirm();
+    const notify = useNotification();
     const { id } = useParams();
     const navigate = useNavigate();
     const [contact, setContact] = React.useState(null);
@@ -30,13 +34,19 @@ export default function ContactDetails() {
     };
 
     const handleDelete = async () => {
-        if (!window.confirm("Are you sure you want to delete this contact?")) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Contact',
+            message: 'Are you sure you want to delete this contact?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await ContactAPI.delete(id);
             navigate('/admin/contacts');
         } catch (err) {
             console.error("Failed to delete contact", err);
-            alert("Failed to delete contact");
+            notify.error("Failed to delete contact");
         }
     };
 

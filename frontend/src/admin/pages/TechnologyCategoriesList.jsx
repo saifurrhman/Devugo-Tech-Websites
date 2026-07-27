@@ -11,6 +11,8 @@ import { CSS } from '@dnd-kit/utilities';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { TechnologyCategoryAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 // Sortable Row Component
 function SortableCategoryRow({ id, category, handleEdit, handleDelete, handleToggleStatus }) {
@@ -45,6 +47,8 @@ function SortableCategoryRow({ id, category, handleEdit, handleDelete, handleTog
 }
 
 export default function TechnologyCategoriesList() {
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -94,8 +98,9 @@ export default function TechnologyCategoriesList() {
     
     try {
       await TechnologyCategoryAPI.reorder(reorderedPayload);
+      notify.success("Order saved");
     } catch(err) {
-      alert("Failed to save order: " + err.message);
+      notify.error("Failed to save order: " + err.message);
       fetchAll();
     }
   };
@@ -104,18 +109,26 @@ export default function TechnologyCategoriesList() {
     try {
       await TechnologyCategoryAPI.update(cat._id, { status: !cat.status });
       setCategories(categories.map(c => c._id === cat._id ? { ...c, status: !c.status } : c));
+      notify.success("Status updated");
     } catch(err) {
-      alert("Failed to toggle status: " + err.message);
+      notify.error("Failed to toggle status: " + err.message);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Category',
+      message: 'Are you sure you want to delete this category?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try {
       await TechnologyCategoryAPI.remove(id);
       setCategories(categories.filter(c => c._id !== id));
+      notify.success("Category deleted");
     } catch(err) {
-      alert("Delete failed: " + err.message);
+      notify.error("Delete failed: " + err.message);
     }
   };
 
@@ -135,13 +148,15 @@ export default function TechnologyCategoriesList() {
     try {
       if (editingCategory) {
         await TechnologyCategoryAPI.update(editingCategory._id, formData);
+        notify.success("Category updated");
       } else {
         await TechnologyCategoryAPI.create(formData);
+        notify.success("Category created");
       }
       setIsModalOpen(false);
       fetchAll();
     } catch(err) {
-      alert("Save failed: " + err.message);
+      notify.error("Save failed: " + err.message);
     }
   };
 

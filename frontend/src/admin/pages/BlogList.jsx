@@ -3,8 +3,12 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { Link, useNavigate } from 'react-router-dom';
 import { BlogAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function BlogList(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,29 +91,41 @@ useEffect(() => {
   // Delete selected posts
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select posts to delete');
+      notify.warning('Please select posts to delete');
       return;
     }
     
-    if (!window.confirm(`Delete ${selectedIds.length} selected post(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Posts',
+      message: `Delete ${selectedIds.length} selected post(s)?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     
     try {
       await Promise.all(selectedIds.map(id => BlogAPI.remove(id)));
       setPosts(prev => prev.filter(p => !selectedIds.includes(p._id)));
       setSelectedIds([]);
-      alert('Selected posts deleted successfully');
+      notify.success('Selected posts deleted successfully');
     } catch (err) { 
-      alert(err.message || 'Failed to delete selected posts'); 
+      notify.error(err.message || 'Failed to delete selected posts'); 
     }
   }
 
   async function handleDelete(id){
-    if(!window.confirm('Delete this post?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Post',
+      message: 'Delete this post?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if(!confirmed) return;
     try{
       await BlogAPI.remove(id);
       setPosts(prev=>prev.filter(p=>p._id!==id));
     }catch(err){
-      alert(err.message||'Failed to delete');
+      notify.error(err.message||'Failed to delete');
     }
   }
 
@@ -118,7 +134,7 @@ useEffect(() => {
       const { post } = await BlogAPI.update(p._id, { published: !p.published });
       setPosts(prev=>prev.map(x=>x._id===p._id? post : x));
     }catch(err){
-      alert(err.message||'Failed to update');
+      notify.error(err.message||'Failed to update');
     }
   }
 

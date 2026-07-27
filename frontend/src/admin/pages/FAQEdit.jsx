@@ -3,8 +3,12 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ClientFaqAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function FAQEdit(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const { id } = useParams();
   const isNew = id === 'new' || !id;
   const navigate = useNavigate();
@@ -39,17 +43,23 @@ export default function FAQEdit(){
     setSaving(true); setError(''); setMessage('');
     try{
       const payload = { ...form, order: Number(form.order)||0 };
-      if(isNew){ await ClientFaqAPI.create(payload); navigate('/admin/faqs'); }
-      else { await ClientFaqAPI.update(id, payload); setMessage('Saved'); }
-    }catch(err){ setError(err.message||'Failed to save'); }
+      if(isNew){ await ClientFaqAPI.create(payload); notify.success('FAQ created'); navigate('/admin/faqs'); }
+      else { await ClientFaqAPI.update(id, payload); notify.success('FAQ saved'); setMessage('Saved'); }
+    }catch(err){ notify.error(err.message||'Failed to save'); setError(err.message||'Failed to save'); }
     finally{ setSaving(false); }
   }
 
   async function handleDelete(){
     if(isNew) return;
-    if(!window.confirm('Delete this FAQ?')) return;
-    try{ await ClientFaqAPI.remove(id); navigate('/admin/faqs'); }
-    catch(err){ alert(err.message||'Failed to delete'); }
+    const confirmed = await confirm.show({
+      title: 'Delete FAQ',
+      message: 'Delete this FAQ?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
+    try{ await ClientFaqAPI.remove(id); notify.success('FAQ deleted'); navigate('/admin/faqs'); }
+    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   return (

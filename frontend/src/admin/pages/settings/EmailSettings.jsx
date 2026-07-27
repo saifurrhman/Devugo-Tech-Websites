@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { SettingsAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function EmailSettings() {
+    const notify = useNotification();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState({
@@ -40,10 +42,10 @@ export default function EmailSettings() {
         setSaving(true);
         try {
             await SettingsAPI.update('email', settings);
-            alert('Email settings saved successfully!');
+            notify.success('Email settings saved successfully!');
         } catch (error) {
             console.error('Failed to save email settings:', error);
-            alert('Failed to save settings. Please try again.');
+            notify.error('Failed to save settings. Please try again.');
         } finally {
             setSaving(false);
         }

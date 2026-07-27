@@ -60,6 +60,7 @@ import SocialLinks from '../admin/pages/SocialLinks';
 import Settings from '../admin/pages/Settings';
 import WhatsAppFloat from '../components/WhatsAppFloat';
 import { NotificationProvider } from '../contexts/NotificationContext';
+import { ConfirmProvider } from '../contexts/ConfirmContext';
 import CampaignsList from '../admin/pages/campaigns/CampaignsList';
 import CreateCampaign from '../admin/pages/campaigns/CreateCampaign';
 import InboxList from '../admin/pages/inbox/InboxList';
@@ -98,6 +99,7 @@ export default function PublicRoutes() {
     <BrowserRouter>
       <DynamicTitle />
       <NotificationProvider>
+        <ConfirmProvider>
         <Routes>
           {/* Public Pages */}
           <Route path="/" element={<Home />} />
@@ -219,6 +221,7 @@ export default function PublicRoutes() {
         {!isChatOpen && <WhatsAppFloat />}
         <ChatWidget isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
 
+        </ConfirmProvider>
       </NotificationProvider>
     </BrowserRouter>
   );

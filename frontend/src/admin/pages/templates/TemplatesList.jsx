@@ -4,11 +4,13 @@ import { Sparkles, Plus, Trash2, Edit } from 'lucide-react';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { TemplateAPI } from '../../../lib/api';
 
 export default function TemplatesList() {
     const navigate = useNavigate();
     const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -33,7 +35,13 @@ export default function TemplatesList() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this template?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Template',
+            message: 'Are you sure you want to delete this template?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await TemplateAPI.delete(id);
             setTemplates(prev => prev.filter(t => (t.id || t._id) !== id));

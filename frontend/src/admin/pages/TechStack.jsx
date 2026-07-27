@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { TechStackAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function TechStack(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -58,19 +62,25 @@ export default function TechStack(){
   // Delete selected items
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select technologies to delete');
+      notify.warning('Please select technologies to delete');
       return;
     }
     
-    if (!window.confirm(`Delete ${selectedIds.length} selected technolog${selectedIds.length === 1 ? 'y' : 'ies'}?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Technologies',
+      message: `Delete ${selectedIds.length} selected technolog${selectedIds.length === 1 ? 'y' : 'ies'}?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     
     try {
       await Promise.all(selectedIds.map(id => TechStackAPI.remove(id)));
       setItems(prev => prev.filter(it => !selectedIds.includes(it._id)));
       setSelectedIds([]);
-      alert('Selected technologies deleted successfully');
+      notify.success('Selected technologies deleted successfully');
     } catch (err) { 
-      alert(err.message || 'Failed to delete selected technologies'); 
+      notify.error(err.message || 'Failed to delete selected technologies'); 
     }
   }
 
@@ -80,17 +90,25 @@ export default function TechStack(){
     try{
       await TechStackAPI.create({ name: name.trim() });
       setName('');
+      notify.success('Technology added');
       fetchAll();
-    }catch(err){ alert(err.message || 'Failed to add'); }
+    }catch(err){ notify.error(err.message || 'Failed to add'); }
   }
 
   async function removeItem(id){
-    if(!window.confirm('Delete this item?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Technology',
+      message: 'Delete this item?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try{ 
       await TechStackAPI.remove(id); 
       setItems(prev => prev.filter(it => it._id !== id));
+      notify.success('Technology deleted');
     }
-    catch(err){ alert(err.message || 'Failed to delete'); }
+    catch(err){ notify.error(err.message || 'Failed to delete'); }
   }
 
   return (

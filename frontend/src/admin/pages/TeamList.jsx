@@ -3,8 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { TeamAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function TeamList(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,29 +103,42 @@ export default function TeamList(){
   // Delete selected members
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select team members to remove');
+      notify.warning('Please select team members to remove');
       return;
     }
     
-    if (!window.confirm(`Remove ${selectedIds.length} selected team member(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Remove Team Members',
+      message: `Remove ${selectedIds.length} selected team member(s)?`,
+      variant: 'danger',
+      confirmText: 'Remove'
+    });
+    if (!confirmed) return;
     
     try {
       await Promise.all(selectedIds.map(id => TeamAPI.remove(id)));
       setItems(prev => prev.filter(m => !selectedIds.includes(m._id)));
       setSelectedIds([]);
-      alert('Selected team members removed successfully');
+      notify.success('Selected team members removed successfully');
     } catch (err) { 
-      alert(err.message || 'Failed to remove selected members'); 
+      notify.error(err.message || 'Failed to remove selected members'); 
     }
   }
 
   async function handleDelete(id){
-    if(!window.confirm('Remove this member?')) return;
+    const confirmed = await confirm.show({
+      title: 'Remove Member',
+      message: 'Remove this member?',
+      variant: 'danger',
+      confirmText: 'Remove'
+    });
+    if (!confirmed) return;
     try{ 
       await TeamAPI.remove(id); 
       setItems(prev=>prev.filter(m=>m._id!==id)); 
+      notify.success('Team member removed');
     }
-    catch(err){ alert(err.message||'Failed to delete'); }
+    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
   
   // ✅ Handle image error

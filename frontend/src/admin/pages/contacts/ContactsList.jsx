@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { ContactAPI, ListAPI } from '../../../lib/api';
 import VerificationDetailsModal from '../../components/verification/VerificationModal';
 import ContactListModal from '../../components/contacts/ContactListModal';
@@ -13,6 +14,7 @@ import CustomSelect from '../../../components/CustomSelect';
 export default function ContactsList() {
     const navigate = useNavigate();
     const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
 
     const location = useLocation();
 
@@ -137,7 +139,13 @@ export default function ContactsList() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this contact?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Contact',
+            message: 'Are you sure you want to delete this contact?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await ContactAPI.delete(id);
             setContacts(prev => prev.filter(c => (c.id || c._id) !== id));
@@ -163,7 +171,13 @@ export default function ContactsList() {
     };
 
     const handleDeleteList = async (id) => {
-        if (!window.confirm('Delete this list? Contacts inside will NOT be deleted.')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete List',
+            message: 'Delete this list? Contacts inside will NOT be deleted.',
+            variant: 'danger',
+            confirmText: 'Delete List'
+        });
+        if (!confirmed) return;
         try {
             await ListAPI.delete(id);
             setLists(prev => prev.filter(l => l._id !== id));
@@ -301,8 +315,14 @@ export default function ContactsList() {
                                 Add to List
                             </button>
                             <button
-                                onClick={() => {
-                                    if (window.confirm(`Delete ${selectedContactIds.length} contacts?`)) {
+                                onClick={async () => {
+                                    const confirmed = await confirm.show({
+                                        title: 'Delete Contacts',
+                                        message: `Delete ${selectedContactIds.length} contacts?`,
+                                        variant: 'danger',
+                                        confirmText: 'Delete'
+                                    });
+                                    if (confirmed) {
                                         Promise.all(selectedContactIds.map(id => ContactAPI.delete(id)))
                                             .then(() => {
                                                 success('Contacts deleted');

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api, ApiKeyAPI, SettingsAPI, API_BASE } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import {
     Video, Calendar, Link as LinkIcon, CheckCircle, ExternalLink,
     Key, Plus, Trash2, Copy, Mail, Cpu, Grid, Save, RefreshCw
@@ -10,6 +11,7 @@ import AdminTopbar from '../../../components/AdminTopbar';
 
 export default function Integrations() {
     const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [activeTab, setActiveTab] = useState('email'); // email | ai | apps | keys
     const [loading, setLoading] = useState(true);
 
@@ -140,7 +142,13 @@ export default function Integrations() {
     };
 
     const handleClearPdf = async () => {
-        if (!window.confirm("Are you sure you want to clear all PDF training data?")) return;
+        const confirmed = await confirm.show({
+            title: 'Clear Data',
+            message: 'Are you sure you want to clear all PDF training data?',
+            variant: 'danger',
+            confirmText: 'Clear'
+        });
+        if (!confirmed) return;
         
         try {
             const token = localStorage.getItem('token'); 
@@ -498,7 +506,13 @@ export default function Integrations() {
     };
 
     const handleRevokeKey = async (id) => {
-        if (!window.confirm('Revoke this key? Integrations will stop working.')) return;
+        const confirmed = await confirm.show({
+            title: 'Revoke Key',
+            message: 'Revoke this key? Integrations will stop working.',
+            variant: 'danger',
+            confirmText: 'Revoke'
+        });
+        if (!confirmed) return;
         try {
             await ApiKeyAPI.revoke(id);
             success('Key Revoked');

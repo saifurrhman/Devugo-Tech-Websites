@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ClientReviewAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function ReviewsList(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -94,29 +98,42 @@ export default function ReviewsList(){
   // Delete selected reviews
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select reviews to delete');
+      notify.warning('Please select reviews to delete');
       return;
     }
     
-    if (!window.confirm(`Delete ${selectedIds.length} selected review(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Reviews',
+      message: `Delete ${selectedIds.length} selected review(s)?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     
     try {
       await Promise.all(selectedIds.map(id => ClientReviewAPI.remove(id)));
       setItems(prev => prev.filter(r => !selectedIds.includes(r._id)));
       setSelectedIds([]);
-      alert('Selected reviews deleted successfully');
+      notify.success('Selected reviews deleted successfully');
     } catch (err) { 
-      alert(err.message || 'Failed to delete selected reviews'); 
+      notify.error(err.message || 'Failed to delete selected reviews'); 
     }
   }
 
   async function removeItem(id){
-    if(!window.confirm('Delete this review?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Review',
+      message: 'Delete this review?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try{ 
       await ClientReviewAPI.remove(id); 
       setItems(prev => prev.filter(r => r._id !== id));
+      notify.success('Review deleted');
     }
-    catch(err){ alert(err.message||'Failed to delete'); }
+    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   const ratingOptions = [

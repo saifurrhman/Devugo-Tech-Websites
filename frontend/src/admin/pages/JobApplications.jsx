@@ -4,6 +4,7 @@ import { ArrowLeft, Mail, Phone, ExternalLink, Calendar, Trash2, CheckCircle, XC
 import { JobApplicationAPI, CareerAPI } from '../../lib/api';
 import { API_BASE } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 
@@ -29,6 +30,7 @@ export default function JobApplications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { success, error: notifyError } = useNotification();
+  const confirm = useConfirm();
   
   // Custom Email Composer State
   const [emailComposeId, setEmailComposeId] = useState(null);
@@ -67,7 +69,13 @@ export default function JobApplications() {
   };
 
   const handleDelete = async (appId) => {
-    if (!window.confirm('Are you sure you want to delete this application?')) return;
+    const confirmed = await confirm.show({
+        title: 'Delete Application',
+        message: 'Are you sure you want to delete this application?',
+        variant: 'danger',
+        confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try {
       await JobApplicationAPI.remove(appId);
       success('Application deleted');

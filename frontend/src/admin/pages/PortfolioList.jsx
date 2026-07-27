@@ -3,8 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { PortfolioAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function PortfolioList(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -93,29 +97,42 @@ export default function PortfolioList(){
   // Delete selected items
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select projects to delete');
+      notify.warning('Please select projects to delete');
       return;
     }
     
-    if (!window.confirm(`Delete ${selectedIds.length} selected project(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Projects',
+      message: `Delete ${selectedIds.length} selected project(s)?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     
     try {
       await Promise.all(selectedIds.map(id => PortfolioAPI.remove(id)));
       setItems(prev => prev.filter(i => !selectedIds.includes(i._id)));
       setSelectedIds([]);
-      alert('Selected projects deleted successfully');
+      notify.success('Selected projects deleted successfully');
     } catch (err) { 
-      alert(err.message || 'Failed to delete selected projects'); 
+      notify.error(err.message || 'Failed to delete selected projects'); 
     }
   }
 
   async function handleDelete(id){
-    if(!window.confirm('Delete this item?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Project',
+      message: 'Delete this item?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try{ 
       await PortfolioAPI.remove(id); 
       setItems(prev=>prev.filter(i=>i._id!==id)); 
+      notify.success('Project deleted');
     }
-    catch(err){ alert(err.message||'Failed to delete'); }
+    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   const featuredOptions = [

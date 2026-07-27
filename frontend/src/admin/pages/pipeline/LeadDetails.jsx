@@ -4,11 +4,13 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { PipelineAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 
 export default function LeadDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { success, error, warning } = useNotification();
+    const confirm = useConfirm();
     const [deal, setDeal] = useState(null);
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
@@ -68,7 +70,13 @@ export default function LeadDetails() {
     }
 
     async function handleDelete() {
-        if (!window.confirm('Are you sure you want to delete this deal?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Deal',
+            message: 'Are you sure you want to delete this deal?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
 
         try {
             setSaving(true);

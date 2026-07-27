@@ -9,11 +9,13 @@ import {
     Trash2, RefreshCw, Download
 } from 'lucide-react';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function UserProfile() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { success: showSuccess, error: showError } = useNotification();
+    const confirm = useConfirm();
 
     const [user, setUser] = useState(null);
     const [activityLogs, setActivityLogs] = useState([]);
@@ -68,7 +70,13 @@ export default function UserProfile() {
     const handleToggleStatus = async () => {
         if (!user) return;
         const action = user.isActive ? 'block' : 'unblock';
-        if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
+        const confirmed = await confirm.show({
+            title: `${user.isActive ? 'Block' : 'Unblock'} User`,
+            message: `Are you sure you want to ${action} this user?`,
+            variant: user.isActive ? 'danger' : 'primary',
+            confirmText: user.isActive ? 'Block' : 'Unblock'
+        });
+        if (!confirmed) return;
 
         try {
             const res = await AuthAPI.toggleUserStatus(user._id);
@@ -80,7 +88,13 @@ export default function UserProfile() {
     };
 
     const handleDelete = async () => {
-        if (!window.confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete User',
+            message: 'Are you sure you want to PERMANENTLY delete this user? This cannot be undone.',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await AuthAPI.deleteUser(user._id);
             showSuccess('User deleted successfully');

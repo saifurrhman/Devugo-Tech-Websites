@@ -7,6 +7,7 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { ProposalAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { ArrowLeft, Save, Download, FileText, User, DollarSign, Calendar, Mail, Copy, Eye } from 'lucide-react';
 
 const getTemplateContent = (type) => {
@@ -71,6 +72,7 @@ export default function ProposalEdit() {
     const isNew = id === 'new';
     const navigate = useNavigate();
     const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [loading, setLoading] = useState(!isNew);
     const [saving, setSaving] = useState(false);
     const [previewMode, setPreviewMode] = useState(false);
@@ -122,12 +124,20 @@ export default function ProposalEdit() {
         setForm(prev => ({ ...prev, content }));
     };
 
-    const applyTemplate = (e) => {
+    const applyTemplate = async (e) => {
         const type = e.target.value;
         if (!type) return;
-        if (form.content && !window.confirm('Applying a template will overwrite your current content. Continue?')) {
-            e.target.value = '';
-            return;
+        if (form.content) {
+            const confirmed = await confirm.show({
+                title: 'Apply Template',
+                message: 'Applying a template will overwrite your current content. Continue?',
+                variant: 'danger',
+                confirmText: 'Apply'
+            });
+            if (!confirmed) {
+                e.target.value = '';
+                return;
+            }
         }
         setForm(prev => ({ ...prev, content: getTemplateContent(type) }));
         e.target.value = ''; // reset dropdown

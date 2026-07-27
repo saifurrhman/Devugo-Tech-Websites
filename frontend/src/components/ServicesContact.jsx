@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ContactAPI, FormAPI } from '../lib/api';
 import BudgetSelect from './BudgetSelect';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function ServicesContact(){
+  const { success, error: notifyError } = useNotification();
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [cfg, setCfg] = useState(null);
@@ -38,10 +40,10 @@ export default function ServicesContact(){
       setLoading(false);
       setForm({ name:'', email:'', phone:'', message:'' });
       setVals({});
-      alert('Thanks! We\'ll get back to you shortly.');
+      success('Thanks! We\'ll get back to you shortly.');
     }catch(err){
       setLoading(false);
-      alert(err.message || 'Failed to submit. Please try again.');
+      notifyError(err.message || 'Failed to submit. Please try again.');
     }
   }
 

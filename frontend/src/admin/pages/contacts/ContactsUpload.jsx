@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { ContactAPI, ListAPI } from '../../../lib/api';
 import CustomSelect from '../../../components/CustomSelect';
 import { Upload, X, Check, FileText, ChevronRight } from 'lucide-react';
@@ -12,6 +13,7 @@ export default function ContactsUpload() {
     const [searchParams] = useSearchParams();
     const returnUrl = searchParams.get('returnUrl');
     const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState([]);
     const [headers, setHeaders] = useState([]);
@@ -102,7 +104,13 @@ export default function ContactsUpload() {
 
         // Validate mapping
         if (!Object.values(mapping).includes('email')) {
-            if (!window.confirm('No column mapped to "Email". Are you sure?')) return;
+            const confirmed = await confirm.show({
+                title: 'No Email Mapped',
+                message: 'No column mapped to "Email". Are you sure you want to proceed?',
+                variant: 'warning',
+                confirmText: 'Yes, proceed'
+            });
+            if (!confirmed) return;
         }
 
         setLoading(true);

@@ -3,8 +3,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { PortfolioAPI, UploadAPI, PortfolioCategoryAPI, TechStackAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function PortfolioEdit() {
+  const confirm = useConfirm();
+  const notify = useNotification();
   const { id } = useParams();
   const isNew = id === 'new' || !id;
   const navigate = useNavigate();
@@ -158,14 +162,22 @@ export default function PortfolioEdit() {
 
   async function handleDelete() {
     if (isNew) return;
-    if (!window.confirm('Delete this item?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Project',
+      message: 'Delete this item?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
 
     setSaving(true);
 
     try {
       await PortfolioAPI.remove(id);
+      notify.success('Project deleted');
       navigate('/admin/portfolio');
     } catch (err) {
+      notify.error(err.message || 'Failed to delete');
       setError(err.message || 'Failed to delete');
     } finally {
       setSaving(false);

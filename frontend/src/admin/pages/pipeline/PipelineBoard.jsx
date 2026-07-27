@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { PipelineAPI } from '../../../lib/api';
+import { useNotification } from '../../../contexts/NotificationContext';
 
 export default function PipelineBoard() {
+    const { success, error: notifyError } = useNotification();
     const navigate = useNavigate();
     const [stages, setStages] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -69,9 +71,10 @@ export default function PipelineBoard() {
             setIsAddDealOpen(false);
             setDealForm({ title: '', value: '', contact: '', stageId: 'new' });
             loadPipeline();
+            success('Deal created successfully');
         } catch (err) {
             console.error('Failed to create deal:', err);
-            alert('Failed to create deal');
+            notifyError('Failed to create deal');
         } finally {
             setSaving(false);
         }

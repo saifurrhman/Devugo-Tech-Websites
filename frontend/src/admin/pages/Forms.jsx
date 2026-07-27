@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { FormAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const KEYS = ['contact','services'];
 
@@ -123,6 +124,7 @@ function Preview({ model }){
 }
 
 export default function Forms(){
+  const { success, error: notifyError } = useNotification();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -158,8 +160,8 @@ export default function Forms(){
         const created = await FormAPI.create(payload);
         setItems(prev=> [...prev, created]);
       }
-      alert('Saved');
-    }catch(e){ alert(e.message||'Save failed'); }
+      success('Saved');
+    }catch(e){ notifyError(e.message||'Save failed'); }
   }
 
   function addField(){

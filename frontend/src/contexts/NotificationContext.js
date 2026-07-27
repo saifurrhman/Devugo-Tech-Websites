@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const NotificationContext = createContext();
 
@@ -22,6 +22,26 @@ export function NotificationProvider({ children }) {
             removeNotification(id);
         }, 3000);
     }, []);
+
+    useEffect(() => {
+        const handleNotify = (e) => {
+            if (e.detail && e.detail.message) {
+                addNotification(e.detail.message, e.detail.type || 'info');
+            }
+        };
+        window.addEventListener('notify', handleNotify);
+        
+        const pending = sessionStorage.getItem('pendingNotification');
+        if (pending) {
+            try {
+                const { type, message } = JSON.parse(pending);
+                if (message) addNotification(message, type || 'info');
+            } catch (e) {}
+            sessionStorage.removeItem('pendingNotification');
+        }
+
+        return () => window.removeEventListener('notify', handleNotify);
+    }, [addNotification]);
 
     const removeNotification = useCallback((id) => {
         setNotifications(prev => prev.filter(n => n.id !== id));

@@ -3,8 +3,12 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ClientReviewAPI, UploadAPI } from '../../lib/api'; // ✅ UploadAPI add kiya
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function ReviewEdit(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const { id } = useParams();
   const isNew = id === 'new' || !id;
   const navigate = useNavigate();
@@ -93,9 +97,19 @@ export default function ReviewEdit(){
 
   async function handleDelete(){
     if(isNew) return;
-    if(!window.confirm('Delete this review?')) return;
-    try{ await ClientReviewAPI.remove(id); navigate('/admin/reviews'); }
-    catch(err){ alert(err.message||'Failed to delete'); }
+    const confirmed = await confirm.show({
+      title: 'Delete Review',
+      message: 'Delete this review?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
+    try{ 
+      await ClientReviewAPI.remove(id); 
+      notify.success('Review deleted');
+      navigate('/admin/reviews'); 
+    }
+    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   return (

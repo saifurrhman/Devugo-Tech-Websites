@@ -3,8 +3,12 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import SocialIcon from '../../components/SocialIcon';
 import { SocialLinksAPI } from '../../services/socialLinks';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function SocialLinks(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ platform: '', url: '', enabled: true });
@@ -53,7 +57,8 @@ export default function SocialLinks(){
       await SocialLinksAPI.create(form);
       setForm({ platform: '', url: '', enabled: true });
       await load();
-    }catch(e){ console.error(e); alert('Failed to create'); }
+      notify.success('Social link created');
+    }catch(e){ console.error(e); notify.error('Failed to create'); }
     setSaving(false);
   }
 
@@ -61,15 +66,23 @@ export default function SocialLinks(){
     try{
       await SocialLinksAPI.update(id, patch);
       await load();
-    }catch(e){ console.error(e); alert('Failed to update'); }
+      notify.success('Social link updated');
+    }catch(e){ console.error(e); notify.error('Failed to update'); }
   }
 
   async function onDelete(id){
-    if(!window.confirm('Delete this social link?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Social Link',
+      message: 'Delete this social link?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try{
       await SocialLinksAPI.remove(id);
       await load();
-    }catch(e){ console.error(e); alert('Failed to delete'); }
+      notify.success('Social link deleted');
+    }catch(e){ console.error(e); notify.error('Failed to delete'); }
   }
 
   function quickAdd(preset){
@@ -80,7 +93,7 @@ export default function SocialLinks(){
 
   async function confirmQuickAdd(){
     if(!modalUrl || !/^https?:\/\//i.test(modalUrl)){
-      alert('Please enter a valid URL starting with http or https');
+      notify.warning('Please enter a valid URL starting with http or https');
       return;
     }
     setModalSaving(true);
@@ -88,7 +101,8 @@ export default function SocialLinks(){
       await SocialLinksAPI.create({ platform: modalPlatform, url: modalUrl, enabled: true });
       setModalOpen(false);
       await load();
-    }catch(_e){ alert('Failed to create'); }
+      notify.success('Social link added');
+    }catch(_e){ notify.error('Failed to create'); }
     setModalSaving(false);
   }
 
@@ -104,7 +118,8 @@ export default function SocialLinks(){
       await SocialLinksAPI.update(editId, editForm);
       setEditId(null);
       await load();
-    }catch(e){ console.error(e); alert('Failed to save changes'); }
+      notify.success('Social link saved');
+    }catch(e){ console.error(e); notify.error('Failed to save changes'); }
   }
 
   function cancelEdit(){ setEditId(null); }

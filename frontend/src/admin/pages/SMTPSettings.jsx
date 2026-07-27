@@ -4,8 +4,10 @@ import AdminTopbar from '../../components/AdminTopbar';
 // Assuming we have an API for settings, otherwise we might need to create one.
 // For now, I'll mock the save/load or use a generic SettingsAPI if available.
 import { SettingsAPI } from '../../lib/api'; // I need to verify if this exists, but I'll assume for now or create it.
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function SMTPSettings() {
+    const { success, error: notifyError, warning } = useNotification();
     const [config, setConfig] = useState({
         provider: 'brevo', // Default to Brevo
         apiKey: '',
@@ -42,12 +44,12 @@ export default function SMTPSettings() {
         // Simulate API call
         setTimeout(() => {
             setSaving(false);
-            alert('Settings saved successfully!');
+            success('Settings saved successfully!');
         }, 1000);
     };
 
     const handleTest = () => {
-        alert('Test connection functionality would go here.');
+        warning('Test connection functionality would go here.');
     };
 
     return (

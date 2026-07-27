@@ -8,8 +8,10 @@ import { SocialLinksAPI } from '../services/socialLinks';
 import { CompanyInfoAPI } from '../services/companyInfo';
 import SocialIcon from '../components/SocialIcon';
 import SEO from '../components/SEO';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function Contact() {
+  const { success, error: notifyError } = useNotification();
   const [cfg, setCfg] = useState(null);
   const [cfgLoading, setCfgLoading] = useState(true);
   const [vals, setVals] = useState({});
@@ -63,9 +65,9 @@ export default function Contact() {
       await ContactAPI.create(payload);
       setForm({ name: '', email: '', company: '', phone: '', website: '', budget: '', message: '' });
       setVals({});
-      alert('Thanks! Your message has been sent.');
+      success('Thanks! Your message has been sent.');
     } catch (err) {
-      alert(err.message || 'Failed to submit. Please try again.');
+      notifyError(err.message || 'Failed to submit. Please try again.');
     }
   }
 

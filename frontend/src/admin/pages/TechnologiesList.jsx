@@ -12,6 +12,8 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import CustomSelect from '../../components/CustomSelect';
 import { TechnologyAPI, UploadAPI, TechnologyCategoryAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 // Sortable Row Component
 function SortableRow({ id, item, selectedIds, toggleSelect, handleEdit, handleDelete, handleToggleStatus }) {
@@ -72,6 +74,8 @@ function SortableRow({ id, item, selectedIds, toggleSelect, handleEdit, handleDe
 }
 
 export default function TechnologiesList() {
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -133,7 +137,7 @@ export default function TechnologiesList() {
     
     // Check if we are filtering, if so prevent drag and drop reordering
     if (activeCategory !== 'All' || q.trim() !== '') {
-      alert("Sorting is only available when viewing 'All' categories without search filters.");
+      notify.warning("Sorting is only available when viewing 'All' categories without search filters.");
       return;
     }
 
@@ -153,8 +157,9 @@ export default function TechnologiesList() {
     
     try {
       await TechnologyAPI.reorder(reorderedPayload);
+      notify.success("Order saved");
     } catch(err) {
-      alert("Failed to save order: " + err.message);
+      notify.error("Failed to save order: " + err.message);
       fetchData(); // Revert on failure
     }
   };
@@ -163,29 +168,44 @@ export default function TechnologiesList() {
     try {
       await TechnologyAPI.toggleStatus(id);
       setItems(items.map(it => it._id === id ? { ...it, status: !it.status } : it));
+      notify.success("Status updated");
     } catch(err) {
-      alert("Failed to toggle status: " + err.message);
+      notify.error("Failed to toggle status: " + err.message);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this technology?")) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Technology',
+      message: 'Are you sure you want to delete this technology?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try {
       await TechnologyAPI.remove(id);
       setItems(items.filter(it => it._id !== id));
+      notify.success("Technology deleted");
     } catch(err) {
-      alert("Delete failed: " + err.message);
+      notify.error("Delete failed: " + err.message);
     }
   };
 
   const handleDeleteSelected = async () => {
-    if (!window.confirm(`Delete ${selectedIds.length} selected items?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Technologies',
+      message: `Delete ${selectedIds.length} selected items?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try {
       await Promise.all(selectedIds.map(id => TechnologyAPI.remove(id)));
       setItems(items.filter(it => !selectedIds.includes(it._id)));
       setSelectedIds([]);
+      notify.success("Selected technologies deleted");
     } catch(err) {
-      alert("Bulk delete failed: " + err.message);
+      notify.error("Bulk delete failed: " + err.message);
     }
   };
 
@@ -213,13 +233,15 @@ export default function TechnologiesList() {
     try {
       if (editingItem) {
         await TechnologyAPI.update(editingItem._id, formData);
+        notify.success("Technology updated");
       } else {
         await TechnologyAPI.create(formData);
+        notify.success("Technology created");
       }
       setIsModalOpen(false);
       fetchData();
     } catch(err) {
-      alert("Save failed: " + err.message);
+      notify.error("Save failed: " + err.message);
     }
   };
 
@@ -240,7 +262,7 @@ export default function TechnologiesList() {
       }
     } catch (err) {
       console.error(err);
-      alert('Upload failed: ' + (err.message || "Unknown error"));
+      notify.error('Upload failed: ' + (err.message || "Unknown error"));
     } finally {
       setUploading(false);
       e.target.value = '';

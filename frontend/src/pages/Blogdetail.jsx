@@ -4,8 +4,10 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { BlogAPI } from '../lib/api';
 import SEO from '../components/SEO';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function BlogDetail() {
+  const { success } = useNotification();
   const { id } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
@@ -125,7 +127,7 @@ export default function BlogDetail() {
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Link copied to clipboard!');
+    success('Link copied to clipboard!');
   };
 
   const handleSearch = (e) => {

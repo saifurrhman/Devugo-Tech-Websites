@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { BrandAPI, UploadAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function Brands() {
+    const confirm = useConfirm();
+    const notify = useNotification();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -51,18 +55,18 @@ export default function Brands() {
                 setForm(f => ({ ...f, logo: url }));
             } else {
                 console.warn('Upload response missing URL:', res);
-                if (res.message) alert('Upload issue: ' + res.message);
+                if (res.message) notify.error('Upload issue: ' + res.message);
             }
         } catch (err) {
             console.error(err);
-            alert('Upload failed: ' + (err.message || 'Unknown error'));
+            notify.error('Upload failed: ' + (err.message || 'Unknown error'));
         }
         setUploading(false);
     }
 
     async function onCreate(e) {
         e.preventDefault();
-        if (!form.name || !form.logo) return alert('Name and Logo are required');
+        if (!form.name || !form.logo) return notify.warning('Name and Logo are required');
 
         setSaving(true);
         try {
@@ -73,7 +77,7 @@ export default function Brands() {
             console.error('Create error:', e);
             // Alert detailed error if available
             const msg = e.response?.data?.message || e.message || 'Unknown error';
-            alert('Failed to create brand: ' + msg);
+            notify.error('Failed to create brand: ' + msg);
         }
         setSaving(false);
     }
@@ -106,7 +110,7 @@ export default function Brands() {
                 setEditForm(f => ({ ...f, logo: url }));
             }
         } catch (err) {
-            alert('Upload failed: ' + err.message);
+            notify.error('Upload failed: ' + err.message);
         }
     }
 
@@ -117,18 +121,24 @@ export default function Brands() {
             await load();
         } catch (e) {
             console.error(e);
-            alert('Failed to update brand');
+            notify.error('Failed to update brand');
         }
     }
 
     async function onDelete(id) {
-        if (!window.confirm('Delete this brand?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Brand',
+            message: 'Delete this brand?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await BrandAPI.remove(id);
             await load();
         } catch (e) {
             console.error(e);
-            alert('Failed to delete');
+            notify.error('Failed to delete');
         }
     }
 

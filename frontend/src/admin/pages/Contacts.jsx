@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ContactAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 // Professional SVG Icons
 const IconPhone = ({ className = "w-4 h-4" }) => (
@@ -91,6 +93,8 @@ const IconTrash = ({ className = "w-4 h-4" }) => (
 
 // Contact Detail Page Component
 const ContactDetailPage = ({ contact, onBack, onDelete }) => {
+  const confirm = useConfirm();
+  const notify = useNotification();
   if (!contact) return null;
 
   const initials = String(contact.name || contact.email || '?').trim().slice(0, 1).toUpperCase();
@@ -104,15 +108,22 @@ const ContactDetailPage = ({ contact, onBack, onDelete }) => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete this contact from ${contact.name || contact.email}?`)) {
+    const confirmed = await confirm.show({
+      title: 'Delete Contact',
+      message: `Are you sure you want to delete this contact from ${contact.name || contact.email}?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) {
       return;
     }
 
     try {
       await onDelete(contact._id);
+      notify.success('Contact deleted successfully');
       onBack();
     } catch (err) {
-      alert('Failed to delete contact: ' + err.message);
+      notify.error('Failed to delete contact: ' + err.message);
     }
   };
 
@@ -434,6 +445,8 @@ const ContactDetailPage = ({ contact, onBack, onDelete }) => {
 };
 
 export default function Contacts() {
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -551,19 +564,25 @@ export default function Contacts() {
   // Delete selected contacts
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select contacts to delete');
+      notify.warning('Please select contacts to delete');
       return;
     }
 
-    if (!window.confirm(`Delete ${selectedIds.length} selected contact(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Contacts',
+      message: `Delete ${selectedIds.length} selected contact(s)?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
 
     try {
       await Promise.all(selectedIds.map(id => ContactAPI.remove(id)));
       setItems(prev => prev.filter(c => !selectedIds.includes(c._id)));
       setSelectedIds([]);
-      alert('Selected contacts deleted successfully');
+      notify.success('Selected contacts deleted successfully');
     } catch (err) {
-      alert(err.message || 'Failed to delete selected contacts');
+      notify.error(err.message || 'Failed to delete selected contacts');
     }
   }
 

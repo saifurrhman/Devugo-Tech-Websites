@@ -5,10 +5,12 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { AuthAPI } from '../../lib/api';
 import { UserPlus, Mail, Shield, RefreshCw, Trash2, CheckCircle, Clock, Activity, X, Eye } from 'lucide-react';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function UsersList() {
     const navigate = useNavigate();
     const { success: showSuccess, error: showError } = useNotification();
+    const confirm = useConfirm();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -49,7 +51,13 @@ export default function UsersList() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete User',
+            message: 'Are you sure you want to delete this user? This action cannot be undone.',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await AuthAPI.deleteUser(id);
             showSuccess('User deleted successfully');
@@ -61,7 +69,13 @@ export default function UsersList() {
 
     const handleToggleStatus = async (id, currentStatus) => {
         const action = currentStatus ? 'block' : 'unblock';
-        if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
+        const confirmed = await confirm.show({
+            title: `${currentStatus ? 'Block' : 'Unblock'} User`,
+            message: `Are you sure you want to ${action} this user?`,
+            variant: currentStatus ? 'danger' : 'primary',
+            confirmText: currentStatus ? 'Block' : 'Unblock'
+        });
+        if (!confirmed) return;
         try {
             const res = await AuthAPI.toggleUserStatus(id);
             showSuccess(res.message);

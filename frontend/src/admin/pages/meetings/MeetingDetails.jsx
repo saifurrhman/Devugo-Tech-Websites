@@ -3,10 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { MeetingAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function MeetingDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [meeting, setMeeting] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -46,15 +50,21 @@ export default function MeetingDetails() {
     }
 
     async function handleCancel() {
-        if (!window.confirm('Are you sure you want to cancel this meeting?')) return;
+        const confirmed = await confirm.show({
+            title: 'Cancel Meeting',
+            message: 'Are you sure you want to cancel this meeting?',
+            variant: 'danger',
+            confirmText: 'Cancel Meeting'
+        });
+        if (!confirmed) return;
 
         try {
             await MeetingAPI.cancel(id);
-            alert('Meeting cancelled successfully');
+            success('Meeting cancelled successfully');
             navigate('/admin/meetings');
         } catch (err) {
             console.error('Failed to cancel meeting:', err);
-            alert('Failed to cancel meeting');
+            notifyError('Failed to cancel meeting');
         }
     }
 

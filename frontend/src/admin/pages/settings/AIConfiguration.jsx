@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { SettingsAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function AIConfiguration() {
+    const notify = useNotification();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [config, setConfig] = useState({
@@ -38,10 +40,10 @@ export default function AIConfiguration() {
         setSaving(true);
         try {
             await SettingsAPI.updateAI(config);
-            alert('AI configuration saved successfully!');
+            notify.success('AI configuration saved successfully!');
         } catch (error) {
             console.error('Failed to save AI configuration:', error);
-            alert('Failed to save configuration. Please try again.');
+            notify.error('Failed to save configuration. Please try again.');
         } finally {
             setSaving(false);
         }

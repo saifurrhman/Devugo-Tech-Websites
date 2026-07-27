@@ -3,8 +3,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { TeamAPI, UploadAPI } from '../../lib/api'; // ✅ Added UploadAPI
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function TeamEdit(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const { id } = useParams();
   const isNew = id === 'new' || !id;
   const navigate = useNavigate();
@@ -100,18 +104,35 @@ export default function TeamEdit(){
     setSaving(true); setError(''); setMessage('');
     try{
       const payload = { ...form };
-      if (isNew){ await TeamAPI.create(payload); navigate('/admin/team'); }
-      else { await TeamAPI.update(id, payload); setMessage('Saved'); }
-    }catch(err){ setError(err.message||'Failed to save'); }
+      if (isNew){ await TeamAPI.create(payload); notify.success('Member created'); navigate('/admin/team'); }
+      else { await TeamAPI.update(id, payload); notify.success('Member saved'); setMessage('Saved'); }
+    }catch(err){ 
+      notify.error(err.message||'Failed to save'); 
+      setError(err.message||'Failed to save'); 
+    }
     finally{ setSaving(false); }
   }
 
   async function handleDelete(){
     if (isNew) return;
-    if(!window.confirm('Remove this member?')) return;
+    const confirmed = await confirm.show({
+      title: 'Remove Member',
+      message: 'Remove this member?',
+      variant: 'danger',
+      confirmText: 'Remove'
+    });
+    if (!confirmed) return;
+    
     setSaving(true); setError(''); setMessage('');
-    try{ await TeamAPI.remove(id); navigate('/admin/team'); }
-    catch(err){ setError(err.message||'Failed to delete'); }
+    try{ 
+      await TeamAPI.remove(id); 
+      notify.success('Member removed');
+      navigate('/admin/team'); 
+    }
+    catch(err){ 
+      notify.error(err.message||'Failed to delete'); 
+      setError(err.message||'Failed to delete'); 
+    }
     finally{ setSaving(false); }
   }
 

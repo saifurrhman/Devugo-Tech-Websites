@@ -3,8 +3,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ServiceAPI, PricingAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function ServiceEdit(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const { id } = useParams();
   const isNew = id === 'new' || !id;
   const navigate = useNavigate();
@@ -81,9 +85,13 @@ export default function ServiceEdit(){
         await syncPlanLinks(item._id, before, selectedPlans);
         // Notify lists to refresh
         try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}
+        notify.success('Service saved successfully');
         setMessage('Saved');
       }
-    }catch(err){ setError(err.message||'Failed to save'); }
+    }catch(err){ 
+      notify.error(err.message||'Failed to save'); 
+      setError(err.message||'Failed to save'); 
+    }
     finally{ setSaving(false); }
   }
 
@@ -104,10 +112,25 @@ export default function ServiceEdit(){
 
   async function handleDelete(){
     if (isNew) return;
-    if(!window.confirm('Delete this service?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Service',
+      message: 'Delete this service?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
+    
     setSaving(true); setError(''); setMessage('');
-    try{ await ServiceAPI.remove(id); try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}; navigate('/admin/services'); }
-    catch(err){ setError(err.message||'Failed to delete'); }
+    try{ 
+      await ServiceAPI.remove(id); 
+      try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}; 
+      notify.success('Service deleted');
+      navigate('/admin/services'); 
+    }
+    catch(err){ 
+      notify.error(err.message||'Failed to delete'); 
+      setError(err.message||'Failed to delete'); 
+    }
     finally{ setSaving(false); }
   }
 

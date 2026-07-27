@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { InvoiceAPI } from '../../../lib/api';
+import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 
 const statusColors = {
     draft: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
@@ -30,6 +32,8 @@ export default function InvoicesList() {
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
 
     const [stats, setStats] = useState({ totalRevenue: 0, pending: 0, overdue: 0, drafts: 0 });
 
@@ -57,13 +61,20 @@ export default function InvoicesList() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this invoice?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Invoice',
+            message: 'Are you sure you want to delete this invoice?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await InvoiceAPI.remove(id);
             setInvoices(prev => prev.filter(inv => (inv._id || inv.id) !== id));
+            success('Invoice deleted successfully');
         } catch (err) {
             console.error('Failed to delete invoice:', err);
-            alert('Failed to delete invoice');
+            notifyError('Failed to delete invoice');
         }
     };
 

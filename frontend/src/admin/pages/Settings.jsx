@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { CompanyInfoAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function Settings() {
+  const notify = useNotification();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     companyName: '',
@@ -49,10 +51,10 @@ export default function Settings() {
     setSaving(true);
     try {
       await CompanyInfoAPI.update(form);
-      alert('Settings saved successfully!');
+      notify.success('Settings saved successfully!');
     } catch (e) {
       console.error(e);
-      alert('Failed to save settings');
+      notify.error('Failed to save settings');
     }
     setSaving(false);
   }

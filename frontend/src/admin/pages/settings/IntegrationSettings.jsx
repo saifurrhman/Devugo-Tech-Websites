@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { SettingsAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function IntegrationSettings() {
+    const notify = useNotification();
     const [loading, setLoading] = useState(true);
     const [integrations, setIntegrations] = useState([]);
 
@@ -49,7 +51,7 @@ export default function IntegrationSettings() {
             await SettingsAPI.update('integrations', updatedIntegrations);
         } catch (error) {
             console.error('Failed to update integration:', error);
-            alert('Failed to update integration status');
+            notify.error('Failed to update integration status');
             // Revert on error
             loadIntegrations();
         }

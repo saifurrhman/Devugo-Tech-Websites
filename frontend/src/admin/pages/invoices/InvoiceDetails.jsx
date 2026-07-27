@@ -4,10 +4,14 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import InvoicePreview from './InvoicePreview';
 import { InvoiceAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function InvoiceDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -44,14 +48,21 @@ export default function InvoiceDetails() {
     }
 
     async function handleDelete() {
-        if (!window.confirm('Are you sure you want to delete this invoice?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Invoice',
+            message: 'Are you sure you want to delete this invoice?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
 
         try {
             await InvoiceAPI.delete(id);
             navigate('/admin/invoices');
+            success('Invoice deleted successfully');
         } catch (err) {
             console.error('Failed to delete invoice:', err);
-            alert('Failed to delete invoice');
+            notifyError('Failed to delete invoice');
         }
     }
 

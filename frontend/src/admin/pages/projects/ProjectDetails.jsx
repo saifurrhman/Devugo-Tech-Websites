@@ -5,11 +5,13 @@ import AdminTopbar from '../../components/AdminTopbar';
 import TaskBoard from './TaskBoard';
 import { ProjectAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function ProjectDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { success, error, warning } = useNotification();
+    const confirm = useConfirm();
     const [project, setProject] = useState(null);
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
@@ -43,7 +45,13 @@ export default function ProjectDetails() {
     }
 
     async function handleDelete() {
-        if (!window.confirm('Are you sure you want to delete this project?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Project',
+            message: 'Are you sure you want to delete this project?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
 
         try {
             await ProjectAPI.delete(id);

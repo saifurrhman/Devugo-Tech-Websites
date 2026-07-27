@@ -6,9 +6,13 @@ import AIPanel from '../../components/AIPanel';
 import BlogGeneratorModal from '../../components/BlogGeneratorModal';
 import { BlogAPI, UploadAPI, BlogCategoryAPI, AIAPI } from '../../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function AdminBlogCreate() {
   const navigate = useNavigate();
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     title: '',
@@ -73,14 +77,14 @@ export default function AdminBlogCreate() {
   }
 
   async function handleAddCategory() {
-    const name = window.prompt('New category name');
+    const name = await confirm.prompt({ title: 'New category name' });
     if (!name) return;
     try {
       const { item } = await BlogCategoryAPI.create({ name });
       setCategories(prev => [...prev, item]);
       setForm(f => ({ ...f, categories: [...new Set([...(f.categories || []), item._id])] }));
     } catch (err) {
-      alert(err.message || 'Failed to create category');
+      notify.error(err.message || 'Failed to create category');
     }
   }
 
@@ -108,8 +112,8 @@ export default function AdminBlogCreate() {
     exec('formatBlock', t);
   }
 
-  function insertLink() {
-    const url = window.prompt('Enter URL (https://...)');
+  async function insertLink() {
+    const url = await confirm.prompt({ title: 'Enter URL (https://...)' });
     if (!url) return;
     exec('createLink', url);
   }

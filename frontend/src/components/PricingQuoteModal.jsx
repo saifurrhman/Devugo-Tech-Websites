@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ContactAPI } from '../lib/api'; // Real API import
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function PricingQuoteModal({ open, onClose, selectedPlan = null }){
+  const { success, error: notifyError, warning } = useNotification();
   const ref = useRef(null);
   const [form, setForm] = useState({ 
     name:'', 
@@ -84,12 +86,12 @@ export default function PricingQuoteModal({ open, onClose, selectedPlan = null }
 
   async function handleSubmit(){
     if (!form.name || !form.email) {
-      alert('Please fill in Name and Email');
+      warning('Please fill in Name and Email');
       return;
     }
     
     if (!selectedPlan && !form.budget) {
-      alert('Please select your budget range');
+      warning('Please select your budget range');
       return;
     }
     
@@ -157,10 +159,10 @@ ${form.message}
       setLoading(false); 
       onClose?.();
       setForm({ name:'', email:'', phone:'', projectType:'', budget:'', message:'', pricingOption: 'monthly' });
-      alert('Thanks! We\'ll reply with a custom quote for ' + (selectedPlan?.name || 'your inquiry') + '.');
+      success('Thanks! We\'ll reply with a custom quote for ' + (selectedPlan?.name || 'your inquiry') + '.');
     }catch(err){ 
       setLoading(false); 
-      alert(err.message || 'Failed to submit.'); 
+      notifyError(err.message || 'Failed to submit.'); 
     }
   }
 

@@ -4,10 +4,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { SenderAPI } from '../../../lib/api';
 
 export default function SenderSettings() {
     const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [activeTab, setActiveTab] = useState('senders'); // senders | domains
 
     // Senders State
@@ -70,7 +72,13 @@ export default function SenderSettings() {
     };
 
     const handleDeleteSender = async (id) => {
-        if (window.confirm('Are you sure you want to delete this sender?')) {
+        const confirmed = await confirm.show({
+            title: 'Delete Sender',
+            message: 'Are you sure you want to delete this sender?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (confirmed) {
             try {
                 await SenderAPI.remove(id);
                 success('Sender deleted successfully');
@@ -148,7 +156,13 @@ export default function SenderSettings() {
     };
 
     const handleDeleteDomain = async (domainName) => {
-        if (window.confirm(`Are you sure you want to delete ${domainName}?`)) {
+        const confirmed = await confirm.show({
+            title: 'Delete Domain',
+            message: `Are you sure you want to delete ${domainName}?`,
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (confirmed) {
             try {
                 await SenderAPI.domains.remove(domainName);
                 success('Domain deleted successfully');

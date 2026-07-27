@@ -3,8 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { BlogAPI, UploadAPI, BlogCategoryAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function BlogEdit(){
+  const confirm = useConfirm();
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -80,7 +82,7 @@ useEffect(() => {
   }
 
   function setBlock(tag){ const t = String(tag||'').toUpperCase(); exec('formatBlock', t); }
-  function insertLink(){ const url = window.prompt('Enter URL (https://...)'); if(!url) return; exec('createLink', url); }
+  async function insertLink(){ const url = await confirm.prompt({ title: 'Enter URL (https://...)' }); if(!url) return; exec('createLink', url); }
   function clearFormats(){ exec('removeFormat'); }
 
   // ✅ FIXED: Upload image using actual file upload
@@ -219,7 +221,13 @@ useEffect(() => {
   }
 
   async function handleDelete(){
-    if(!window.confirm('Delete this post?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Post',
+      message: 'Delete this post?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if(!confirmed) return;
     setSaving(true); setError(''); setMessage('');
     try{
       await BlogAPI.remove(id);

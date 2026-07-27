@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { PortfolioCategoryAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function PortfolioCategories() {
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -51,20 +55,26 @@ export default function PortfolioCategories() {
   // Delete selected categories
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select categories to delete');
+      notify.warning('Please select categories to delete');
       return;
     }
 
-    if (!window.confirm(`Delete ${selectedIds.length} selected categor${selectedIds.length === 1 ? 'y' : 'ies'}?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Categories',
+      message: `Delete ${selectedIds.length} selected categor${selectedIds.length === 1 ? 'y' : 'ies'}?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
 
     setSaving(true);
     try {
       await Promise.all(selectedIds.map(id => PortfolioCategoryAPI.remove(id)));
       setItems(prev => prev.filter(c => !selectedIds.includes(c._id)));
       setSelectedIds([]);
-      alert('Selected categories deleted successfully');
+      notify.success('Selected categories deleted successfully');
     } catch (err) {
-      alert(err.message || 'Failed to delete selected categories');
+      notify.error(err.message || 'Failed to delete selected categories');
     } finally {
       setSaving(false);
     }
@@ -78,28 +88,42 @@ export default function PortfolioCategories() {
       const { item } = await PortfolioCategoryAPI.create({ name });
       setItems(prev => [...prev, item]);
       setNewName('');
-    } catch (err) { alert(err.message || 'Failed to create'); }
+      notify.success('Category created');
+    } catch (err) { notify.error(err.message || 'Failed to create'); }
     finally { setSaving(false); }
   }
 
   async function renameCategory(cat) {
-    const name = window.prompt('Rename category', cat.name);
+    const name = await confirm.prompt({
+      title: 'Rename category',
+      message: 'Enter new category name:',
+      defaultValue: cat.name,
+      confirmText: 'Rename'
+    });
     if (!name || name === cat.name) return;
     setSaving(true);
     try {
       const { item } = await PortfolioCategoryAPI.update(cat._id, { name });
       setItems(prev => prev.map(x => x._id === cat._id ? item : x));
-    } catch (err) { alert(err.message || 'Failed to update'); }
+      notify.success('Category renamed');
+    } catch (err) { notify.error(err.message || 'Failed to update'); }
     finally { setSaving(false); }
   }
 
   async function removeCategory(cat) {
-    if (!window.confirm(`Delete category "${cat.name}"?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Category',
+      message: `Delete category "${cat.name}"?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     setSaving(true);
     try {
       await PortfolioCategoryAPI.remove(cat._id);
       setItems(prev => prev.filter(x => x._id !== cat._id));
-    } catch (err) { alert(err.message || 'Failed to delete'); }
+      notify.success('Category deleted');
+    } catch (err) { notify.error(err.message || 'Failed to delete'); }
     finally { setSaving(false); }
   }
 

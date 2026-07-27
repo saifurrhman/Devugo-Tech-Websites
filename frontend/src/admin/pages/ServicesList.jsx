@@ -4,8 +4,12 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ServiceAPI } from '../../lib/api';
 import { API_BASE } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function ServicesList() {
+  const confirm = useConfirm();
+  const notify = useNotification();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -123,11 +127,17 @@ export default function ServicesList() {
   // NEW: Delete selected services
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select services to delete');
+      notify.warning('Please select services to delete');
       return;
     }
     
-    if (!window.confirm(`Delete ${selectedIds.length} selected service(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Services',
+      message: `Delete ${selectedIds.length} selected service(s)?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     
     try {
       // Delete all selected services
@@ -137,19 +147,26 @@ export default function ServicesList() {
       setItems(prev => prev.filter(s => !selectedIds.includes(s._id)));
       setSelectedIds([]);
       
-      alert('Selected services deleted successfully');
+      notify.success('Selected services deleted successfully');
     } catch (err) { 
-      alert(err.message || 'Failed to delete selected services'); 
+      notify.error(err.message || 'Failed to delete selected services'); 
     }
   }
 
   async function handleDelete(id) {
-    if (!window.confirm('Delete this service?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Service',
+      message: 'Delete this service?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try {
       await ServiceAPI.remove(id);
       setItems(prev => prev.filter(s => s._id !== id));
+      notify.success('Service deleted');
     } catch (err) { 
-      alert(err.message || 'Failed to delete'); 
+      notify.error(err.message || 'Failed to delete'); 
     }
   }
 

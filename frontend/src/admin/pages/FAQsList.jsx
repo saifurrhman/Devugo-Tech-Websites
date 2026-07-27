@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { ClientFaqAPI } from '../../lib/api';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function FAQsList(){
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -97,29 +101,42 @@ export default function FAQsList(){
   // Delete selected FAQs
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select FAQs to delete');
+      notify.warning('Please select FAQs to delete');
       return;
     }
     
-    if (!window.confirm(`Delete ${selectedIds.length} selected FAQ(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete FAQs',
+      message: `Delete ${selectedIds.length} selected FAQ(s)?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     
     try {
       await Promise.all(selectedIds.map(id => ClientFaqAPI.remove(id)));
       setItems(prev => prev.filter(f => !selectedIds.includes(f._id)));
       setSelectedIds([]);
-      alert('Selected FAQs deleted successfully');
+      notify.success('Selected FAQs deleted successfully');
     } catch (err) { 
-      alert(err.message || 'Failed to delete selected FAQs'); 
+      notify.error(err.message || 'Failed to delete selected FAQs'); 
     }
   }
 
   async function removeItem(id){
-    if(!window.confirm('Delete this FAQ?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete FAQ',
+      message: 'Delete this FAQ?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try{ 
       await ClientFaqAPI.remove(id); 
       setItems(prev => prev.filter(f => f._id !== id));
+      notify.success('FAQ deleted');
     }
-    catch(err){ alert(err.message||'Failed to delete'); }
+    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   function move(id, dir){
@@ -132,7 +149,7 @@ export default function FAQsList(){
     Promise.all([
       ClientFaqAPI.update(a._id, { order: bOrder }),
       ClientFaqAPI.update(b._id, { order: aOrder }),
-    ]).then(fetchAll).catch(e=>alert(e.message||'Failed to reorder'));
+    ]).then(() => { fetchAll(); notify.success('Reordered'); }).catch(e=>notify.error(e.message||'Failed to reorder'));
   }
 
   const statusOptions = [

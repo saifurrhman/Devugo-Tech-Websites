@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { SettingsAPI } from '../../lib/api';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function SMTPSettings() {
+    const notify = useNotification();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [testing, setTesting] = useState(false);
@@ -47,10 +49,10 @@ export default function SMTPSettings() {
         setSaving(true);
         try {
             await SettingsAPI.update('smtp', formData);
-            alert('SMTP settings saved successfully!');
+            notify.success('SMTP settings saved successfully!');
         } catch (error) {
             console.error('Failed to save SMTP settings:', error);
-            alert('Failed to save settings. Please try again.');
+            notify.error('Failed to save settings. Please try again.');
         } finally {
             setSaving(false);
         }
@@ -61,9 +63,9 @@ export default function SMTPSettings() {
         try {
             // Simulate test connection
             await new Promise(resolve => setTimeout(resolve, 2000));
-            alert('Connection successful!');
+            notify.success('Connection successful!');
         } catch (error) {
-            alert('Connection failed. Please check your settings.');
+            notify.error('Connection failed. Please check your settings.');
         } finally {
             setTesting(false);
         }

@@ -3,8 +3,10 @@ import { SocialLinksAPI } from '../services/socialLinks';
 import { ContactAPI } from '../lib/api';
 import { CompanyInfoAPI } from '../services/companyInfo';
 import SocialIcon from './SocialIcon';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function Footer() {
+  const { success, error: notifyError, warning } = useNotification();
   const [email, setEmail] = useState('');
   const [links, setLinks] = useState([]);
   const [info, setInfo] = useState(null);
@@ -25,7 +27,7 @@ export default function Footer() {
   async function submitNewsletter(e) {
     e.preventDefault();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      return alert('Please enter a valid email');
+      return warning('Please enter a valid email');
 
     try {
       // Import ContactAPI if not already available or ensure it is imported
@@ -37,11 +39,11 @@ export default function Footer() {
         message: 'Newsletter subscription request',
         status: 'New'
       });
-      alert('Thanks for subscribing!');
+      success('Thanks for subscribing!');
       setEmail('');
     } catch (err) {
       console.error(err);
-      alert('Subscription failed. Please try again.');
+      notifyError('Subscription failed. Please try again.');
     }
   }
 

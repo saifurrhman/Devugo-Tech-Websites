@@ -5,10 +5,12 @@ import AdminTopbar from '../../../components/AdminTopbar';
 import { ProposalAPI } from '../../../lib/api';
 import { Plus, Edit2, Trash2, FileText } from 'lucide-react';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 
 export default function ProposalsList() {
     const navigate = useNavigate();
     const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [proposals, setProposals] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -30,7 +32,13 @@ export default function ProposalsList() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this proposal?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Proposal',
+            message: 'Are you sure you want to delete this proposal?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await ProposalAPI.remove(id);
             success('Proposal deleted successfully');

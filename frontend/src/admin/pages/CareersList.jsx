@@ -4,6 +4,7 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { CareerAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function CareersList() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function CareersList() {
   const [selectedIds, setSelectedIds] = useState([]);
   const typeDropdownRef = useRef(null);
   const { success: notifySuccess, error: notifyError } = useNotification();
+  const confirm = useConfirm();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -65,7 +67,13 @@ export default function CareersList() {
     setSelectedIds(selectedIds.length === filtered.length ? [] : filtered.map(c => c._id));
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this job posting?')) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Job Posting',
+      message: 'Delete this job posting?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try {
       await CareerAPI.remove(id);
       notifySuccess('Career deleted successfully');
@@ -77,7 +85,13 @@ export default function CareersList() {
 
   const handleDeleteSelected = async () => {
     if (!selectedIds.length) return;
-    if (!window.confirm(`Delete ${selectedIds.length} job posting(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Job Postings',
+      message: `Delete ${selectedIds.length} job posting(s)?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     try {
       await Promise.all(selectedIds.map(id => CareerAPI.remove(id)));
       notifySuccess(`${selectedIds.length} career(s) deleted`);

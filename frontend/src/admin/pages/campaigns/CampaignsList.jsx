@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { CampaignAPI } from '../../../lib/api';
 
 export default function CampaignsList() {
     const navigate = useNavigate();
     const { success, error: notifyError } = useNotification();
+    const confirm = useConfirm();
     const [filter, setFilter] = useState('all');
     const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -32,7 +34,13 @@ export default function CampaignsList() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this campaign?')) return;
+        const confirmed = await confirm.show({
+            title: 'Delete Campaign',
+            message: 'Are you sure you want to delete this campaign?',
+            variant: 'danger',
+            confirmText: 'Delete'
+        });
+        if (!confirmed) return;
         try {
             await CampaignAPI.remove(id); // Fixed: changed .delete to .remove based on api.js
             setCampaigns(prev => prev.filter(c => (c.id || c._id) !== id));

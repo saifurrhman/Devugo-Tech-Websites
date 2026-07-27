@@ -22,8 +22,8 @@ const setAccessToken = (token) => {
 
 const logoutUser = () => {
   localStorage.removeItem('user');
-  alert('Your session has expired. Please log in again.');
-  window.location.href = '/login';
+  sessionStorage.setItem('pendingNotification', JSON.stringify({ type: 'error', message: 'Your session has expired. Please log in again.' }));
+  window.location.href = '/admin/login';
 };
 
 // --- API Configuration ---

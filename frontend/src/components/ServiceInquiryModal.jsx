@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ContactAPI } from '../lib/api';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function ServiceInquiryModal({ open, onClose, service }){
+  const { error: notifyError } = useNotification();
   const dialogRef = useRef(null);
   const [form, setForm] = useState({ 
     name: '', 
@@ -107,7 +109,7 @@ ${form.additionalDetails}
       
     }catch(err){
       setLoading(false);
-      alert(err.message || 'Failed to submit. Please try again.');
+      notifyError(err.message || 'Failed to submit. Please try again.');
     }
   }
 

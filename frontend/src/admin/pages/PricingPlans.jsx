@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { PricingAPI } from '../../lib/api';
-
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 function PlanForm({ initial, onCancel, onSave }) {
   const [form, setForm] = useState(() => ({
@@ -182,6 +183,8 @@ function PlanForm({ initial, onCancel, onSave }) {
 
 
 export default function PricingPlans() {
+  const confirm = useConfirm();
+  const notify = useNotification();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -286,19 +289,25 @@ export default function PricingPlans() {
   // Delete selected plans
   async function handleDeleteSelected() {
     if (selectedIds.length === 0) {
-      alert('Please select plans to delete');
+      notify.warning('Please select plans to delete');
       return;
     }
     
-    if (!window.confirm(`Delete ${selectedIds.length} selected plan(s)?`)) return;
+    const confirmed = await confirm.show({
+      title: 'Delete Plans',
+      message: `Delete ${selectedIds.length} selected plan(s)?`,
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
     
     try {
       await Promise.all(selectedIds.map(id => PricingAPI.remove(id)));
       setItems(prev => prev.filter(p => !selectedIds.includes(p._id)));
       setSelectedIds([]);
-      alert('Selected plans deleted successfully');
+      notify.success('Selected plans deleted successfully');
     } catch (err) { 
-      alert(err.message || 'Failed to delete selected plans'); 
+      notify.error(err.message || 'Failed to delete selected plans'); 
     }
   }
 
@@ -315,9 +324,20 @@ export default function PricingPlans() {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm('Delete this plan?')) return;
-    await PricingAPI.remove(id);
-    setItems(prev => prev.filter(p => p._id !== id));
+    const confirmed = await confirm.show({
+      title: 'Delete Plan',
+      message: 'Delete this plan?',
+      variant: 'danger',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
+    try {
+      await PricingAPI.remove(id);
+      setItems(prev => prev.filter(p => p._id !== id));
+      notify.success('Plan deleted');
+    } catch (err) {
+      notify.error(err.message || 'Failed to delete');
+    }
   }
 
   async function toggleField(plan, field) {
