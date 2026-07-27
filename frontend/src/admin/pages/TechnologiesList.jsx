@@ -155,7 +155,7 @@ export default function TechnologiesList() {
       await TechnologyAPI.reorder(reorderedPayload);
     } catch(err) {
       alert("Failed to save order: " + err.message);
-      fetchAll(); // Revert on failure
+      fetchData(); // Revert on failure
     }
   };
 
@@ -217,7 +217,7 @@ export default function TechnologiesList() {
         await TechnologyAPI.create(formData);
       }
       setIsModalOpen(false);
-      fetchAll();
+      fetchData();
     } catch(err) {
       alert("Save failed: " + err.message);
     }
