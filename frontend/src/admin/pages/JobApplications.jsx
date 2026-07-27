@@ -7,6 +7,7 @@ import { useNotification } from '../../contexts/NotificationContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import CustomSelect from '../../components/CustomSelect';
 
 const cardStyle = {
   background: '#003560',
@@ -160,7 +161,6 @@ export default function JobApplications() {
         {/* ── Applications List ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {applications.map(app => {
-            const bc = badgeColors[app.status] || badgeColors['new'];
             const isComposing = emailComposeId === app._id;
             return (
               <div key={app._id} style={{ ...cardStyle, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -174,16 +174,18 @@ export default function JobApplications() {
                     <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: 700 }}>
                       {app.fullName}
                     </h3>
-                    <select
-                      value={app.status}
-                      onChange={(e) => handleUpdateStatus(app._id, e.target.value)}
-                      style={{ padding: '.2rem .6rem', borderRadius: '999px', fontSize: '.75rem', fontWeight: 600, background: bc.bg, color: bc.text, border: `1px solid ${bc.border}`, outline: 'none', cursor: 'pointer' }}
-                    >
-                      <option value="new">New</option>
-                      <option value="shortlisted">Shortlisted</option>
-                      <option value="hired">Hired</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
+                    <div className="w-40">
+                      <CustomSelect
+                        value={app.status}
+                        onChange={(val) => handleUpdateStatus(app._id, val)}
+                        options={[
+                          { value: 'new', label: 'New' },
+                          { value: 'shortlisted', label: 'Shortlisted' },
+                          { value: 'hired', label: 'Hired' },
+                          { value: 'rejected', label: 'Rejected' }
+                        ]}
+                      />
+                    </div>
                   </div>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '.75rem', marginBottom: '1.25rem' }}>

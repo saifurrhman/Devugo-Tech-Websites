@@ -1,6 +1,7 @@
 import React from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function UsersRoles() {
   return (
@@ -36,12 +37,16 @@ export default function UsersRoles() {
                 <input className="form-field" placeholder="Role name (e.g., Editor)" />
               </label>
               <label className="form-label">Permissions
-                <select className="w-full bg-[#002747] border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" multiple>
-                  <option className="bg-[#002747] text-white py-2">Blog: read</option>
-                  <option className="bg-[#002747] text-white py-2">Blog: write</option>
-                  <option className="bg-[#002747] text-white py-2">Pricing: manage</option>
-                  <option className="bg-[#002747] text-white py-2">Leads: manage</option>
-                </select>
+                <CustomSelect
+                  options={[
+                    { value: 'blog_read', label: 'Blog: read' },
+                    { value: 'blog_write', label: 'Blog: write' },
+                    { value: 'pricing_manage', label: 'Pricing: manage' },
+                    { value: 'leads_manage', label: 'Leads: manage' }
+                  ]}
+                  value="blog_read"
+                  onChange={() => {}}
+                />
               </label>
             </div>
             <div className="settings-actions">

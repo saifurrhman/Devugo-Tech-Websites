@@ -4,6 +4,7 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { MeetingAPI, ContactAPI, ProjectAPI, api } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import CustomSelect from '../../../components/CustomSelect';
 
 export default function MeetingScheduler() {
     const navigate = useNavigate();
@@ -144,29 +145,25 @@ export default function MeetingScheduler() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Client (Optional)</label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.client}
-                                        onChange={e => setFormData({ ...formData, client: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
-                                    >
-                                        <option value="">Select Client</option>
-                                        {clients.map(c => (
-                                            <option key={c._id} value={c._id}>{c.firstName} {c.lastName}</option>
-                                        ))}
-                                    </select>
+                                        onChange={val => setFormData({ ...formData, client: val })}
+                                        options={[
+                                            { value: '', label: 'Select Client' },
+                                            ...clients.map(c => ({ value: c._id, label: `${c.firstName} ${c.lastName}` }))
+                                        ]}
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Project (Optional)</label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.project}
-                                        onChange={e => setFormData({ ...formData, project: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
-                                    >
-                                        <option value="">Select Project</option>
-                                        {projects.map(p => (
-                                            <option key={p._id} value={p._id}>{p.title}</option>
-                                        ))}
-                                    </select>
+                                        onChange={val => setFormData({ ...formData, project: val })}
+                                        options={[
+                                            { value: '', label: 'Select Project' },
+                                            ...projects.map(p => ({ value: p._id, label: p.title }))
+                                        ]}
+                                    />
                                 </div>
                             </div>
 
@@ -254,31 +251,31 @@ export default function MeetingScheduler() {
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Meeting Type</label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.type}
-                                        onChange={e => setFormData({ ...formData, type: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
-                                    >
-                                        <option value="discovery">Discovery</option>
-                                        <option value="proposal">Proposal</option>
-                                        <option value="kickoff">Kickoff</option>
-                                        <option value="review">Review</option>
-                                        <option value="demo">Demo</option>
-                                    </select>
+                                        onChange={val => setFormData({ ...formData, type: val })}
+                                        options={[
+                                            { value: 'discovery', label: 'Discovery' },
+                                            { value: 'proposal', label: 'Proposal' },
+                                            { value: 'kickoff', label: 'Kickoff' },
+                                            { value: 'review', label: 'Review' },
+                                            { value: 'demo', label: 'Demo' }
+                                        ]}
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Platform</label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.platform}
-                                        onChange={e => setFormData({ ...formData, platform: e.target.value })}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 transition-colors"
-                                    >
-                                        <option value="zoom">Zoom</option>
-                                        <option value="google_meet">Google Meet</option>
-                                        <option value="microsoft_teams">Microsoft Teams</option>
-                                        <option value="phone">Phone Call</option>
-                                        <option value="in_person">In Person</option>
-                                    </select>
+                                        onChange={val => setFormData({ ...formData, platform: val })}
+                                        options={[
+                                            { value: 'zoom', label: 'Zoom' },
+                                            { value: 'google_meet', label: 'Google Meet' },
+                                            { value: 'microsoft_teams', label: 'Microsoft Teams' },
+                                            { value: 'phone', label: 'Phone Call' },
+                                            { value: 'in_person', label: 'In Person' }
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         </div>

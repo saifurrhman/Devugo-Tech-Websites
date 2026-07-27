@@ -6,6 +6,7 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { InvoiceAPI, ContactAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import CustomSelect from '../../../components/CustomSelect';
 import logo from '../../../assets/Devugo Tech.png';
 
 export default function CreateInvoice() {
@@ -525,29 +526,20 @@ export default function CreateInvoice() {
                                                         {formData.status}
                                                     </span>
                                                 ) : (
-                                                    <select
-                                                        value={formData.status}
-                                                        onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                                        className={`rounded px-2 py-0.5 text-xs font-bold uppercase cursor-pointer outline-none border ${formData.status === 'paid'
-                                                            ? 'bg-green-500/10 text-green-400 border-green-500/30'
-                                                            : formData.status === 'overdue'
-                                                            ? 'bg-red-500/10 text-red-400 border-red-500/30'
-                                                            : formData.status === 'sent'
-                                                            ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
-                                                            : formData.status === 'partial'
-                                                            ? 'bg-orange-500/10 text-orange-400 border-orange-500/30'
-                                                            : formData.status === 'cancelled'
-                                                            ? 'bg-gray-500/10 text-gray-500 border-gray-500/30'
-                                                            : 'bg-gray-500/10 text-gray-400 border-gray-500/30'
-                                                            }`}
-                                                    >
-                                                        <option value="draft" className="bg-[#002747]">Draft</option>
-                                                        <option value="sent" className="bg-[#002747]">Sent (Unpaid)</option>
-                                                        <option value="paid" className="bg-[#002747]">Paid</option>
-                                                        <option value="partial" className="bg-[#002747]">Partial</option>
-                                                        <option value="overdue" className="bg-[#002747]">Overdue</option>
-                                                        <option value="cancelled" className="bg-[#002747]">Cancelled</option>
-                                                    </select>
+                                                    <div className="w-36">
+                                                        <CustomSelect
+                                                            value={formData.status}
+                                                            onChange={val => setFormData({ ...formData, status: val })}
+                                                            options={[
+                                                                { value: 'draft', label: 'Draft' },
+                                                                { value: 'sent', label: 'Sent (Unpaid)' },
+                                                                { value: 'paid', label: 'Paid' },
+                                                                { value: 'partial', label: 'Partial' },
+                                                                { value: 'overdue', label: 'Overdue' },
+                                                                { value: 'cancelled', label: 'Cancelled' }
+                                                            ]}
+                                                        />
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -808,17 +800,17 @@ export default function CreateInvoice() {
                                 </div>
                                 <div>
                                     <label className="block text-sm text-gray-400 mb-2 font-medium">Currency</label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.currency}
-                                        onChange={e => setFormData({ ...formData, currency: e.target.value })}
-                                        className="w-full bg-[rgba(255,255,255,0.08)] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 cursor-pointer"
-                                    >
-                                        <option value="USD">USD ($)</option>
-                                        <option value="EUR">EUR (€)</option>
-                                        <option value="GBP">GBP (£)</option>
-                                        <option value="PKR">PKR (₨)</option>
-                                        <option value="INR">INR (₹)</option>
-                                    </select>
+                                        onChange={val => setFormData({ ...formData, currency: val })}
+                                        options={[
+                                            { value: 'USD', label: 'USD ($)' },
+                                            { value: 'EUR', label: 'EUR (€)' },
+                                            { value: 'GBP', label: 'GBP (£)' },
+                                            { value: 'PKR', label: 'PKR (₨)' },
+                                            { value: 'INR', label: 'INR (₹)' }
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         </div>

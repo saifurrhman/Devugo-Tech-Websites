@@ -4,6 +4,7 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { ProjectAPI, ContactAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import CustomSelect from '../../../components/CustomSelect';
 
 export default function CreateProject() {
     const navigate = useNavigate();
@@ -93,19 +94,17 @@ export default function CreateProject() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-400 mb-2">Client *</label>
-                                        <select
-                                            required
+                                        <CustomSelect
                                             value={formData.client}
-                                            onChange={e => setFormData({ ...formData, client: e.target.value })}
-                                            className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
-                                        >
-                                            <option value="" className="bg-[#002747] text-white">Select Client</option>
-                                            {clients.map(client => (
-                                                <option key={client._id} value={client._id} className="bg-[#002747] text-white py-2">
-                                                    {client.firstName} {client.lastName} ({client.email})
-                                                </option>
-                                            ))}
-                                        </select>
+                                            onChange={val => setFormData({ ...formData, client: val })}
+                                            options={[
+                                                { value: '', label: 'Select Client', disabled: true },
+                                                ...clients.map(client => ({
+                                                    value: client._id,
+                                                    label: `${client.firstName} ${client.lastName} (${client.email})`
+                                                }))
+                                            ]}
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-400 mb-2">Budget ($)</label>
@@ -188,28 +187,28 @@ export default function CreateProject() {
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Priority</label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.priority}
-                                        onChange={e => setFormData({ ...formData, priority: e.target.value })}
-                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
-                                    >
-                                        <option value="low" className="bg-[#002747] text-white py-2">Low</option>
-                                        <option value="medium" className="bg-[#002747] text-white py-2">Medium</option>
-                                        <option value="high" className="bg-[#002747] text-white py-2">High</option>
-                                        <option value="urgent" className="bg-[#002747] text-white py-2">Urgent</option>
-                                    </select>
+                                        onChange={val => setFormData({ ...formData, priority: val })}
+                                        options={[
+                                            { value: 'low', label: 'Low' },
+                                            { value: 'medium', label: 'Medium' },
+                                            { value: 'high', label: 'High' },
+                                            { value: 'urgent', label: 'Urgent' }
+                                        ]}
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Initial Status</label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.status}
-                                        onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
-                                    >
-                                        <option value="planning" className="bg-[#002747] text-white py-2">Planning</option>
-                                        <option value="in_progress" className="bg-[#002747] text-white py-2">In Progress</option>
-                                        <option value="on_hold" className="bg-[#002747] text-white py-2">On Hold</option>
-                                    </select>
+                                        onChange={val => setFormData({ ...formData, status: val })}
+                                        options={[
+                                            { value: 'planning', label: 'Planning' },
+                                            { value: 'in_progress', label: 'In Progress' },
+                                            { value: 'on_hold', label: 'On Hold' }
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         </div>

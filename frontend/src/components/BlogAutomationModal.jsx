@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Loader2, Settings, Check, X, Clock, Plus, Trash2 } from 'lucide-react';
 import { SettingsAPI } from '../lib/api';
 import { useNotification } from '../contexts/NotificationContext';
+import CustomSelect from './CustomSelect';
 
 export default function BlogAutomationModal({ isOpen, onClose }) {
     const { success, error: notifyError } = useNotification();
@@ -129,18 +130,18 @@ export default function BlogAutomationModal({ isOpen, onClose }) {
                                     {/* Select AI Agent */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-300 mb-2">Select AI Agent</label>
-                                        <select
+                                        <CustomSelect
                                             value={config.selectedAgentId}
-                                            onChange={e => setConfig({ ...config, selectedAgentId: e.target.value })}
-                                            className="w-full bg-[#003560] border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none text-sm"
-                                        >
-                                            <option value="">-- Default (System Fallback) --</option>
-                                            {availableAgents.map(agent => (
-                                                <option key={agent._id || agent.name} value={agent._id || agent.name}>
-                                                    {agent.name} {agent.scope ? `(${agent.scope})` : ''}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            onChange={val => setConfig({ ...config, selectedAgentId: val })}
+                                            placeholder="-- Default (System Fallback) --"
+                                            options={[
+                                                { value: '', label: '-- Default (System Fallback) --' },
+                                                ...availableAgents.map(agent => ({
+                                                    value: agent._id || agent.name,
+                                                    label: `${agent.name} ${agent.scope ? `(${agent.scope})` : ''}`
+                                                }))
+                                            ]}
+                                        />
                                         <p className="text-xs text-gray-500 mt-1">
                                             Choose which external AI agent webhook should handle this automation.
                                         </p>

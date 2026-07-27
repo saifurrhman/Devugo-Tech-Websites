@@ -5,6 +5,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import html2pdf from 'html2pdf.js';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
+import CustomSelect from '../../../components/CustomSelect';
 import { ProposalAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { useConfirm } from '../../../contexts/ConfirmContext';
@@ -511,16 +512,16 @@ export default function ProposalEdit() {
                                             <FileText size={18} className="text-blue-400" />
                                             Proposal Document
                                         </h2>
-                                        <select 
-                                            onChange={applyTemplate}
-                                            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors [&>option]:bg-[#003560]"
-                                            defaultValue=""
-                                        >
-                                            <option value="" disabled>Load a Template...</option>
-                                            <option value="web">Web Dev Proposal</option>
-                                            <option value="saas">SaaS Development Proposal</option>
-                                            <option value="automation">Automation Proposal</option>
-                                        </select>
+                                        <CustomSelect 
+                                            value=""
+                                            onChange={val => applyTemplate({ target: { value: val } })}
+                                            options={[
+                                                { value: '', label: 'Load a Template...', disabled: true },
+                                                { value: 'web', label: 'Web Dev Proposal' },
+                                                { value: 'saas', label: 'SaaS Development Proposal' },
+                                                { value: 'automation', label: 'Automation Proposal' }
+                                            ]}
+                                        />
                                     </div>
                                     
                                     <div className="mb-6">
@@ -619,18 +620,17 @@ export default function ProposalEdit() {
                                         </div>
                                         <div>
                                             <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Project Source</label>
-                                            <select
-                                                name="projectSource"
+                                            <CustomSelect
                                                 value={form.projectSource}
-                                                onChange={handleChange}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors [&>option]:bg-[#003560]"
-                                            >
-                                                <option value="Direct">Direct / Referrals</option>
-                                                <option value="Upwork">Upwork</option>
-                                                <option value="LinkedIn">LinkedIn</option>
-                                                <option value="Fiverr">Fiverr</option>
-                                                <option value="Website">Website Leads</option>
-                                            </select>
+                                                onChange={val => setForm(prev => ({ ...prev, projectSource: val }))}
+                                                options={[
+                                                    { value: 'Direct', label: 'Direct / Referrals' },
+                                                    { value: 'Upwork', label: 'Upwork' },
+                                                    { value: 'LinkedIn', label: 'LinkedIn' },
+                                                    { value: 'Fiverr', label: 'Fiverr' },
+                                                    { value: 'Website', label: 'Website Leads' }
+                                                ]}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -644,18 +644,17 @@ export default function ProposalEdit() {
                                         <div className="grid grid-cols-3 gap-3">
                                             <div className="col-span-1">
                                                 <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Currency</label>
-                                                <select
-                                                    name="currency"
+                                                <CustomSelect
                                                     value={form.currency}
-                                                    onChange={handleChange}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-2 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors [&>option]:bg-[#003560]"
-                                                >
-                                                    <option value="USD">USD ($)</option>
-                                                    <option value="EUR">EUR (€)</option>
-                                                    <option value="GBP">GBP (£)</option>
-                                                    <option value="PKR">PKR (₨)</option>
-                                                    <option value="INR">INR (₹)</option>
-                                                </select>
+                                                    onChange={val => setForm(prev => ({ ...prev, currency: val }))}
+                                                    options={[
+                                                        { value: 'USD', label: 'USD ($)' },
+                                                        { value: 'EUR', label: 'EUR (€)' },
+                                                        { value: 'GBP', label: 'GBP (£)' },
+                                                        { value: 'PKR', label: 'PKR (₨)' },
+                                                        { value: 'INR', label: 'INR (₹)' }
+                                                    ]}
+                                                />
                                             </div>
                                             <div className="col-span-2">
                                                 <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Amount *</label>
@@ -671,31 +670,29 @@ export default function ProposalEdit() {
                                         </div>
                                         <div>
                                             <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Payment Terms</label>
-                                            <select
-                                                name="paymentTerms"
+                                            <CustomSelect
                                                 value={form.paymentTerms}
-                                                onChange={handleChange}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors [&>option]:bg-[#003560]"
-                                            >
-                                                <option value="Full Upfront">Full Upfront (100%)</option>
-                                                <option value="50-50 Split">50/50 Split (Start & Completion)</option>
-                                                <option value="Milestone-based">Milestone-based (e.g. 30/40/30)</option>
-                                                <option value="Hourly">Hourly / Retainer</option>
-                                            </select>
+                                                onChange={val => setForm(prev => ({ ...prev, paymentTerms: val }))}
+                                                options={[
+                                                    { value: 'Full Upfront', label: 'Full Upfront (100%)' },
+                                                    { value: '50-50 Split', label: '50/50 Split (Start & Completion)' },
+                                                    { value: 'Milestone-based', label: 'Milestone-based (e.g. 30/40/30)' },
+                                                    { value: 'Hourly', label: 'Hourly / Retainer' }
+                                                ]}
+                                            />
                                         </div>
                                         <div>
                                             <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Status</label>
-                                            <select
-                                                name="status"
+                                            <CustomSelect
                                                 value={form.status}
-                                                onChange={handleChange}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors [&>option]:bg-[#003560]"
-                                            >
-                                                <option value="Draft">Draft</option>
-                                                <option value="Sent">Sent</option>
-                                                <option value="Accepted">Accepted</option>
-                                                <option value="Rejected">Rejected</option>
-                                            </select>
+                                                onChange={val => setForm(prev => ({ ...prev, status: val }))}
+                                                options={[
+                                                    { value: 'Draft', label: 'Draft' },
+                                                    { value: 'Sent', label: 'Sent' },
+                                                    { value: 'Accepted', label: 'Accepted' },
+                                                    { value: 'Rejected', label: 'Rejected' }
+                                                ]}
+                                            />
                                         </div>
                                         <div>
                                             <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1"><Calendar size={14}/> Valid Until</label>

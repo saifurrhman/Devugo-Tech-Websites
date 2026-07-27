@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { AnalyticsAPI } from '../../../lib/api';
-
+import CustomSelect from '../../../components/CustomSelect';
 
 
 export default function EmailAnalytics() {
@@ -99,15 +99,17 @@ export default function EmailAnalytics() {
                         <h1 className="text-2xl font-bold">Email Deliverability</h1>
                         <p className="text-gray-400 text-sm mt-1">Monitor your email sending reputation and health</p>
                     </div>
-                    <select
-                        value={timeRange}
-                        onChange={(e) => setTimeRange(e.target.value)}
-                        className="bg-[#1e293b] border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
-                    >
-                        <option value="24h" className="bg-[#0f172a]">Last 24 Hours</option>
-                        <option value="7d" className="bg-[#0f172a]">Last 7 Days</option>
-                        <option value="30d" className="bg-[#0f172a]">Last 30 Days</option>
-                    </select>
+                    <div className="w-40">
+                        <CustomSelect
+                            value={timeRange}
+                            onChange={setTimeRange}
+                            options={[
+                                { value: '24h', label: 'Last 24 Hours' },
+                                { value: '7d', label: 'Last 7 Days' },
+                                { value: '30d', label: 'Last 30 Days' }
+                            ]}
+                        />
+                    </div>
                 </div>
 
                 {/* Health Score */}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function Leads(){
   const [status, setStatus] = useState('all');
@@ -40,12 +41,18 @@ export default function Leads(){
 
           <div style={{display:'flex',gap:'.5rem',alignItems:'center',marginBottom:'.5rem'}}>
             <span className="muted">Filter:</span>
-            <select className="form-field" value={status} onChange={e=>setStatus(e.target.value)}>
-              <option value="all">All</option>
-              <option value="new">New</option>
-              <option value="contacted">Contacted</option>
-              <option value="converted">Converted</option>
-            </select>
+            <div className="w-48">
+              <CustomSelect 
+                value={status} 
+                onChange={val => setStatus(val)}
+                options={[
+                  { value: 'all', label: 'All' },
+                  { value: 'new', label: 'New' },
+                  { value: 'contacted', label: 'Contacted' },
+                  { value: 'converted', label: 'Converted' }
+                ]}
+              />
+            </div>
           </div>
 
           <div className="table" role="table">

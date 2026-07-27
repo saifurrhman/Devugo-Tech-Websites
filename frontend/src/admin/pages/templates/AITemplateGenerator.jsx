@@ -5,6 +5,7 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { TemplateAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import CustomSelect from '../../../components/CustomSelect';
 
 export default function AITemplateGenerator() {
     const navigate = useNavigate();
@@ -119,66 +120,62 @@ export default function AITemplateGenerator() {
 
                                 <label className="block mb-3">
                                     <span className="text-sm text-gray-400 mb-1 block">Email Type</span>
-                                    <select
-                                        name="type"
+                                    <CustomSelect
                                         value={formData.type}
-                                        onChange={handleChange}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
-                                    >
-                                        <option value="newsletter" className="bg-[#0f172a]">Newsletter</option>
-                                        <option value="promotional" className="bg-[#0f172a]">Promotional Offer</option>
-                                        <option value="welcome" className="bg-[#0f172a]">Welcome Email</option>
-                                        <option value="transactional" className="bg-[#0f172a]">Transactional</option>
-                                        <option value="followup" className="bg-[#0f172a]">Follow-up</option>
-                                    </select>
+                                        onChange={(val) => setFormData(prev => ({ ...prev, type: val }))}
+                                        options={[
+                                            { value: 'newsletter', label: 'Newsletter' },
+                                            { value: 'promotional', label: 'Promotional Offer' },
+                                            { value: 'welcome', label: 'Welcome Email' },
+                                            { value: 'transactional', label: 'Transactional' },
+                                            { value: 'followup', label: 'Follow-up' }
+                                        ]}
+                                    />
                                 </label>
 
                                 <label className="block mb-3">
                                     <span className="text-sm text-gray-400 mb-1 block">Goal</span>
-                                    <select
-                                        name="goal"
+                                    <CustomSelect
                                         value={formData.goal}
-                                        onChange={handleChange}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
-                                    >
-                                        <option value="lead_generation" className="bg-[#0f172a]">Lead Generation</option>
-                                        <option value="sales" className="bg-[#0f172a]">Drive Sales</option>
-                                        <option value="engagement" className="bg-[#0f172a]">Engagement</option>
-                                        <option value="announcement" className="bg-[#0f172a]">Announcement</option>
-                                        <option value="nurture" className="bg-[#0f172a]">Nurture Relationship</option>
-                                    </select>
+                                        onChange={(val) => setFormData(prev => ({ ...prev, goal: val }))}
+                                        options={[
+                                            { value: 'lead_generation', label: 'Lead Generation' },
+                                            { value: 'sales', label: 'Drive Sales' },
+                                            { value: 'engagement', label: 'Engagement' },
+                                            { value: 'announcement', label: 'Announcement' },
+                                            { value: 'nurture', label: 'Nurture Relationship' }
+                                        ]}
+                                    />
                                 </label>
 
                                 <label className="block mb-3">
                                     <span className="text-sm text-gray-400 mb-1 block">Tone</span>
-                                    <select
-                                        name="tone"
+                                    <CustomSelect
                                         value={formData.tone}
-                                        onChange={handleChange}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
-                                    >
-                                        <option value="professional" className="bg-[#0f172a]">Professional</option>
-                                        <option value="friendly" className="bg-[#0f172a]">Friendly & Casual</option>
-                                        <option value="urgent" className="bg-[#0f172a]">Urgent / Scarcity</option>
-                                        <option value="witty" className="bg-[#0f172a]">Witty / Humorous</option>
-                                        <option value="empathetic" className="bg-[#0f172a]">Empathetic</option>
-                                    </select>
+                                        onChange={(val) => setFormData(prev => ({ ...prev, tone: val }))}
+                                        options={[
+                                            { value: 'professional', label: 'Professional' },
+                                            { value: 'friendly', label: 'Friendly & Casual' },
+                                            { value: 'urgent', label: 'Urgent / Scarcity' },
+                                            { value: 'witty', label: 'Witty / Humorous' },
+                                            { value: 'empathetic', label: 'Empathetic' }
+                                        ]}
+                                    />
                                 </label>
 
                                 <label className="block mb-3">
                                     <span className="text-sm text-gray-400 mb-1 block">Language</span>
-                                    <select
-                                        name="language"
+                                    <CustomSelect
                                         value={formData.language}
-                                        onChange={handleChange}
-                                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none"
-                                    >
-                                        <option value="english" className="bg-[#0f172a]">English</option>
-                                        <option value="urdu" className="bg-[#0f172a]">Urdu</option>
-                                        <option value="spanish" className="bg-[#0f172a]">Spanish</option>
-                                        <option value="french" className="bg-[#0f172a]">French</option>
-                                        <option value="german" className="bg-[#0f172a]">German</option>
-                                    </select>
+                                        onChange={(val) => setFormData(prev => ({ ...prev, language: val }))}
+                                        options={[
+                                            { value: 'english', label: 'English' },
+                                            { value: 'urdu', label: 'Urdu' },
+                                            { value: 'spanish', label: 'Spanish' },
+                                            { value: 'french', label: 'French' },
+                                            { value: 'german', label: 'German' }
+                                        ]}
+                                    />
                                 </label>
                             </div>
                         </div>

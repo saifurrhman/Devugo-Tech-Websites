@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
+import CustomSelect from '../../../components/CustomSelect';
 
 export default function Integrations() {
     const { success, error: notifyError } = useNotification();
@@ -295,13 +296,17 @@ export default function Integrations() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="text-sm text-gray-400 mb-1 block">Primary Model</label>
-                            <select value={aiConfig.model} onChange={e => setAiConfig({ ...aiConfig, model: e.target.value })} className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white">
-                                <option value="GPT-4 Turbo">GPT-4 Turbo</option>
-                                <option value="GPT-4o">GPT-4o</option>
-                                <option value="GPT-3.5 Turbo">GPT-3.5 Turbo</option>
-                                <option value="Gemini Flash 1.5">Gemini Flash 1.5</option>
-                                <option value="Gemini Pro 1.5">Gemini Pro 1.5</option>
-                            </select>
+                            <CustomSelect
+                                value={aiConfig.model}
+                                onChange={val => setAiConfig({ ...aiConfig, model: val })}
+                                options={[
+                                    { value: 'GPT-4 Turbo', label: 'GPT-4 Turbo' },
+                                    { value: 'GPT-4o', label: 'GPT-4o' },
+                                    { value: 'GPT-3.5 Turbo', label: 'GPT-3.5 Turbo' },
+                                    { value: 'Gemini Flash 1.5', label: 'Gemini Flash 1.5' },
+                                    { value: 'Gemini Pro 1.5', label: 'Gemini Pro 1.5' }
+                                ]}
+                            />
                         </div>
                         <div className="flex items-center justify-between p-4 bg-[#0f172a] rounded-lg">
                             <div>
@@ -389,15 +394,16 @@ export default function Integrations() {
                                     value={newAgent.name} onChange={e => setNewAgent({ ...newAgent, name: e.target.value })}
                                     className="bg-gray-800 border-gray-700 rounded px-3 py-2 text-sm text-white"
                                 />
-                                <select
-                                    value={newAgent.tool} onChange={e => setNewAgent({ ...newAgent, tool: e.target.value })}
-                                    className="bg-gray-800 border-gray-700 rounded px-3 py-2 text-sm text-white"
-                                >
-                                    <option value="n8n">n8n</option>
-                                    <option value="make">Make.com</option>
-                                    <option value="zapier">Zapier</option>
-                                    <option value="custom">Custom Webhook</option>
-                                </select>
+                                <CustomSelect
+                                    value={newAgent.tool}
+                                    onChange={val => setNewAgent({ ...newAgent, tool: val })}
+                                    options={[
+                                        { value: 'n8n', label: 'n8n' },
+                                        { value: 'make', label: 'Make.com' },
+                                        { value: 'zapier', label: 'Zapier' },
+                                        { value: 'custom', label: 'Custom Webhook' }
+                                    ]}
+                                />
                                 <input
                                     type="text" placeholder="Webhook URL"
                                     value={newAgent.webhook} onChange={e => setNewAgent({ ...newAgent, webhook: e.target.value })}
@@ -650,13 +656,17 @@ export default function Integrations() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="text-sm text-blue-200/80 mb-1 block">Primary Model</label>
-                                                    <select value={aiConfig.model} onChange={e => setAiConfig({ ...aiConfig, model: e.target.value })} className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2 text-white">
-                                                        <option value="GPT-4 Turbo">GPT-4 Turbo</option>
-                                                        <option value="GPT-4o">GPT-4o</option>
-                                                        <option value="GPT-3.5 Turbo">GPT-3.5 Turbo</option>
-                                                        <option value="Gemini Flash 1.5">Gemini Flash 1.5</option>
-                                                        <option value="Gemini Pro 1.5">Gemini Pro 1.5</option>
-                                                    </select>
+                                                    <CustomSelect
+                                                        value={aiConfig.model}
+                                                        onChange={val => setAiConfig({ ...aiConfig, model: val })}
+                                                        options={[
+                                                            { value: 'GPT-4 Turbo', label: 'GPT-4 Turbo' },
+                                                            { value: 'GPT-4o', label: 'GPT-4o' },
+                                                            { value: 'GPT-3.5 Turbo', label: 'GPT-3.5 Turbo' },
+                                                            { value: 'Gemini Flash 1.5', label: 'Gemini Flash 1.5' },
+                                                            { value: 'Gemini Pro 1.5', label: 'Gemini Pro 1.5' }
+                                                        ]}
+                                                    />
                                                 </div>
                                                 <div>
                                                     <label className="text-sm text-blue-200/80 mb-1 block">Safety Settings</label>
@@ -791,30 +801,31 @@ export default function Integrations() {
                                                             value={newAgent.name} onChange={e => setNewAgent({ ...newAgent, name: e.target.value })}
                                                             className="bg-[#003560] border-white/10 rounded px-3 py-2 text-sm text-white"
                                                         />
-                                                        <select
-                                                            value={newAgent.tool} onChange={e => setNewAgent({ ...newAgent, tool: e.target.value })}
-                                                            className="bg-[#003560] border-white/10 rounded px-3 py-2 text-sm text-white"
-                                                        >
-                                                            <option value="n8n">n8n</option>
-                                                            <option value="make">Make.com</option>
-                                                            <option value="zapier">Zapier</option>
-                                                            <option value="custom">Custom Webhook</option>
-                                                        </select>
+                                                        <CustomSelect
+                                                            value={newAgent.tool}
+                                                            onChange={val => setNewAgent({ ...newAgent, tool: val })}
+                                                            options={[
+                                                                { value: 'n8n', label: 'n8n' },
+                                                                { value: 'make', label: 'Make.com' },
+                                                                { value: 'zapier', label: 'Zapier' },
+                                                                { value: 'custom', label: 'Custom Webhook' }
+                                                            ]}
+                                                        />
 
                                                         {/* New Scope Selector */}
                                                         <div className="md:col-span-2">
                                                             <label className="text-[10px] text-blue-200/60 uppercase tracking-wider font-bold mb-1 block">Agent Function (Where to use?)</label>
-                                                            <select
+                                                            <CustomSelect
                                                                 value={newAgent.scope || 'all'}
-                                                                onChange={e => setNewAgent({ ...newAgent, scope: e.target.value })}
-                                                                className="w-full bg-[#003560] border-white/10 rounded px-3 py-2 text-sm text-white"
-                                                            >
-                                                                <option value="all">General / Fallback (Use for everything)</option>
-                                                                <option value="campaigns">Campaign Generation Only</option>
-                                                                <option value="replies">Inbox Replies Only</option>
-                                                                <option value="leads">Lead Qualification Only</option>
-                                                                <option value="blog">Blog Post Generation Only</option>
-                                                            </select>
+                                                                onChange={val => setNewAgent({ ...newAgent, scope: val })}
+                                                                options={[
+                                                                    { value: 'all', label: 'General / Fallback (Use for everything)' },
+                                                                    { value: 'campaigns', label: 'Campaign Generation Only' },
+                                                                    { value: 'replies', label: 'Inbox Replies Only' },
+                                                                    { value: 'leads', label: 'Lead Qualification Only' },
+                                                                    { value: 'blog', label: 'Blog Post Generation Only' }
+                                                                ]}
+                                                            />
                                                         </div>
                                                         <input
                                                             type="text" placeholder="Webhook URL"

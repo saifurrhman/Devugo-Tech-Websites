@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function EmailCampaigns(){
+  const [audience, setAudience] = useState('All leads');
   return (
     <div className="admin-layout">
       <AdminSidebar />
@@ -19,12 +21,18 @@ export default function EmailCampaigns(){
               <input className="form-field" placeholder="Your Name <you@domain.com>" />
             </label>
             <label className="form-label" style={{gridColumn:'1 / -1'}}>Audience
-              <select className="form-field">
-                <option>All leads</option>
-                <option>Only New</option>
-                <option>Only Contacted</option>
-                <option>Only Converted</option>
-              </select>
+              <div className="mt-1">
+                <CustomSelect
+                  value={audience}
+                  onChange={setAudience}
+                  options={[
+                    { value: 'All leads', label: 'All leads' },
+                    { value: 'Only New', label: 'Only New' },
+                    { value: 'Only Contacted', label: 'Only Contacted' },
+                    { value: 'Only Converted', label: 'Only Converted' }
+                  ]}
+                />
+              </div>
             </label>
             <label className="form-label" style={{gridColumn:'1 / -1'}}>Message
               <textarea className="form-field" rows={6} placeholder="Write email..." />

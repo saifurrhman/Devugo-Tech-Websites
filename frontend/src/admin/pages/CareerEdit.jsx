@@ -5,6 +5,7 @@ import { CareerAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import CustomSelect from '../../components/CustomSelect';
 
 const JOB_TYPES = ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'];
 
@@ -71,20 +72,18 @@ export default function CareerEdit() {
   const { success: notifySuccess, error: notifyError } = useNotification();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [typeOpen, setTypeOpen] = useState(false);
-  const typeRef = useRef(null);
 
   const [form, setForm] = useState({
-    title: '', department: '', location: '',
-    type: 'Full-Time', experience: 'Not specified', description: '', requirementsText: '', deadline: '', isActive: true
+    title: '',
+    department: '',
+    location: '',
+    type: 'Full-Time',
+    experience: 'Not specified',
+    description: '',
+    requirementsText: '',
+    deadline: '',
+    isActive: true
   });
-
-  useEffect(() => {
-    const h = e => { if (typeRef.current && !typeRef.current.contains(e.target)) setTypeOpen(false); };
-    document.addEventListener('mousedown', h);
-    return () => document.removeEventListener('mousedown', h);
-  }, []);
-
   useEffect(() => { if (!isNew) fetchCareer(); }, [id]);
 
   const fetchCareer = async () => {
@@ -310,37 +309,11 @@ export default function CareerEdit() {
                 </div>
 
                 {/* Custom dropdown */}
-                <div ref={typeRef} style={{ position: 'relative' }}>
-                  <button type="button" onClick={() => setTypeOpen(p => !p)}
-                    style={{ width: '100%', padding: '.6rem .85rem', borderRadius: '8px', border: `1px solid ${typeOpen ? 'rgba(67,133,205,0.6)' : 'rgba(255,255,255,0.08)'}`, background: typeOpen ? 'rgba(67,133,205,0.07)' : 'rgba(255,255,255,0.04)', color: '#fff', fontWeight: 600, fontSize: '.88rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'all .18s' }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4385cd', display: 'inline-block', flexShrink: 0 }} />
-                      {form.type}
-                    </div>
-                    <ChevronDown size={14} style={{ opacity: .55, transition: 'transform .2s', transform: typeOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
-                  </button>
-
-                  {typeOpen && (
-                    <div style={{ position: 'absolute', top: 'calc(100% + .4rem)', left: 0, right: 0, zIndex: 200, borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', background: '#002747', boxShadow: '0 16px 48px rgba(0,0,0,0.5)', overflow: 'hidden', padding: '.3rem' }}>
-                      {JOB_TYPES.map(t => {
-                        const active = form.type === t;
-                        return (
-                          <button key={t} type="button"
-                            onClick={() => { set('type', t); setTypeOpen(false); }}
-                            style={{ width: '100%', padding: '.58rem .8rem', borderRadius: '7px', border: 'none', background: active ? 'rgba(67,133,205,0.2)' : 'transparent', color: active ? '#fff' : 'rgba(255,255,255,0.65)', fontWeight: active ? 700 : 400, fontSize: '.88rem', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.15rem', transition: 'background .12s, color .12s' }}
-                            onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#fff'; } }}
-                            onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; } }}
-                          >
-                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: active ? '#4385cd' : 'rgba(255,255,255,0.2)', flexShrink: 0, transition: 'background .12s' }} />
-                            {t}
-                            {active && <span style={{ marginLeft: 'auto', fontSize: '.72rem', color: '#4385cd', fontWeight: 700 }}>✓</span>}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                <CustomSelect
+                  options={JOB_TYPES.map(t => ({ label: t, value: t }))}
+                  value={form.type}
+                  onChange={val => set('type', val)}
+                />
 
                 {/* Quick type pills */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginTop: '.85rem' }}>

@@ -368,19 +368,19 @@ export default function ContactsList() {
                         </div>
 
                         {/* Status Filter */}
-                        <div className="pb-2">
-                            <select
+                        <div className="pb-2 w-full sm:w-48">
+                            <CustomSelect
                                 value={filter}
-                                onChange={(e) => setFilter(e.target.value)}
-                                className="bg-[#1e293b] border border-gray-700 text-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-48 p-2"
-                            >
-                                <option value="all">All Status</option>
-                                <option value="verified">Verified</option>
-                                <option value="unverified">Unverified</option>
-                                <option value="bounced">Bounced</option>
-                                <option value="unsubscribed">Unsubscribed</option>
-                                <option value="new">New</option>
-                            </select>
+                                onChange={setFilter}
+                                options={[
+                                    { value: 'all', label: 'All Status' },
+                                    { value: 'verified', label: 'Verified' },
+                                    { value: 'unverified', label: 'Unverified' },
+                                    { value: 'bounced', label: 'Bounced' },
+                                    { value: 'unsubscribed', label: 'Unsubscribed' },
+                                    { value: 'new', label: 'New' }
+                                ]}
+                            />
                         </div>
                     </div>
                 )}
@@ -565,16 +565,15 @@ export default function ContactsList() {
 
                         <div className="mb-6">
                             <label className="block text-sm font-medium text-gray-400 mb-2">Select List</label>
-                            <select
+                            <CustomSelect
                                 value={targetListId}
-                                onChange={(e) => setTargetListId(e.target.value)}
-                                className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                            >
-                                <option value="" className="bg-[#002747] text-white">-- Choose a list --</option>
-                                {lists.map(l => (
-                                    <option key={l._id} value={l._id} className="bg-[#002747] text-white py-2">{l.name}</option>
-                                ))}
-                            </select>
+                                onChange={setTargetListId}
+                                placeholder="-- Choose a list --"
+                                options={[
+                                    { value: '', label: '-- Choose a list --' },
+                                    ...lists.map(l => ({ value: l._id, label: l.name }))
+                                ]}
+                            />
                         </div>
 
                         <div className="flex justify-end gap-3">

@@ -3,6 +3,7 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { SettingsAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function SMTPSettings() {
     const notify = useNotification();
@@ -111,15 +112,15 @@ export default function SMTPSettings() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Encryption</label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.encryption}
-                                        onChange={e => setFormData({ ...formData, encryption: e.target.value })}
-                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                                    >
-                                        <option value="TLS" className="bg-[#002747] text-white py-2">TLS</option>
-                                        <option value="SSL" className="bg-[#002747] text-white py-2">SSL</option>
-                                        <option value="None" className="bg-[#002747] text-white py-2">None</option>
-                                    </select>
+                                        onChange={(val) => setFormData({ ...formData, encryption: val })}
+                                        options={[
+                                            { value: 'TLS', label: 'TLS' },
+                                            { value: 'SSL', label: 'SSL' },
+                                            { value: 'None', label: 'None' }
+                                        ]}
+                                    />
                                 </div>
                             </div>
 

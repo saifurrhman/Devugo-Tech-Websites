@@ -4,6 +4,7 @@ import { SettingsAPI, BlogAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import CustomSelect from '../../components/CustomSelect';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function BlogAutomationPage() {
@@ -329,21 +330,18 @@ export default function BlogAutomationPage() {
                                                 <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
                                                     <label className="block text-sm font-medium text-gray-200 mb-3">Select AI Agent</label>
                                                     <div className="relative">
-                                                        <select
+                                                        <CustomSelect
                                                             value={config.selectedAgentId}
-                                                            onChange={e => setConfig({ ...config, selectedAgentId: e.target.value })}
-                                                            className="w-full bg-[#051426] border border-white/10 rounded-lg py-3 px-4 text-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none text-sm appearance-none"
-                                                        >
-                                                            <option value="">-- Default (System Fallback) --</option>
-                                                            {availableAgents.map(agent => (
-                                                                <option key={agent._id || agent.name} value={agent._id || agent.name}>
-                                                                    {agent.name} {agent.scope ? `(${agent.scope})` : ''}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
-                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                                                        </div>
+                                                            onChange={val => setConfig({ ...config, selectedAgentId: val })}
+                                                            placeholder="-- Default (System Fallback) --"
+                                                            options={[
+                                                                { value: '', label: '-- Default (System Fallback) --' },
+                                                                ...availableAgents.map(agent => ({
+                                                                    value: agent._id || agent.name,
+                                                                    label: `${agent.name} ${agent.scope ? `(${agent.scope})` : ''}`
+                                                                }))
+                                                            ]}
+                                                        />
                                                     </div>
                                                     <p className="text-xs text-gray-500 mt-3">
                                                         Choose which external AI agent webhook should handle this automation.

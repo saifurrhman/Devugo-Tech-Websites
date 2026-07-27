@@ -5,6 +5,7 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { ClientFaqAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function FAQsList(){
   const confirm = useConfirm();
@@ -19,27 +20,6 @@ export default function FAQsList(){
   // Filter states
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'published', 'draft'
   const [categoryFilter, setCategoryFilter] = useState('all');
-  
-  // Dropdown states
-  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
-  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  
-  const statusDropdownRef = useRef(null);
-  const categoryDropdownRef = useRef(null);
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
-        setStatusDropdownOpen(false);
-      }
-      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
-        setCategoryDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   async function fetchAll(){
     setLoading(true); setError('');
@@ -168,178 +148,20 @@ export default function FAQsList(){
         <div className="toolbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'.6rem',flexWrap:'wrap'}}>
           <h1>FAQs</h1>
           <div style={{display:'flex',gap:'.6rem',alignItems:'center',flexWrap:'wrap'}}>
-            {/* Status Filter Dropdown */}
-            <div ref={statusDropdownRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-                style={{
-                  padding: '.5rem .75rem',
-                  borderRadius: '.375rem',
-                  border: '1px solid rgba(55, 65, 81, 0.5)',
-                  background: 'rgba(31, 41, 55, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '.5rem',
-                  minWidth: '160px',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>{selectedStatusOption.label}</span>
-                <span style={{fontSize:'.75rem'}}>▼</span>
-              </button>
-              
-              {statusDropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + .5rem)',
-                    right: 0,
-                    minWidth: '180px',
-                    padding: '.4rem',
-                    zIndex: 1000,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '.5rem',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {statusOptions.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setStatusFilter(option.value);
-                        setStatusDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '.6rem .85rem',
-                        background: statusFilter === option.value 
-                          ? 'rgba(59, 130, 246, 0.3)' 
-                          : 'transparent',
-                        border: statusFilter === option.value 
-                          ? '1px solid rgba(59, 130, 246, 0.5)' 
-                          : '1px solid transparent',
-                        borderRadius: '.375rem',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all .2s',
-                        fontSize: '.9rem',
-                        fontWeight: statusFilter === option.value ? '500' : '400',
-                        marginBottom: '.25rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (statusFilter !== option.value) {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (statusFilter !== option.value) {
-                          e.target.style.background = 'transparent';
-                          e.target.style.borderColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div style={{ width: '180px' }}>
+              <CustomSelect 
+                options={statusOptions}
+                value={statusFilter}
+                onChange={setStatusFilter}
+              />
             </div>
-
-            {/* Category Filter Dropdown */}
-            <div ref={categoryDropdownRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-                style={{
-                  padding: '.5rem .75rem',
-                  borderRadius: '.375rem',
-                  border: '1px solid rgba(55, 65, 81, 0.5)',
-                  background: 'rgba(31, 41, 55, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '.5rem',
-                  minWidth: '140px',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>{categoryFilter === 'all' ? 'All Categories' : categoryFilter}</span>
-                <span style={{fontSize:'.75rem'}}>▼</span>
-              </button>
-              
-              {categoryDropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + .5rem)',
-                    right: 0,
-                    minWidth: '180px',
-                    padding: '.4rem',
-                    zIndex: 1000,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '.5rem',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
-                    maxHeight: '300px',
-                    overflowY: 'auto'
-                  }}
-                >
-                  {categories.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => {
-                        setCategoryFilter(cat);
-                        setCategoryDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '.6rem .85rem',
-                        background: categoryFilter === cat 
-                          ? 'rgba(59, 130, 246, 0.3)' 
-                          : 'transparent',
-                        border: categoryFilter === cat 
-                          ? '1px solid rgba(59, 130, 246, 0.5)' 
-                          : '1px solid transparent',
-                        borderRadius: '.375rem',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all .2s',
-                        fontSize: '.9rem',
-                        fontWeight: categoryFilter === cat ? '500' : '400',
-                        marginBottom: '.25rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (categoryFilter !== cat) {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (categoryFilter !== cat) {
-                          e.target.style.background = 'transparent';
-                          e.target.style.borderColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {cat === 'all' ? 'All Categories' : cat}
-                    </button>
-                  ))}
-                </div>
-              )}
+            
+            <div style={{ width: '180px' }}>
+              <CustomSelect 
+                options={categories.map(c => ({ label: c === 'all' ? 'All Categories' : c, value: c }))}
+                value={categoryFilter}
+                onChange={setCategoryFilter}
+              />
             </div>
 
             <Link to="/admin/faqs/new" className="btn">Add FAQ</Link>

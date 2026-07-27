@@ -3,6 +3,7 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { FormAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 const KEYS = ['contact','services'];
 
@@ -75,10 +76,13 @@ function Preview({ model }){
     if(f.type==='select') return (
       <div className="form-field" key={f.name}>
         <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-1.5">{f.label}</label>
-        <select disabled className="w-full min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-md">
-          <option>{f.placeholder||'Select'}</option>
-          {(f.options||[]).map(o=> <option key={o.value||o.label}>{o.label}</option>)}
-        </select>
+        <CustomSelect 
+          disabled 
+          value=""
+          placeholder={f.placeholder||'Select'}
+          options={(f.options||[]).map(o=> ({ value: o.value||o.label, label: o.label }))}
+          onChange={() => {}}
+        />
       </div>
     );
     
@@ -442,21 +446,21 @@ export default function Forms(){
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 md:gap-3">
                         <div className="form-field">
                           <label className="block text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1">Type</label>
-                          <select 
+                          <CustomSelect 
                             value={f.type} 
-                            onChange={e=>setModel(m=>{ 
+                            onChange={val=>setModel(m=>{ 
                               const arr=[...m.fields]; 
-                              arr[idx]={...arr[idx],type:e.target.value}; 
+                              arr[idx]={...arr[idx],type:val}; 
                               return {...m,fields:arr}; 
                             })}
-                            className="w-full min-h-[36px] sm:min-h-[40px] md:min-h-[44px] px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs md:text-sm border rounded-md bg-white text-slate-900"
-                          >
-                            <option value="text">Text</option>
-                            <option value="email">Email</option>
-                            <option value="tel">Phone</option>
-                            <option value="textarea">Textarea</option>
-                            <option value="select">Select</option>
-                          </select>
+                            options={[
+                                { value: 'text', label: 'Text' },
+                                { value: 'email', label: 'Email' },
+                                { value: 'tel', label: 'Phone' },
+                                { value: 'textarea', label: 'Textarea' },
+                                { value: 'select', label: 'Select' }
+                            ]}
+                          />
                         </div>
                         
                         <div className="form-field">

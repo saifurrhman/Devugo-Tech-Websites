@@ -4,6 +4,7 @@ import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { PipelineAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import CustomSelect from '../../../components/CustomSelect';
 
 export default function PipelineBoard() {
     const { success, error: notifyError } = useNotification();
@@ -196,9 +197,11 @@ export default function PipelineBoard() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Pipeline Stage</label>
-                                <select value={dealForm.stageId} onChange={e => setDealForm({...dealForm, stageId: e.target.value})} className="w-full px-3 py-2 bg-[#0f172a] border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
-                                    {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                </select>
+                                <CustomSelect 
+                                    value={dealForm.stageId} 
+                                    onChange={val => setDealForm({...dealForm, stageId: val})} 
+                                    options={stages.map(s => ({ value: s.id, label: s.name }))}
+                                />
                             </div>
                             <div className="flex gap-3 pt-4">
                                 <button type="button" onClick={() => setIsAddDealOpen(false)} className="flex-1 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors">Cancel</button>

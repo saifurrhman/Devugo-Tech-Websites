@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Loader2, Sparkles, FileText, Copy, Check, X } from 'lucide-react';
 import { AIAPI } from '../lib/api';
 import { useNotification } from '../contexts/NotificationContext';
+import CustomSelect from './CustomSelect';
 
 export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialTopic = '' }) {
     console.log('BlogGeneratorModal render', { isOpen, initialTopic });
@@ -136,22 +137,19 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                                 Writing Tone
                             </label>
                             <div className="relative">
-                                <select
+                                <CustomSelect
                                     value={tone}
-                                    onChange={(e) => setTone(e.target.value)}
-                                    className="w-full px-4 py-3.5 bg-[#002747] border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none text-white shadow-sm"
-                                >
-                                    <option value="Professional">Professional</option>
-                                    <option value="Casual">Casual</option>
-                                    <option value="Friendly">Friendly</option>
-                                    <option value="Formal">Formal</option>
-                                    <option value="Conversational">Conversational</option>
-                                    <option value="Educational">Educational</option>
-                                    <option value="Persuasive">Persuasive</option>
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
+                                    onChange={setTone}
+                                    options={[
+                                        { value: 'Professional', label: 'Professional' },
+                                        { value: 'Casual', label: 'Casual' },
+                                        { value: 'Friendly', label: 'Friendly' },
+                                        { value: 'Formal', label: 'Formal' },
+                                        { value: 'Conversational', label: 'Conversational' },
+                                        { value: 'Educational', label: 'Educational' },
+                                        { value: 'Persuasive', label: 'Persuasive' }
+                                    ]}
+                                />
                             </div>
                         </div>
 

@@ -3,6 +3,7 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { SettingsAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function AIConfiguration() {
     const notify = useNotification();
@@ -87,16 +88,16 @@ export default function AIConfiguration() {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-2">Primary Model</label>
-                                <select
+                                <CustomSelect
                                     value={config.model}
-                                    onChange={e => setConfig({ ...config, model: e.target.value })}
-                                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-purple-500"
-                                >
-                                    <option value="GPT-4 Turbo">GPT-4 Turbo</option>
-                                    <option value="GPT-3.5 Turbo">GPT-3.5 Turbo</option>
-                                    <option value="Claude 3 Opus">Claude 3 Opus</option>
-                                    <option value="Gemini Flash 1.5">Gemini Flash 1.5</option>
-                                </select>
+                                    onChange={val => setConfig({ ...config, model: val })}
+                                    options={[
+                                        { value: 'GPT-4 Turbo', label: 'GPT-4 Turbo' },
+                                        { value: 'GPT-3.5 Turbo', label: 'GPT-3.5 Turbo' },
+                                        { value: 'Claude 3 Opus', label: 'Claude 3 Opus' },
+                                        { value: 'Gemini Flash 1.5', label: 'Gemini Flash 1.5' }
+                                    ]}
+                                />
                             </div>
                         </div>
                     </div>

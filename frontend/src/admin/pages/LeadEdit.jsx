@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function LeadEdit(){
   const { id } = useParams();
   const isNew = id === 'new' || !id;
+  const [status, setStatus] = useState('New');
   return (
     <div className="admin-layout">
       <AdminSidebar />
@@ -24,11 +26,17 @@ export default function LeadEdit(){
               <input className="form-field" placeholder="Optional" />
             </label>
             <label className="form-label">Status
-              <select className="form-field" defaultValue="New">
-                <option>New</option>
-                <option>Contacted</option>
-                <option>Converted</option>
-              </select>
+              <div className="mt-1">
+                <CustomSelect
+                  value={status}
+                  onChange={setStatus}
+                  options={[
+                    { value: 'New', label: 'New' },
+                    { value: 'Contacted', label: 'Contacted' },
+                    { value: 'Converted', label: 'Converted' }
+                  ]}
+                />
+              </div>
             </label>
             <label className="form-label" style={{gridColumn:'1 / -1'}}>Notes
               <textarea className="form-field" placeholder="Notes about this lead" rows={4} />

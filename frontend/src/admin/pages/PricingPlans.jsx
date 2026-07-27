@@ -4,6 +4,7 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { PricingAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 function PlanForm({ initial, onCancel, onSave }) {
   const notify = useNotification();
@@ -64,15 +65,15 @@ function PlanForm({ initial, onCancel, onSave }) {
 
         <label className="flex flex-col gap-1">
           <span className="font-medium text-sm">Plan Type</span>
-          <select
-            className="form-field ux-input px-3 py-2 border rounded text-base"
+          <CustomSelect
+            options={[
+              { value: 'subscription', label: 'Subscription (Monthly/Yearly)' },
+              { value: 'one-time', label: 'One-Time Setup' },
+              { value: 'custom', label: 'Custom Quote' }
+            ]}
             value={form.planType}
-            onChange={e => setForm(f => ({ ...f, planType: e.target.value }))}
-          >
-            <option value="subscription">Subscription (Monthly/Yearly)</option>
-            <option value="one-time">One-Time Setup</option>
-            <option value="custom">Custom Quote</option>
-          </select>
+            onChange={val => setForm(f => ({ ...f, planType: val }))}
+          />
         </label>
 
         {form.planType === 'subscription' && (
@@ -192,27 +193,6 @@ export default function PricingPlans() {
   // Filter states
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'published', 'draft'
   const [planTypeFilter, setPlanTypeFilter] = useState('all'); // 'all', 'subscription', 'one-time', 'custom'
-  
-  // Dropdown states
-  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
-  const [planTypeDropdownOpen, setPlanTypeDropdownOpen] = useState(false);
-  
-  const statusDropdownRef = useRef(null);
-  const planTypeDropdownRef = useRef(null);
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
-        setStatusDropdownOpen(false);
-      }
-      if (planTypeDropdownRef.current && !planTypeDropdownRef.current.contains(event.target)) {
-        setPlanTypeDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const total = items.length;
   const publishedCount = items.filter(p => !!p.published).length;
@@ -400,175 +380,21 @@ export default function PricingPlans() {
             </div>
 
             {/* Status Filter Dropdown */}
-            <div ref={statusDropdownRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-                style={{
-                  padding: '.5rem .75rem',
-                  borderRadius: '.375rem',
-                  border: '1px solid rgba(55, 65, 81, 0.5)',
-                  background: 'rgba(31, 41, 55, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '.5rem',
-                  minWidth: '140px',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>{selectedStatusOption.label}</span>
-                <span style={{fontSize:'.75rem'}}>▼</span>
-              </button>
-              
-              {statusDropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + .5rem)',
-                    right: 0,
-                    minWidth: '160px',
-                    padding: '.4rem',
-                    zIndex: 1000,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '.5rem',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {statusOptions.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setStatusFilter(option.value);
-                        setStatusDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '.6rem .85rem',
-                        background: statusFilter === option.value 
-                          ? 'rgba(59, 130, 246, 0.3)' 
-                          : 'transparent',
-                        border: statusFilter === option.value 
-                          ? '1px solid rgba(59, 130, 246, 0.5)' 
-                          : '1px solid transparent',
-                        borderRadius: '.375rem',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all .2s',
-                        fontSize: '.9rem',
-                        fontWeight: statusFilter === option.value ? '500' : '400',
-                        marginBottom: '.25rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (statusFilter !== option.value) {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (statusFilter !== option.value) {
-                          e.target.style.background = 'transparent';
-                          e.target.style.borderColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div style={{ width: '160px' }}>
+              <CustomSelect 
+                options={statusOptions}
+                value={statusFilter}
+                onChange={setStatusFilter}
+              />
             </div>
 
             {/* Plan Type Filter Dropdown */}
-            <div ref={planTypeDropdownRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setPlanTypeDropdownOpen(!planTypeDropdownOpen)}
-                style={{
-                  padding: '.5rem .75rem',
-                  borderRadius: '.375rem',
-                  border: '1px solid rgba(55, 65, 81, 0.5)',
-                  background: 'rgba(31, 41, 55, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '.5rem',
-                  minWidth: '140px',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>{selectedPlanTypeOption.label}</span>
-                <span style={{fontSize:'.75rem'}}>▼</span>
-              </button>
-              
-              {planTypeDropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + .5rem)',
-                    right: 0,
-                    minWidth: '160px',
-                    padding: '.4rem',
-                    zIndex: 1000,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '.5rem',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {planTypeOptions.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setPlanTypeFilter(option.value);
-                        setPlanTypeDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '.6rem .85rem',
-                        background: planTypeFilter === option.value 
-                          ? 'rgba(59, 130, 246, 0.3)' 
-                          : 'transparent',
-                        border: planTypeFilter === option.value 
-                          ? '1px solid rgba(59, 130, 246, 0.5)' 
-                          : '1px solid transparent',
-                        borderRadius: '.375rem',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all .2s',
-                        fontSize: '.9rem',
-                        fontWeight: planTypeFilter === option.value ? '500' : '400',
-                        marginBottom: '.25rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (planTypeFilter !== option.value) {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (planTypeFilter !== option.value) {
-                          e.target.style.background = 'transparent';
-                          e.target.style.borderColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div style={{ width: '160px' }}>
+              <CustomSelect 
+                options={planTypeOptions}
+                value={planTypeFilter}
+                onChange={setPlanTypeFilter}
+              />
             </div>
 
             <button onClick={() => { setShowForm(true); setEditItem(null); }} className="btn">

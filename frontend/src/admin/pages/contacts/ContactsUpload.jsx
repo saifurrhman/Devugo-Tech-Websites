@@ -263,24 +263,30 @@ export default function ContactsUpload() {
 
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-gray-600 text-xs">→</span>
-                                                        <select
-                                                            className={`bg-[#002747] text-sm rounded px-3 py-1.5 outline-none min-w-[140px] transition-colors border ${mapping[header] ? 'border-blue-500 text-white' : 'border-white/10 text-gray-400'}`}
-                                                            value={mapping[header] || ''}
-                                                            onChange={(e) => handleMapChange(header, e.target.value)}
-                                                        >
-                                                            <option value="" className="bg-[#002747] text-white">Ignore</option>
-                                                            <optgroup label="Contact Fields" className="bg-[#002747] text-white">
-                                                                <option value="name" className="bg-[#002747] text-white py-2">Full Name</option>
-                                                                <option value="email" className="bg-[#002747] text-white py-2">Email Address</option>
-                                                                <option value="phone" className="bg-[#002747] text-white py-2">Phone Number</option>
-                                                                <option value="company" className="bg-[#002747] text-white py-2">Company</option>
-                                                                <option value="jobTitle" className="bg-[#002747] text-white py-2">Job Title</option>
-                                                                <option value="website" className="bg-[#002747] text-white py-2">Website</option>
-                                                                <option value="city" className="bg-[#002747] text-white py-2">City</option>
-                                                                <option value="country" className="bg-[#002747] text-white py-2">Country</option>
-                                                                <option value="tags" className="bg-[#002747] text-white py-2">Tags</option>
-                                                            </optgroup>
-                                                        </select>
+                                                        <div className="w-[140px]">
+                                                            <CustomSelect
+                                                                value={mapping[header] || ''}
+                                                                onChange={(val) => handleMapChange(header, val)}
+                                                                groups={true}
+                                                                options={[
+                                                                    { label: '', options: [{ value: '', label: 'Ignore' }] },
+                                                                    {
+                                                                        label: 'Contact Fields',
+                                                                        options: [
+                                                                            { value: 'name', label: 'Full Name' },
+                                                                            { value: 'email', label: 'Email Address' },
+                                                                            { value: 'phone', label: 'Phone Number' },
+                                                                            { value: 'company', label: 'Company' },
+                                                                            { value: 'jobTitle', label: 'Job Title' },
+                                                                            { value: 'website', label: 'Website' },
+                                                                            { value: 'city', label: 'City' },
+                                                                            { value: 'country', label: 'Country' },
+                                                                            { value: 'tags', label: 'Tags' }
+                                                                        ]
+                                                                    }
+                                                                ]}
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ))}

@@ -459,17 +459,18 @@ export default function CreateCampaign() {
 
                     <div className="flex items-center gap-4">
                       <label className="text-sm text-gray-300">Send if no reply after</label>
-                      <select
-                        value={formData.followUpDelay}
-                        onChange={handleInputChange}
-                        name="followUpDelay"
-                        className="bg-gray-900 border border-gray-700 rounded px-3 py-1 text-white text-sm focus:border-blue-500 outline-none"
-                      >
-                        <option value="2">2 Days</option>
-                        <option value="3">3 Days</option>
-                        <option value="5">5 Days</option>
-                        <option value="7">7 Days</option>
-                      </select>
+                      <div className="w-32">
+                        <CustomSelect
+                          value={formData.followUpDelay}
+                          onChange={(val) => setFormData(prev => ({ ...prev, followUpDelay: val }))}
+                          options={[
+                            { value: '2', label: '2 Days' },
+                            { value: '3', label: '3 Days' },
+                            { value: '5', label: '5 Days' },
+                            { value: '7', label: '7 Days' }
+                          ]}
+                        />
+                      </div>
                     </div>
 
                     <div className="form-group">

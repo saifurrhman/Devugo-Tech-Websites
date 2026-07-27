@@ -1,6 +1,7 @@
 import React from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function AISettings() {
     return (
@@ -40,10 +41,14 @@ export default function AISettings() {
 
                             <div>
                                 <label className="block text-sm text-gray-400 mb-1">Default Model</label>
-                                <select className="w-full bg-[#0f172a] border border-gray-700 rounded px-3 py-2 text-white outline-none focus:border-purple-500">
-                                    <option>gpt-4-turbo</option>
-                                    <option>gpt-3.5-turbo</option>
-                                </select>
+                                <CustomSelect
+                                    value="gpt-4-turbo"
+                                    onChange={() => {}}
+                                    options={[
+                                        { value: 'gpt-4-turbo', label: 'gpt-4-turbo' },
+                                        { value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo' }
+                                    ]}
+                                />
                             </div>
 
                             <div>

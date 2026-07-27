@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { ChevronDown, Check } from 'lucide-react';
 
 export default function CustomSelect({
     options = [],
@@ -7,11 +7,32 @@ export default function CustomSelect({
     onChange,
     placeholder = "Select...",
     className = "",
+    disabled = false,
     groups = false // If true, expects options as [{label: "Group Name", options: [...]}]
 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [highlightedIndex, setHighlightedIndex] = useState(-1);
+    const [openUpwards, setOpenUpwards] = useState(false);
+    
     const containerRef = useRef(null);
+    const listboxRef = useRef(null);
+    const buttonRef = useRef(null);
 
+    // Flatten options for easy index calculation
+    const flatOptions = useMemo(() => {
+        if (!groups) return options;
+        return options.reduce((acc, group) => {
+            return [...acc, ...group.options];
+        }, []);
+    }, [options, groups]);
+
+    const selectedLabel = (() => {
+        if (value === undefined || value === null || value === '') return placeholder;
+        const found = flatOptions.find(opt => opt.value === value || opt.value === Number(value) || String(opt.value) === String(value));
+        return found ? found.label : value; 
+    })();
+
+    // Close on outside click
     useEffect(() => {
         function handleClickOutside(event) {
             if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -22,76 +43,186 @@ export default function CustomSelect({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const selectedLabel = (() => {
-        if (!value) return placeholder;
-
-        if (groups) {
-            for (const group of options) {
-                const found = group.options.find(opt => opt.value === value);
-                if (found) return found.label;
+    // Handle smart positioning
+    useEffect(() => {
+        if (isOpen && buttonRef.current && listboxRef.current) {
+            const buttonRect = buttonRef.current.getBoundingClientRect();
+            const listboxRect = listboxRef.current.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            
+            // If it goes off the bottom of the screen, open upwards
+            if (buttonRect.bottom + listboxRect.height > windowHeight - 20) {
+                setOpenUpwards(true);
+            } else {
+                setOpenUpwards(false);
             }
-        } else {
-            const found = options.find(opt => opt.value === value);
-            if (found) return found.label;
         }
-        return value; // Fallback
-    })();
+    }, [isOpen]);
 
-    const handleSelect = (val) => {
+    // Focus highlighted element
+    useEffect(() => {
+        if (isOpen && highlightedIndex >= 0 && listboxRef.current) {
+            const el = listboxRef.current.querySelector(`[data-index="${highlightedIndex}"]`);
+            if (el) {
+                el.scrollIntoView({ block: 'nearest' });
+            }
+        }
+    }, [highlightedIndex, isOpen]);
+
+    const handleSelect = useCallback((val) => {
         onChange(val);
         setIsOpen(false);
+        buttonRef.current?.focus();
+    }, [onChange]);
+
+    const toggleOpen = () => {
+        if (disabled) return;
+        setIsOpen(!isOpen);
+        if (!isOpen) {
+            // Find current value index to highlight
+            const idx = flatOptions.findIndex(opt => String(opt.value) === String(value));
+            setHighlightedIndex(idx >= 0 ? idx : 0);
+        }
     };
+
+    const handleKeyDown = (e) => {
+        if (disabled) return;
+
+        switch (e.key) {
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                if (isOpen) {
+                    if (highlightedIndex >= 0 && highlightedIndex < flatOptions.length) {
+                        handleSelect(flatOptions[highlightedIndex].value);
+                    }
+                } else {
+                    toggleOpen();
+                }
+                break;
+            case 'Escape':
+                if (isOpen) {
+                    setIsOpen(false);
+                    buttonRef.current?.focus();
+                }
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                if (!isOpen) {
+                    toggleOpen();
+                } else {
+                    setHighlightedIndex(prev => Math.min(prev + 1, flatOptions.length - 1));
+                }
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                if (!isOpen) {
+                    toggleOpen();
+                } else {
+                    setHighlightedIndex(prev => Math.max(prev - 1, 0));
+                }
+                break;
+            case 'Tab':
+                if (isOpen) {
+                    setIsOpen(false);
+                }
+                break;
+            default:
+                break;
+        }
+    };
+
+    let optionIndexCounter = 0;
 
     return (
         <div className={`relative ${className}`} ref={containerRef}>
             <button
+                ref={buttonRef}
                 type="button"
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-left flex justify-between items-center transition-colors"
+                disabled={disabled}
+                onClick={toggleOpen}
+                onKeyDown={handleKeyDown}
+                aria-haspopup="listbox"
+                aria-expanded={isOpen}
+                className={`w-full bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none focus:border-blue-500 focus:bg-[rgba(67,133,205,0.07)] text-left flex justify-between items-center transition-all min-h-[40px] sm:min-h-[42px] ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-[rgba(255,255,255,0.06)]'}`}
             >
-                <span className="truncate">{selectedLabel}</span>
-                <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <span className="truncate text-[0.88rem] pr-2">{selectedLabel}</span>
+                <ChevronDown size={15} className={`text-gray-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-[#002747] border border-white/10 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto custom-scrollbar backdrop-blur-sm">
+                <div 
+                    ref={listboxRef}
+                    role="listbox"
+                    className={`absolute left-0 right-0 ${openUpwards ? 'bottom-full mb-1' : 'top-full mt-1'} bg-[#002747] border border-white/10 rounded-lg shadow-2xl z-[100] max-h-60 overflow-y-auto custom-scrollbar p-1.5 min-w-[120px]`}
+                >
                     {groups ? (
                         options.map((group, groupIndex) => (
-                            <div key={groupIndex}>
+                            <div key={groupIndex} className="mb-1 last:mb-0">
                                 {group.label && (
-                                    <div className="px-3 py-2 text-xs font-semibold text-gray-400 bg-[#003560]/50 uppercase tracking-wider sticky top-0">
+                                    <div className="px-3 py-1.5 text-[0.7rem] font-bold text-[rgba(255,255,255,0.45)] uppercase tracking-wider sticky top-0 bg-[#002747] z-10">
                                         {group.label}
                                     </div>
                                 )}
-                                {group.options.map((opt) => (
-                                    <button
-                                        key={opt.value}
-                                        type="button"
-                                        onClick={() => handleSelect(opt.value)}
-                                        className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-blue-600/20 hover:text-blue-200 ${value === opt.value ? 'bg-blue-600 text-white' : 'text-gray-200'
+                                {group.options.map((opt) => {
+                                    const index = optionIndexCounter++;
+                                    const isSelected = String(value) === String(opt.value);
+                                    const isHighlighted = highlightedIndex === index;
+                                    
+                                    return (
+                                        <div
+                                            key={opt.value}
+                                            role="option"
+                                            aria-selected={isSelected}
+                                            data-index={index}
+                                            onClick={() => handleSelect(opt.value)}
+                                            onMouseEnter={() => setHighlightedIndex(index)}
+                                            className={`w-full text-left px-3 py-2 text-[0.85rem] rounded-md transition-colors cursor-pointer flex items-center justify-between ${
+                                                isSelected 
+                                                    ? 'bg-[rgba(67,133,205,0.2)] text-white font-medium' 
+                                                    : isHighlighted 
+                                                        ? 'bg-[rgba(255,255,255,0.06)] text-white' 
+                                                        : 'text-[rgba(255,255,255,0.7)]'
                                             }`}
-                                    >
-                                        {opt.label}
-                                    </button>
-                                ))}
+                                        >
+                                            <span className="truncate pr-4">{opt.label}</span>
+                                            {isSelected && <Check size={14} className="text-blue-400 flex-shrink-0" />}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         ))
                     ) : (
-                        options.map((opt) => (
-                            <button
-                                key={opt.value}
-                                type="button"
-                                onClick={() => handleSelect(opt.value)}
-                                className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-blue-600/20 hover:text-blue-200 ${value === opt.value ? 'bg-blue-600 text-white' : 'text-gray-200'
+                        options.map((opt) => {
+                            const index = optionIndexCounter++;
+                            const isSelected = String(value) === String(opt.value);
+                            const isHighlighted = highlightedIndex === index;
+                            
+                            return (
+                                <div
+                                    key={opt.value}
+                                    role="option"
+                                    aria-selected={isSelected}
+                                    data-index={index}
+                                    onClick={() => handleSelect(opt.value)}
+                                    onMouseEnter={() => setHighlightedIndex(index)}
+                                    className={`w-full text-left px-3 py-2 text-[0.85rem] rounded-md transition-colors cursor-pointer flex items-center justify-between ${
+                                        isSelected 
+                                            ? 'bg-[rgba(67,133,205,0.2)] text-white font-medium' 
+                                            : isHighlighted 
+                                                ? 'bg-[rgba(255,255,255,0.06)] text-white' 
+                                                : 'text-[rgba(255,255,255,0.7)]'
                                     }`}
-                            >
-                                {opt.label}
-                            </button>
-                        ))
+                                >
+                                    <span className="truncate pr-4">{opt.label}</span>
+                                    {isSelected && <Check size={14} className="text-blue-400 flex-shrink-0" />}
+                                </div>
+                            );
+                        })
                     )}
 
-                    {(!options || options.length === 0) && (
-                        <div className="px-4 py-3 text-center text-gray-500 text-sm">
+                    {(!options || flatOptions.length === 0) && (
+                        <div className="px-4 py-3 text-center text-[rgba(255,255,255,0.4)] text-sm">
                             No options available
                         </div>
                     )}

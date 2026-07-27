@@ -11,6 +11,7 @@ import AdminTopbar from '../../../components/AdminTopbar';
 import AIPanel from '../../../components/AIPanel';
 import { TemplateAPI, AIAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import CustomSelect from '../../../components/CustomSelect';
 
 // --- Block Definitions ---
 const BLOCK_TYPES = {
@@ -352,9 +353,12 @@ export default function CreateTemplate() {
                             </div>
                             <div>
                                 <label className="text-xs text-gray-400">Font Size</label>
-                                <select value={block.content.styles.fontSize} onChange={(e) => updateBlock(block.id, { styles: { ...block.content.styles, fontSize: e.target.value } })} className="w-full h-8 bg-gray-800 border-gray-700 rounded text-xs text-white">
-                                    {[12, 14, 16, 18, 20, 24, 30, 36, 48].map(s => <option key={s} value={`${s}px`}>{s}px</option>)}
-                                </select>
+                                <CustomSelect 
+                                    value={block.content.styles.fontSize} 
+                                    onChange={(val) => updateBlock(block.id, { styles: { ...block.content.styles, fontSize: val } })}
+                                    options={[12, 14, 16, 18, 20, 24, 30, 36, 48].map(s => ({ value: `${s}px`, label: `${s}px` }))}
+                                    className="w-full"
+                                />
                             </div>
                         </div>
                     </div>

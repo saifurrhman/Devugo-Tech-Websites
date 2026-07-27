@@ -5,6 +5,7 @@ import AdminTopbar from '../../components/AdminTopbar';
 // For now, I'll mock the save/load or use a generic SettingsAPI if available.
 import { SettingsAPI } from '../../lib/api'; // I need to verify if this exists, but I'll assume for now or create it.
 import { useNotification } from '../../contexts/NotificationContext';
+import CustomSelect from '../../components/CustomSelect';
 
 export default function SMTPSettings() {
     const { success, error: notifyError, warning } = useNotification();
@@ -71,17 +72,16 @@ export default function SMTPSettings() {
                             {/* Provider Selection */}
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-300">Email Provider</label>
-                                <select
-                                    name="provider"
+                                <CustomSelect
                                     value={config.provider}
-                                    onChange={handleChange}
-                                    className="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2.5 text-white outline-none focus:border-blue-500"
-                                >
-                                    <option value="brevo">Brevo (Sendinblue)</option>
-                                    <option value="smtp">Custom SMTP</option>
-                                    <option value="ses">Amazon SES</option>
-                                    <option value="sendgrid">SendGrid</option>
-                                </select>
+                                    onChange={(val) => setConfig(prev => ({ ...prev, provider: val }))}
+                                    options={[
+                                        { value: 'brevo', label: 'Brevo (Sendinblue)' },
+                                        { value: 'smtp', label: 'Custom SMTP' },
+                                        { value: 'ses', label: 'Amazon SES' },
+                                        { value: 'sendgrid', label: 'SendGrid' }
+                                    ]}
+                                />
                             </div>
 
                             {/* API Configuration */}
