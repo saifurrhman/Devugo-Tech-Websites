@@ -5,6 +5,7 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { AuthAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import { Mail, ArrowLeft, CheckCircle, Shield, Globe, PenTool, Layout, Users } from 'lucide-react';
+import Spinner from '../../components/Spinner';
 
 export default function InviteUser() {
     const navigate = useNavigate();
@@ -247,7 +248,7 @@ export default function InviteUser() {
                                 >
                                     {inviting ? (
                                         <>
-                                            <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                            <Spinner size="sm" />
                                             Sending...
                                         </>
                                     ) : (
