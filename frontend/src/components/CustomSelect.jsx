@@ -144,17 +144,17 @@ export default function CustomSelect({
                 onKeyDown={handleKeyDown}
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
-                className={`w-full bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-lg px-3.5 py-2 text-white outline-none focus:border-blue-500 focus:bg-[rgba(67,133,205,0.07)] text-left flex justify-between items-center transition-all min-h-[40px] sm:min-h-[42px] ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-[rgba(255,255,255,0.06)]'}`}
+                className={`w-full bg-[#002747] border ${isOpen ? 'border-blue-500 ring-1 ring-blue-500' : 'border-white/10'} rounded-md px-3.5 py-2 text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-left flex justify-between items-center transition-all min-h-[38px] ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-[rgba(255,255,255,0.06)]'}`}
             >
-                <span className="truncate text-[0.88rem] pr-2">{selectedLabel}</span>
-                <ChevronDown size={15} className={`text-gray-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                <span className="truncate text-[0.85rem] font-medium pr-2">{selectedLabel}</span>
+                <ChevronDown size={14} strokeWidth={2} className={`text-gray-300 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (
                 <div 
                     ref={listboxRef}
                     role="listbox"
-                    className={`absolute left-0 right-0 ${openUpwards ? 'bottom-full mb-1' : 'top-full mt-1'} bg-[#002747] border border-white/10 rounded-lg shadow-2xl z-[100] max-h-60 overflow-y-auto custom-scrollbar p-1.5 min-w-[120px]`}
+                    className={`absolute left-0 right-0 ${openUpwards ? 'bottom-full mb-1' : 'top-full mt-1'} bg-[#002747] border border-blue-500/30 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.5)] z-[100] max-h-60 overflow-y-auto custom-scrollbar p-1 min-w-[140px]`}
                 >
                     {groups ? (
                         options.map((group, groupIndex) => (
