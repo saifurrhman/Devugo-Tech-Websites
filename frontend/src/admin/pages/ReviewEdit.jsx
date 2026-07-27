@@ -15,8 +15,6 @@ export default function ReviewEdit(){
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [form, setForm] = useState({ name:'', role:'', company:'', rating:5, summary:'', avatar:'', featured:true });
   const [avatarOk, setAvatarOk] = useState(true);
 
@@ -28,22 +26,18 @@ export default function ReviewEdit(){
     // Validate file type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      setError('Only image files are allowed (jpeg, jpg, png, gif, webp)');
-      setTimeout(() => setError(''), 3000);
+      notify.error('Only image files are allowed (jpeg, jpg, png, gif, webp)');
       return;
     }
     
     // Validate file size (5MB max)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      setError('File size must be less than 5MB');
-      setTimeout(() => setError(''), 3000);
+      notify.error('File size must be less than 5MB');
       return;
     }
     
     setUploading(true);
-    setError('');
-    setMessage('');
     
     try {
       // ✅ Use UploadAPI (Team jaisa)
@@ -52,16 +46,14 @@ export default function ReviewEdit(){
       if (data && data.url) {
         setForm(f => ({ ...f, avatar: data.url }));
         setAvatarOk(true);
-        setMessage('Avatar uploaded successfully!');
-        setTimeout(() => setMessage(''), 3000);
+        notify.success('Avatar uploaded successfully!');
       } else {
         throw new Error('Upload failed - no URL returned');
       }
       
     } catch (err) {
       console.error('Upload error:', err);
-      setError(err.message || 'Failed to upload avatar');
-      setTimeout(() => setError(''), 3000);
+      notify.error(err.message || 'Failed to upload avatar');
     } finally {
       setUploading(false);
     }
@@ -71,14 +63,14 @@ export default function ReviewEdit(){
     if(isNew) return;
     let mounted = true;
     (async()=>{
-      setLoading(true); setError('');
+      setLoading(true);
       try{
         const { item } = await ClientReviewAPI.get(id);
         if(mounted) setForm({
           name: item.name||'', role:item.role||'', company:item.company||'', rating: item.rating||5,
           summary:item.summary||'', avatar:item.avatar||'', featured: !!item.featured,
         });
-      }catch(err){ if(mounted) setError(err.message||'Failed to load'); }
+      }catch(err){ if(mounted) notify.error(err.message||'Failed to load'); }
       finally{ if(mounted) setLoading(false); }
     })();
     return ()=>{ mounted=false };
@@ -86,12 +78,19 @@ export default function ReviewEdit(){
 
   async function handleSave(e){
     e?.preventDefault?.();
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
     try{
       const payload = { ...form, rating: Math.min(5, Math.max(1, Number(form.rating)||5)) };
-      if (isNew) { await ClientReviewAPI.create(payload); navigate('/admin/reviews'); }
-      else { await ClientReviewAPI.update(id, payload); setMessage('Saved'); }
-    }catch(err){ setError(err.message||'Failed to save'); }
+      if (isNew) { 
+        await ClientReviewAPI.create(payload); 
+        notify.success('Review created');
+        navigate('/admin/reviews'); 
+      }
+      else { 
+        await ClientReviewAPI.update(id, payload); 
+        notify.success('Review saved'); 
+      }
+    }catch(err){ notify.error(err.message||'Failed to save'); }
     finally{ setSaving(false); }
   }
 
@@ -121,8 +120,6 @@ export default function ReviewEdit(){
           <h1 style={{fontSize: 'clamp(1.5rem, 5vw, 2rem)'}}>{isNew? 'Add Review':'Edit Review'}</h1>
         </div>
 
-        {error && <div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>}
-        {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
         {uploading && <div className="chip" style={{marginTop:'.5rem'}}>Uploading...</div>}
 
         {loading ? <div className="card" style={{marginTop:'1rem'}}>Loading…</div> : (

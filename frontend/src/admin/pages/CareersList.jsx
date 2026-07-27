@@ -105,10 +105,10 @@ export default function CareersList() {
   const toggleStatus = async (career) => {
     try {
       await CareerAPI.update(career._id, { isActive: !career.isActive });
-      notifySuccess(`Career marked as ${!career.isActive ? 'Active' : 'Inactive'}`);
+      notifySuccess(`Job posting ${!career.isActive ? 'published' : 'unpublished'}.`);
       fetchCareers();
     } catch (err) {
-      notifyError('Failed to update status');
+      notifyError('Failed to update status. Please try again.');
     }
   };
 

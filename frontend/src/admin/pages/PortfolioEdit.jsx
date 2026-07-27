@@ -14,8 +14,6 @@ export default function PortfolioEdit() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
 
   const [form, setForm] = useState({
     title: '',
@@ -37,7 +35,6 @@ export default function PortfolioEdit() {
 
     (async () => {
       setLoading(true);
-      setError('');
       try {
         const { item } = await PortfolioAPI.get(id);
         if (!mounted) return;
@@ -53,7 +50,7 @@ export default function PortfolioEdit() {
           featured: !!item.featured
         });
       } catch (err) {
-        if (mounted) setError(err.message || 'Failed to load item');
+        if (mounted) notify.error(err.message || 'Failed to load item');
       } finally {
         if (mounted) setLoading(false);
       }
@@ -113,9 +110,9 @@ export default function PortfolioEdit() {
       );
 
       setForm(f => ({ ...f, thumbnails: [...f.thumbnails, ...uploads] }));
-      setMessage('Images uploaded');
+      notify.success('Images uploaded');
     } catch (err) {
-      setError(err.message || 'Failed to upload images');
+      notify.error(err.message || 'Failed to upload images');
     } finally {
       e.target.value = '';
     }
@@ -131,8 +128,6 @@ export default function PortfolioEdit() {
   async function handleSave(e) {
     e.preventDefault();
     setSaving(true);
-    setMessage('');
-    setError('');
 
     try {
       const payload = {
@@ -148,13 +143,14 @@ export default function PortfolioEdit() {
 
       if (isNew) {
         await PortfolioAPI.create(payload);
+        notify.success('Project created successfully!');
         navigate('/admin/portfolio');
       } else {
         await PortfolioAPI.update(id, payload);
-        setMessage('Saved');
+        notify.success('Project saved successfully!');
       }
     } catch (err) {
-      setError(err.message || 'Failed to save');
+      notify.error(err.message || 'Failed to save');
     } finally {
       setSaving(false);
     }
@@ -178,7 +174,6 @@ export default function PortfolioEdit() {
       navigate('/admin/portfolio');
     } catch (err) {
       notify.error(err.message || 'Failed to delete');
-      setError(err.message || 'Failed to delete');
     } finally {
       setSaving(false);
     }
@@ -216,17 +211,6 @@ export default function PortfolioEdit() {
         </div>
 
         <h1 className="text-2xl font-bold mb-4">{isNew ? 'Add Project' : 'Edit Project'}</h1>
-        
-        {error && (
-          <div className="card mb-4 p-3 bg-red-50 border border-red-200 text-red-600">
-            {error}
-          </div>
-        )}
-        {message && (
-          <div className="card mb-4 p-3 bg-green-50 border border-green-200 text-green-600">
-            {message}
-          </div>
-        )}
 
         <form onSubmit={handleSave}>
           

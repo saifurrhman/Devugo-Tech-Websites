@@ -72,6 +72,7 @@ export default function Brands() {
         try {
             await BrandAPI.create(form);
             setForm({ name: '', logo: '', url: '', isActive: true });
+            notify.success('Brand created successfully!');
             await load();
         } catch (e) {
             console.error('Create error:', e);
@@ -118,6 +119,7 @@ export default function Brands() {
         try {
             await BrandAPI.update(editId, editForm);
             setEditId(null);
+            notify.success('Brand updated successfully!');
             await load();
         } catch (e) {
             console.error(e);
@@ -135,6 +137,7 @@ export default function Brands() {
         if (!confirmed) return;
         try {
             await BrandAPI.remove(id);
+            notify.success('Brand deleted successfully!');
             await load();
         } catch (e) {
             console.error(e);
@@ -145,8 +148,12 @@ export default function Brands() {
     async function onToggle(item) {
         try {
             await BrandAPI.update(item._id, { isActive: !item.isActive });
+            notify.success(`Brand ${!item.isActive ? 'activated' : 'deactivated'}.`);
             load();
-        } catch (e) { console.error(e); }
+        } catch (e) { 
+            console.error(e); 
+            notify.error('Failed to update status.');
+        }
     }
 
     return (

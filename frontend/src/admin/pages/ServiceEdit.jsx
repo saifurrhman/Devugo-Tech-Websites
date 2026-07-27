@@ -14,8 +14,6 @@ export default function ServiceEdit(){
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [form, setForm] = useState({
     title: '', slug: '', description: '', features: '', icon: '', published: true, order: 0,
   });
@@ -26,7 +24,7 @@ export default function ServiceEdit(){
     if (isNew) return;
     let mounted = true;
     (async()=>{
-      setLoading(true); setError('');
+      setLoading(true);
       try{
         const [{ item }, { items: allPlans }] = await Promise.all([
           ServiceAPI.get(id),
@@ -48,7 +46,7 @@ export default function ServiceEdit(){
         const also = (allPlans||[]).filter(p=>String(p.service||'')===String(id)).map(p=>String(p._id));
         const merged = Array.from(new Set([ ...preselected, ...also ]));
         setSelectedPlans(merged);
-      }catch(err){ if(mounted) setError(err.message||'Failed to load service'); }
+      }catch(err){ if(mounted) notify.error(err.message||'Failed to load service'); }
       finally{ if(mounted) setLoading(false); }
     })();
     return ()=>{ mounted=false };
@@ -61,7 +59,7 @@ export default function ServiceEdit(){
 
   async function handleSave(e){
     e?.preventDefault?.();
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
     try{
       const payload = {
         title: form.title,
@@ -86,11 +84,9 @@ export default function ServiceEdit(){
         // Notify lists to refresh
         try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}
         notify.success('Service saved successfully');
-        setMessage('Saved');
       }
     }catch(err){ 
       notify.error(err.message||'Failed to save'); 
-      setError(err.message||'Failed to save'); 
     }
     finally{ setSaving(false); }
   }
@@ -120,7 +116,7 @@ export default function ServiceEdit(){
     });
     if (!confirmed) return;
     
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
     try{ 
       await ServiceAPI.remove(id); 
       try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}; 
@@ -129,7 +125,6 @@ export default function ServiceEdit(){
     }
     catch(err){ 
       notify.error(err.message||'Failed to delete'); 
-      setError(err.message||'Failed to delete'); 
     }
     finally{ setSaving(false); }
   }
@@ -166,8 +161,6 @@ export default function ServiceEdit(){
           {isNew ? 'Create Service' : 'Edit Service'}
           <span className="badge" style={{marginLeft:'.6rem'}}>{form.published ? 'Published' : 'Draft'}</span>
         </h1>
-        {error && <div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>}
-        {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
 
         <form onSubmit={handleSave} style={{marginTop:'1rem'}}>
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-4">

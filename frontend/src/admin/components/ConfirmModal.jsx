@@ -54,25 +54,45 @@ export default function ConfirmModal({
         <div style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
             {/* Backdrop */}
             <div 
-                style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} 
+                style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', transition: 'opacity 0.2s ease-in-out' }} 
                 onClick={onCancel}
             ></div>
             
             {/* Modal Card */}
             <div 
-                className="card animate-in fade-in zoom-in-95" 
+                className="card" 
                 style={{ 
                     position: 'relative', width: '100%', maxWidth: '450px', margin: 0, padding: 0, 
                     display: 'flex', flexDirection: 'column', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', zIndex: 10, overflow: 'hidden'
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', zIndex: 10, overflow: 'hidden',
+                    animation: 'scaleIn 0.2s ease-out forwards'
                 }}
                 role="dialog"
                 aria-modal="true"
             >
+                <style>
+                    {`
+                    @keyframes scaleIn {
+                        from { opacity: 0; transform: scale(0.95); }
+                        to { opacity: 1; transform: scale(1); }
+                    }
+                    `}
+                </style>
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 600 }}>{title}</h3>
-                    <button onClick={onCancel} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '1.5rem', lineHeight: 1, padding: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem 1.5rem 1rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        {variant === 'danger' ? (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(220, 38, 38, 0.1)', color: '#ef4444' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                            </div>
+                        )}
+                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600, color: '#fff', letterSpacing: '-0.01em' }}>{title}</h3>
+                    </div>
+                    <button onClick={onCancel} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '1.5rem', lineHeight: 1, padding: '0.25rem', transition: 'color 0.15s ease' }} onMouseOver={(e) => e.currentTarget.style.color = 'white'} onMouseOut={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.4)'}>
                         &times;
                     </button>
                 </div>
@@ -80,7 +100,7 @@ export default function ConfirmModal({
                 {/* Body */}
                 <form id="confirm-modal-form" onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
                     {message && (
-                        <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: type === 'prompt' ? '1rem' : 0 }}>
+                        <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: type === 'prompt' ? '1.25rem' : 0 }}>
                             {message}
                         </p>
                     )}
@@ -99,15 +119,32 @@ export default function ConfirmModal({
                 </form>
 
                 {/* Footer */}
-                <div style={{ padding: '1.25rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '0.75rem', background: 'rgba(0,0,0,0.15)', justifyContent: 'flex-end' }}>
-                    <button type="button" onClick={onCancel} className="btn-secondary" style={{ padding: '0.5rem 1rem' }}>
+                <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '0.75rem', background: 'rgba(0,0,0,0.15)', justifyContent: 'flex-end' }}>
+                    <button type="button" onClick={onCancel} className="btn-secondary" style={{ padding: '0.5rem 1.25rem' }}>
                         {cancelText}
                     </button>
                     <button 
                         form="confirm-modal-form" 
                         type="submit" 
                         className={`btn ${variant === 'danger' ? 'danger' : ''}`}
-                        style={{ padding: '0.5rem 1rem' }}
+                        style={{ 
+                            padding: '0.5rem 1.25rem',
+                            background: variant === 'danger' ? '#dc2626' : undefined,
+                            borderColor: variant === 'danger' ? '#dc2626' : undefined,
+                            color: variant === 'danger' ? '#fff' : undefined
+                        }}
+                        onMouseOver={(e) => {
+                            if (variant === 'danger') {
+                                e.currentTarget.style.background = '#b91c1c';
+                                e.currentTarget.style.borderColor = '#b91c1c';
+                            }
+                        }}
+                        onMouseOut={(e) => {
+                            if (variant === 'danger') {
+                                e.currentTarget.style.background = '#dc2626';
+                                e.currentTarget.style.borderColor = '#dc2626';
+                            }
+                        }}
                     >
                         {confirmText}
                     </button>

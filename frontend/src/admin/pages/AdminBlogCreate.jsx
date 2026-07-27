@@ -26,9 +26,8 @@ export default function AdminBlogCreate() {
     published: false,
     seoTitle: '',
     seoDescription: '',
+    seoDescription: '',
   });
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [shareToSocial, setShareToSocial] = useState(false);
   const editorRef = useRef(null);
   const [categories, setCategories] = useState([]);
@@ -51,8 +50,6 @@ export default function AdminBlogCreate() {
   async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
-    setError('');
-    setMessage('');
     try {
       const payload = {
         title: form.title,
@@ -67,10 +64,10 @@ export default function AdminBlogCreate() {
         seo: { metaTitle: form.seoTitle, metaDescription: form.seoDescription },
       };
       await BlogAPI.create(payload);
-      setMessage('Post created');
+      notify.success('Post created successfully!');
       navigate('/admin/blog');
     } catch (err) {
-      setError(err.message || 'Failed to create post');
+      notify.error(err.message || 'Failed to create post. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -134,7 +131,7 @@ export default function AdminBlogCreate() {
         const dataUrl = reader.result;
         const { url } = await UploadAPI.image(dataUrl, file.name);
         setForm(f => ({ ...f, [field]: url }));
-        setMessage(`${field} uploaded`);
+        notify.success(`${field} uploaded`);
       };
       reader.readAsDataURL(file);
     };
@@ -159,6 +156,7 @@ export default function AdminBlogCreate() {
           document.execCommand('insertHTML', false, img);
           setForm(f => ({ ...f, content: current.innerHTML }));
         }
+        notify.success('Image inserted');
       };
       reader.readAsDataURL(file);
     };
@@ -174,9 +172,9 @@ export default function AdminBlogCreate() {
         const dataUrl = reader.result;
         const { url } = await UploadAPI.image(dataUrl, file.name);
         setForm(f => ({ ...f, coverImage: url }));
-        setMessage('Cover image uploaded');
+        notify.success('Cover image uploaded');
       } catch (err) {
-        setError(err.message || 'Failed to upload image');
+        notify.error(err.message || 'Failed to upload image');
       }
     };
     reader.readAsDataURL(file);
@@ -218,7 +216,7 @@ export default function AdminBlogCreate() {
       };
     });
     setGeneratorOpen(false);
-    setMessage('Content & Images applied successfully! 🚀');
+    notify.success('Content & Images applied successfully! 🚀');
   }
 
   return (
@@ -252,11 +250,7 @@ export default function AdminBlogCreate() {
           >
             <span>✨ Auto-Generate with AI</span>
           </button>
-
         </div>
-
-        {error && (<div className="chip chip-error" style={{ marginTop: '.5rem' }}>{error}</div>)}
-        {message && (<div className="chip chip-success" style={{ marginTop: '.5rem' }}>{message}</div>)}
 
         <form onSubmit={handleSubmit} style={{ marginTop: '1rem', display: 'grid', gap: '1rem' }}>
           {/* Basic Details */}

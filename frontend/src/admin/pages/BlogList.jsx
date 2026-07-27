@@ -133,8 +133,9 @@ useEffect(() => {
     try{
       const { post } = await BlogAPI.update(p._id, { published: !p.published });
       setPosts(prev=>prev.map(x=>x._id===p._id? post : x));
+      notify.success(`Post ${post.published ? 'published' : 'unpublished'}.`);
     }catch(err){
-      notify.error(err.message||'Failed to update');
+      notify.error(err.message||'Failed to update post. Please try again.');
     }
   }
 

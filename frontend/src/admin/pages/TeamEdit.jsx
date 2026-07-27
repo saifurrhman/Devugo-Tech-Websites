@@ -15,8 +15,6 @@ export default function TeamEdit(){
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [form, setForm] = useState({
     name: '', role: '', bio: '', avatar: '', socials: { linkedin:'', twitter:'', github:'', website:'' }
   });
@@ -33,22 +31,18 @@ export default function TeamEdit(){
     // Validate file type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      setError('Only image files are allowed (jpeg, jpg, png, gif, webp)');
-      setTimeout(() => setError(''), 3000);
+      notify.error('Only image files are allowed (jpeg, jpg, png, gif, webp)');
       return;
     }
     
     // Validate file size (5MB max)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
-      setError('File size must be less than 5MB');
-      setTimeout(() => setError(''), 3000);
+      notify.error('File size must be less than 5MB');
       return;
     }
     
     setUploading(true);
-    setError('');
-    setMessage('');
     
     try {
       // ✅ Use UploadAPI instead of axios
@@ -58,16 +52,14 @@ export default function TeamEdit(){
         // Update form with new image URL
         setForm(f => ({ ...f, avatar: data.url }));
         setAvatarOk(true);
-        setMessage('Avatar uploaded successfully!');
-        setTimeout(() => setMessage(''), 3000);
+        notify.success('Avatar uploaded successfully!');
       } else {
         throw new Error('Upload failed - no URL returned');
       }
       
     } catch (err) {
       console.error('Upload error:', err);
-      setError(err.message || 'Failed to upload avatar');
-      setTimeout(() => setError(''), 3000);
+      notify.error(err.message || 'Failed to upload avatar');
     } finally {
       setUploading(false);
     }
@@ -77,7 +69,7 @@ export default function TeamEdit(){
     if (isNew) return;
     let mounted = true;
     (async()=>{
-      setLoading(true); setError('');
+      setLoading(true);
       try{
         const { member } = await TeamAPI.get(id);
         if(!mounted) return;
@@ -93,7 +85,7 @@ export default function TeamEdit(){
             website: member.socials?.website || '',
           }
         });
-      }catch(err){ if(mounted) setError(err.message||'Failed to load member'); }
+      }catch(err){ if(mounted) notify.error(err.message||'Failed to load member'); }
       finally{ if(mounted) setLoading(false); }
     })();
     return ()=>{ mounted=false };
@@ -101,14 +93,13 @@ export default function TeamEdit(){
 
   async function handleSave(e){
     e?.preventDefault?.();
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
     try{
       const payload = { ...form };
       if (isNew){ await TeamAPI.create(payload); notify.success('Member created'); navigate('/admin/team'); }
-      else { await TeamAPI.update(id, payload); notify.success('Member saved'); setMessage('Saved'); }
+      else { await TeamAPI.update(id, payload); notify.success('Member saved'); }
     }catch(err){ 
       notify.error(err.message||'Failed to save'); 
-      setError(err.message||'Failed to save'); 
     }
     finally{ setSaving(false); }
   }
@@ -123,7 +114,7 @@ export default function TeamEdit(){
     });
     if (!confirmed) return;
     
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
     try{ 
       await TeamAPI.remove(id); 
       notify.success('Member removed');
@@ -131,7 +122,6 @@ export default function TeamEdit(){
     }
     catch(err){ 
       notify.error(err.message||'Failed to delete'); 
-      setError(err.message||'Failed to delete'); 
     }
     finally{ setSaving(false); }
   }
@@ -165,8 +155,6 @@ export default function TeamEdit(){
         </div>
 
         <h1 className="page-title" style={{marginTop:'.25rem'}}>{isNew? 'Add Member' : 'Edit Member'}</h1>
-        {error && <div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>}
-        {message && <div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>}
         {uploading && <div className="chip" style={{marginTop:'.5rem'}}>Uploading...</div>}
 
         <form onSubmit={handleSave} style={{marginTop:'1rem'}}>

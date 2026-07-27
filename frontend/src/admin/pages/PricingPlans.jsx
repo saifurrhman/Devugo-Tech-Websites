@@ -6,6 +6,7 @@ import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 
 function PlanForm({ initial, onCancel, onSave }) {
+  const notify = useNotification();
   const [form, setForm] = useState(() => ({
     name: initial?.name || '',
     priceMonthly: initial?.priceMonthly ?? 0,
@@ -35,13 +36,12 @@ function PlanForm({ initial, onCancel, onSave }) {
         features: form.features.split(',').map(s => s.trim()).filter(Boolean),
         recommended: !!form.recommended,
         published: !!form.published,
-        order: Number(form.order) || 0,
         planType: form.planType,
       };
 
       await onSave(payload);
     } catch (err) {
-      setError(err.message || 'Failed to save');
+      notify.error(err.message || 'Failed to save plan. Please check the fields and try again.');
     } finally {
       setSaving(false);
     }
@@ -49,12 +49,6 @@ function PlanForm({ initial, onCancel, onSave }) {
 
   return (
     <form onSubmit={handleSubmit} className="card mt-4 p-6 flex flex-col gap-6">
-      {error && (
-        <div className="bg-red-200 text-red-800 rounded p-3 text-sm">
-          {error}
-        </div>
-      )}
-
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
         <label className="flex flex-col gap-1">
@@ -315,12 +309,14 @@ export default function PricingPlans() {
     const { item } = await PricingAPI.create(payload);
     setItems(prev => [item, ...prev]);
     setShowForm(false);
+    notify.success('Plan created successfully.');
   }
 
   async function handleUpdate(id, payload) {
     const { item } = await PricingAPI.update(id, payload);
     setItems(prev => prev.map(p => (p._id === id ? item : p)));
     setEditItem(null);
+    notify.success('Plan updated successfully.');
   }
 
   async function handleDelete(id) {
@@ -341,8 +337,18 @@ export default function PricingPlans() {
   }
 
   async function toggleField(plan, field) {
-    const { item } = await PricingAPI.update(plan._id, { [field]: !plan[field] });
-    setItems(prev => prev.map(p => (p._id === plan._id ? item : p)));
+    try {
+      const { item } = await PricingAPI.update(plan._id, { [field]: !plan[field] });
+      setItems(prev => prev.map(p => (p._id === plan._id ? item : p)));
+      
+      if (field === 'published') {
+        notify.success(`Plan ${item.published ? 'published' : 'unpublished'}.`);
+      } else if (field === 'recommended') {
+        notify.success(`Plan ${item.recommended ? 'marked as recommended' : 'unmarked'}.`);
+      }
+    } catch (err) {
+      notify.error(err.message || 'Failed to update plan. Please try again.');
+    }
   }
 
   function formatPrice(plan) {

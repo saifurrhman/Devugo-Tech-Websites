@@ -12,8 +12,7 @@ export default function BlogEdit(){
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  const notify = useNotification();
   const [shareToSocial, setShareToSocial] = useState(false);
   const editorRef = useRef(null);
 
@@ -55,7 +54,7 @@ useEffect(() => {
         });
         setCategories(cats.items||[]);
       }catch(err){
-        if(mounted) setError(err.message || 'Failed to load post');
+        if(mounted) notify.error(err.message || 'Failed to load post');
       }finally{
         if(mounted) setLoading(false);
       }
@@ -96,7 +95,6 @@ useEffect(() => {
       if (!file) return;
       
       setUploading(true);
-      setMessage('Uploading image...');
       
       try {
         // ✅ Use uploadSingle instead of base64
@@ -104,14 +102,12 @@ useEffect(() => {
         
         if (data && data.url) {
           setForm(f => ({ ...f, [field]: data.url }));
-          setMessage('Image uploaded successfully!');
-          setTimeout(() => setMessage(''), 2000);
+          notify.success('Image uploaded successfully!');
         } else {
           throw new Error('Upload failed - no URL returned');
         }
       } catch (err) {
-        setError(err.message || 'Image upload failed');
-        setTimeout(() => setError(''), 3000);
+        notify.error(err.message || 'Image upload failed');
       } finally {
         setUploading(false);
       }
@@ -131,7 +127,6 @@ useEffect(() => {
       if (!file) return;
       
       setUploading(true);
-      setMessage('Uploading image...');
       
       try {
         // ✅ Use uploadSingle instead of base64
@@ -144,14 +139,12 @@ useEffect(() => {
             document.execCommand('insertHTML', false, `<img src="${data.url}" alt="" style="max-width:100%;height:auto;" />`); 
             setForm(f => ({ ...f, content: el.innerHTML })); 
           }
-          setMessage('Image inserted successfully!');
-          setTimeout(() => setMessage(''), 2000);
+          notify.success('Image inserted successfully!');
         } else {
           throw new Error('Upload failed - no URL returned');
         }
       } catch (err) {
-        setError(err.message || 'Image upload failed');
-        setTimeout(() => setError(''), 3000);
+        notify.error(err.message || 'Image upload failed');
       } finally {
         setUploading(false);
       }
@@ -171,7 +164,6 @@ useEffect(() => {
       if (!file) return;
       
       setUploading(true);
-      setMessage('Uploading gallery image...');
       
       try {
         // ✅ Use uploadSingle instead of base64
@@ -179,14 +171,12 @@ useEffect(() => {
         
         if (data && data.url) {
           setForm(f => ({ ...f, galleryImages: [...f.galleryImages, data.url] }));
-          setMessage('Gallery image uploaded!');
-          setTimeout(() => setMessage(''), 2000);
+          notify.success('Gallery image uploaded!');
         } else {
           throw new Error('Upload failed - no URL returned');
         }
       } catch (err) {
-        setError(err.message || 'Gallery image upload failed');
-        setTimeout(() => setError(''), 3000);
+        notify.error(err.message || 'Gallery image upload failed');
       } finally {
         setUploading(false);
       }
@@ -197,7 +187,7 @@ useEffect(() => {
 
   async function handleSave(e){
     e?.preventDefault?.();
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
     try{
       const payload = {
         title: form.title,
@@ -211,10 +201,10 @@ useEffect(() => {
         published: form.published,
       };
       const { post } = await BlogAPI.update(id, payload);
-      setMessage('Changes saved');
+      notify.success('Changes saved successfully.');
       setForm(f=>({...f, publishedAt: post.publishedAt || f.publishedAt }));
     }catch(err){
-      setError(err.message || 'Failed to save changes');
+      notify.error(err.message || 'Failed to save changes. Please try again.');
     }finally{
       setSaving(false);
     }
@@ -228,12 +218,13 @@ useEffect(() => {
       confirmText: 'Delete'
     });
     if(!confirmed) return;
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
     try{
       await BlogAPI.remove(id);
+      notify.success('Post deleted successfully.');
       navigate('/admin/blog');
     }catch(err){
-      setError(err.message || 'Failed to delete post');
+      notify.error(err.message || 'Failed to delete post');
     }finally{
       setSaving(false);
     }
@@ -245,7 +236,6 @@ useEffect(() => {
     if (!file) return;
     
     setUploading(true);
-    setMessage('Uploading cover image...');
     
     try {
       // ✅ Use uploadSingle instead of base64
@@ -253,14 +243,12 @@ useEffect(() => {
       
       if (data && data.url) {
         setForm(f => ({ ...f, coverImage: data.url }));
-        setMessage('Cover image uploaded!');
-        setTimeout(() => setMessage(''), 2000);
+        notify.success('Cover image uploaded!');
       } else {
         throw new Error('Upload failed - no URL returned');
       }
     } catch (err) {
-      setError(err.message || 'Cover image upload failed');
-      setTimeout(() => setError(''), 3000);
+      notify.error(err.message || 'Cover image upload failed');
     } finally {
       setUploading(false);
     }
@@ -295,8 +283,6 @@ useEffect(() => {
 
         <h1 className="page-title" style={{marginTop:'.25rem'}}>Edit Post</h1>
 
-        {error && (<div className="chip chip-error" style={{marginTop:'.5rem'}}>{error}</div>)}
-        {message && (<div className="chip chip-success" style={{marginTop:'.5rem'}}>{message}</div>)}
         {uploading && (<div className="chip" style={{marginTop:'.5rem'}}>Uploading...</div>)}
 
         <form onSubmit={handleSave} style={{marginTop:'1rem', display:'grid', gap:'1rem'}}>

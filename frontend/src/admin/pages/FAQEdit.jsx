@@ -14,8 +14,6 @@ export default function FAQEdit(){
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [form, setForm] = useState({ question:'', answer:'', category:'', order:0, published:true });
 
   useEffect(()=>{
@@ -32,7 +30,7 @@ export default function FAQEdit(){
           order: item.order || 0,
           published: !!item.published,
         });
-      }catch(err){ if(mounted) setError(err.message||'Failed to load'); }
+      }catch(err){ if(mounted) notify.error(err.message||'Failed to load'); }
       finally{ if(mounted) setLoading(false); }
     })();
     return ()=>{ mounted=false };
@@ -40,12 +38,12 @@ export default function FAQEdit(){
 
   async function handleSave(e){
     e?.preventDefault?.();
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
     try{
       const payload = { ...form, order: Number(form.order)||0 };
-      if(isNew){ await ClientFaqAPI.create(payload); notify.success('FAQ created'); navigate('/admin/faqs'); }
-      else { await ClientFaqAPI.update(id, payload); notify.success('FAQ saved'); setMessage('Saved'); }
-    }catch(err){ notify.error(err.message||'Failed to save'); setError(err.message||'Failed to save'); }
+      if(isNew){ await ClientFaqAPI.create(payload); notify.success('FAQ created successfully.'); navigate('/admin/faqs'); }
+      else { await ClientFaqAPI.update(id, payload); notify.success('FAQ saved successfully.'); }
+    }catch(err){ notify.error(err.message||'Failed to save FAQ. Please try again.'); }
     finally{ setSaving(false); }
   }
 
@@ -103,9 +101,6 @@ export default function FAQEdit(){
                 </div>
               </aside>
             </div>
-
-            {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
-            {message && <div className="card" style={{marginTop:'1rem', color:'#16a34a'}}>{message}</div>}
 
                <div className="bottom-actions">
             <div className="container flex flex-row items-center justify-end gap-3">
