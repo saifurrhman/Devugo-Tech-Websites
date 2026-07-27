@@ -305,6 +305,17 @@ export const TechnologyAPI = {
 };
 
 // ============================================
+// TECHNOLOGY CATEGORIES API (New)
+// ============================================
+export const TechnologyCategoryAPI = {
+  list: (params = {}) => api('/api/technology-categories' + buildQuery(params)),
+  create: (payload) => api('/api/technology-categories', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/technology-categories/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/technology-categories/${id}`, { method: 'DELETE' }),
+  reorder: (items) => api('/api/technology-categories/action/reorder', { method: 'PUT', body: { items } }),
+};
+
+// ============================================
 // TECH STACK API
 // ============================================
 export const TechStackAPI = {

@@ -259,6 +259,10 @@ app.use('/api/tech-stack', techStackRoutes);
 const technologyRoutes = require('./routes/technologyRoutes');
 app.use('/api/technologies', technologyRoutes);
 
+// Technology Categories Routes
+const technologyCategoryRoutes = require('./routes/technologyCategories');
+app.use('/api/technology-categories', technologyCategoryRoutes);
+
 // Review Routes
 const reviewRoutes = require('./routes/reviews');
 app.use('/api/reviews', reviewRoutes);

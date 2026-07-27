@@ -18,7 +18,6 @@ const TechnologySchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ['Frontend', 'Backend', 'Database', 'AI & Automation', 'DevOps', 'CMS/E-commerce', 'Other'],
       default: 'Other'
     },
     description: { 
