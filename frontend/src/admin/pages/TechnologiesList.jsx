@@ -247,6 +247,10 @@ export default function TechnologiesList() {
     }
   };
 
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
   const toggleSelectAll = () => {
     if (selectedIds.length === filteredItems.length && filteredItems.length > 0) {
       setSelectedIds([]);
