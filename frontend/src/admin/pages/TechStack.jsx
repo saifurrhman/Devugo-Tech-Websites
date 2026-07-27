@@ -5,6 +5,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { TechStackAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function TechStack(){
   const confirm = useConfirm();
@@ -14,6 +16,7 @@ export default function TechStack(){
   const [error, setError] = useState('');
   const [name, setName] = useState('');
   const [q, setQ] = useState('');
+  const [saving, setSaving] = useState(false);
   
   // Selection state
   const [selectedIds, setSelectedIds] = useState([]);
@@ -66,49 +69,52 @@ export default function TechStack(){
       return;
     }
     
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Technologies',
       message: `Delete ${selectedIds.length} selected technolog${selectedIds.length === 1 ? 'y' : 'ies'}?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        try {
+          await Promise.all(selectedIds.map(id => TechStackAPI.remove(id)));
+          setItems(prev => prev.filter(it => !selectedIds.includes(it._id)));
+          setSelectedIds([]);
+          notify.success('Selected technologies deleted successfully');
+        } catch (err) { 
+          notify.error(err.message || 'Failed to delete selected technologies'); 
+        }
+      }
     });
-    if (!confirmed) return;
-    
-    try {
-      await Promise.all(selectedIds.map(id => TechStackAPI.remove(id)));
-      setItems(prev => prev.filter(it => !selectedIds.includes(it._id)));
-      setSelectedIds([]);
-      notify.success('Selected technologies deleted successfully');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to delete selected technologies'); 
-    }
   }
 
   async function addItem(e){
     e?.preventDefault?.();
     if(!name.trim()) return;
+    setSaving(true);
     try{
       await TechStackAPI.create({ name: name.trim() });
       setName('');
       notify.success('Technology added');
       fetchAll();
     }catch(err){ notify.error(err.message || 'Failed to add'); }
+    finally { setSaving(false); }
   }
 
   async function removeItem(id){
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Technology',
       message: 'Delete this item?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        try{ 
+          await TechStackAPI.remove(id); 
+          setItems(prev => prev.filter(it => it._id !== id));
+          notify.success('Technology deleted');
+        }
+        catch(err){ notify.error(err.message || 'Failed to delete'); }
+      }
     });
-    if (!confirmed) return;
-    try{ 
-      await TechStackAPI.remove(id); 
-      setItems(prev => prev.filter(it => it._id !== id));
-      notify.success('Technology deleted');
-    }
-    catch(err){ notify.error(err.message || 'Failed to delete'); }
   }
 
   return (
@@ -151,7 +157,10 @@ export default function TechStack(){
               placeholder="e.g. React" 
               required 
             />
-            <button type="submit" className="btn">Add Technology</button>
+            <button type="submit" className="btn" disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+              {saving && <Spinner size="sm" />}
+              {saving ? 'Adding...' : 'Add Technology'}
+            </button>
           </div>
         </form>
 
@@ -195,7 +204,7 @@ export default function TechStack(){
         )}
 
         {/* Loading & Error States */}
-        {loading && <div className="card mt-4 p-4">Loading…</div>}
+        {loading && <div className="card mt-4"><LoadingState message="Loading tech stack..." /></div>}
         {error && <div className="card mt-4 p-4 text-red-500">{error}</div>}
         
         {/* Tech Stack List */}

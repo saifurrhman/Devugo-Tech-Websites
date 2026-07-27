@@ -13,6 +13,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { TechnologyCategoryAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 // Sortable Row Component
 function SortableCategoryRow({ id, category, handleEdit, handleDelete, handleToggleStatus }) {
@@ -56,6 +58,7 @@ export default function TechnologyCategoriesList() {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [saving, setSaving] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({ name: '', status: true });
@@ -116,20 +119,21 @@ export default function TechnologyCategoriesList() {
   };
 
   const handleDelete = async (id) => {
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Category',
       message: 'Are you sure you want to delete this category?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        try {
+          await TechnologyCategoryAPI.remove(id);
+          setCategories(prev => prev.filter(c => c._id !== id));
+          notify.success("Category deleted");
+        } catch(err) {
+          notify.error("Delete failed: " + err.message);
+        }
+      }
     });
-    if (!confirmed) return;
-    try {
-      await TechnologyCategoryAPI.remove(id);
-      setCategories(categories.filter(c => c._id !== id));
-      notify.success("Category deleted");
-    } catch(err) {
-      notify.error("Delete failed: " + err.message);
-    }
   };
 
   const openModal = (category = null) => {
@@ -145,6 +149,7 @@ export default function TechnologyCategoriesList() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
       if (editingCategory) {
         await TechnologyCategoryAPI.update(editingCategory._id, formData);
@@ -157,6 +162,8 @@ export default function TechnologyCategoriesList() {
       fetchAll();
     } catch(err) {
       notify.error("Save failed: " + err.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -190,7 +197,7 @@ export default function TechnologyCategoriesList() {
 
         {/* List Card */}
         <div className="card" style={{ marginTop: '.75rem' }}>
-            {loading ? <div className="muted" style={{ marginTop: '1rem', padding: '1rem' }}>Loading categories...</div> : error ? <div style={{ color: '#ef4444', padding: '1rem' }}>{error}</div> : (
+            {loading ? <LoadingState message="Loading categories..." /> : error ? <div style={{ color: '#ef4444', padding: '1rem' }}>{error}</div> : (
                 <div className="table-wrapper" style={{ overflowX: 'auto' }}>
                     <table className="table" style={{ width: '100%' }}>
                         <thead>
@@ -291,11 +298,12 @@ export default function TechnologyCategoriesList() {
             </form>
 
             <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '1rem', background: 'rgba(0,0,0,0.15)', justifyContent: 'flex-end' }}>
-              <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ padding: '0.5rem 1.5rem' }}>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" disabled={saving} style={{ padding: '0.5rem 1.5rem' }}>
                 Cancel
               </button>
-              <button form="cat-form" type="submit" className="btn" style={{ padding: '0.5rem 1.5rem' }}>
-                {editingCategory ? 'Save' : 'Add Category'}
+              <button form="cat-form" type="submit" className="btn" disabled={saving} style={{ padding: '0.5rem 1.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                {saving && <Spinner size="sm" />}
+                {saving ? 'Saving...' : (editingCategory ? 'Save' : 'Add Category')}
               </button>
             </div>
 
