@@ -6,6 +6,7 @@ import { ClientFaqAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
 
 export default function FAQsList(){
   const confirm = useConfirm();
@@ -85,38 +86,32 @@ export default function FAQsList(){
       return;
     }
     
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete FAQs',
       message: `Delete ${selectedIds.length} selected FAQ(s)?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await Promise.all(selectedIds.map(id => ClientFaqAPI.remove(id)));
+        setItems(prev => prev.filter(f => !selectedIds.includes(f._id)));
+        setSelectedIds([]);
+        notify.success('Selected FAQs deleted successfully');
+      }
     });
-    if (!confirmed) return;
-    
-    try {
-      await Promise.all(selectedIds.map(id => ClientFaqAPI.remove(id)));
-      setItems(prev => prev.filter(f => !selectedIds.includes(f._id)));
-      setSelectedIds([]);
-      notify.success('Selected FAQs deleted successfully');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to delete selected FAQs'); 
-    }
   }
 
   async function removeItem(id){
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete FAQ',
       message: 'Delete this FAQ?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await ClientFaqAPI.remove(id); 
+        setItems(prev => prev.filter(f => f._id !== id));
+        notify.success('FAQ deleted');
+      }
     });
-    if (!confirmed) return;
-    try{ 
-      await ClientFaqAPI.remove(id); 
-      setItems(prev => prev.filter(f => f._id !== id));
-      notify.success('FAQ deleted');
-    }
-    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   function move(id, dir){
@@ -221,7 +216,7 @@ export default function FAQsList(){
           </div>
         )}
 
-        {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+        {loading && <LoadingState message="Loading FAQs..." />}
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
         
         {!loading && !error && (

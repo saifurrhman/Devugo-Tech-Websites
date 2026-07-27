@@ -8,6 +8,7 @@ import { BlogAPI, UploadAPI, BlogCategoryAPI, AIAPI } from '../../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import Spinner from '../../components/Spinner';
 
 export default function AdminBlogCreate() {
   const navigate = useNavigate();
@@ -533,9 +534,13 @@ export default function AdminBlogCreate() {
                   padding: '10px 24px',
                   borderRadius: '8px',
                   opacity: saving ? 0.6 : 1,
-                  cursor: saving ? 'not-allowed' : 'pointer'
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
                 }}
               >
+                {saving && <Spinner size="sm" />}
                 {saving ? 'Saving…' : 'Save Post'}
               </button>
             </div>

@@ -7,6 +7,7 @@ import { API_BASE } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
 
 export default function ServicesList() {
   const confirm = useConfirm();
@@ -121,43 +122,36 @@ export default function ServicesList() {
       return;
     }
     
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Services',
       message: `Delete ${selectedIds.length} selected service(s)?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        // Delete all selected services
+        await Promise.all(selectedIds.map(id => ServiceAPI.remove(id)));
+        
+        // Update state
+        setItems(prev => prev.filter(s => !selectedIds.includes(s._id)));
+        setSelectedIds([]);
+        
+        notify.success('Selected services deleted successfully');
+      }
     });
-    if (!confirmed) return;
-    
-    try {
-      // Delete all selected services
-      await Promise.all(selectedIds.map(id => ServiceAPI.remove(id)));
-      
-      // Update state
-      setItems(prev => prev.filter(s => !selectedIds.includes(s._id)));
-      setSelectedIds([]);
-      
-      notify.success('Selected services deleted successfully');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to delete selected services'); 
-    }
   }
 
   async function handleDelete(id) {
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Service',
       message: 'Delete this service?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await ServiceAPI.remove(id);
+        setItems(prev => prev.filter(s => s._id !== id));
+        notify.success('Service deleted');
+      }
     });
-    if (!confirmed) return;
-    try {
-      await ServiceAPI.remove(id);
-      setItems(prev => prev.filter(s => s._id !== id));
-      notify.success('Service deleted');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to delete'); 
-    }
   }
 
   const statusOptions = [
@@ -241,7 +235,7 @@ export default function ServicesList() {
           </div>
         )}
 
-        {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+        {loading && <LoadingState message="Loading services..." />}
         
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
 

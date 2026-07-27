@@ -5,6 +5,8 @@
   import { BlogCategoryAPI } from '../../lib/api';
   import { useConfirm } from '../../contexts/ConfirmContext';
   import { useNotification } from '../../contexts/NotificationContext';
+  import LoadingState from '../components/LoadingState';
+  import Spinner from '../../components/Spinner';
 
   export default function BlogCategories(){
     const confirm = useConfirm();
@@ -59,25 +61,25 @@
         return;
       }
       
-      const confirmed = await confirm.show({
+      await confirm.show({
         title: 'Delete Categories',
         message: `Delete ${selectedIds.length} selected categor${selectedIds.length === 1 ? 'y' : 'ies'}?`,
         variant: 'danger',
-        confirmText: 'Delete'
+        confirmText: 'Delete',
+        action: async () => {
+          setSaving(true);
+          try {
+            await Promise.all(selectedIds.map(id => BlogCategoryAPI.remove(id)));
+            setItems(prev => prev.filter(c => !selectedIds.includes(c._id)));
+            setSelectedIds([]);
+            notify.success('Selected categories deleted successfully');
+          } catch (err) { 
+            notify.error(err.message || 'Failed to delete selected categories'); 
+          } finally {
+            setSaving(false);
+          }
+        }
       });
-      if (!confirmed) return;
-      
-      setSaving(true);
-      try {
-        await Promise.all(selectedIds.map(id => BlogCategoryAPI.remove(id)));
-        setItems(prev => prev.filter(c => !selectedIds.includes(c._id)));
-        setSelectedIds([]);
-        notify.success('Selected categories deleted successfully');
-      } catch (err) { 
-        notify.error(err.message || 'Failed to delete selected categories'); 
-      } finally {
-        setSaving(false);
-      }
     }
 
     async function addCategory(){
@@ -108,19 +110,20 @@
     }
 
     async function removeCategory(cat){
-      const confirmed = await confirm.show({
+      await confirm.show({
         title: 'Delete Category',
         message: `Delete category "${cat.name}"?`,
         variant: 'danger',
-        confirmText: 'Delete'
+        confirmText: 'Delete',
+        action: async () => {
+          setSaving(true);
+          try{
+            await BlogCategoryAPI.remove(cat._id);
+            setItems(prev=>prev.filter(x=>x._id!==cat._id));
+          }catch(err){ notify.error(err.message||'Failed to delete'); }
+          finally{ setSaving(false); }
+        }
       });
-      if(!confirmed) return;
-      setSaving(true);
-      try{
-        await BlogCategoryAPI.remove(cat._id);
-        setItems(prev=>prev.filter(x=>x._id!==cat._id));
-      }catch(err){ notify.error(err.message||'Failed to delete'); }
-      finally{ setSaving(false); }
     }
 
     return (
@@ -157,7 +160,8 @@
                 onKeyPress={e => e.key === 'Enter' && addCategory()}
                 style={{flex:1,minWidth:'200px'}}
               />
-              <button className="btn" onClick={addCategory} disabled={saving || !newName.trim()}>
+              <button className="btn" onClick={addCategory} disabled={saving || !newName.trim()} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                {saving && <Spinner size="sm" />}
                 {saving ? 'Adding...' : 'Add Category'}
               </button>
             </div>
@@ -217,7 +221,7 @@
             </div>
           )}
 
-          {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+          {loading && <LoadingState message="Loading categories..." />}
           {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
 
           {!loading && !error && (

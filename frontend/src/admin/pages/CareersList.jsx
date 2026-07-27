@@ -6,6 +6,7 @@ import { CareerAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
 
 export default function CareersList() {
   const navigate = useNavigate();
@@ -58,39 +59,33 @@ export default function CareersList() {
     setSelectedIds(selectedIds.length === filtered.length ? [] : filtered.map(c => c._id));
 
   const handleDelete = async (id) => {
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Job Posting',
       message: 'Delete this job posting?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await CareerAPI.remove(id);
+        notifySuccess('Career deleted successfully');
+        fetchCareers();
+      }
     });
-    if (!confirmed) return;
-    try {
-      await CareerAPI.remove(id);
-      notifySuccess('Career deleted successfully');
-      fetchCareers();
-    } catch (err) {
-      notifyError('Failed to delete career');
-    }
   };
 
   const handleDeleteSelected = async () => {
     if (!selectedIds.length) return;
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Job Postings',
       message: `Delete ${selectedIds.length} job posting(s)?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await Promise.all(selectedIds.map(id => CareerAPI.remove(id)));
+        notifySuccess(`${selectedIds.length} career(s) deleted`);
+        setSelectedIds([]);
+        fetchCareers();
+      }
     });
-    if (!confirmed) return;
-    try {
-      await Promise.all(selectedIds.map(id => CareerAPI.remove(id)));
-      notifySuccess(`${selectedIds.length} career(s) deleted`);
-      setSelectedIds([]);
-      fetchCareers();
-    } catch (err) {
-      notifyError('Failed to delete selected careers');
-    }
   };
 
   const toggleStatus = async (career) => {
@@ -158,7 +153,7 @@ export default function CareersList() {
           </div>
         )}
 
-        {loading && <div className="card" style={{ marginTop: '1rem' }}>Loading careers…</div>}
+        {loading && <LoadingState message="Loading careers..." />}
         {error && <div className="card" style={{ marginTop: '1rem', color: '#ef4444' }}>{error}</div>}
 
         {!loading && !error && (

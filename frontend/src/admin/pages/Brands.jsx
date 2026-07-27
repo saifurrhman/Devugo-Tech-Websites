@@ -4,6 +4,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { BrandAPI, UploadAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function Brands() {
     const confirm = useConfirm();
@@ -19,6 +21,7 @@ export default function Brands() {
     // Edit State
     const [editId, setEditId] = useState(null);
     const [editForm, setEditForm] = useState({ name: '', logo: '', url: '', isActive: true });
+    const [savingEdit, setSavingEdit] = useState(false);
 
     useEffect(() => {
         load();
@@ -48,7 +51,6 @@ export default function Brands() {
         setUploading(true);
         try {
             const res = await UploadAPI.uploadSingle(file);
-            // Support both structures (nested data or direct url)
             const url = res.data?.url || res.url;
 
             if (url) {
@@ -76,7 +78,6 @@ export default function Brands() {
             await load();
         } catch (e) {
             console.error('Create error:', e);
-            // Alert detailed error if available
             const msg = e.response?.data?.message || e.message || 'Unknown error';
             notify.error('Failed to create brand: ' + msg);
         }
@@ -102,7 +103,6 @@ export default function Brands() {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Use a separate loading state or just blocking? blocking for simplicity
         try {
             const res = await UploadAPI.uploadSingle(file);
             const url = res.data?.url || res.url;
@@ -116,6 +116,7 @@ export default function Brands() {
     }
 
     async function saveEdit() {
+        setSavingEdit(true);
         try {
             await BrandAPI.update(editId, editForm);
             setEditId(null);
@@ -125,24 +126,21 @@ export default function Brands() {
             console.error(e);
             notify.error('Failed to update brand');
         }
+        setSavingEdit(false);
     }
 
     async function onDelete(id) {
-        const confirmed = await confirm.show({
+        await confirm.show({
             title: 'Delete Brand',
             message: 'Delete this brand?',
             variant: 'danger',
-            confirmText: 'Delete'
+            confirmText: 'Delete',
+            action: async () => {
+                await BrandAPI.remove(id);
+                notify.success('Brand deleted successfully!');
+                await load();
+            }
         });
-        if (!confirmed) return;
-        try {
-            await BrandAPI.remove(id);
-            notify.success('Brand deleted successfully!');
-            await load();
-        } catch (e) {
-            console.error(e);
-            notify.error('Failed to delete');
-        }
     }
 
     async function onToggle(item) {
@@ -167,10 +165,8 @@ export default function Brands() {
                 {/* Create Card */}
                 <div className="card" style={{ marginTop: '1.5rem' }}>
                     <strong>Add New Brand</strong>
-                    {/* Responsive Form Layout */}
                     <form onSubmit={onCreate} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
 
-                        {/* Row 1: Name and Logo */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
                             <label className="form-label" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <span style={{ fontWeight: 500 }}>Brand Name *</span>
@@ -182,12 +178,11 @@ export default function Brands() {
                                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                     {form.logo && <img src={form.logo} alt="preview" style={{ height: '40px', borderRadius: '4px', background: '#eee' }} />}
                                     <input type="file" onChange={onUpload} accept="image/*" style={{ fontSize: '0.9rem', maxWidth: '100%' }} />
-                                    {uploading && <span className="muted">Uploading...</span>}
+                                    {uploading && <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Spinner size="sm" className="text-gray-400" /><span className="muted">Uploading...</span></div>}
                                 </div>
                             </label>
                         </div>
 
-                        {/* Row 2: URL and Active Toggle */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', alignItems: 'end' }}>
                             <label className="form-label" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <span style={{ fontWeight: 500 }}>Website URL (Optional)</span>
@@ -219,8 +214,9 @@ export default function Brands() {
                         </div>
 
                         <div style={{ marginTop: '0.5rem' }}>
-                            <button className="btn" disabled={saving || uploading} style={{ minWidth: '120px' }}>
-                                {saving ? 'Saving...' : 'Add Brand'}
+                            <button className="btn" disabled={saving || uploading} style={{ minWidth: '120px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
+                                {saving && <Spinner size="sm" />}
+                                <span>{saving ? 'Saving...' : 'Add Brand'}</span>
                             </button>
                         </div>
                     </form>
@@ -229,7 +225,7 @@ export default function Brands() {
                 {/* List Card */}
                 <div className="card" style={{ marginTop: '1.5rem' }}>
                     <strong>Existing Brands</strong>
-                    {loading ? <div className="muted" style={{ marginTop: '1rem' }}>Loading...</div> : (
+                    {loading ? <LoadingState message="Loading brands..." /> : (
                         <div className="table-wrapper" style={{ marginTop: '1rem', overflowX: 'auto' }}>
                             <table className="table" style={{ width: '100%' }}>
                                 <thead>
@@ -263,8 +259,16 @@ export default function Brands() {
                                                         <input type="checkbox" checked={editForm.isActive} onChange={e => setEditForm({ ...editForm, isActive: e.target.checked })} />
                                                     </td>
                                                     <td style={{ textAlign: 'right' }}>
-                                                        <button className="btn-sm" onClick={saveEdit}>Save</button>
-                                                        <button className="btn-secondary-sm" onClick={cancelEdit} style={{ marginLeft: '.5rem' }}>Cancel</button>
+                                                        <button 
+                                                            className="btn-sm" 
+                                                            onClick={saveEdit} 
+                                                            disabled={savingEdit}
+                                                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                                                        >
+                                                            {savingEdit && <Spinner size="sm" />}
+                                                            {savingEdit ? 'Saving' : 'Save'}
+                                                        </button>
+                                                        <button className="btn-secondary-sm" onClick={cancelEdit} disabled={savingEdit} style={{ marginLeft: '.5rem' }}>Cancel</button>
                                                     </td>
                                                 </>
                                             ) : (

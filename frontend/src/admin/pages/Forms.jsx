@@ -4,6 +4,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { FormAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 const KEYS = ['contact','services'];
 
@@ -132,6 +134,7 @@ export default function Forms(){
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
   const byKey = useMemo(()=> Object.fromEntries(items.map(i=>[i.key, i])), [items]);
 
   const [editingKey, setEditingKey] = useState('contact');
@@ -154,6 +157,7 @@ export default function Forms(){
   },[]);
 
   async function save(){
+    setSaving(true);
     try{
       const exists = byKey[model.key];
       const payload = { ...model, fields: (model.fields||[]).map((f,i)=>({ ...f, order: i })) };
@@ -166,6 +170,7 @@ export default function Forms(){
       }
       success('Saved');
     }catch(e){ notifyError(e.message||'Save failed'); }
+    finally { setSaving(false); }
   }
 
   function addField(){
@@ -199,18 +204,15 @@ export default function Forms(){
             </small>
           </div>
           <div className="flex gap-1.5 flex-wrap w-full sm:w-auto">
-            <button className="btn-secondary px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm whitespace-nowrap flex-1 sm:flex-none" onClick={save}>
-              Save
+            <button className="btn-secondary px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm whitespace-nowrap flex-1 sm:flex-none" onClick={save} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+              {saving && <Spinner size="sm" />}
+              {saving ? 'Saving…' : 'Save'}
             </button>
           </div>
         </div>
 
         {/* Loading & Error States */}
-        {loading && (
-          <div className="card mt-3 sm:mt-4 mx-2 sm:mx-3 lg:mx-5 p-3 sm:p-4 lg:p-6 text-xs sm:text-sm">
-            Loading…
-          </div>
-        )}
+        {loading && <LoadingState message="Loading form settings..." />}
         
         {error && (
           <div className="card mt-3 sm:mt-4 mx-2 sm:mx-3 lg:mx-5 p-3 sm:p-4 lg:p-6 text-red-500 text-xs sm:text-sm">

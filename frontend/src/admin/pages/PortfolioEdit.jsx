@@ -5,6 +5,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { PortfolioAPI, UploadAPI, PortfolioCategoryAPI, TechStackAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function PortfolioEdit() {
   const confirm = useConfirm();
@@ -14,6 +16,7 @@ export default function PortfolioEdit() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState({
     title: '',
@@ -89,6 +92,7 @@ export default function PortfolioEdit() {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
+    setUploading(true);
     try {
       const uploads = await Promise.all(
         files.map(
@@ -115,6 +119,7 @@ export default function PortfolioEdit() {
       notify.error(err.message || 'Failed to upload images');
     } finally {
       e.target.value = '';
+      setUploading(false);
     }
   }
 
@@ -158,25 +163,17 @@ export default function PortfolioEdit() {
 
   async function handleDelete() {
     if (isNew) return;
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Project',
       message: 'Delete this item?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await PortfolioAPI.remove(id);
+        notify.success('Project deleted');
+        navigate('/admin/portfolio');
+      }
     });
-    if (!confirmed) return;
-
-    setSaving(true);
-
-    try {
-      await PortfolioAPI.remove(id);
-      notify.success('Project deleted');
-      navigate('/admin/portfolio');
-    } catch (err) {
-      notify.error(err.message || 'Failed to delete');
-    } finally {
-      setSaving(false);
-    }
   }
 
   if (loading) {
@@ -185,7 +182,7 @@ export default function PortfolioEdit() {
         <AdminSidebar />
         <main className="admin-content">
           <AdminTopbar />
-          <div className="card mt-4">Loading…</div>
+          <LoadingState message="Loading project details..." />
         </main>
       </div>
     );
@@ -316,10 +313,20 @@ export default function PortfolioEdit() {
                     multiple
                     onChange={onFiles}
                     className="hidden"
+                    disabled={uploading}
                   />
                   <div>
-                    <strong className="block mb-1">Click to upload images</strong>
-                    <div className="text-sm opacity-60">JPG, PNG, WEBP, GIF</div>
+                    {uploading ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Spinner size="md" className="text-blue-500" />
+                        <strong className="block text-blue-500">Uploading images...</strong>
+                      </div>
+                    ) : (
+                      <>
+                        <strong className="block mb-1">Click to upload images</strong>
+                        <div className="text-sm opacity-60">JPG, PNG, WEBP, GIF</div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -439,8 +446,9 @@ export default function PortfolioEdit() {
               </button>
             )}
 
-            <button type="submit" disabled={saving} className="btn">
-              {saving ? 'Saving...' : 'Save Project'}
+            <button type="submit" disabled={saving || uploading} className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
+              {saving && <Spinner size="sm" />}
+              <span>{saving ? 'Saving...' : 'Save Project'}</span>
             </button>
           </div>
 

@@ -5,6 +5,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { TeamAPI, UploadAPI } from '../../lib/api'; // ✅ Added UploadAPI
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function TeamEdit(){
   const confirm = useConfirm();
@@ -106,24 +108,17 @@ export default function TeamEdit(){
 
   async function handleDelete(){
     if (isNew) return;
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Remove Member',
       message: 'Remove this member?',
       variant: 'danger',
-      confirmText: 'Remove'
+      confirmText: 'Remove',
+      action: async () => {
+        await TeamAPI.remove(id); 
+        notify.success('Member removed');
+        navigate('/admin/team'); 
+      }
     });
-    if (!confirmed) return;
-    
-    setSaving(true);
-    try{ 
-      await TeamAPI.remove(id); 
-      notify.success('Member removed');
-      navigate('/admin/team'); 
-    }
-    catch(err){ 
-      notify.error(err.message||'Failed to delete'); 
-    }
-    finally{ setSaving(false); }
   }
 
   if (loading){
@@ -132,7 +127,7 @@ export default function TeamEdit(){
         <AdminSidebar />
         <main className="admin-content create-post">
           <AdminTopbar />
-          <div className="card" style={{marginTop:'1rem'}}>Loading…</div>
+          <LoadingState message="Loading member details..." />
         </main>
       </div>
     );
@@ -155,7 +150,6 @@ export default function TeamEdit(){
         </div>
 
         <h1 className="page-title" style={{marginTop:'.25rem'}}>{isNew? 'Add Member' : 'Edit Member'}</h1>
-        {uploading && <div className="chip" style={{marginTop:'.5rem'}}>Uploading...</div>}
 
         <form onSubmit={handleSave} style={{marginTop:'1rem'}}>
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-4">
@@ -200,8 +194,10 @@ export default function TeamEdit(){
                     className="btn-secondary" 
                     onClick={()=>document.getElementById('avatar-file').click()}
                     disabled={uploading}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                   >
-                    {uploading ? 'Uploading...' : 'Upload'}
+                    {uploading && <Spinner size="sm" />}
+                    {uploading ? 'Uploading' : 'Upload'}
                   </button>
                 </div>
                 {(form.avatar || form.name) && (
@@ -252,9 +248,12 @@ export default function TeamEdit(){
 
            <div className="bottom-actions">
             <div className="container flex flex-row items-center justify-end gap-3">
-              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/team')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
+              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/team')} disabled={saving || uploading} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
               {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
-              <button type="submit" className="btn lg" disabled={saving || uploading} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+              <button type="submit" className="btn lg" disabled={saving || uploading} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: (saving || uploading) ? 0.7 : 1}}>
+                {saving && <Spinner size="sm" />}
+                <span>{saving? 'Saving…':'Save'}</span>
+              </button>
             </div>
           </div>
         </form>

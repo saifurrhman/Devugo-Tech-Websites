@@ -5,6 +5,8 @@ import { PricingAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 function PlanForm({ initial, onCancel, onSave }) {
   const notify = useNotification();
@@ -168,8 +170,9 @@ function PlanForm({ initial, onCancel, onSave }) {
         <button type="button" onClick={onCancel} className="btn-secondary" style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}} >
           Cancel
         </button>
-        <button type="submit" className="btn" disabled={saving} >
-          {saving ? 'Saving...' : initial ? 'Update Plan' : 'Create Plan'}
+        <button type="submit" className="btn" disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: saving ? 0.7 : 1 }}>
+          {saving && <Spinner size="sm" />}
+          <span>{saving ? 'Saving...' : initial ? 'Update Plan' : 'Create Plan'}</span>
         </button>
       </div>
     </form>
@@ -267,22 +270,18 @@ export default function PricingPlans() {
       return;
     }
     
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Plans',
       message: `Delete ${selectedIds.length} selected plan(s)?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await Promise.all(selectedIds.map(id => PricingAPI.remove(id)));
+        setItems(prev => prev.filter(p => !selectedIds.includes(p._id)));
+        setSelectedIds([]);
+        notify.success('Selected plans deleted successfully');
+      }
     });
-    if (!confirmed) return;
-    
-    try {
-      await Promise.all(selectedIds.map(id => PricingAPI.remove(id)));
-      setItems(prev => prev.filter(p => !selectedIds.includes(p._id)));
-      setSelectedIds([]);
-      notify.success('Selected plans deleted successfully');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to delete selected plans'); 
-    }
   }
 
   async function handleCreate(payload) {
@@ -300,20 +299,17 @@ export default function PricingPlans() {
   }
 
   async function handleDelete(id) {
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Plan',
       message: 'Delete this plan?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await PricingAPI.remove(id);
+        setItems(prev => prev.filter(p => p._id !== id));
+        notify.success('Plan deleted');
+      }
     });
-    if (!confirmed) return;
-    try {
-      await PricingAPI.remove(id);
-      setItems(prev => prev.filter(p => p._id !== id));
-      notify.success('Plan deleted');
-    } catch (err) {
-      notify.error(err.message || 'Failed to delete');
-    }
   }
 
   async function toggleField(plan, field) {
@@ -447,7 +443,7 @@ export default function PricingPlans() {
           </div>
         )}
 
-        {loading && <div className="card mt-4">Loading...</div>}
+        {loading && <LoadingState message="Loading plans..." />}
         {error && <div className="card mt-4 text-red-500">{error}</div>}
 
         {!loading && !error && !showForm && !editItem && (

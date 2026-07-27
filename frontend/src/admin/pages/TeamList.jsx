@@ -6,6 +6,7 @@ import { TeamAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
 
 export default function TeamList(){
   const confirm = useConfirm();
@@ -97,38 +98,32 @@ export default function TeamList(){
       return;
     }
     
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Remove Team Members',
       message: `Remove ${selectedIds.length} selected team member(s)?`,
       variant: 'danger',
-      confirmText: 'Remove'
+      confirmText: 'Remove',
+      action: async () => {
+        await Promise.all(selectedIds.map(id => TeamAPI.remove(id)));
+        setItems(prev => prev.filter(m => !selectedIds.includes(m._id)));
+        setSelectedIds([]);
+        notify.success('Selected team members removed successfully');
+      }
     });
-    if (!confirmed) return;
-    
-    try {
-      await Promise.all(selectedIds.map(id => TeamAPI.remove(id)));
-      setItems(prev => prev.filter(m => !selectedIds.includes(m._id)));
-      setSelectedIds([]);
-      notify.success('Selected team members removed successfully');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to remove selected members'); 
-    }
   }
 
   async function handleDelete(id){
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Remove Member',
       message: 'Remove this member?',
       variant: 'danger',
-      confirmText: 'Remove'
+      confirmText: 'Remove',
+      action: async () => {
+        await TeamAPI.remove(id); 
+        setItems(prev=>prev.filter(m=>m._id!==id)); 
+        notify.success('Team member removed');
+      }
     });
-    if (!confirmed) return;
-    try{ 
-      await TeamAPI.remove(id); 
-      setItems(prev=>prev.filter(m=>m._id!==id)); 
-      notify.success('Team member removed');
-    }
-    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
   
   // ✅ Handle image error
@@ -219,7 +214,7 @@ export default function TeamList(){
           </div>
         )}
 
-        {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+        {loading && <LoadingState message="Loading team..." />}
         
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
 

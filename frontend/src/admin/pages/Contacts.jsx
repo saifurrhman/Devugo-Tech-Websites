@@ -5,6 +5,7 @@ import { ContactAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
 
 // Professional SVG Icons
 const IconPhone = ({ className = "w-4 h-4" }) => (
@@ -109,23 +110,21 @@ const ContactDetailPage = ({ contact, onBack, onDelete }) => {
   };
 
   const handleDelete = async () => {
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Contact',
       message: `Are you sure you want to delete this contact from ${contact.name || contact.email}?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        try {
+          await onDelete(contact._id);
+          notify.success('Contact deleted successfully');
+          onBack();
+        } catch (err) {
+          notify.error('Failed to delete contact: ' + err.message);
+        }
+      }
     });
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await onDelete(contact._id);
-      notify.success('Contact deleted successfully');
-      onBack();
-    } catch (err) {
-      notify.error('Failed to delete contact: ' + err.message);
-    }
   };
 
   // useEffect(() => {
@@ -557,22 +556,22 @@ export default function Contacts() {
       return;
     }
 
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Contacts',
       message: `Delete ${selectedIds.length} selected contact(s)?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        try {
+          await Promise.all(selectedIds.map(id => ContactAPI.remove(id)));
+          setItems(prev => prev.filter(c => !selectedIds.includes(c._id)));
+          setSelectedIds([]);
+          notify.success('Selected contacts deleted successfully');
+        } catch (err) {
+          notify.error(err.message || 'Failed to delete selected contacts');
+        }
+      }
     });
-    if (!confirmed) return;
-
-    try {
-      await Promise.all(selectedIds.map(id => ContactAPI.remove(id)));
-      setItems(prev => prev.filter(c => !selectedIds.includes(c._id)));
-      setSelectedIds([]);
-      notify.success('Selected contacts deleted successfully');
-    } catch (err) {
-      notify.error(err.message || 'Failed to delete selected contacts');
-    }
   }
 
   function exportCsv(rows) {
@@ -885,12 +884,7 @@ export default function Contacts() {
         )}
 
         {/* Loading/Error States */}
-        {loading && (
-          <div className="card p-6 text-center" style={{ borderRadius: '16px' }}>
-            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
-            <div className="text-sm font-semibold" style={{ color: '#9ca3af' }}>Loading contacts...</div>
-          </div>
-        )}
+        {loading && <LoadingState message="Loading contacts..." />}
 
         {error && (
           <div className="card p-4 sm:p-6 text-center font-semibold" style={{

@@ -5,6 +5,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { ServiceAPI, PricingAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function ServiceEdit(){
   const confirm = useConfirm();
@@ -108,25 +110,18 @@ export default function ServiceEdit(){
 
   async function handleDelete(){
     if (isNew) return;
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Service',
       message: 'Delete this service?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await ServiceAPI.remove(id); 
+        try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}; 
+        notify.success('Service deleted');
+        navigate('/admin/services'); 
+      }
     });
-    if (!confirmed) return;
-    
-    setSaving(true);
-    try{ 
-      await ServiceAPI.remove(id); 
-      try{ window.dispatchEvent(new Event('services:updated')); }catch(_e){}; 
-      notify.success('Service deleted');
-      navigate('/admin/services'); 
-    }
-    catch(err){ 
-      notify.error(err.message||'Failed to delete'); 
-    }
-    finally{ setSaving(false); }
   }
 
   if (loading) {
@@ -135,7 +130,7 @@ export default function ServiceEdit(){
         <AdminSidebar />
         <main className="admin-content create-post">
           <AdminTopbar />
-          <div className="card" style={{marginTop:'1rem'}}>Loading…</div>
+          <LoadingState message="Loading service details..." />
         </main>
       </div>
     );
@@ -261,7 +256,10 @@ export default function ServiceEdit(){
             <div className="container flex flex-row items-center justify-end gap-3">
               <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/services')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
               {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
-              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: saving ? 0.7 : 1}}>
+                {saving && <Spinner size="sm" />}
+                <span>{saving ? 'Saving…' : 'Save'}</span>
+              </button>
             </div>
           </div>
         </form>

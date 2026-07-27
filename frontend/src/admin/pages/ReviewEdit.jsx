@@ -5,6 +5,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { ClientReviewAPI, UploadAPI } from '../../lib/api'; // ✅ UploadAPI add kiya
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function ReviewEdit(){
   const confirm = useConfirm();
@@ -96,19 +98,17 @@ export default function ReviewEdit(){
 
   async function handleDelete(){
     if(isNew) return;
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Review',
       message: 'Delete this review?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await ClientReviewAPI.remove(id); 
+        notify.success('Review deleted');
+        navigate('/admin/reviews'); 
+      }
     });
-    if (!confirmed) return;
-    try{ 
-      await ClientReviewAPI.remove(id); 
-      notify.success('Review deleted');
-      navigate('/admin/reviews'); 
-    }
-    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   return (
@@ -120,9 +120,7 @@ export default function ReviewEdit(){
           <h1 style={{fontSize: 'clamp(1.5rem, 5vw, 2rem)'}}>{isNew? 'Add Review':'Edit Review'}</h1>
         </div>
 
-        {uploading && <div className="chip" style={{marginTop:'.5rem'}}>Uploading...</div>}
-
-        {loading ? <div className="card" style={{marginTop:'1rem'}}>Loading…</div> : (
+        {loading ? <LoadingState message="Loading review details..." /> : (
           <form onSubmit={handleSave} className="create-post" style={{marginTop:'.9rem'}}>
             <div className="grid two" style={{
               alignItems: 'start',
@@ -185,8 +183,10 @@ export default function ReviewEdit(){
                       className="btn-secondary" 
                       onClick={()=>document.getElementById('avatar-file-review').click()}
                       disabled={uploading}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                     >
-                      {uploading ? 'Uploading...' : 'Upload'}
+                      {uploading && <Spinner size="sm" />}
+                      {uploading ? 'Uploading' : 'Upload'}
                     </button>
                   </div>
                   
@@ -227,7 +227,10 @@ export default function ReviewEdit(){
               <div className="container flex flex-row items-center justify-end gap-3">
                 <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/reviews')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
                 {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
-                <button type="submit" className="btn lg" disabled={saving || uploading} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px'}}>{saving? 'Saving…':'Save'}</button>
+                <button type="submit" className="btn lg" disabled={saving || uploading} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: (saving || uploading) ? 0.7 : 1}}>
+                  {saving && <Spinner size="sm" />}
+                  <span>{saving? 'Saving…':'Save'}</span>
+                </button>
               </div>
             </div>
           </form>

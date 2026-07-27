@@ -6,6 +6,7 @@ import { ClientReviewAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
 
 export default function ReviewsList(){
   const confirm = useConfirm();
@@ -92,38 +93,32 @@ export default function ReviewsList(){
       return;
     }
     
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Reviews',
       message: `Delete ${selectedIds.length} selected review(s)?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await Promise.all(selectedIds.map(id => ClientReviewAPI.remove(id)));
+        setItems(prev => prev.filter(r => !selectedIds.includes(r._id)));
+        setSelectedIds([]);
+        notify.success('Selected reviews deleted successfully');
+      }
     });
-    if (!confirmed) return;
-    
-    try {
-      await Promise.all(selectedIds.map(id => ClientReviewAPI.remove(id)));
-      setItems(prev => prev.filter(r => !selectedIds.includes(r._id)));
-      setSelectedIds([]);
-      notify.success('Selected reviews deleted successfully');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to delete selected reviews'); 
-    }
   }
 
   async function removeItem(id){
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Review',
       message: 'Delete this review?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await ClientReviewAPI.remove(id); 
+        setItems(prev => prev.filter(r => r._id !== id));
+        notify.success('Review deleted');
+      }
     });
-    if (!confirmed) return;
-    try{ 
-      await ClientReviewAPI.remove(id); 
-      setItems(prev => prev.filter(r => r._id !== id));
-      notify.success('Review deleted');
-    }
-    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   const ratingOptions = [
@@ -221,7 +216,7 @@ export default function ReviewsList(){
           </div>
         )}
 
-        {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+        {loading && <LoadingState message="Loading reviews..." />}
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
         
         {!loading && !error && (

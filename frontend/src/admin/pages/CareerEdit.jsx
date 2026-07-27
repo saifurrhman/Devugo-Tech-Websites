@@ -6,6 +6,8 @@ import { useNotification } from '../../contexts/NotificationContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 const JOB_TYPES = ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'];
 
@@ -127,7 +129,7 @@ export default function CareerEdit() {
       <AdminSidebar />
       <main className="admin-content">
         <AdminTopbar />
-        <div style={{ ...cardStyle, marginTop: '1rem' }}>Loading…</div>
+        <LoadingState message="Loading job posting..." />
       </main>
     </div>
   );
@@ -288,7 +290,7 @@ export default function CareerEdit() {
                   onMouseEnter={e => { if (!saving) e.currentTarget.style.background = '#3a78bb'; }}
                   onMouseLeave={e => { if (!saving) e.currentTarget.style.background = '#4385cd'; }}
                 >
-                  <Save size={15} />
+                  {saving ? <Spinner size="sm" /> : <Save size={15} />}
                   {saving ? 'Saving…' : isNew ? 'Publish Job' : 'Save Changes'}
                 </button>
 

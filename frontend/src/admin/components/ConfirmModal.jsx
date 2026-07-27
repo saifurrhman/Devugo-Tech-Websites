@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import Spinner from '../../../components/Spinner';
 
 export default function ConfirmModal({
     isOpen,
@@ -10,10 +11,12 @@ export default function ConfirmModal({
     variant,
     defaultValue,
     inputPlaceholder,
+    action,
     onConfirm,
     onCancel
 }) {
     const [inputValue, setInputValue] = useState('');
+    const [loading, setLoading] = useState(false);
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -41,12 +44,25 @@ export default function ConfirmModal({
 
     if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (type === 'prompt') {
-            onConfirm(inputValue);
+        
+        if (action) {
+            try {
+                setLoading(true);
+                await action(type === 'prompt' ? inputValue : true);
+            } catch (err) {
+                console.error("ConfirmModal action failed:", err);
+            } finally {
+                setLoading(false);
+                onConfirm(type === 'prompt' ? inputValue : true);
+            }
         } else {
-            onConfirm(true);
+            if (type === 'prompt') {
+                onConfirm(inputValue);
+            } else {
+                onConfirm(true);
+            }
         }
     };
 
@@ -126,27 +142,33 @@ export default function ConfirmModal({
                     <button 
                         form="confirm-modal-form" 
                         type="submit" 
+                        disabled={loading}
                         className={`btn ${variant === 'danger' ? 'danger' : ''}`}
                         style={{ 
                             padding: '0.5rem 1.25rem',
                             background: variant === 'danger' ? '#dc2626' : undefined,
                             borderColor: variant === 'danger' ? '#dc2626' : undefined,
-                            color: variant === 'danger' ? '#fff' : undefined
+                            color: variant === 'danger' ? '#fff' : undefined,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            opacity: loading ? 0.7 : 1
                         }}
                         onMouseOver={(e) => {
-                            if (variant === 'danger') {
+                            if (!loading && variant === 'danger') {
                                 e.currentTarget.style.background = '#b91c1c';
                                 e.currentTarget.style.borderColor = '#b91c1c';
                             }
                         }}
                         onMouseOut={(e) => {
-                            if (variant === 'danger') {
+                            if (!loading && variant === 'danger') {
                                 e.currentTarget.style.background = '#dc2626';
                                 e.currentTarget.style.borderColor = '#dc2626';
                             }
                         }}
                     >
-                        {confirmText}
+                        {loading && <Spinner size="sm" />}
+                        <span>{loading ? 'Processing...' : confirmText}</span>
                     </button>
                 </div>
             </div>

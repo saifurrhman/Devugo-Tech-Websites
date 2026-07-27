@@ -6,6 +6,7 @@ import { AuthAPI } from '../../lib/api';
 import { UserPlus, Mail, Shield, RefreshCw, Trash2, CheckCircle, Clock, Activity, X, Eye } from 'lucide-react';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
+import LoadingState from '../components/LoadingState';
 
 export default function UsersList() {
     const navigate = useNavigate();
@@ -51,39 +52,41 @@ export default function UsersList() {
     };
 
     const handleDelete = async (id) => {
-        const confirmed = await confirm.show({
+        await confirm.show({
             title: 'Delete User',
             message: 'Are you sure you want to delete this user? This action cannot be undone.',
             variant: 'danger',
-            confirmText: 'Delete'
+            confirmText: 'Delete',
+            action: async () => {
+                try {
+                    await AuthAPI.deleteUser(id);
+                    showSuccess('User deleted successfully');
+                    setUsers(prev => prev.filter(u => u._id !== id));
+                } catch (err) {
+                    showError(err.message || 'Failed to delete user');
+                }
+            }
         });
-        if (!confirmed) return;
-        try {
-            await AuthAPI.deleteUser(id);
-            showSuccess('User deleted successfully');
-            setUsers(users.filter(u => u._id !== id));
-        } catch (err) {
-            showError(err.message || 'Failed to delete user');
-        }
     };
 
     const handleToggleStatus = async (id, currentStatus) => {
-        const action = currentStatus ? 'block' : 'unblock';
-        const confirmed = await confirm.show({
+        const actionText = currentStatus ? 'block' : 'unblock';
+        await confirm.show({
             title: `${currentStatus ? 'Block' : 'Unblock'} User`,
-            message: `Are you sure you want to ${action} this user?`,
+            message: `Are you sure you want to ${actionText} this user?`,
             variant: currentStatus ? 'danger' : 'primary',
-            confirmText: currentStatus ? 'Block' : 'Unblock'
+            confirmText: currentStatus ? 'Block' : 'Unblock',
+            action: async () => {
+                try {
+                    const res = await AuthAPI.toggleUserStatus(id);
+                    showSuccess(res.message);
+                    // Update local state
+                    setUsers(prev => prev.map(u => u._id === id ? { ...u, isActive: !u.isActive } : u));
+                } catch (err) {
+                    showError(err.message || `Failed to ${actionText} user`);
+                }
+            }
         });
-        if (!confirmed) return;
-        try {
-            const res = await AuthAPI.toggleUserStatus(id);
-            showSuccess(res.message);
-            // Update local state
-            setUsers(users.map(u => u._id === id ? { ...u, isActive: !u.isActive } : u));
-        } catch (err) {
-            showError(err.message || `Failed to ${action} user`);
-        }
     };
 
     // Helper for role badge color
@@ -127,7 +130,7 @@ export default function UsersList() {
                 </div>
 
                 {loading ? (
-                    <div className="card p-8 text-center text-gray-400">Loading users...</div>
+                    <LoadingState message="Loading users..." />
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         {users.map(user => (

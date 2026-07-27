@@ -6,6 +6,7 @@ import { PortfolioAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
 
 export default function PortfolioList(){
   const confirm = useConfirm();
@@ -91,38 +92,32 @@ export default function PortfolioList(){
       return;
     }
     
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Projects',
       message: `Delete ${selectedIds.length} selected project(s)?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await Promise.all(selectedIds.map(id => PortfolioAPI.remove(id)));
+        setItems(prev => prev.filter(i => !selectedIds.includes(i._id)));
+        setSelectedIds([]);
+        notify.success('Selected projects deleted successfully');
+      }
     });
-    if (!confirmed) return;
-    
-    try {
-      await Promise.all(selectedIds.map(id => PortfolioAPI.remove(id)));
-      setItems(prev => prev.filter(i => !selectedIds.includes(i._id)));
-      setSelectedIds([]);
-      notify.success('Selected projects deleted successfully');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to delete selected projects'); 
-    }
   }
 
   async function handleDelete(id){
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Project',
       message: 'Delete this item?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await PortfolioAPI.remove(id); 
+        setItems(prev=>prev.filter(i=>i._id!==id)); 
+        notify.success('Project deleted');
+      }
     });
-    if (!confirmed) return;
-    try{ 
-      await PortfolioAPI.remove(id); 
-      setItems(prev=>prev.filter(i=>i._id!==id)); 
-      notify.success('Project deleted');
-    }
-    catch(err){ notify.error(err.message||'Failed to delete'); }
   }
 
   const featuredOptions = [
@@ -220,7 +215,7 @@ export default function PortfolioList(){
           </div>
         )}
 
-        {loading && <div className="card" style={{marginTop:'1rem'}}>Loading…</div>}
+        {loading && <LoadingState message="Loading portfolio..." />}
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
 
         {!loading && !error && (

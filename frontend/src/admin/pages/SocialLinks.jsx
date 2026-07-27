@@ -5,6 +5,8 @@ import SocialIcon from '../../components/SocialIcon';
 import { SocialLinksAPI } from '../../services/socialLinks';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function SocialLinks(){
   const confirm = useConfirm();
@@ -13,6 +15,7 @@ export default function SocialLinks(){
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ platform: '', url: '', enabled: true });
   const [saving, setSaving] = useState(false);
+  const [savingEdit, setSavingEdit] = useState(false);
   const presets = ['Facebook','Instagram','X','LinkedIn','YouTube','GitHub','WhatsApp','TikTok','Telegram','Pinterest','Dribbble','Behance','Reddit','Discord','Slack','Medium','Vimeo'];
   const [editId, setEditId] = useState(null);
   const [editForm, setEditForm] = useState({ platform:'', url:'', enabled:true });
@@ -71,18 +74,17 @@ export default function SocialLinks(){
   }
 
   async function onDelete(id){
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Social Link',
       message: 'Delete this social link?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await SocialLinksAPI.remove(id);
+        await load();
+        notify.success('Social link deleted');
+      }
     });
-    if (!confirmed) return;
-    try{
-      await SocialLinksAPI.remove(id);
-      await load();
-      notify.success('Social link deleted');
-    }catch(e){ console.error(e); notify.error('Failed to delete'); }
   }
 
   function quickAdd(preset){
@@ -114,12 +116,14 @@ export default function SocialLinks(){
   }
 
   async function saveEdit(){
+    setSavingEdit(true);
     try{
       await SocialLinksAPI.update(editId, editForm);
       setEditId(null);
       await load();
       notify.success('Social link saved');
     }catch(e){ console.error(e); notify.error('Failed to save changes'); }
+    finally { setSavingEdit(false); }
   }
 
   function cancelEdit(){ setEditId(null); }
@@ -162,7 +166,10 @@ export default function SocialLinks(){
               </button>
             </div>
             <div style={{gridColumn:'1 / -1'}}>
-              <button className="btn" disabled={saving}>{saving?'Saving...':'Add link'}</button>
+              <button className="btn" disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                {saving && <Spinner size="sm" />}
+                {saving?'Saving...':'Add link'}
+              </button>
             </div>
           </form>
           <div className="muted" style={{marginTop:'.5rem'}}>Quick select</div>
@@ -182,7 +189,7 @@ export default function SocialLinks(){
 
         <div className="card" style={{marginTop:'1rem'}}>
           <strong>All links</strong>
-          {loading ? <div className="muted" style={{marginTop:'.5rem'}}>Loading...</div> : (
+          {loading ? <LoadingState message="Loading social links..." /> : (
             <table className="table" style={{width:'100%', marginTop:'.5rem'}}>
               <thead>
                 <tr>
@@ -230,8 +237,11 @@ export default function SocialLinks(){
                           </button>
                         </td>
                         <td style={{whiteSpace:'nowrap'}}>
-                          <button className="btn" onClick={saveEdit}>Save</button>
-                          <button className="btn-secondary" onClick={cancelEdit} style={{marginLeft:'.4rem'}}>Cancel</button>
+                          <button className="btn" onClick={saveEdit} disabled={savingEdit} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                            {savingEdit && <Spinner size="sm" />}
+                            Save
+                          </button>
+                          <button className="btn-secondary" onClick={cancelEdit} disabled={savingEdit} style={{marginLeft:'.4rem'}}>Cancel</button>
                         </td>
                       </>
                     ) : (
@@ -282,7 +292,10 @@ export default function SocialLinks(){
               </label>
               <div className="settings-actions" style={{marginTop:'.8rem'}}>
                 <button className="btn-secondary" onClick={cancelQuickAdd} disabled={modalSaving}>Cancel</button>
-                <button className="btn" onClick={confirmQuickAdd} disabled={modalSaving || !/^https?:\/\//i.test(modalUrl)}>{modalSaving? 'Adding…':'Add link'}</button>
+                <button className="btn" onClick={confirmQuickAdd} disabled={modalSaving || !/^https?:\/\//i.test(modalUrl)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                  {modalSaving && <Spinner size="sm" />}
+                  {modalSaving? 'Adding…':'Add link'}
+                </button>
               </div>
             </div>
           </div>

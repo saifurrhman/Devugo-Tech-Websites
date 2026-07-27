@@ -14,6 +14,8 @@ import CustomSelect from '../../components/CustomSelect';
 import { TechnologyAPI, UploadAPI, TechnologyCategoryAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 // Sortable Row Component
 function SortableRow({ id, item, selectedIds, toggleSelect, handleEdit, handleDelete, handleToggleStatus }) {
@@ -88,6 +90,7 @@ export default function TechnologiesList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [iconMode, setIconMode] = useState('upload'); // 'upload' | 'url'
   
   // Form state
@@ -175,38 +178,32 @@ export default function TechnologiesList() {
   };
 
   const handleDelete = async (id) => {
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Technology',
       message: 'Are you sure you want to delete this technology?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await TechnologyAPI.remove(id);
+        setItems(items.filter(it => it._id !== id));
+        notify.success("Technology deleted");
+      }
     });
-    if (!confirmed) return;
-    try {
-      await TechnologyAPI.remove(id);
-      setItems(items.filter(it => it._id !== id));
-      notify.success("Technology deleted");
-    } catch(err) {
-      notify.error("Delete failed: " + err.message);
-    }
   };
 
   const handleDeleteSelected = async () => {
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Technologies',
       message: `Delete ${selectedIds.length} selected items?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await Promise.all(selectedIds.map(id => TechnologyAPI.remove(id)));
+        setItems(items.filter(it => !selectedIds.includes(it._id)));
+        setSelectedIds([]);
+        notify.success("Selected technologies deleted");
+      }
     });
-    if (!confirmed) return;
-    try {
-      await Promise.all(selectedIds.map(id => TechnologyAPI.remove(id)));
-      setItems(items.filter(it => !selectedIds.includes(it._id)));
-      setSelectedIds([]);
-      notify.success("Selected technologies deleted");
-    } catch(err) {
-      notify.error("Bulk delete failed: " + err.message);
-    }
   };
 
   const openModal = (item = null) => {
@@ -230,6 +227,7 @@ export default function TechnologiesList() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
       if (editingItem) {
         await TechnologyAPI.update(editingItem._id, formData);
@@ -242,6 +240,8 @@ export default function TechnologiesList() {
       fetchData();
     } catch(err) {
       notify.error("Save failed: " + err.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -383,7 +383,7 @@ export default function TechnologiesList() {
 
         {/* List Card */}
         <div className="card" style={{ marginTop: '.75rem' }}>
-            {loading ? <div className="muted" style={{ marginTop: '1rem', padding: '1rem' }}>Loading technologies...</div> : error ? <div style={{ color: '#ef4444', padding: '1rem' }}>{error}</div> : (
+            {loading ? <LoadingState message="Loading technologies..." /> : error ? <div style={{ color: '#ef4444', padding: '1rem' }}>{error}</div> : (
                 <div className="table-wrapper" style={{ overflowX: 'auto' }}>
                     <table className="table" style={{ width: '100%' }}>
                         <thead>
@@ -491,7 +491,10 @@ export default function TechnologiesList() {
                   >
                     <input id="tech-icon-upload" type="file" accept="image/*,.svg" onChange={handleUpload} style={{ display: 'none' }} />
                     {uploading ? (
-                        <div className="muted" style={{ padding: '0.5rem 0' }}>Uploading...</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0' }}>
+                            <Spinner size="md" className="text-blue-500" />
+                            <strong style={{ color: '#3b82f6' }}>Uploading...</strong>
+                        </div>
                     ) : formData.icon && (formData.icon.startsWith('http') || formData.icon.startsWith('/')) ? (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                             <img src={formData.icon} alt="preview" style={{ height: '48px', objectFit: 'contain', background: 'rgba(255,255,255,0.1)', padding: '4px', borderRadius: '4px' }} />
@@ -615,11 +618,12 @@ export default function TechnologiesList() {
 
             {/* Footer */}
             <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '1rem', background: 'rgba(0,0,0,0.15)', justifyContent: 'flex-end' }}>
-              <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ padding: '0.5rem 1.5rem' }}>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" disabled={saving} style={{ padding: '0.5rem 1.5rem' }}>
                 Cancel
               </button>
-              <button form="tech-form" type="submit" className="btn" style={{ padding: '0.5rem 1.5rem' }}>
-                {editingItem ? 'Save Changes' : 'Add Tool'}
+              <button form="tech-form" type="submit" className="btn" disabled={saving} style={{ padding: '0.5rem 1.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                {saving && <Spinner size="sm" />}
+                <span>{saving ? 'Saving...' : (editingItem ? 'Save Changes' : 'Add Tool')}</span>
               </button>
             </div>
 

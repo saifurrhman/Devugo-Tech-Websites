@@ -40,7 +40,8 @@ export function ConfirmProvider({ children }) {
                 cancelText: options.cancelText || 'Cancel',
                 variant: options.variant || 'default',
                 defaultValue: '',
-                inputPlaceholder: ''
+                inputPlaceholder: '',
+                action: options.action || null
             });
         });
     }, []);
@@ -57,7 +58,8 @@ export function ConfirmProvider({ children }) {
                 cancelText: options.cancelText || 'Cancel',
                 variant: options.variant || 'default',
                 defaultValue: options.defaultValue || '',
-                inputPlaceholder: options.inputPlaceholder || ''
+                inputPlaceholder: options.inputPlaceholder || '',
+                action: options.action || null
             });
         });
     }, []);
@@ -91,6 +93,7 @@ export function ConfirmProvider({ children }) {
                 variant={state.variant}
                 defaultValue={state.defaultValue}
                 inputPlaceholder={state.inputPlaceholder}
+                action={state.action}
                 onConfirm={handleConfirm}
                 onCancel={handleCancel}
             />

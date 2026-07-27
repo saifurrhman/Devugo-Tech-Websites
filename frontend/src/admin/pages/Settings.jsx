@@ -4,6 +4,8 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { CompanyInfoAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function Settings() {
   const notify = useNotification();
@@ -64,19 +66,7 @@ export default function Settings() {
       <AdminSidebar />
       <main className="admin-content">
         <AdminTopbar />
-        <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              border: '4px solid rgba(59, 130, 246, 0.2)',
-              borderTopColor: '#3b82f6',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }}></div>
-            <span style={{ marginLeft: '12px', color: '#6b7280' }}>Loading...</span>
-          </div>
-        </div>
+        <LoadingState message="Loading settings..." />
       </main>
     </div>
   );
@@ -342,7 +332,7 @@ export default function Settings() {
             <button type="submit" disabled={saving} className="btn-save">
               {saving ? (
                 <>
-                  <div className="spinner" />
+                  <Spinner size="sm" />
                   Saving...
                 </>
               ) : (

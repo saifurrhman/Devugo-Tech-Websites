@@ -6,6 +6,7 @@ import { BlogAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
+import LoadingState from '../components/LoadingState';
 
 export default function BlogList(){
   const confirm = useConfirm();
@@ -83,38 +84,31 @@ useEffect(() => {
       return;
     }
     
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Posts',
       message: `Delete ${selectedIds.length} selected post(s)?`,
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await Promise.all(selectedIds.map(id => BlogAPI.remove(id)));
+        setPosts(prev => prev.filter(p => !selectedIds.includes(p._id)));
+        setSelectedIds([]);
+        notify.success('Selected posts deleted successfully');
+      }
     });
-    if (!confirmed) return;
-    
-    try {
-      await Promise.all(selectedIds.map(id => BlogAPI.remove(id)));
-      setPosts(prev => prev.filter(p => !selectedIds.includes(p._id)));
-      setSelectedIds([]);
-      notify.success('Selected posts deleted successfully');
-    } catch (err) { 
-      notify.error(err.message || 'Failed to delete selected posts'); 
-    }
   }
 
   async function handleDelete(id){
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Post',
       message: 'Delete this post?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await BlogAPI.remove(id);
+        setPosts(prev=>prev.filter(p=>p._id!==id));
+      }
     });
-    if(!confirmed) return;
-    try{
-      await BlogAPI.remove(id);
-      setPosts(prev=>prev.filter(p=>p._id!==id));
-    }catch(err){
-      notify.error(err.message||'Failed to delete');
-    }
   }
 
   async function togglePublish(p){
@@ -223,7 +217,7 @@ useEffect(() => {
           </div>
         )}
 
-        {loading && <div className="card" style={{marginTop:'1rem'}}>Loading posts…</div>}
+        {loading && <LoadingState message="Loading posts..." />}
         {error && <div className="card" style={{marginTop:'1rem', color:'#ef4444'}}>{error}</div>}
 
         {!loading && !error && (

@@ -4,6 +4,9 @@ import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import { BlogAPI, UploadAPI, BlogCategoryAPI } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
+import { useNotification } from '../../contexts/NotificationContext';
+import LoadingState from '../components/LoadingState';
+import Spinner from '../../components/Spinner';
 
 export default function BlogEdit(){
   const confirm = useConfirm();
@@ -35,7 +38,7 @@ useEffect(() => {
   useEffect(()=>{
     let mounted = true;
     (async()=>{
-      setLoading(true); setError('');
+      setLoading(true);
       try{
         const cats = await BlogCategoryAPI.list().catch(()=>({items:[]}));
         const { post } = await BlogAPI.get(id);
@@ -211,23 +214,17 @@ useEffect(() => {
   }
 
   async function handleDelete(){
-    const confirmed = await confirm.show({
+    await confirm.show({
       title: 'Delete Post',
       message: 'Delete this post?',
       variant: 'danger',
-      confirmText: 'Delete'
+      confirmText: 'Delete',
+      action: async () => {
+        await BlogAPI.remove(id);
+        notify.success('Post deleted successfully.');
+        navigate('/admin/blog');
+      }
     });
-    if(!confirmed) return;
-    setSaving(true);
-    try{
-      await BlogAPI.remove(id);
-      notify.success('Post deleted successfully.');
-      navigate('/admin/blog');
-    }catch(err){
-      notify.error(err.message || 'Failed to delete post');
-    }finally{
-      setSaving(false);
-    }
   }
 
   // ✅ FIXED: Cover image upload
@@ -260,7 +257,7 @@ useEffect(() => {
         <AdminSidebar />
         <main className="admin-content create-post">
           <AdminTopbar />
-          <div className="card" style={{marginTop:'1rem'}}>Loading…</div>
+          <LoadingState message="Loading post details..." />
         </main>
       </div>
     );
@@ -330,7 +327,8 @@ useEffect(() => {
                   <button type="button" className="uploader-remove" onClick={()=>setForm(f=>({...f,galleryImages:f.galleryImages.filter((_,x)=>x!==i)}))} style={{left:6,bottom:6}}>Remove</button>
                 </div>
               ))}
-              <button type="button" className="btn-secondary" onClick={uploadGalleryImage} disabled={uploading}>
+              <button type="button" className="btn-secondary" onClick={uploadGalleryImage} disabled={uploading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                {uploading && <Spinner size="sm" />}
                 {uploading ? 'Uploading...' : 'Add image'}
               </button>
             </div>
@@ -383,7 +381,8 @@ useEffect(() => {
                 <button type="button" onClick={()=>exec('undo')}>Undo</button>
                 <button type="button" onClick={()=>exec('redo')}>Redo</button>
                 <button type="button" onClick={clearFormats}>Clear</button>
-                <button type="button" onClick={uploadAndInsertToContent} disabled={uploading}>
+                <button type="button" onClick={uploadAndInsertToContent} disabled={uploading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                  {uploading && <Spinner size="sm" />}
                   {uploading ? 'Uploading...' : '+ Image'}
                 </button>
               </div>
@@ -444,10 +443,12 @@ useEffect(() => {
               <button type="button" className="btn-secondary" onClick={()=>navigate('/admin/blog')}>Back</button>
             </div>
             <div style={{display:'flex', gap:'.5rem'}}>
-              <button type="button" className="btn-secondary" onClick={handleSave} disabled={saving || uploading}>
+              <button type="button" className="btn-secondary" onClick={handleSave} disabled={saving || uploading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
+                {saving && <Spinner size="sm" />}
                 {saving ? 'Saving…' : 'Save changes'}
               </button>
-              <button type="submit" className="btn" disabled={saving || uploading}>
+              <button type="submit" className="btn" disabled={saving || uploading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
+                {saving && <Spinner size="sm" />}
                 {saving ? 'Saving…' : 'Save & Stay'}
               </button>
               <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
