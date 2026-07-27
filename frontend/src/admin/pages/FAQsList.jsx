@@ -243,15 +243,15 @@ export default function FAQsList(){
                     />
                     <div style={{flex:1}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'.6rem',flexWrap:'wrap'}}>
-                        <div style={{flex:1}}>
+                        <div style={{flex:'1 1 200px'}}>
                           <strong>{f.question}</strong>
                           <div className="muted" style={{fontSize:'.85rem',marginTop:'.25rem'}}>
                             {f.category || 'General'} • Order {f.order ?? 0} • {f.published? 'Published':'Draft'}
                           </div>
                         </div>
-                        <div style={{display:'flex',gap:'.4rem'}}>
-                          <button className="btn-secondary" onClick={()=>move(f._id,'up')}>↑</button>
-                          <button className="btn-secondary" onClick={()=>move(f._id,'down')}>↓</button>
+                        <div style={{display:'flex',gap:'.4rem', flexShrink: 0}}>
+                          <button className="btn-secondary" onClick={()=>move(f._id,'up')} style={{padding: '0.2rem 0.5rem', minHeight: '32px'}}>↑</button>
+                          <button className="btn-secondary" onClick={()=>move(f._id,'down')} style={{padding: '0.2rem 0.5rem', minHeight: '32px'}}>↓</button>
                         </div>
                       </div>
                     </div>

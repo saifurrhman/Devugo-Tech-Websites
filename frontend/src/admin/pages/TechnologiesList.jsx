@@ -384,7 +384,7 @@ export default function TechnologiesList() {
         {/* List Card */}
         <div className="card" style={{ marginTop: '.75rem' }}>
             {loading ? <LoadingState message="Loading technologies..." /> : error ? <div style={{ color: '#ef4444', padding: '1rem' }}>{error}</div> : (
-                <div className="table-wrapper" style={{ overflowX: 'auto' }}>
+                <div className="table-responsive" style={{ overflowX: 'auto' }}>
                     <table className="table" style={{ width: '100%' }}>
                         <thead>
                             <tr>

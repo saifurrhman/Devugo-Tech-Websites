@@ -6233,7 +6233,7 @@ body.admin-light .admin-sidebar__footer {
 
 @media (max-width: 768px) {
   /* 1. Two-Column Layouts (Forms) */
-  .grid.two, .form-grid {
+  .grid.two, .grid.three, .grid.four, .form-grid {
     grid-template-columns: 1fr !important;
   }
   
