@@ -10,7 +10,8 @@ import { CSS } from '@dnd-kit/utilities';
 
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { TechnologyAPI } from '../../lib/api';
+import CustomSelect from '../../components/CustomSelect';
+import { TechnologyAPI, UploadAPI } from '../../lib/api';
 
 const CATEGORIES = ['Frontend', 'Backend', 'Database', 'AI & Automation', 'DevOps', 'CMS/E-commerce', 'Other'];
 
@@ -84,6 +85,7 @@ export default function TechnologiesList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [iconMode, setIconMode] = useState('upload'); // 'upload' | 'url'
   
   // Form state
   const [formData, setFormData] = useState({
@@ -192,11 +194,13 @@ export default function TechnologiesList() {
         description: item.description || '', proficiencyLevel: item.proficiencyLevel || 0,
         websiteUrl: item.websiteUrl || '', status: item.status !== false, featured: !!item.featured
       });
+      setIconMode(item.icon && !item.icon.startsWith('http') && !item.icon.startsWith('/') && item.icon.includes('<svg') ? 'url' : 'upload');
     } else {
       setEditingItem(null);
       setFormData({
         name: '', icon: '', category: 'Frontend', description: '', proficiencyLevel: 80, websiteUrl: '', status: true, featured: false
       });
+      setIconMode('upload');
     }
     setIsModalOpen(true);
   };
@@ -213,6 +217,30 @@ export default function TechnologiesList() {
       fetchAll();
     } catch(err) {
       alert("Save failed: " + err.message);
+    }
+  };
+
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      // Re-using the same image/file upload API method that is used globally
+      const res = await UploadAPI.uploadSingle ? await UploadAPI.uploadSingle(file) : await UploadAPI.image(file, file.name);
+      
+      const url = res.data?.url || res.url || res;
+      if (url && typeof url === 'string') {
+        setFormData(f => ({ ...f, icon: url }));
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Upload failed: ' + (err.message || "Unknown error"));
+    } finally {
+      setUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -370,25 +398,27 @@ export default function TechnologiesList() {
 
       </main>
 
-      {/* Slide-over Modal Form - Restyled to match Admin Theme */}
+      {/* Centered Modal Form */}
       {isModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={() => setIsModalOpen(false)}></div>
           
           <div className="card" style={{ 
-            position: 'relative', width: '100%', maxWidth: '450px', height: '100%', margin: 0, borderRadius: 0, 
-            display: 'flex', flexDirection: 'column', border: 'none', borderLeft: '1px solid rgba(255,255,255,0.1)',
-            transform: 'translateX(0)', transition: 'transform 0.3s ease-out', zIndex: 10
+            position: 'relative', width: '100%', maxWidth: '550px', maxHeight: '90vh', margin: 0, padding: 0, 
+            display: 'flex', flexDirection: 'column', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', zIndex: 10, overflow: 'hidden'
           }}>
             
+            {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
               <h2 style={{ margin: 0, fontSize: '1.25rem' }}>{editingItem ? 'Edit Technology' : 'Add Technology'}</h2>
-              <button onClick={() => setIsModalOpen(false)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '1.5rem' }}>
+              <button onClick={() => setIsModalOpen(false)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '1.5rem', lineHeight: 1 }}>
                 ×
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Scrollable Body */}
+            <form id="tech-form" onSubmit={handleFormSubmit} style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
               <label className="form-label" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <span style={{ fontWeight: 500 }}>Name *</span>
@@ -402,34 +432,66 @@ export default function TechnologiesList() {
 
               <label className="form-label" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <span style={{ fontWeight: 500 }}>Category</span>
-                <select 
-                  value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}
-                  className="form-field"
-                >
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <CustomSelect 
+                  options={CATEGORIES.map(c => ({ label: c, value: c }))} 
+                  value={formData.category} 
+                  onChange={val => setFormData({...formData, category: val})} 
+                />
               </label>
 
               <label className="form-label" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <span style={{ fontWeight: 500 }}>Icon (URL or SVG String)</span>
-                <textarea 
-                  rows="2"
-                  value={formData.icon} onChange={e => setFormData({...formData, icon: e.target.value})}
-                  className="form-field"
-                  placeholder="https://.../icon.png OR <svg>...</svg>"
-                  style={{ resize: 'none' }}
-                ></textarea>
-                {formData.icon && (
-                  <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    <span className="muted" style={{ fontSize: '0.85rem' }}>Preview:</span>
-                    <div style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {formData.icon.startsWith('http') || formData.icon.includes('base64') ? (
-                        <img src={formData.icon} alt="preview" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                      ) : (
-                        <div style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{__html: formData.icon}}></div>
-                      )}
-                    </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 500 }}>Icon</span>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button type="button" onClick={() => setIconMode('upload')} style={{ fontSize: '0.8rem', background: iconMode === 'upload' ? 'rgba(59, 130, 246, 0.1)' : 'transparent', border: iconMode === 'upload' ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid transparent', cursor: 'pointer', padding: '2px 8px', borderRadius: '4px', color: iconMode === 'upload' ? '#60a5fa' : 'inherit', transition: 'all .2s' }}>Upload</button>
+                    <button type="button" onClick={() => setIconMode('url')} style={{ fontSize: '0.8rem', background: iconMode === 'url' ? 'rgba(59, 130, 246, 0.1)' : 'transparent', border: iconMode === 'url' ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid transparent', cursor: 'pointer', padding: '2px 8px', borderRadius: '4px', color: iconMode === 'url' ? '#60a5fa' : 'inherit', transition: 'all .2s' }}>Paste URL / SVG</button>
                   </div>
+                </div>
+
+                {iconMode === 'upload' ? (
+                  <div
+                    style={{ border: '2px dashed rgba(255,255,255,0.2)', borderRadius: '8px', padding: '1.5rem', textAlign: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.02)', transition: 'border 0.2s', ...(uploading ? { opacity: 0.5, pointerEvents: 'none' } : {}) }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'}
+                    onClick={() => document.getElementById('tech-icon-upload').click()}
+                  >
+                    <input id="tech-icon-upload" type="file" accept="image/*,.svg" onChange={handleUpload} style={{ display: 'none' }} />
+                    {uploading ? (
+                        <div className="muted" style={{ padding: '0.5rem 0' }}>Uploading...</div>
+                    ) : formData.icon && (formData.icon.startsWith('http') || formData.icon.startsWith('/')) ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                            <img src={formData.icon} alt="preview" style={{ height: '48px', objectFit: 'contain', background: 'rgba(255,255,255,0.1)', padding: '4px', borderRadius: '4px' }} />
+                            <span className="muted" style={{ fontSize: '0.8rem' }}>Click to replace</span>
+                        </div>
+                    ) : (
+                        <div style={{ padding: '0.5rem 0' }}>
+                            <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Click to upload image</strong>
+                            <div className="muted" style={{ fontSize: '0.8rem' }}>SVG, PNG, JPG, WEBP</div>
+                        </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <textarea 
+                      rows="2"
+                      value={formData.icon} onChange={e => setFormData({...formData, icon: e.target.value})}
+                      className="form-field"
+                      placeholder="https://.../icon.png OR <svg>...</svg>"
+                      style={{ resize: 'none' }}
+                    ></textarea>
+                    {formData.icon && (
+                      <div style={{ marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <span className="muted" style={{ fontSize: '0.85rem' }}>Preview:</span>
+                        <div style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {formData.icon.startsWith('http') || formData.icon.includes('base64') || formData.icon.startsWith('/') ? (
+                            <img src={formData.icon} alt="preview" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                          ) : (
+                            <div style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{__html: formData.icon}}></div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </label>
 
@@ -469,7 +531,7 @@ export default function TechnologiesList() {
                 />
               </label>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <span style={{ fontWeight: 500, minWidth: '90px' }}>Featured</span>
                   <button
@@ -517,11 +579,12 @@ export default function TechnologiesList() {
               
             </form>
 
-            <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '1rem', background: 'rgba(0,0,0,0.1)' }}>
-              <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ flex: 1, justifyContent: 'center' }}>
+            {/* Footer */}
+            <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '1rem', background: 'rgba(0,0,0,0.15)', justifyContent: 'flex-end' }}>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ padding: '0.5rem 1.5rem' }}>
                 Cancel
               </button>
-              <button onClick={handleFormSubmit} className="btn" style={{ flex: 1, justifyContent: 'center' }}>
+              <button form="tech-form" type="submit" className="btn" style={{ padding: '0.5rem 1.5rem' }}>
                 {editingItem ? 'Save Changes' : 'Add Tool'}
               </button>
             </div>
