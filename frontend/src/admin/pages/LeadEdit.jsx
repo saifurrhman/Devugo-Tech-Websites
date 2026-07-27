@@ -42,7 +42,6 @@ export default function LeadEdit(){
               <textarea className="form-field" placeholder="Notes about this lead" rows={4} />
             </label>
           </div>
-          </div>
         </div>
         <div className="admin-sticky-footer">
           <button type="button" className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm text-gray-300">Cancel</button>
