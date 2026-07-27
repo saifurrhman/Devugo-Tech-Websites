@@ -10,6 +10,9 @@ import ContactListModal from '../../components/contacts/ContactListModal';
 import { UserPlus, Plus, Download, Upload, List as ListIcon, Trash2, Edit2, CheckCircle, XCircle, ChevronLeft, UserCheck } from 'lucide-react';
 
 import CustomSelect from '../../../components/CustomSelect';
+import LoadingState from '../../components/LoadingState';
+import EmptyState from '../../components/EmptyState';
+import Spinner from '../../../components/Spinner';
 
 export default function ContactsList() {
     const navigate = useNavigate();
@@ -139,21 +142,22 @@ export default function ContactsList() {
     };
 
     const handleDelete = async (id) => {
-        const confirmed = await confirm.show({
+        await confirm.show({
             title: 'Delete Contact',
             message: 'Are you sure you want to delete this contact?',
             variant: 'danger',
-            confirmText: 'Delete'
+            confirmText: 'Delete',
+            action: async () => {
+                try {
+                    await ContactAPI.delete(id);
+                    setContacts(prev => prev.filter(c => (c.id || c._id) !== id));
+                    success('Contact deleted successfully');
+                } catch (err) {
+                    console.error('Delete failed', err);
+                    notifyError('Failed to delete contact');
+                }
+            }
         });
-        if (!confirmed) return;
-        try {
-            await ContactAPI.delete(id);
-            setContacts(prev => prev.filter(c => (c.id || c._id) !== id));
-            success('Contact deleted successfully');
-        } catch (err) {
-            console.error('Delete failed', err);
-            notifyError('Failed to delete contact');
-        }
     };
 
     const handleCreateList = async (listData) => {
@@ -171,20 +175,21 @@ export default function ContactsList() {
     };
 
     const handleDeleteList = async (id) => {
-        const confirmed = await confirm.show({
+        await confirm.show({
             title: 'Delete List',
             message: 'Delete this list? Contacts inside will NOT be deleted.',
             variant: 'danger',
-            confirmText: 'Delete List'
+            confirmText: 'Delete List',
+            action: async () => {
+                try {
+                    await ListAPI.delete(id);
+                    setLists(prev => prev.filter(l => l._id !== id));
+                    success('List deleted');
+                } catch (err) {
+                    notifyError('Failed to delete list');
+                }
+            }
         });
-        if (!confirmed) return;
-        try {
-            await ListAPI.delete(id);
-            setLists(prev => prev.filter(l => l._id !== id));
-            success('List deleted');
-        } catch (err) {
-            notifyError('Failed to delete list');
-        }
     };
 
     // Add Contact Modal State
@@ -316,22 +321,20 @@ export default function ContactsList() {
                             </button>
                             <button
                                 onClick={async () => {
-                                    const confirmed = await confirm.show({
+                                    await confirm.show({
                                         title: 'Delete Contacts',
                                         message: `Delete ${selectedContactIds.length} contacts?`,
                                         variant: 'danger',
-                                        confirmText: 'Delete'
+                                        confirmText: 'Delete',
+                                        action: async () => {
+                                            await Promise.all(selectedContactIds.map(id => ContactAPI.delete(id)));
+                                            success('Contacts deleted');
+                                            setSelectedContactIds([]);
+                                            loadData();
+                                        }
                                     });
-                                    if (confirmed) {
-                                        Promise.all(selectedContactIds.map(id => ContactAPI.delete(id)))
-                                            .then(() => {
-                                                success('Contacts deleted');
-                                                setSelectedContactIds([]);
-                                                loadData();
-                                            });
-                                    }
                                 }}
-                                className="px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-300 rounded transition-colors"
+                                className="px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-300 rounded transition-colors flex items-center gap-1"
                             >
                                 <Trash2 size={14} className="mr-1 inline" /> Delete
                             </button>
@@ -388,10 +391,7 @@ export default function ContactsList() {
                 {/* DEBUG INFO REMOVED */}
 
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Loading...</p>
-                    </div>
+                    <LoadingState message="Loading contacts..." />
                 ) : (
                     <>
                         {/* LISTS VIEW */}
@@ -410,10 +410,13 @@ export default function ContactsList() {
                                         <tbody className="divide-y divide-gray-800">
                                             {lists.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
-                                                        <ListIcon size={48} className="mx-auto mb-4 opacity-20" />
-                                                        <p className="text-lg font-medium text-gray-400">No lists created yet</p>
-                                                        <button onClick={() => setListModalOpen(true)} className="mt-4 text-blue-400 hover:text-blue-300">Create your first list</button>
+                                                    <td colSpan="4" className="p-8">
+                                                        <EmptyState 
+                                                            title="No lists created yet"
+                                                            description="Create a list to organize your contacts."
+                                                            actionLabel="Create List"
+                                                            onAction={() => setListModalOpen(true)}
+                                                        />
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -464,8 +467,13 @@ export default function ContactsList() {
                                         <tbody className="divide-y divide-gray-800">
                                             {filteredContacts.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
-                                                        No contacts found.
+                                                    <td colSpan="7" className="p-8">
+                                                        <EmptyState 
+                                                            title="No contacts found"
+                                                            description="There are no contacts matching the current criteria."
+                                                            actionLabel="Add Contact"
+                                                            onAction={() => setAddContactModalOpen(true)}
+                                                        />
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -643,8 +651,9 @@ export default function ContactsList() {
                                 <button
                                     type="submit"
                                     disabled={addingContact}
-                                    className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                                    className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
                                 >
+                                    {addingContact && <Spinner size="sm" />}
                                     {addingContact ? 'Adding...' : 'Add Contact'}
                                 </button>
                             </div>

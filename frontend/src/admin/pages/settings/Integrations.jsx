@@ -9,6 +9,7 @@ import {
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import CustomSelect from '../../../components/CustomSelect';
+import EmptyState from '../../components/EmptyState';
 
 export default function Integrations() {
     const { success, error: notifyError } = useNotification();
@@ -786,8 +787,13 @@ export default function Integrations() {
                                                     </div>
                                                 ))}
                                                 {aiConfig.agents.length === 0 && !newAgent && (
-                                                    <div className="text-center py-8 text-blue-300/40 bg-[#002747] rounded-lg border border-white/5 border-dashed">
-                                                        No external agents connected.
+                                                    <div className="py-4">
+                                                        <EmptyState 
+                                                            title="No external agents connected"
+                                                            description="Connect AI agents to automate tasks."
+                                                            actionLabel="Add Agent"
+                                                            onAction={() => setNewAgent({ name: '', tool: 'n8n', webhook: '', apiKey: '', scope: 'all' })}
+                                                        />
                                                     </div>
                                                 )}
                                             </div>
@@ -977,7 +983,16 @@ export default function Integrations() {
                                                 </thead>
                                                 <tbody className="divide-y divide-white/5">
                                                     {apiKeys.length === 0 ? (
-                                                        <tr><td colSpan="4" className="p-8 text-center text-blue-300/40">No active keys</td></tr>
+                                                        <tr>
+                                                            <td colSpan="4" className="p-8">
+                                                                <EmptyState 
+                                                                    title="No active keys"
+                                                                    description="Generate an API key to allow external tools to access data."
+                                                                    actionLabel="Generate Key"
+                                                                    onAction={handleCreateKey}
+                                                                />
+                                                            </td>
+                                                        </tr>
                                                     ) : (
                                                         apiKeys.map(key => (
                                                             <tr key={key._id} className="hover:bg-white/5 transition-colors">

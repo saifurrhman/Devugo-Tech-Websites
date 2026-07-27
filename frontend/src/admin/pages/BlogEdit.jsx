@@ -438,21 +438,18 @@ useEffect(() => {
             </label>
           </section>
 
-          <div className="settings-actions" style={{display:'flex',justifyContent:'space-between',gap:'.5rem'}}>
-            <div>
-              <button type="button" className="btn-secondary" onClick={()=>navigate('/admin/blog')}>Back</button>
-            </div>
-            <div style={{display:'flex', gap:'.5rem'}}>
-              <button type="button" className="btn-secondary" onClick={handleSave} disabled={saving || uploading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
-                {saving && <Spinner size="sm" />}
-                {saving ? 'Saving…' : 'Save changes'}
-              </button>
-              <button type="submit" className="btn" disabled={saving || uploading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
-                {saving && <Spinner size="sm" />}
-                {saving ? 'Saving…' : 'Save & Stay'}
-              </button>
-              <button type="button" className="btn-secondary" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444'}}>Delete</button>
-            </div>
+          <div className="admin-sticky-footer">
+            <button type="button" className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm text-gray-300" onClick={()=>navigate('/admin/blog')}>Cancel</button>
+            {!isNew && <button type="button" className="px-4 py-2 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors text-sm" onClick={handleDelete}>Delete</button>}
+            
+            <button type="button" className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm text-gray-300" onClick={handleSave} disabled={saving || uploading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
+              {saving && <Spinner size="sm" />}
+              <span>{saving ? 'Saving...' : 'Save changes'}</span>
+            </button>
+            <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors text-sm font-medium" disabled={saving || uploading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
+              {saving && <Spinner size="sm" />}
+              <span>{saving ? 'Saving...' : 'Save & Stay'}</span>
+            </button>
           </div>
         </form>
       </main>

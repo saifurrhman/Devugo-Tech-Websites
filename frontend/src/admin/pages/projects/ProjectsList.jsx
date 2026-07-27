@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { ProjectAPI } from '../../../lib/api';
+import LoadingState from '../../components/LoadingState';
 
 export default function ProjectsList() {
     const navigate = useNavigate();
@@ -82,10 +83,7 @@ export default function ProjectsList() {
 
                 {/* Content Area */}
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Loading projects...</p>
-                    </div>
+                    <LoadingState message="Loading projects..." />
                 ) : error ? (
                     <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-6 text-center">
                         <div className="text-red-400 mb-2 font-medium">{error}</div>

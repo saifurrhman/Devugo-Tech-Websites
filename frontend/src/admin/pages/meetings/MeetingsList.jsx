@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/AdminSidebar';
 import AdminTopbar from '../../../components/AdminTopbar';
 import { MeetingAPI } from '../../../lib/api';
+import LoadingState from '../../components/LoadingState';
+import EmptyState from '../../components/EmptyState';
 
 export default function MeetingsList() {
     const navigate = useNavigate();
@@ -95,17 +97,17 @@ export default function MeetingsList() {
                 </div>
 
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Loading meetings...</p>
-                    </div>
+                    <LoadingState message="Loading meetings..." />
                 ) : (
                     /* Meetings List */
                     <div className="space-y-4">
                         {filteredMeetings.length === 0 ? (
-                            <div className="text-center py-12 text-gray-500 bg-[#1e293b]/50 rounded-xl border border-dashed border-gray-800">
-                                No meetings found.
-                            </div>
+                            <EmptyState 
+                                title="No meetings found" 
+                                description={`There are no ${filter === 'all' ? '' : filter} meetings to display.`}
+                                actionLabel="Schedule Meeting"
+                                onAction={() => navigate('/admin/meetings/schedule')}
+                            />
                         ) : (
                             filteredMeetings.map((meeting) => (
                                 <div
@@ -138,12 +140,6 @@ export default function MeetingsList() {
                                     </div>
                                 </div>
                             ))
-                        )}
-
-                        {filteredMeetings.length === 0 && (
-                            <div className="text-center py-12 text-gray-500 bg-[#1e293b]/50 rounded-xl border border-dashed border-gray-800">
-                                No meetings found.
-                            </div>
                         )}
                     </div>
                 )}

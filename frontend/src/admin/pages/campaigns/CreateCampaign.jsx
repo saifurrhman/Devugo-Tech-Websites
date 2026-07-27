@@ -10,6 +10,7 @@ import AIPanel from '../../../components/AIPanel';
 import RichTextEditor from '../../components/RichTextEditor';
 import { CampaignAPI, TemplateAPI, ContactAPI, AIAPI, SenderAPI, ListAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import Spinner from '../../../components/Spinner';
 
 export default function CreateCampaign() {
   const navigate = useNavigate();
@@ -590,6 +591,7 @@ export default function CreateCampaign() {
                 disabled={loading}
                 className="px-8 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-green-900/20"
               >
+                {loading && <Spinner size="sm" />}
                 {loading ? 'Launching...' : `Launch Campaign 🚀`}
               </button>
             )}

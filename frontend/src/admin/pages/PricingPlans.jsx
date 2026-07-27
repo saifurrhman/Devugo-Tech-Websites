@@ -7,6 +7,7 @@ import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
 import LoadingState from '../components/LoadingState';
 import Spinner from '../../components/Spinner';
+import Badge from '../components/Badge';
 
 function PlanForm({ initial, onCancel, onSave }) {
   const notify = useNotification();
@@ -401,11 +402,11 @@ export default function PricingPlans() {
 
         {!loading && !error && (
           <div className="card mt-3 p-3 flex flex-wrap gap-3 items-center">
-            <span className="badge">Total: {total}</span>
-            <span className="badge">Published: {publishedCount}</span>
-            <span className="badge">Showing: {filtered.length}</span>
+            <Badge status="neutral">Total: {total}</Badge>
+            <Badge status="published">Published: {publishedCount}</Badge>
+            <Badge status="info">Showing: {filtered.length}</Badge>
             {selectedIds.length > 0 && (
-              <span className="badge" style={{background:'#3b82f6'}}>Selected: {selectedIds.length}</span>
+              <Badge status="info" style={{background:'#3b82f6'}}>Selected: {selectedIds.length}</Badge>
             )}
           </div>
         )}
@@ -468,14 +469,14 @@ export default function PricingPlans() {
                     />
                     <div className="flex justify-between items-center gap-2" style={{flex:1}}>
                       <h3 className="m-0">{p.name}</h3>
-                      <span className="badge">{p.planType}</span>
+                      <Badge status={p.planType}>{p.planType}</Badge>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2" style={{paddingLeft:'1.75rem'}}>
                     <strong>{formatPrice(p)}</strong>
-                    {p.recommended && <span className="badge" style={{background:'#f59e0b'}}>⭐ Recommended</span>}
-                    <span className="badge">{p.published ? 'Published' : 'Draft'}</span>
+                    {p.recommended && <Badge status="recommended">⭐ Recommended</Badge>}
+                    <Badge status={p.published ? 'published' : 'draft'}>{p.published ? 'Published' : 'Draft'}</Badge>
                   </div>
 
                   <div className="flex flex-wrap gap-2 mt-1" style={{paddingLeft:'1.75rem'}}>
@@ -488,7 +489,7 @@ export default function PricingPlans() {
                     <button className="btn-secondary" onClick={() => toggleField(p, 'published')}>
                       {p.published ? 'Unpublish' : 'Publish'}
                     </button>
-                    <button className="btn-secondary text-red-500 border-red-500" onClick={() => handleDelete(p._id)}>
+                    <button className="btn-secondary" style={{borderColor:'#ef4444',color:'#ef4444'}} onClick={() => handleDelete(p._id)}>
                       Delete
                     </button>
                   </div>

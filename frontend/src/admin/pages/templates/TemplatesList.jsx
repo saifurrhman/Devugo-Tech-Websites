@@ -6,6 +6,7 @@ import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { useConfirm } from '../../../contexts/ConfirmContext';
 import { TemplateAPI } from '../../../lib/api';
+import LoadingState from '../../components/LoadingState';
 
 export default function TemplatesList() {
     const navigate = useNavigate();
@@ -35,21 +36,22 @@ export default function TemplatesList() {
     };
 
     const handleDelete = async (id) => {
-        const confirmed = await confirm.show({
+        await confirm.show({
             title: 'Delete Template',
             message: 'Are you sure you want to delete this template?',
             variant: 'danger',
-            confirmText: 'Delete'
+            confirmText: 'Delete',
+            action: async () => {
+                try {
+                    await TemplateAPI.delete(id);
+                    setTemplates(prev => prev.filter(t => (t.id || t._id) !== id));
+                    success('Template deleted successfully');
+                } catch (err) {
+                    console.error('Delete failed', err);
+                    notifyError('Failed to delete template');
+                }
+            }
         });
-        if (!confirmed) return;
-        try {
-            await TemplateAPI.delete(id);
-            setTemplates(prev => prev.filter(t => (t.id || t._id) !== id));
-            success('Template deleted successfully');
-        } catch (err) {
-            console.error('Delete failed', err);
-            notifyError('Failed to delete template');
-        }
     };
 
     const filteredTemplates = filter === 'All' ? templates : templates.filter(t => (t.category || 'General') === filter);
@@ -99,10 +101,7 @@ export default function TemplatesList() {
 
                 {/* Templates Table */}
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Loading templates...</p>
-                    </div>
+                    <LoadingState message="Loading templates..." />
                 ) : error ? (
                     <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-6 text-center">
                         <div className="text-red-400 mb-2 font-medium">{error}</div>

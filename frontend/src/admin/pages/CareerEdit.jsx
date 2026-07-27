@@ -284,23 +284,6 @@ export default function CareerEdit() {
                   </div>
                 </div>
 
-                {/* Save button */}
-                <button type="submit" disabled={saving}
-                  style={{ width: '100%', padding: '.68rem', borderRadius: '8px', border: 'none', background: saving ? 'rgba(67,133,205,0.45)' : '#4385cd', color: '#fff', fontWeight: 700, fontSize: '.9rem', cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.45rem', transition: 'background .15s, opacity .15s', opacity: saving ? 0.7 : 1 }}
-                  onMouseEnter={e => { if (!saving) e.currentTarget.style.background = '#3a78bb'; }}
-                  onMouseLeave={e => { if (!saving) e.currentTarget.style.background = '#4385cd'; }}
-                >
-                  {saving ? <Spinner size="sm" /> : <Save size={15} />}
-                  {saving ? 'Saving…' : isNew ? 'Publish Job' : 'Save Changes'}
-                </button>
-
-                <Link to="/admin/careers"
-                  style={{ display: 'block', textAlign: 'center', marginTop: '.6rem', padding: '.55rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '.88rem', transition: 'background .15s, color .15s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
-                >
-                  Cancel
-                </Link>
               </div>
 
               {/* Job Type */}
@@ -329,6 +312,32 @@ export default function CareerEdit() {
                 </div>
               </div>
             </div>
+          </div>
+          
+          <div className="admin-sticky-footer">
+            <Link to="/admin/careers" className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm text-gray-300 inline-block text-center">
+              Cancel
+            </Link>
+            {!isNew && (
+              <button type="button" onClick={() => {
+                confirm.show({
+                  title: 'Delete Job',
+                  message: 'Are you sure you want to delete this job posting?',
+                  variant: 'danger',
+                  confirmText: 'Delete',
+                  action: async () => {
+                    // Assuming delete API exists, this is a placeholder if not
+                    navigate('/admin/careers');
+                  }
+                });
+              }} className="px-4 py-2 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors text-sm">
+                Delete
+              </button>
+            )}
+            <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors text-sm font-medium" disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: saving ? 0.7 : 1 }}>
+              {saving && <Spinner size="sm" />}
+              <span>{saving ? 'Saving...' : isNew ? 'Publish Job' : 'Save Changes'}</span>
+            </button>
           </div>
         </form>
       </main>

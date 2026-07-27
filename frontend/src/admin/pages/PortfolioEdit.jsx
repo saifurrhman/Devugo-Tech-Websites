@@ -427,11 +427,11 @@ export default function PortfolioEdit() {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-8 pt-4 border-t border-gray-300 flex justify-end gap-3 flex-wrap">
+          <div className="admin-sticky-footer">
             <button 
               type="button" 
               onClick={() => navigate('/admin/portfolio')} 
-              className="btn-secondary"
+              className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm text-gray-300"
             >
               Cancel
             </button>
@@ -440,13 +440,13 @@ export default function PortfolioEdit() {
               <button 
                 type="button" 
                 onClick={handleDelete} 
-                className="btn-secondary border-red-400 text-red-500 hover:bg-red-50"
+                className="px-4 py-2 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors text-sm"
               >
                 Delete
               </button>
             )}
 
-            <button type="submit" disabled={saving || uploading} className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
+            <button type="submit" disabled={saving || uploading} className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors text-sm font-medium" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: (saving || uploading) ? 0.7 : 1 }}>
               {saving && <Spinner size="sm" />}
               <span>{saving ? 'Saving...' : 'Save Project'}</span>
             </button>

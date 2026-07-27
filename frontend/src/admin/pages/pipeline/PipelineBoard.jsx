@@ -5,6 +5,8 @@ import AdminTopbar from '../../../components/AdminTopbar';
 import { PipelineAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
 import CustomSelect from '../../../components/CustomSelect';
+import LoadingState from '../../components/LoadingState';
+import Spinner from '../../../components/Spinner';
 
 export default function PipelineBoard() {
     const { success, error: notifyError } = useNotification();
@@ -128,13 +130,10 @@ export default function PipelineBoard() {
                 </div>
 
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 h-[calc(100vh-180px)]">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Loading pipeline...</p>
-                    </div>
+                    <LoadingState message="Loading pipeline..." />
                 ) : (
                     /* Pipeline Board */
-                    <div className="flex gap-4 overflow-x-auto pb-6 h-[calc(100vh-180px)]">
+                    <div className="flex gap-4 overflow-x-auto custom-scrollbar pb-6 h-[calc(100vh-180px)]">
                         {stages.map((stage) => (
                             <div key={stage.id} className="min-w-[300px] w-[300px] flex flex-col">
                                 <div className={`p-3 rounded-t-lg bg-${stage.color || 'blue'}-900/20 border-t-4 border-${stage.color || 'blue'}-500 flex justify-between items-center mb-2`}>
@@ -142,7 +141,7 @@ export default function PipelineBoard() {
                                     <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full text-gray-400">{stage.items.length}</span>
                                 </div>
 
-                                <div className="flex-1 bg-[#1e293b]/50 rounded-lg p-2 space-y-3 overflow-y-auto">
+                                <div className="flex-1 bg-[#1e293b]/50 rounded-lg p-2 space-y-3 overflow-y-auto custom-scrollbar">
                                     {stage.items.map((item) => (
                                         <div
                                             key={item.id || item._id}
@@ -205,7 +204,8 @@ export default function PipelineBoard() {
                             </div>
                             <div className="flex gap-3 pt-4">
                                 <button type="button" onClick={() => setIsAddDealOpen(false)} className="flex-1 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors">Cancel</button>
-                                <button type="submit" disabled={saving} className="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors disabled:opacity-50">
+                                <button type="submit" disabled={saving} className="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                                    {saving && <Spinner size="sm" />}
                                     {saving ? 'Saving...' : 'Create Deal'}
                                 </button>
                             </div>

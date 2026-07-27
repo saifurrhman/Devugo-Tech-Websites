@@ -42,10 +42,12 @@ export default function LeadEdit(){
               <textarea className="form-field" placeholder="Notes about this lead" rows={4} />
             </label>
           </div>
-          <div className="settings-actions">
-            <button className="btn-secondary">Save</button>
-            <button className="btn">Save & Close</button>
           </div>
+        </div>
+        <div className="admin-sticky-footer">
+          <button type="button" className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm text-gray-300">Cancel</button>
+          <button type="button" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors text-sm font-medium">Save</button>
+          <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors text-sm font-medium">Save & Close</button>
         </div>
       </main>
     </div>

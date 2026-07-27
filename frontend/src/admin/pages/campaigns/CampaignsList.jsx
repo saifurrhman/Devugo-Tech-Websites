@@ -5,6 +5,8 @@ import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { useConfirm } from '../../../contexts/ConfirmContext';
 import { CampaignAPI } from '../../../lib/api';
+import LoadingState from '../../components/LoadingState';
+import Badge from '../../components/Badge';
 
 export default function CampaignsList() {
     const navigate = useNavigate();
@@ -34,21 +36,22 @@ export default function CampaignsList() {
     };
 
     const handleDelete = async (id) => {
-        const confirmed = await confirm.show({
+        await confirm.show({
             title: 'Delete Campaign',
             message: 'Are you sure you want to delete this campaign?',
             variant: 'danger',
-            confirmText: 'Delete'
+            confirmText: 'Delete',
+            action: async () => {
+                try {
+                    await CampaignAPI.remove(id);
+                    setCampaigns(prev => prev.filter(c => (c.id || c._id) !== id));
+                    success('Campaign deleted successfully');
+                } catch (err) {
+                    console.error('Delete failed', err);
+                    notifyError('Failed to delete campaign');
+                }
+            }
         });
-        if (!confirmed) return;
-        try {
-            await CampaignAPI.remove(id); // Fixed: changed .delete to .remove based on api.js
-            setCampaigns(prev => prev.filter(c => (c.id || c._id) !== id));
-            success('Campaign deleted successfully');
-        } catch (err) {
-            console.error('Delete failed', err);
-            notifyError('Failed to delete campaign');
-        }
     };
 
     const filteredCampaigns = filter === 'all' ? campaigns : campaigns.filter(c => (c.status || 'Draft').toLowerCase() === filter);
@@ -88,12 +91,18 @@ export default function CampaignsList() {
                     ))}
                 </div>
 
+                {/* Totals strip */}
+                {!loading && !error && (
+                    <div className="card bg-[#1e293b] rounded-xl border border-gray-800 mb-6 p-4 flex flex-wrap gap-4 items-center">
+                        <Badge status="neutral">Total: {campaigns.length}</Badge>
+                        <Badge status="scheduled">Scheduled: {campaigns.filter(c => c.status === 'scheduled').length}</Badge>
+                        <Badge status="completed">Completed: {campaigns.filter(c => c.status === 'sent').length}</Badge>
+                    </div>
+                )}
+
                 {/* Content Area */}
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Loading campaigns...</p>
-                    </div>
+                    <LoadingState message="Loading campaigns..." />
                 ) : error ? (
                     <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-6 text-center">
                         <div className="text-red-400 mb-2 font-medium">{error}</div>
@@ -138,13 +147,9 @@ export default function CampaignsList() {
                                                     {campaign.senderEmail || 'info@devugo-tech.com'}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`px-2 py-1 rounded-full text-xs border ${campaign.status === 'sent' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                            campaign.status === 'sending' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                                                campaign.status === 'scheduled' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
-                                                                    'bg-gray-500/10 text-gray-400 border-gray-500/20'
-                                                        }`}>
+                                                    <Badge status={campaign.status || 'draft'}>
                                                         {campaign.status || 'Draft'}
-                                                    </span>
+                                                    </Badge>
                                                 </td>
                                                 <td className="px-6 py-4 text-right text-gray-300">
                                                     {campaign.stats?.sent || 0}
@@ -163,15 +168,18 @@ export default function CampaignsList() {
                                                 <td className="px-6 py-4 text-right">
                                                     <button
                                                         onClick={() => navigate(`/admin/campaigns/create?id=${campaign.id || campaign._id}`)}
-                                                        className="text-gray-400 hover:text-white mx-2 transition-colors"
+                                                        className="btn-icon"
+                                                        title="Edit"
                                                     >
-                                                        Edit
+                                                        ✏️
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(campaign.id || campaign._id)}
-                                                        className="text-gray-400 hover:text-red-400 transition-colors"
+                                                        className="btn-icon danger"
+                                                        title="Delete"
+                                                        style={{ marginLeft: '.5rem' }}
                                                     >
-                                                        Delete
+                                                        🗑️
                                                     </button>
                                                 </td>
                                             </tr>

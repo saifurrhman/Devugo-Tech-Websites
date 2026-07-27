@@ -5,6 +5,9 @@ import AdminTopbar from '../../../components/AdminTopbar';
 import { InvoiceAPI } from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { useConfirm } from '../../../contexts/ConfirmContext';
+import LoadingState from '../../components/LoadingState';
+import Badge from '../../components/Badge';
+import EmptyState from '../../components/EmptyState';
 
 const statusColors = {
     draft: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
@@ -61,21 +64,22 @@ export default function InvoicesList() {
     };
 
     const handleDelete = async (id) => {
-        const confirmed = await confirm.show({
+        await confirm.show({
             title: 'Delete Invoice',
             message: 'Are you sure you want to delete this invoice?',
             variant: 'danger',
-            confirmText: 'Delete'
+            confirmText: 'Delete',
+            action: async () => {
+                try {
+                    await InvoiceAPI.remove(id);
+                    setInvoices(prev => prev.filter(inv => (inv._id || inv.id) !== id));
+                    success('Invoice deleted successfully');
+                } catch (err) {
+                    console.error('Failed to delete invoice:', err);
+                    notifyError('Failed to delete invoice');
+                }
+            }
         });
-        if (!confirmed) return;
-        try {
-            await InvoiceAPI.remove(id);
-            setInvoices(prev => prev.filter(inv => (inv._id || inv.id) !== id));
-            success('Invoice deleted successfully');
-        } catch (err) {
-            console.error('Failed to delete invoice:', err);
-            notifyError('Failed to delete invoice');
-        }
     };
 
     const filteredInvoices = filter === 'all' ? invoices : invoices.filter(i => (i.status || 'draft') === filter);
@@ -178,11 +182,15 @@ export default function InvoicesList() {
                     ))}
                 </div>
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Loading invoices...</p>
+                {!loading && (
+                    <div className="card bg-[rgba(255,255,255,0.06)] rounded-2xl border border-white/10 mb-6 p-4 flex flex-wrap gap-4 items-center shadow-lg">
+                        <Badge status="neutral">Total Invoices: {invoices.length}</Badge>
+                        <Badge status="info">Showing: {filteredInvoices.length}</Badge>
                     </div>
+                )}
+
+                {loading ? (
+                    <LoadingState message="Loading invoices..." />
                 ) : (
                     /* Invoices Table */
                     <div className="card bg-[rgba(255,255,255,0.06)] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
@@ -202,8 +210,13 @@ export default function InvoicesList() {
                                 <tbody className="divide-y divide-gray-800/50">
                                     {filteredInvoices.length === 0 ? (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
-                                                No invoices found.
+                                            <td colSpan="7" className="p-8">
+                                                <EmptyState 
+                                                    title="No invoices found" 
+                                                    description="There are no invoices to display for the current filter."
+                                                    actionLabel="Create Invoice"
+                                                    onAction={() => navigate('/admin/invoices/create')}
+                                                />
                                             </td>
                                         </tr>
                                     ) : (
@@ -216,15 +229,15 @@ export default function InvoicesList() {
                                                     <td className="px-6 py-4 text-gray-200">{getClientName(inv)}</td>
                                                     <td className="px-6 py-4 text-white font-medium">{formatCurrency(inv.total, inv.currency)}</td>
                                                     <td className="px-6 py-4">
-                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${statusColors[status] || statusColors.draft}`}>
+                                                        <Badge status={status === 'viewed' ? 'info' : status === 'partial' ? 'orange' : status === 'cancelled' ? 'neutral' : status}>
                                                             {statusLabels[status] || status}
-                                                        </span>
+                                                        </Badge>
                                                     </td>
                                                     <td className="px-6 py-4 text-right text-gray-400">{formatDate(inv.issueDate)}</td>
                                                     <td className="px-6 py-4 text-right text-gray-400">{formatDate(inv.dueDate)}</td>
                                                     <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
-                                                        <button onClick={() => navigate(`/admin/invoices/${invId}`)} className="text-blue-400 hover:text-blue-300 mx-1 transition-colors text-xs">View</button>
-                                                        <button onClick={() => handleDelete(invId)} className="text-red-400 hover:text-red-300 mx-1 transition-colors text-xs">Delete</button>
+                                                        <button onClick={() => navigate(`/admin/invoices/${invId}`)} className="btn-icon" title="View/Edit">✏️</button>
+                                                        <button onClick={() => handleDelete(invId)} className="btn-icon danger" style={{ marginLeft: '.5rem' }} title="Delete">🗑️</button>
                                                     </td>
                                                 </tr>
                                             );

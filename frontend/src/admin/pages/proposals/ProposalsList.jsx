@@ -6,6 +6,8 @@ import { ProposalAPI } from '../../../lib/api';
 import { Plus, Edit2, Trash2, FileText } from 'lucide-react';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { useConfirm } from '../../../contexts/ConfirmContext';
+import LoadingState from '../../components/LoadingState';
+import Badge from '../../components/Badge';
 
 export default function ProposalsList() {
     const navigate = useNavigate();
@@ -32,28 +34,29 @@ export default function ProposalsList() {
     };
 
     const handleDelete = async (id) => {
-        const confirmed = await confirm.show({
+        await confirm.show({
             title: 'Delete Proposal',
             message: 'Are you sure you want to delete this proposal?',
             variant: 'danger',
-            confirmText: 'Delete'
+            confirmText: 'Delete',
+            action: async () => {
+                try {
+                    await ProposalAPI.remove(id);
+                    success('Proposal deleted successfully');
+                    loadProposals();
+                } catch (err) {
+                    notifyError('Failed to delete proposal');
+                }
+            }
         });
-        if (!confirmed) return;
-        try {
-            await ProposalAPI.remove(id);
-            success('Proposal deleted successfully');
-            loadProposals();
-        } catch (err) {
-            notifyError('Failed to delete proposal');
-        }
     };
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'Sent': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-            case 'Accepted': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-            case 'Rejected': return 'bg-red-500/20 text-red-400 border-red-500/30';
-            default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+            case 'Sent': return 'info';
+            case 'Accepted': return 'green';
+            case 'Rejected': return 'red';
+            default: return 'neutral';
         }
     };
 
@@ -77,10 +80,16 @@ export default function ProposalsList() {
                     </Link>
                 </div>
 
-                {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                {!loading && proposals.length > 0 && (
+                    <div className="card bg-[#003560] rounded-2xl border border-white/5 mb-6 p-4 flex flex-wrap gap-4 items-center">
+                        <Badge status="neutral">Total: {proposals.length}</Badge>
+                        <Badge status="info">Sent: {proposals.filter(p => p.status === 'Sent').length}</Badge>
+                        <Badge status="green">Accepted: {proposals.filter(p => p.status === 'Accepted').length}</Badge>
                     </div>
+                )}
+
+                {loading ? (
+                    <LoadingState message="Loading proposals..." />
                 ) : proposals.length === 0 ? (
                     <div className="bg-[#003560] rounded-2xl border border-white/5 p-12 text-center">
                         <div className="bg-blue-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -128,30 +137,34 @@ export default function ProposalsList() {
                                                 {prop.currency} {prop.amount?.toLocaleString()}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(prop.status)}`}>
+                                                <Badge status={getStatusColor(prop.status)}>
                                                     {prop.status}
-                                                </span>
+                                                </Badge>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-400">
                                                 {new Date(prop.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center justify-end gap-3">
-                                                    <Link
-                                                        to={`/admin/proposals/${prop._id}`}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors"
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/admin/proposals/${prop._id}`);
+                                                        }}
+                                                        className="btn-icon"
+                                                        title="Edit"
                                                     >
-                                                        <Edit2 size={16} />
-                                                    </Link>
+                                                        ✏️
+                                                    </button>
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleDelete(prop._id);
                                                         }}
-                                                        className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+                                                        className="btn-icon danger"
+                                                        title="Delete"
                                                     >
-                                                        <Trash2 size={16} />
+                                                        🗑️
                                                     </button>
                                                 </div>
                                             </td>

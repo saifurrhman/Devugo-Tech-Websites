@@ -6,6 +6,7 @@ import AdminTopbar from '../../../components/AdminTopbar';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { useConfirm } from '../../../contexts/ConfirmContext';
 import { SenderAPI } from '../../../lib/api';
+import EmptyState from '../../components/EmptyState';
 
 export default function SenderSettings() {
     const { success, error: notifyError } = useNotification();
@@ -268,8 +269,13 @@ export default function SenderSettings() {
                         {activeTab === 'senders' ? (
                             <div className="space-y-4">
                                 {senders.length === 0 && (
-                                    <div className="text-center py-12 text-gray-400 bg-[#003560] rounded-xl border border-white/10">
-                                        <p>No senders found. Add one to get started.</p>
+                                    <div className="py-4">
+                                        <EmptyState 
+                                            title="No senders found"
+                                            description="Add a sender to get started."
+                                            actionLabel="Add Sender"
+                                            onAction={() => setIsSenderModalOpen(true)}
+                                        />
                                     </div>
                                 )}
                                 <div className="space-y-4">
@@ -364,8 +370,13 @@ export default function SenderSettings() {
                         ) : (
                             <div className="space-y-4">
                                 {domains.length === 0 && (
-                                    <div className="text-center py-12 text-gray-400 bg-[#003560] rounded-xl border border-white/10">
-                                        <p>No domains found. Add a domain to authenticate it.</p>
+                                    <div className="py-4">
+                                        <EmptyState 
+                                            title="No domains found"
+                                            description="Add a domain to authenticate it."
+                                            actionLabel="Add Domain"
+                                            onAction={() => setIsDomainWizardOpen(true)}
+                                        />
                                     </div>
                                 )}
                                 {domains.map((domain) => (

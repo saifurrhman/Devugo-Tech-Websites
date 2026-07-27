@@ -252,15 +252,13 @@ export default function ServiceEdit(){
             </aside>
           </div>
 
-          <div className="bottom-actions">
-            <div className="container flex flex-row items-center justify-end gap-3">
-              <button type="button" className="btn-secondary lg" onClick={()=>navigate('/admin/services')} style={{backgroundColor: 'white', color: 'black', padding: '8px 16px', borderRadius: '8px'}}>Cancel</button>
-              {!isNew && <button type="button" className="btn-secondary lg" onClick={handleDelete} style={{borderColor:'#ef4444',color:'#ef4444', backgroundColor: 'white', padding: '8px 16px', borderRadius: '8px'}}>Delete</button>}
-              <button type="submit" className="btn lg" disabled={saving} style={{backgroundColor: '#0f2b5b', color: 'white', padding: '8px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: saving ? 0.7 : 1}}>
-                {saving && <Spinner size="sm" />}
-                <span>{saving ? 'Saving…' : 'Save'}</span>
-              </button>
-            </div>
+          <div className="admin-sticky-footer">
+            <button type="button" className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm text-gray-300" onClick={()=>navigate('/admin/services')}>Cancel</button>
+            {!isNew && <button type="button" className="px-4 py-2 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors text-sm" onClick={handleDelete}>Delete</button>}
+            <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors text-sm font-medium" disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: saving ? 0.7 : 1 }}>
+              {saving && <Spinner size="sm" />}
+              <span>{saving ? 'Saving...' : 'Save'}</span>
+            </button>
           </div>
         </form>
       </main>
