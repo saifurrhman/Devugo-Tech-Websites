@@ -445,15 +445,15 @@ export default function CreateTemplate() {
                     </div>
                 </header>
 
-                <div className="flex-1 flex overflow-hidden">
-                    {/* Components Library (Left) */}
-                    <div className="w-16 lg:w-20 bg-[#1e293b] border-r border-gray-800 flex flex-col items-center py-4 gap-4 shrink-0 z-10">
-                        <button onClick={() => { setActivePanelTab('blocks'); setSelectedBlockId(null); }} className={`p-3 rounded-xl transition-all ${activePanelTab === 'blocks' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}><Plus size={24} /></button>
-                        <button onClick={() => { setActivePanelTab('design'); setSelectedBlockId(null); }} className={`p-3 rounded-xl transition-all ${activePanelTab === 'design' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}><Palette size={24} /></button>
+                <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+                    {/* Components Library (Left/Top on Mobile) */}
+                    <div className="w-full lg:w-20 bg-[#1e293b] border-b lg:border-r lg:border-b-0 border-gray-800 flex lg:flex-col items-center justify-center lg:justify-start py-2 lg:py-4 gap-4 shrink-0 z-10 overflow-x-auto">
+                        <button onClick={() => { setActivePanelTab('blocks'); setSelectedBlockId(null); }} className={`p-2 lg:p-3 rounded-xl transition-all ${activePanelTab === 'blocks' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}><Plus size={24} /></button>
+                        <button onClick={() => { setActivePanelTab('design'); setSelectedBlockId(null); }} className={`p-2 lg:p-3 rounded-xl transition-all ${activePanelTab === 'design' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}><Palette size={24} /></button>
                     </div>
 
                     {/* Canvas Area (Center) */}
-                    <div className="flex-1 bg-[#0f172a] p-8 overflow-y-auto flex justify-center relative bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px]">
+                    <div className="flex-1 bg-[#0f172a] p-4 lg:p-8 overflow-y-auto flex justify-center relative bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px]">
                         {viewMode === 'code' ? (
                             <div className="w-full max-w-4xl h-full bg-[#1e293b] rounded-xl border border-gray-700 overflow-hidden flex flex-col">
                                 <div className="bg-gray-900 px-4 py-2 border-b border-gray-800 text-xs text-gray-400 font-mono">HTML Source (Read Only)</div>
@@ -489,8 +489,8 @@ export default function CreateTemplate() {
                         )}
                     </div>
 
-                    {/* Properties (Right) */}
-                    <div className="w-[300px] bg-[#1e293b] border-l border-gray-800 flex flex-col shrink-0">
+                    {/* Properties (Right/Bottom on Mobile) */}
+                    <div className="w-full lg:w-[300px] bg-[#1e293b] border-t lg:border-t-0 lg:border-l border-gray-800 flex flex-col shrink-0 h-[300px] lg:h-auto overflow-y-auto">
                         {activePanelTab === 'blocks' && (
                             <div className="p-4 grid grid-cols-2 gap-3">
                                 {Object.values(BLOCK_TYPES).map(type => (

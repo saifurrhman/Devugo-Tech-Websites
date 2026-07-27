@@ -454,13 +454,35 @@ body.admin-dark .badge {
 }
 
 @media (max-width: 920px) {
-
   /* Collapse sidebar */
   .admin-layout {
     grid-template-columns: 1fr;
   }
 
-  /* Conflicting mobile sidebar styles removed */
+  /* Sidebar Drawer on Mobile */
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .admin-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 40;
+    backdrop-filter: blur(2px);
+  }
 
   .admin-sidebar .admin-link {
     padding: .55rem .6rem;
@@ -468,11 +490,11 @@ body.admin-dark .badge {
   }
 
   .admin-content {
-    min-width: 0
+    min-width: 0;
   }
 
   /* Make top bar stick to top for mobile */
-  .admin-content>.toolbar:first-of-type {
+  .admin-content > .toolbar:first-of-type {
     position: sticky;
     top: 8px;
     z-index: 19;
@@ -6204,3 +6226,83 @@ body.admin-light .admin-sidebar__header,
 body.admin-light .admin-sidebar__footer {
   background: rgba(0, 0, 0, 0.02);
 }
+
+/* ========================================================= */
+/* GLOBAL RESPONSIVE OVERRIDES (Admin Panel)                  */
+/* ========================================================= */
+
+@media (max-width: 768px) {
+  /* 1. Two-Column Layouts (Forms) */
+  .grid.two, .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Reverse the order if sidebar needs to be below (via grid auto flow or explicit order if they are flex) */
+  /* Most form grids don't have explicit sidebars except via grid columns, so stacking is enough */
+  
+  /* 2. Modals constraints */
+  .modal-content, .modal-card, [role="dialog"] > div {
+    width: 95vw !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    margin: 0 auto;
+  }
+
+  /* 3. Touch Targets */
+  button, 
+  .btn, 
+  select, 
+  input[type="checkbox"], 
+  .admin-link, 
+  .icon-btn,
+  .ql {
+    min-height: 44px;
+  }
+  
+  /* Special cases for icon buttons that are explicitly smaller */
+  .toolbar button.icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* 4. Filter Bars & Toolbars */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .toolbar > * {
+    flex-shrink: 0;
+  }
+  .toolbar input[type="text"], 
+  .toolbar input[type="search"] {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  /* 5. Kanban Board Base Responsive styles */
+  .kanban-board, .pipeline-board {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 1rem; /* For scrollbar */
+  }
+  .kanban-column, .pipeline-stage {
+    min-width: 85vw !important;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+}
+
+/* Data Tables responsive wrapper (Global class to wrap standard tables) */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  min-width: 800px; /* Forces horizontal scroll on mobile */
+  width: 100%;
+}

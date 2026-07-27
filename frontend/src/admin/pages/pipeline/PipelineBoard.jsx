@@ -133,9 +133,9 @@ export default function PipelineBoard() {
                     <LoadingState message="Loading pipeline..." />
                 ) : (
                     /* Pipeline Board */
-                    <div className="flex gap-4 overflow-x-auto custom-scrollbar pb-6 h-[calc(100vh-180px)]">
+                    <div className="flex gap-4 overflow-x-auto custom-scrollbar pb-6 h-[calc(100vh-180px)] pipeline-board">
                         {stages.map((stage) => (
-                            <div key={stage.id} className="min-w-[300px] w-[300px] flex flex-col">
+                            <div key={stage.id} className="min-w-[300px] w-[300px] flex flex-col pipeline-stage">
                                 <div className={`p-3 rounded-t-lg bg-${stage.color || 'blue'}-900/20 border-t-4 border-${stage.color || 'blue'}-500 flex justify-between items-center mb-2`}>
                                     <span className="font-semibold text-sm uppercase tracking-wide">{stage.name}</span>
                                     <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full text-gray-400">{stage.items.length}</span>
