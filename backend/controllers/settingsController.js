@@ -1,7 +1,6 @@
 const Setting = require('../models/Setting');
 const fs = require('fs');
-const pdfParse = require('pdf-parse');
-// Get AI Configuration
+// Removed top-level pdf-parse to prevent DOMMatrix ReferenceError on Vercel Node 20+
 exports.getAIConfig = async (req, res) => {
     try {
         const setting = await Setting.findOne({ key: 'ai' });
@@ -56,6 +55,9 @@ exports.uploadAITrainingPDF = async (req, res) => {
 
         let extractedText = '';
         let fileNames = [];
+        
+        // Lazy load pdf-parse to prevent Vercel crash on initialization
+        const pdfParse = require('pdf-parse');
 
         // Parse all uploaded PDFs
         for (const file of req.files) {
