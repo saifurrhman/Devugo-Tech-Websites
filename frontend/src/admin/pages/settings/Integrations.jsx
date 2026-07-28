@@ -838,12 +838,12 @@ export default function Integrations() {
                                                             <CustomSelect
                                                                 value={newAgent.scope || 'all'}
                                                                 onChange={val => setNewAgent({ ...newAgent, scope: val })}
-                                                                options={[
                                                                     { value: 'all', label: 'General / Fallback (Use for everything)' },
                                                                     { value: 'campaigns', label: 'Campaign Generation Only' },
                                                                     { value: 'replies', label: 'Inbox Replies Only' },
                                                                     { value: 'leads', label: 'Lead Qualification Only' },
-                                                                    { value: 'blog', label: 'Blog Post Generation Only' }
+                                                                    { value: 'blog', label: 'Blog Post Generation Only' },
+                                                                    { value: 'whatsapp', label: 'WhatsApp Auto Replies Only' }
                                                                 ]}
                                                             />
                                                         </div>

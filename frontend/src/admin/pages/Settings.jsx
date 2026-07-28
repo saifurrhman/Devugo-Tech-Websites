@@ -18,6 +18,7 @@ export default function Settings() {
     address: '',
     whatsappNumber: '',
     whatsappMessage: '',
+    whatsappAiPrompt: '',
     workingHours: '',
     showWhatsappFloat: true,
     showChatBot: true,
@@ -264,16 +265,30 @@ export default function Settings() {
                 </div>
 
                 <div className="form-group full-width">
-                  <label>Default WhatsApp Message</label>
+                  <label>Default WhatsApp Message (For Float Button)</label>
                   <textarea
                     className="form-input"
                     name="whatsappMessage"
                     value={form.whatsappMessage}
                     onChange={onChange}
-                    rows="3"
+                    rows="2"
                     placeholder="Hello! I would like to discuss a project."
                   />
-                  <p className="field-hint">This message will be pre-filled when users click the WhatsApp button</p>
+                  <p className="field-hint">This message will be pre-filled when users click the WhatsApp float button</p>
+                </div>
+
+                <div className="form-group full-width" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                  <label>WhatsApp AI Agent Prompt (For n8n Bot)</label>
+                  <textarea
+                    className="form-input"
+                    name="whatsappAiPrompt"
+                    value={form.whatsappAiPrompt}
+                    onChange={onChange}
+                    rows="4"
+                    placeholder="You are a helpful Devugo WhatsApp assistant. Please provide brief, friendly answers."
+                    style={{ backgroundColor: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  />
+                  <p className="field-hint">These instructions will be sent to the AI Agent (via n8n webhook) whenever a customer messages your WhatsApp.</p>
                 </div>
               </div>
             </div>

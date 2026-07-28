@@ -9,6 +9,7 @@ const CompanyInfoSchema = new mongoose.Schema(
     address: { type: String, default: 'Lahore, Pakistan' },
     whatsappNumber: { type: String, default: '+923001234567' },
     whatsappMessage: { type: String, default: 'Hello! I would like to discuss a project.' },
+    whatsappAiPrompt: { type: String, default: 'You are a helpful Devugo WhatsApp assistant. Please provide brief, friendly answers.' },
     workingHours: { type: String, default: 'Mon–Fri · 9am–6pm PKT' },
     showWhatsappFloat: { type: Boolean, default: true },
     showChatBot: { type: Boolean, default: true },
