@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, Settings, Check, X, Clock, Plus, ArrowLeft, Calendar, BarChart2, Trophy, Minus, Hash } from 'lucide-react';
+import { Loader2, Settings, Check, X, Clock, Plus, ArrowLeft, Calendar, BarChart2, Trophy, Minus, Hash, Sparkles } from 'lucide-react';
 import { SettingsAPI, BlogAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
 import CustomSelect from '../../components/CustomSelect';
+import BlogGeneratorModal from '../../components/BlogGeneratorModal';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function BlogAutomationPage() {
@@ -13,6 +14,7 @@ export default function BlogAutomationPage() {
     
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
     const [statsLoading, setStatsLoading] = useState(true);
     const [stats, setStats] = useState({
         today: 0,
@@ -115,13 +117,19 @@ export default function BlogAutomationPage() {
         }
     };
 
-    const handleTrigger = async () => {
+    const handleTrigger = () => {
+        setIsGeneratorOpen(true);
+    };
+
+    const handleAcceptGeneratedContent = async (content) => {
+        setIsGeneratorOpen(false);
         try {
-            success('Automation triggered! Please check the blogs page in a few moments.');
-            await SettingsAPI.triggerBlogAutomation();
+            await BlogAPI.create(content);
+            success('Blog post generated and published successfully!');
+            navigate('/admin/blog');
         } catch (error) {
-            console.error('Trigger error:', error);
-            notifyError('Failed to trigger automation');
+            console.error('Failed to save generated blog:', error);
+            notifyError('Failed to publish the generated blog post');
         }
     };
 
@@ -480,9 +488,10 @@ export default function BlogAutomationPage() {
                     <button
                         onClick={handleTrigger}
                         disabled={saving || loading}
-                        className="px-6 py-2.5 text-sm font-medium text-purple-300 hover:text-white bg-purple-500/10 hover:bg-purple-500/20 rounded-lg transition-colors border border-purple-500/20 mr-auto"
+                        className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/20 rounded-lg transition-all border border-blue-500/50 mr-auto flex items-center gap-2"
                     >
-                        Generate Blog Now
+                        <Sparkles size={16} />
+                        Generate Blog Now (Preview)
                     </button>
                     <button
                         onClick={() => navigate('/admin/blog')}
@@ -501,6 +510,12 @@ export default function BlogAutomationPage() {
                     </button>
                 </div>
             </main>
+            
+            <BlogGeneratorModal 
+                isOpen={isGeneratorOpen} 
+                onClose={() => setIsGeneratorOpen(false)} 
+                onAccept={handleAcceptGeneratedContent} 
+            />
         </div>
     );
 }
