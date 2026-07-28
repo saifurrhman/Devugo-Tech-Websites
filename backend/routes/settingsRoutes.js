@@ -27,5 +27,6 @@ router.put('/integrations', settingsController.updateIntegrations);
 // Blog Automation
 router.get('/blog-automation', settingsController.getBlogAutomation);
 router.put('/blog-automation', settingsController.updateBlogAutomation);
+router.post('/blog-automation/trigger', settingsController.triggerBlogAutomation);
 
 module.exports = router;

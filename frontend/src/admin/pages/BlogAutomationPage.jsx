@@ -100,11 +100,28 @@ export default function BlogAutomationPage() {
         setSaving(true);
         try {
             await SettingsAPI.updateBlogAutomation(config);
-            success('Automation settings saved successfully');
+            // Optionally, also update the local state to match DB
+            // await fetchConfig();
+            notifyError(''); // clear any previous errors
+            
+            // Show custom success modal via context if you have one, or regular notification
+            success('Automation settings saved successfully!');
+            
         } catch (error) {
-            notifyError(error.message || 'Failed to save settings');
+            console.error('Save error:', error);
+            notifyError('Failed to save automation settings');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleTrigger = async () => {
+        try {
+            success('Automation triggered! Please check the blogs page in a few moments.');
+            await SettingsAPI.triggerBlogAutomation();
+        } catch (error) {
+            console.error('Trigger error:', error);
+            notifyError('Failed to trigger automation');
         }
     };
 
@@ -460,6 +477,13 @@ export default function BlogAutomationPage() {
                     </div>
                 {/* STICKY BOTTOM BAR */}
                 <div className="sticky bottom-0 z-20 bg-[#020b14]/90 backdrop-blur-md border-t border-white/10 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] flex justify-end gap-4 px-6 md:px-12 w-full mt-8">
+                    <button
+                        onClick={handleTrigger}
+                        disabled={saving || loading}
+                        className="px-6 py-2.5 text-sm font-medium text-purple-300 hover:text-white bg-purple-500/10 hover:bg-purple-500/20 rounded-lg transition-colors border border-purple-500/20 mr-auto"
+                    >
+                        Generate Blog Now
+                    </button>
                     <button
                         onClick={() => navigate('/admin/blog')}
                         disabled={saving}

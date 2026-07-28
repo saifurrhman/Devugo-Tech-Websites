@@ -527,6 +527,7 @@ export const SettingsAPI = {
   updateAI: (payload) => api('/api/settings/ai', { method: 'PUT', body: payload }),
   getBlogAutomation: () => api('/api/settings/blog-automation'),
   updateBlogAutomation: (payload) => api('/api/settings/blog-automation', { method: 'PUT', body: payload }),
+  triggerBlogAutomation: () => api('/api/settings/blog-automation/trigger', { method: 'POST' }),
 };
 
 // ============================================

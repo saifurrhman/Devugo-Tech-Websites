@@ -5864,3 +5864,15 @@
 {"timestamp":"2026-07-27T12:10:01.303Z","level":"INFO","message":"No pending AI personalization requests"}
 {"timestamp":"2026-07-27T12:10:01.317Z","level":"INFO","message":"Updated stats for 1 campaigns"}
 {"timestamp":"2026-07-27T12:10:01.664Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-07-28T08:38:18.617Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-07-28T08:38:21.951Z","level":"INFO","message":"🤖 Triggering Blog Automation for time: 13:38"}
+{"timestamp":"2026-07-28T08:38:22.287Z","level":"INFO","message":"Invoking External Agent [Devugo Blog Automation (Gemini 2-Agent)] for blog"}
+{"timestamp":"2026-07-28T08:38:23.343Z","level":"INFO","message":"✅ Using Gemini model: gemini-1.5-flash"}
+{"timestamp":"2026-07-28T08:40:17.938Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-07-28T08:40:20.564Z","level":"INFO","message":"🤖 Triggering Blog Automation for time: 13:40"}
+{"timestamp":"2026-07-28T08:40:20.643Z","level":"INFO","message":"Invoking External Agent [Devugo Blog Automation (Gemini 2-Agent)] for blog"}
+{"timestamp":"2026-07-28T08:40:21.696Z","level":"INFO","message":"✅ Using Gemini model: gemini-1.5-flash"}
+{"timestamp":"2026-07-28T08:46:37.882Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-07-28T08:46:39.201Z","level":"INFO","message":"🤖 Triggering Blog Automation for time: 13:46"}
+{"timestamp":"2026-07-28T08:46:39.267Z","level":"INFO","message":"Invoking External Agent [Devugo Blog Automation (Gemini 2-Agent)] for blog"}
+{"timestamp":"2026-07-28T08:46:40.003Z","level":"INFO","message":"✅ Using Gemini model: gemini-1.5-flash"}
