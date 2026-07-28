@@ -237,9 +237,10 @@ export default function Integrations() {
             
             // Auto-add agent if user forgot to click "Add Agent" before saving
             if (newAgent && newAgent.name && newAgent.webhook) {
+                const currentAgents = Array.isArray(configToSave.agents) ? configToSave.agents : [];
                 configToSave = {
                     ...configToSave,
-                    agents: [...configToSave.agents, { ...newAgent, id: Date.now() }]
+                    agents: [...currentAgents, { ...newAgent, id: Date.now() }]
                 };
                 setAiConfig(configToSave);
                 setNewAgent(null);
@@ -248,7 +249,8 @@ export default function Integrations() {
             await SettingsAPI.updateAI(configToSave);
             success('AI configuration saved');
         } catch (err) {
-            notifyError('Failed to save AI configuration');
+            console.error('Save AI error:', err);
+            notifyError(err.message || 'Failed to save AI configuration');
         } finally {
             setSavingAI(false);
         }
