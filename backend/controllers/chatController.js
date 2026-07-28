@@ -62,7 +62,7 @@ function getFallbackReply(message) {
     }
 
     // Default
-    return "Thanks for reaching out to Devugo Tech Solutions! 🙏\n\nI'd be happy to help you. For the best assistance, please contact us directly:\n\n📧 **Email:** support@devugotechsolution.store\n📝 **Contact Form:** Available on our website\n\nOur team will respond within 24 hours and we'll make sure all your questions are answered!";
+    return "I'm sorry, I couldn't understand that. Please contact support@devugotechsolution.store for further assistance.";
 }
 
 exports.handleChatMessage = async (req, res) => {
