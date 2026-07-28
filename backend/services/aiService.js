@@ -88,9 +88,9 @@ class AIService {
       
       if (setting && setting.value && setting.value.model) {
         const dbModel = setting.value.model.toLowerCase();
-        if (dbModel.includes('flash')) selectedModel = 'gemini-1.5-flash';
-        if (dbModel.includes('pro')) selectedModel = 'gemini-1.5-pro';
-        if (dbModel.includes('gpt')) selectedModel = 'gemini-1.5-flash'; // Fallback for GPT configs on Gemini API
+        if (dbModel.includes('flash')) selectedModel = 'gemini-flash-latest';
+        if (dbModel.includes('pro')) selectedModel = 'gemini-pro-latest';
+        if (dbModel.includes('gpt')) selectedModel = 'gemini-flash-latest'; // Fallback for GPT configs on Gemini API
       }
 
       logger.info(`✅ Using Gemini model: ${selectedModel}`);
@@ -102,7 +102,7 @@ class AIService {
     } catch (e) {
       logger.error('Error selecting model:', e.message);
       return genAI.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-flash-latest',
         generationConfig: { responseMimeType: "application/json" }
       });
     }
