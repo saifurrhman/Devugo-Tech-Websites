@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const Setting = require('../models/Setting');
 const BlogPost = require('../models/BlogPost');
+const BlogCategory = require('../models/BlogCategory');
 const aiService = require('../services/aiService');
 const logger = require('../utils/logger');
 
@@ -96,20 +97,57 @@ class BlogAutomationJob {
         catch (e) { parsedResult = { title: selectedTopic || 'Auto Generated Blog', content: aiResponse }; }
       }
       
-      const title = parsedResult.title || parsedResult.subject || 'Auto Generated Blog';
-      const content = parsedResult.content || parsedResult.body || '';
-      
+      const {
+        title = parsedResult.subject || 'Auto Generated Blog',
+        content = parsedResult.body || '',
+        excerpt = '',
+        tags = [],
+        category = '',
+        coverImage = null,
+        galleryImages = [],
+        seo = {}
+      } = parsedResult;
+
+      if (!title || !content) {
+        throw new Error('Blog generation failed: title and content are required');
+      }
+
       // Generate slug
       let slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
       const existingSlug = await BlogPost.findOne({ slug });
       if (existingSlug) slug = `${slug}-${Date.now()}`;
 
+      // Dynamic Category Resolution
+      let categoryId = null;
+      if (category && typeof category === 'string') {
+        const catName = category.trim();
+        const existingCat = await BlogCategory.findOne({
+          name: { $regex: `^${catName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' }
+        });
+        
+        if (existingCat) {
+          categoryId = existingCat._id;
+        } else {
+          const catSlug = catName.toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
+          const newCat = await BlogCategory.create({ name: catName, slug: catSlug });
+          categoryId = newCat._id;
+        }
+      }
+
       const newPost = new BlogPost({
         title,
         slug,
-        excerpt: parsedResult.excerpt || content.substring(0, 150) + '...',
+        excerpt: excerpt || content.substring(0, 150) + '...',
         content,
-        seo: parsedResult.seo || { metaTitle: title, metaDescription: content.substring(0, 150) },
+        tags: Array.isArray(tags) ? tags : [],
+        categories: categoryId ? [categoryId] : [],
+        coverImage: coverImage && typeof coverImage === 'string' && !coverImage.includes('oaidalleapi') ? coverImage : null,
+        galleryImages: Array.isArray(galleryImages) ? galleryImages : [],
+        seo: {
+          metaTitle: seo.metaTitle || title.substring(0, 60),
+          metaDescription: seo.metaDescription || content.substring(0, 150),
+          metaKeywords: Array.isArray(tags) ? tags : []
+        },
         published: !config.saveAsDraft,
         publishedAt: config.saveAsDraft ? null : new Date(),
         source: 'auto'

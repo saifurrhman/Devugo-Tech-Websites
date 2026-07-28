@@ -71,7 +71,7 @@ class AIService {
 
       const response = await axios.post(agent.webhook, payload, {
         headers: { 'Content-Type': 'application/json', ...(agent.apiKey ? { 'Authorization': `Bearer ${agent.apiKey}` } : {}) },
-        timeout: 30000
+        timeout: 90000
       });
 
       return response.data;
