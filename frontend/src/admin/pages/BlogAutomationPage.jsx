@@ -205,7 +205,7 @@ export default function BlogAutomationPage() {
                         {/* Stats Section */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                             {/* Today */}
-                            <div className="bg-[#051426] border-l-4 border-l-teal-500 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                            <div className="card border-l-4 border-l-teal-500 p-5 relative overflow-hidden group" style={{ border: 'none', borderLeft: '4px solid #14b8a6' }}>
                                 <div className="absolute -right-4 -top-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <Calendar size={80} className="text-teal-500" />
                                 </div>
@@ -225,7 +225,7 @@ export default function BlogAutomationPage() {
                             </div>
 
                             {/* This Week */}
-                            <div className="bg-[#051426] border-l-4 border-l-blue-500 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                            <div className="card border-l-4 border-l-blue-500 p-5 relative overflow-hidden group" style={{ border: 'none', borderLeft: '4px solid #3b82f6' }}>
                                 <div className="absolute -right-4 -top-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <BarChart2 size={80} className="text-blue-500" />
                                 </div>
@@ -245,7 +245,7 @@ export default function BlogAutomationPage() {
                             </div>
 
                             {/* This Month */}
-                            <div className="bg-[#051426] border-l-4 border-l-purple-500 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                            <div className="card border-l-4 border-l-purple-500 p-5 relative overflow-hidden group" style={{ border: 'none', borderLeft: '4px solid #a855f7' }}>
                                 <div className="absolute -right-4 -top-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <Hash size={80} className="text-purple-500" />
                                 </div>
@@ -265,7 +265,7 @@ export default function BlogAutomationPage() {
                             </div>
 
                             {/* Total */}
-                            <div className="bg-[#051426] border-l-4 border-l-amber-500 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                            <div className="card border-l-4 border-l-amber-500 p-5 relative overflow-hidden group" style={{ border: 'none', borderLeft: '4px solid #f59e0b' }}>
                                 <div className="absolute -right-4 -top-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <Trophy size={80} className="text-amber-500" />
                                 </div>
@@ -286,8 +286,8 @@ export default function BlogAutomationPage() {
                         </div>
 
                         {/* Configuration Section */}
-                        <div className="bg-[#051426] rounded-2xl shadow-2xl border border-white/5 overflow-hidden">
-                            <div className="px-6 py-5 border-b border-white/5 bg-white/[0.02] flex items-center gap-3">
+                        <div className="card p-0 overflow-hidden" style={{ border: 'none' }}>
+                            <div className="px-6 py-5 border-b border-white/5 flex items-center gap-3">
                                 <div className="p-2 bg-teal-500/20 rounded-lg">
                                     <Settings className="text-teal-400" size={20} />
                                 </div>
@@ -306,7 +306,7 @@ export default function BlogAutomationPage() {
                                         {/* LEFT COLUMN */}
                                         <div className="space-y-6">
                                             {/* Enable Toggle */}
-                                            <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 flex items-center justify-between transition-colors hover:border-white/10 shadow-inner">
+                                            <div className="card p-6 flex items-center justify-between" style={{ border: 'none', background: 'rgba(255,255,255,0.02)' }}>
                                                 <div>
                                                     <h3 className="text-white font-medium text-base mb-1">Enable Auto-Publishing</h3>
                                                     <p className="text-sm text-gray-400">Automatically generate and save blog posts daily</p>
@@ -325,9 +325,9 @@ export default function BlogAutomationPage() {
                                             <div className={`transition-opacity duration-300 space-y-6 ${!config.isAutomationEnabled ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
                                                 
                                                 {/* Posts Per Day Stepper */}
-                                                <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                                <div className="card p-6" style={{ border: 'none', background: 'rgba(255,255,255,0.02)' }}>
                                                     <label className="block text-sm font-medium text-gray-200 mb-4">How many blog posts per day?</label>
-                                                    <div className="flex items-center gap-4 bg-[#051426] border border-white/10 rounded-lg p-2 w-fit">
+                                                    <div className="flex items-center gap-4 bg-black/20 border border-white/10 rounded-lg p-2 w-fit">
                                                         <button 
                                                             onClick={decrementPosts}
                                                             className="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors disabled:opacity-50"
@@ -354,7 +354,7 @@ export default function BlogAutomationPage() {
                                                 </div>
 
                                                 {/* Select AI Agent */}
-                                                <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                                <div className="card p-6" style={{ border: 'none', background: 'rgba(255,255,255,0.02)' }}>
                                                     <label className="block text-sm font-medium text-gray-200 mb-3">Select AI Agent</label>
                                                     <div className="relative">
                                                         <CustomSelect
@@ -381,10 +381,10 @@ export default function BlogAutomationPage() {
                                         <div className={`space-y-6 transition-opacity duration-300 ${!config.isAutomationEnabled ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
                                             
                                             {/* Action Type */}
-                                            <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                            <div className="card p-6" style={{ border: 'none', background: 'rgba(255,255,255,0.02)' }}>
                                                 <label className="block text-sm font-medium text-gray-200 mb-4">After generation:</label>
                                                 <div className="flex flex-col sm:flex-row gap-4">
-                                                    <label className={`flex-1 flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${config.saveAsDraft ? 'bg-teal-500/10 border-teal-500/50 text-teal-400' : 'bg-[#051426] border-white/10 text-gray-400 hover:bg-white/5'}`}>
+                                                    <label className={`flex-1 flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${config.saveAsDraft ? 'bg-teal-500/10 border-teal-500/50 text-teal-400' : 'bg-black/20 border-white/10 text-gray-400 hover:bg-white/5'}`}>
                                                         <input 
                                                             type="radio" 
                                                             name="saveAs" 
@@ -398,7 +398,7 @@ export default function BlogAutomationPage() {
                                                         <span className="text-sm font-medium">Save as Draft</span>
                                                     </label>
                                                     
-                                                    <label className={`flex-1 flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${!config.saveAsDraft ? 'bg-teal-500/10 border-teal-500/50 text-teal-400' : 'bg-[#051426] border-white/10 text-gray-400 hover:bg-white/5'}`}>
+                                                    <label className={`flex-1 flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${!config.saveAsDraft ? 'bg-teal-500/10 border-teal-500/50 text-teal-400' : 'bg-black/20 border-white/10 text-gray-400 hover:bg-white/5'}`}>
                                                         <input 
                                                             type="radio" 
                                                             name="saveAs" 
@@ -415,7 +415,7 @@ export default function BlogAutomationPage() {
                                             </div>
 
                                             {/* Schedule Times */}
-                                            <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                            <div className="card p-6" style={{ border: 'none', background: 'rgba(255,255,255,0.02)' }}>
                                                 <div className="flex items-center justify-between mb-4">
                                                     <label className="block text-sm font-medium text-gray-200">Publish Times (Every day)</label>
                                                     <span className="text-xs px-2.5 py-1 bg-white/10 rounded-md text-gray-300 font-medium">
@@ -454,7 +454,7 @@ export default function BlogAutomationPage() {
                                                         type="time" 
                                                         value={newTime} 
                                                         onChange={e => setNewTime(e.target.value)}
-                                                        className="bg-[#051426] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                                                        className="bg-black/20 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
                                                     />
                                                     <button 
                                                         onClick={addTime} 
@@ -467,13 +467,13 @@ export default function BlogAutomationPage() {
                                             </div>
 
                                             {/* Topics */}
-                                            <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                            <div className="card p-6" style={{ border: 'none', background: 'rgba(255,255,255,0.02)' }}>
                                                 <label className="block text-sm font-medium text-gray-200 mb-3">Topic Schedule (One per line)</label>
                                                 <textarea
                                                     value={config.topics}
                                                     onChange={e => setConfig({ ...config, topics: e.target.value })}
                                                     placeholder="Example:&#10;How AI is changing SaaS in 2026&#10;Top 10 features for scalable products&#10;Why choose Devugo for development"
-                                                    className="w-full bg-[#051426] border border-white/10 rounded-lg p-4 text-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none text-sm min-h-[160px] resize-y placeholder-gray-600 leading-relaxed"
+                                                    className="w-full bg-black/20 border border-white/10 rounded-lg p-4 text-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none text-sm min-h-[160px] resize-y placeholder-gray-600 leading-relaxed"
                                                 />
                                                 <p className="text-xs text-gray-500 mt-3 leading-tight">
                                                     Enter one topic per line. The AI will automatically read from this schedule in order. 
