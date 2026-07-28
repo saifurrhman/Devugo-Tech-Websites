@@ -84,13 +84,13 @@ class AIService {
   async getWorkingModel(genAI) {
     try {
       const setting = await Setting.findOne({ key: 'ai' });
-      let selectedModel = 'gemini-flash-latest'; // Default model    
+      let selectedModel = 'gemini-flash-lite-latest'; // Default model (Cheapest & Fastest)
       
       if (setting && setting.value && setting.value.model) {
         const dbModel = setting.value.model.toLowerCase();
-        if (dbModel.includes('flash')) selectedModel = 'gemini-flash-latest';
+        if (dbModel.includes('flash')) selectedModel = 'gemini-flash-lite-latest';
         if (dbModel.includes('pro')) selectedModel = 'gemini-pro-latest';
-        if (dbModel.includes('gpt')) selectedModel = 'gemini-flash-latest'; // Fallback for GPT configs on Gemini API
+        if (dbModel.includes('gpt')) selectedModel = 'gemini-flash-lite-latest'; // Fallback for GPT configs on Gemini API
       }
 
       logger.info(`✅ Using Gemini model: ${selectedModel}`);
@@ -102,7 +102,7 @@ class AIService {
     } catch (e) {
       logger.error('Error selecting model:', e.message);
       return genAI.getGenerativeModel({ 
-        model: 'gemini-flash-latest',
+        model: 'gemini-flash-lite-latest',
         generationConfig: { responseMimeType: "application/json" }
       });
     }
