@@ -227,3 +227,16 @@ exports.updateBlogAutomation = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.triggerBlogAutomation = async (req, res) => {
+    try {
+        const blogAutomationJob = require('../jobs/blogAutomation');
+        // trigger the job asynchronously without awaiting the full process to avoid blocking
+        blogAutomationJob.processAutomation().catch(err => {
+            console.error("Manual blog automation error:", err);
+        });
+        res.json({ success: true, message: "Automation triggered successfully. Please wait a few moments." });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
