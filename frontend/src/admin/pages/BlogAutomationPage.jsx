@@ -196,8 +196,8 @@ export default function BlogAutomationPage() {
                                     <ArrowLeft size={18} />
                                 </button>
                                 <div>
-                                    <h1 className="page-title" style={{ marginBottom: 0 }}>Automation Settings</h1>
-                                    <p className="text-sm text-slate-500 mt-1">Configure your AI blog post generation flow</p>
+                                    <h1 className="text-2xl font-bold text-white tracking-tight">Automation Settings</h1>
+                                    <p className="text-sm text-gray-400 mt-1">Configure your AI blog post generation flow</p>
                                 </div>
                             </div>
                         </div>
@@ -205,93 +205,93 @@ export default function BlogAutomationPage() {
                         {/* Stats Section */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                             {/* Today */}
-                            <div className="section-card border-l-4 border-l-teal-500 p-5 relative overflow-hidden group">
+                            <div className="bg-[#051426] border-l-4 border-l-teal-500 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden group">
                                 <div className="absolute -right-4 -top-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <Calendar size={80} className="text-teal-500" />
                                 </div>
                                 <div className="flex items-center gap-3 mb-3 relative z-10">
                                     <div className="p-2 bg-teal-500/10 rounded-lg">
-                                        <Calendar size={18} className="text-teal-500" />
+                                        <Calendar size={18} className="text-teal-400" />
                                     </div>
-                                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Generated Today</span>
+                                    <span className="text-sm font-medium text-gray-400">Generated Today</span>
                                 </div>
                                 <div className="relative z-10">
                                     {statsLoading ? (
                                         <Loader2 className="animate-spin text-teal-500" size={24} />
                                     ) : (
-                                        <span className="text-3xl font-bold tracking-tight">{stats.today}</span>
+                                        <span className="text-3xl font-bold text-white tracking-tight">{stats.today}</span>
                                     )}
                                 </div>
                             </div>
 
                             {/* This Week */}
-                            <div className="section-card border-l-4 border-l-blue-500 p-5 relative overflow-hidden group">
+                            <div className="bg-[#051426] border-l-4 border-l-blue-500 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden group">
                                 <div className="absolute -right-4 -top-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <BarChart2 size={80} className="text-blue-500" />
                                 </div>
                                 <div className="flex items-center gap-3 mb-3 relative z-10">
                                     <div className="p-2 bg-blue-500/10 rounded-lg">
-                                        <BarChart2 size={18} className="text-blue-500" />
+                                        <BarChart2 size={18} className="text-blue-400" />
                                     </div>
-                                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400">This Week</span>
+                                    <span className="text-sm font-medium text-gray-400">This Week</span>
                                 </div>
                                 <div className="relative z-10">
                                     {statsLoading ? (
                                         <Loader2 className="animate-spin text-blue-500" size={24} />
                                     ) : (
-                                        <span className="text-3xl font-bold tracking-tight">{stats.thisWeek}</span>
+                                        <span className="text-3xl font-bold text-white tracking-tight">{stats.thisWeek}</span>
                                     )}
                                 </div>
                             </div>
 
                             {/* This Month */}
-                            <div className="section-card border-l-4 border-l-purple-500 p-5 relative overflow-hidden group">
+                            <div className="bg-[#051426] border-l-4 border-l-purple-500 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden group">
                                 <div className="absolute -right-4 -top-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <Hash size={80} className="text-purple-500" />
                                 </div>
                                 <div className="flex items-center gap-3 mb-3 relative z-10">
                                     <div className="p-2 bg-purple-500/10 rounded-lg">
-                                        <Hash size={18} className="text-purple-500" />
+                                        <Hash size={18} className="text-purple-400" />
                                     </div>
-                                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400">This Month</span>
+                                    <span className="text-sm font-medium text-gray-400">This Month</span>
                                 </div>
                                 <div className="relative z-10">
                                     {statsLoading ? (
                                         <Loader2 className="animate-spin text-purple-500" size={24} />
                                     ) : (
-                                        <span className="text-3xl font-bold tracking-tight">{stats.thisMonth}</span>
+                                        <span className="text-3xl font-bold text-white tracking-tight">{stats.thisMonth}</span>
                                     )}
                                 </div>
                             </div>
 
                             {/* Total */}
-                            <div className="section-card border-l-4 border-l-amber-500 p-5 relative overflow-hidden group">
+                            <div className="bg-[#051426] border-l-4 border-l-amber-500 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden group">
                                 <div className="absolute -right-4 -top-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <Trophy size={80} className="text-amber-500" />
                                 </div>
                                 <div className="flex items-center gap-3 mb-3 relative z-10">
                                     <div className="p-2 bg-amber-500/10 rounded-lg">
-                                        <Trophy size={18} className="text-amber-500" />
+                                        <Trophy size={18} className="text-amber-400" />
                                     </div>
-                                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Total Auto-Generated</span>
+                                    <span className="text-sm font-medium text-gray-400">Total Auto-Generated</span>
                                 </div>
                                 <div className="relative z-10">
                                     {statsLoading ? (
                                         <Loader2 className="animate-spin text-amber-500" size={24} />
                                     ) : (
-                                        <span className="text-3xl font-bold tracking-tight">{stats.allTime}</span>
+                                        <span className="text-3xl font-bold text-white tracking-tight">{stats.allTime}</span>
                                     )}
                                 </div>
                             </div>
                         </div>
 
                         {/* Configuration Section */}
-                        <div className="section-card p-0 overflow-hidden">
-                            <div className="px-6 py-5 border-b flex items-center gap-3">
+                        <div className="bg-[#051426] rounded-2xl shadow-2xl border border-white/5 overflow-hidden">
+                            <div className="px-6 py-5 border-b border-white/5 bg-white/[0.02] flex items-center gap-3">
                                 <div className="p-2 bg-teal-500/20 rounded-lg">
-                                    <Settings className="text-teal-600 dark:text-teal-400" size={20} />
+                                    <Settings className="text-teal-400" size={20} />
                                 </div>
-                                <h2 className="text-xl font-semibold">Automation Configuration</h2>
+                                <h2 className="text-xl font-semibold text-white">Automation Configuration</h2>
                             </div>
 
                             {loading ? (
@@ -306,10 +306,10 @@ export default function BlogAutomationPage() {
                                         {/* LEFT COLUMN */}
                                         <div className="space-y-6">
                                             {/* Enable Toggle */}
-                                            <div className="border rounded-xl p-6 flex items-center justify-between transition-colors shadow-sm bg-slate-50/50 dark:bg-slate-800/50">
+                                            <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 flex items-center justify-between transition-colors hover:border-white/10 shadow-inner">
                                                 <div>
-                                                    <h3 className="font-medium text-base mb-1">Enable Auto-Publishing</h3>
-                                                    <p className="text-sm text-slate-500">Automatically generate and save blog posts daily</p>
+                                                    <h3 className="text-white font-medium text-base mb-1">Enable Auto-Publishing</h3>
+                                                    <p className="text-sm text-gray-400">Automatically generate and save blog posts daily</p>
                                                 </div>
                                                 <label className="relative inline-flex items-center cursor-pointer ml-4">
                                                     <input 
@@ -325,9 +325,9 @@ export default function BlogAutomationPage() {
                                             <div className={`transition-opacity duration-300 space-y-6 ${!config.isAutomationEnabled ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
                                                 
                                                 {/* Posts Per Day Stepper */}
-                                                <div className="border rounded-xl p-6 shadow-sm bg-slate-50/50 dark:bg-slate-800/50">
-                                                    <label className="block text-sm font-medium mb-4">How many blog posts per day?</label>
-                                                    <div className="flex items-center gap-4 border rounded-lg p-2 w-fit bg-white dark:bg-slate-900">
+                                                <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                                    <label className="block text-sm font-medium text-gray-200 mb-4">How many blog posts per day?</label>
+                                                    <div className="flex items-center gap-4 bg-[#051426] border border-white/10 rounded-lg p-2 w-fit">
                                                         <button 
                                                             onClick={decrementPosts}
                                                             className="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors disabled:opacity-50"
@@ -336,7 +336,7 @@ export default function BlogAutomationPage() {
                                                             <Minus size={18} />
                                                         </button>
                                                         
-                                                        <div className="w-12 text-center text-xl font-bold select-none">
+                                                        <div className="w-12 text-center text-xl font-bold text-white select-none">
                                                             {config.postsPerDay}
                                                         </div>
 
@@ -348,14 +348,14 @@ export default function BlogAutomationPage() {
                                                             <Plus size={18} />
                                                         </button>
                                                     </div>
-                                                    <p className="text-xs text-slate-500 mt-3">
+                                                    <p className="text-xs text-gray-500 mt-3">
                                                         System will generate this many posts automatically each day (min: 1, max: 10).
                                                     </p>
                                                 </div>
 
                                                 {/* Select AI Agent */}
-                                                <div className="border rounded-xl p-6 shadow-sm bg-slate-50/50 dark:bg-slate-800/50">
-                                                    <label className="block text-sm font-medium mb-3">Select AI Agent</label>
+                                                <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                                    <label className="block text-sm font-medium text-gray-200 mb-3">Select AI Agent</label>
                                                     <div className="relative">
                                                         <CustomSelect
                                                             value={config.selectedAgentId}
@@ -370,7 +370,7 @@ export default function BlogAutomationPage() {
                                                             ]}
                                                         />
                                                     </div>
-                                                    <p className="text-xs text-slate-500 mt-3">
+                                                    <p className="text-xs text-gray-500 mt-3">
                                                         Choose which external AI agent webhook should handle this automation.
                                                     </p>
                                                 </div>
@@ -381,10 +381,10 @@ export default function BlogAutomationPage() {
                                         <div className={`space-y-6 transition-opacity duration-300 ${!config.isAutomationEnabled ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
                                             
                                             {/* Action Type */}
-                                            <div className="border rounded-xl p-6 shadow-sm bg-slate-50/50 dark:bg-slate-800/50">
-                                                <label className="block text-sm font-medium mb-4">After generation:</label>
+                                            <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                                <label className="block text-sm font-medium text-gray-200 mb-4">After generation:</label>
                                                 <div className="flex flex-col sm:flex-row gap-4">
-                                                    <label className={`flex-1 flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${config.saveAsDraft ? 'bg-teal-50 dark:bg-teal-900/20 border-teal-500/50 text-teal-700 dark:text-teal-400' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                                    <label className={`flex-1 flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${config.saveAsDraft ? 'bg-teal-500/10 border-teal-500/50 text-teal-400' : 'bg-[#051426] border-white/10 text-gray-400 hover:bg-white/5'}`}>
                                                         <input 
                                                             type="radio" 
                                                             name="saveAs" 
@@ -392,13 +392,13 @@ export default function BlogAutomationPage() {
                                                             onChange={() => setConfig({ ...config, saveAsDraft: true })}
                                                             className="hidden"
                                                         />
-                                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${config.saveAsDraft ? 'border-teal-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${config.saveAsDraft ? 'border-teal-500' : 'border-gray-500'}`}>
                                                             {config.saveAsDraft && <div className="w-2.5 h-2.5 bg-teal-500 rounded-full" />}
                                                         </div>
                                                         <span className="text-sm font-medium">Save as Draft</span>
                                                     </label>
                                                     
-                                                    <label className={`flex-1 flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${!config.saveAsDraft ? 'bg-teal-50 dark:bg-teal-900/20 border-teal-500/50 text-teal-700 dark:text-teal-400' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                                    <label className={`flex-1 flex items-center gap-3 p-4 rounded-lg cursor-pointer border transition-colors ${!config.saveAsDraft ? 'bg-teal-500/10 border-teal-500/50 text-teal-400' : 'bg-[#051426] border-white/10 text-gray-400 hover:bg-white/5'}`}>
                                                         <input 
                                                             type="radio" 
                                                             name="saveAs" 
@@ -406,7 +406,7 @@ export default function BlogAutomationPage() {
                                                             onChange={() => setConfig({ ...config, saveAsDraft: false })}
                                                             className="hidden"
                                                         />
-                                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${!config.saveAsDraft ? 'border-teal-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${!config.saveAsDraft ? 'border-teal-500' : 'border-gray-500'}`}>
                                                             {!config.saveAsDraft && <div className="w-2.5 h-2.5 bg-teal-500 rounded-full" />}
                                                         </div>
                                                         <span className="text-sm font-medium">Publish Now</span>
@@ -415,26 +415,26 @@ export default function BlogAutomationPage() {
                                             </div>
 
                                             {/* Schedule Times */}
-                                            <div className="border rounded-xl p-6 shadow-sm bg-slate-50/50 dark:bg-slate-800/50">
+                                            <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
                                                 <div className="flex items-center justify-between mb-4">
-                                                    <label className="block text-sm font-medium">Publish Times (Every day)</label>
-                                                    <span className="text-xs px-2.5 py-1 bg-slate-200 dark:bg-slate-700 rounded-md font-medium">
+                                                    <label className="block text-sm font-medium text-gray-200">Publish Times (Every day)</label>
+                                                    <span className="text-xs px-2.5 py-1 bg-white/10 rounded-md text-gray-300 font-medium">
                                                         {config.publishTimes.length} / {config.postsPerDay}
                                                     </span>
                                                 </div>
                                                 
                                                 <div className="flex flex-wrap gap-2 mb-4">
                                                     {config.publishTimes.map(time => (
-                                                        <div key={time} className="flex items-center gap-2 bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 px-4 py-2 rounded-lg border border-teal-200 dark:border-teal-500/30 text-sm font-medium">
+                                                        <div key={time} className="flex items-center gap-2 bg-teal-500/20 text-teal-300 px-4 py-2 rounded-lg border border-teal-500/30 text-sm font-medium">
                                                             <Clock size={14} />
                                                             {time}
-                                                            <button onClick={() => removeTime(time)} className="hover:text-red-500 ml-2 transition-colors p-1 -mr-1 rounded-md hover:bg-red-500/10">
+                                                            <button onClick={() => removeTime(time)} className="hover:text-red-400 ml-2 transition-colors p-1 -mr-1 rounded-md hover:bg-red-400/20">
                                                                 <X size={14} />
                                                             </button>
                                                         </div>
                                                     ))}
                                                     {config.publishTimes.length === 0 && (
-                                                        <span className="text-sm text-slate-500 italic py-2 px-1">No times scheduled</span>
+                                                        <span className="text-sm text-gray-500 italic py-2 px-1">No times scheduled</span>
                                                     )}
                                                 </div>
 
@@ -454,12 +454,12 @@ export default function BlogAutomationPage() {
                                                         type="time" 
                                                         value={newTime} 
                                                         onChange={e => setNewTime(e.target.value)}
-                                                        className="border rounded-lg px-4 py-2.5 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white dark:bg-slate-900"
+                                                        className="bg-[#051426] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
                                                     />
                                                     <button 
                                                         onClick={addTime} 
                                                         disabled={!newTime || config.publishTimes.length >= config.postsPerDay}
-                                                        className="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 px-5 py-2.5 rounded-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                                                        className="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
                                                     >
                                                         <Plus size={16} /> Add Time
                                                     </button>
@@ -467,15 +467,15 @@ export default function BlogAutomationPage() {
                                             </div>
 
                                             {/* Topics */}
-                                            <div className="border rounded-xl p-6 shadow-sm bg-slate-50/50 dark:bg-slate-800/50">
-                                                <label className="block text-sm font-medium mb-3">Topic Schedule (One per line)</label>
+                                            <div className="bg-[#081a2f] border border-white/5 rounded-xl p-6 shadow-inner">
+                                                <label className="block text-sm font-medium text-gray-200 mb-3">Topic Schedule (One per line)</label>
                                                 <textarea
                                                     value={config.topics}
                                                     onChange={e => setConfig({ ...config, topics: e.target.value })}
                                                     placeholder="Example:&#10;How AI is changing SaaS in 2026&#10;Top 10 features for scalable products&#10;Why choose Devugo for development"
-                                                    className="w-full border rounded-lg p-4 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none text-sm min-h-[160px] resize-y bg-white dark:bg-slate-900 leading-relaxed"
+                                                    className="w-full bg-[#051426] border border-white/10 rounded-lg p-4 text-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none text-sm min-h-[160px] resize-y placeholder-gray-600 leading-relaxed"
                                                 />
-                                                <p className="text-xs text-slate-500 mt-3 leading-tight">
+                                                <p className="text-xs text-gray-500 mt-3 leading-tight">
                                                     Enter one topic per line. The AI will automatically read from this schedule in order. 
                                                     When it finishes the list, it will loop back to the top.
                                                 </p>
@@ -487,7 +487,7 @@ export default function BlogAutomationPage() {
                         </div>
                     </div>
                 {/* STICKY BOTTOM BAR */}
-                <div className="sticky bottom-0 z-20 backdrop-blur-md border-t p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)] flex justify-end gap-4 px-6 md:px-12 w-full mt-8 bg-white/90 dark:bg-slate-900/90 dark:border-slate-800">
+                <div className="sticky bottom-0 z-20 bg-transparent border-t border-white/10 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] flex justify-end gap-4 px-6 md:px-12 w-full mt-8" style={{ backdropFilter: 'blur(12px)' }}>
                     <button
                         onClick={handleTrigger}
                         disabled={saving || loading}
@@ -499,7 +499,7 @@ export default function BlogAutomationPage() {
                     <button
                         onClick={() => navigate('/admin/blog')}
                         disabled={saving}
-                        className="px-6 py-2.5 text-sm font-medium btn-secondary"
+                        className="px-6 py-2.5 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/5"
                     >
                         Cancel
                     </button>
