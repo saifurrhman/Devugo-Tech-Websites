@@ -11,9 +11,9 @@ function getFallbackReply(message) {
         return "Hello! 👋 Welcome to Devugo Tech Solutions! I'm here to help you. How can I assist you today?";
     }
 
-    // Services
-    if (msg.includes('service') || msg.includes('offer') || msg.includes('provide') || msg.includes('what do you do') || msg.includes('kya karte')) {
-        return "We offer a range of digital services:\n\n🌐 **Web Development** - Custom websites & web apps\n📱 **Mobile App Development** - iOS & Android\n🔍 **SEO & Digital Marketing** - Grow your online presence\n🤖 **AI Solutions** - Smart automation & AI tools\n🎨 **UI/UX Design** - Beautiful, user-friendly designs\n\nWould you like to know more about any specific service?";
+    // Services / MVP / SaaS
+    if (msg.includes('service') || msg.includes('offer') || msg.includes('provide') || msg.includes('what do you do') || msg.includes('kya karte') || msg.includes('saas') || msg.includes('mvp') || msg.includes('software')) {
+        return "We offer a range of digital services, including building custom SaaS and MVPs! 🚀\n\n🌐 **Web Development** - Custom websites & web apps\n📱 **Mobile App Development** - iOS & Android\n🔧 **SaaS / MVP Development** - We can build your product from scratch!\n🤖 **AI Solutions** - Smart automation & AI tools\n\nWould you like to get a free consultation and quote for your MVP?";
     }
 
     // Pricing
