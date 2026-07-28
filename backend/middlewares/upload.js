@@ -12,12 +12,16 @@ const fs = require('fs');
 // Define upload directory path
 const uploadDir = path.join(__dirname, '../public/uploads');
 
-// Create directory if it doesn't exist
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('✅ Upload directory created:', uploadDir);
-} else {
-  console.log('📁 Upload directory exists:', uploadDir);
+try {
+  // Create directory if it doesn't exist
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('✅ Upload directory created:', uploadDir);
+  } else {
+    console.log('📁 Upload directory exists:', uploadDir);
+  }
+} catch (err) {
+  console.log('Warning: Could not create upload dir:', err.message);
 }
 
 // ============================================================================

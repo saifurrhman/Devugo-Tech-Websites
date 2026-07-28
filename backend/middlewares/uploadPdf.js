@@ -2,10 +2,17 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const uploadDir = path.join(__dirname, '../public/uploads/pdf');
+// Use /tmp for Vercel Serverless (read-only filesystem)
+const uploadDir = process.env.NODE_ENV === 'production' 
+  ? '/tmp/pdf' 
+  : path.join(__dirname, '../public/uploads/pdf');
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (err) {
+  console.log('Warning: Could not create PDF upload dir:', err.message);
 }
 
 const storage = multer.diskStorage({
