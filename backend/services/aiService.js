@@ -84,7 +84,7 @@ class AIService {
   async getWorkingModel(genAI) {
     try {
       const setting = await Setting.findOne({ key: 'ai' });
-      let selectedModel = 'gemini-1.5-flash';
+      let selectedModel = 'gemini-flash-latest'; // Default model    
       
       if (setting && setting.value && setting.value.model) {
         const dbModel = setting.value.model.toLowerCase();

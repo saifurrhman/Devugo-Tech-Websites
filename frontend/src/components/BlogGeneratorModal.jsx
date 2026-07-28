@@ -185,37 +185,37 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                 </div>
 
                 {/* Right Panel: Preview (Maintains Paper Look) */}
-                <div className="flex-1 bg-[#f8fafc] relative flex flex-col min-h-[300px] md:min-h-[500px]">
+                <div className="flex-1 bg-[#001f3f] relative flex flex-col min-h-[300px] md:min-h-[500px] rounded-r-xl md:rounded-r-2xl overflow-hidden">
                     {!result ? (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#f1f5f9]">
-                            <div className="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-6 border border-slate-200">
-                                <FileText className="w-10 h-10 text-[#003560]" />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#001f3f]">
+                            <div className="w-24 h-24 bg-[#002747] rounded-full shadow-lg flex items-center justify-center mb-6 border border-white/10">
+                                <FileText className="w-10 h-10 text-white/80" />
                             </div>
-                            <h3 className="text-xl font-bold text-[#002747] mb-2">Ready to Write</h3>
-                            <p className="text-slate-500 max-w-sm">
+                            <h3 className="text-xl font-bold text-white mb-2">Ready to Write</h3>
+                            <p className="text-blue-100/60 max-w-sm">
                                 Enter your topic on the left and let AI generate a complete, formatted blog post for you in seconds.
                             </p>
                         </div>
                     ) : (
                         <div className="flex flex-col h-full">
                             {/* Toolbar */}
-                            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-200 p-4 flex items-center justify-between shadow-sm">
+                            <div className="sticky top-0 z-10 bg-[#002747]/90 backdrop-blur-md border-b border-white/10 p-4 flex items-center justify-between shadow-sm">
                                 <div className="flex items-center gap-2">
-                                    <span className="flex items-center justify-center w-6 h-6 bg-green-100 text-green-600 rounded-full">
+                                    <span className="flex items-center justify-center w-6 h-6 bg-green-500/20 text-green-400 rounded-full">
                                         <Check size={14} strokeWidth={3} />
                                     </span>
-                                    <span className="font-semibold text-slate-700">Content Generated</span>
+                                    <span className="font-semibold text-white">Content Generated</span>
                                 </div>
                                 <button
                                     onClick={() => onAccept(result)}
-                                    className="bg-[#0f2b5b] hover:bg-[#003560] text-white px-6 py-2.5 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 ring-1 ring-black/5"
+                                    className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 ring-1 ring-white/10"
                                 >
                                     Use This Content <Check size={16} />
                                 </button>
                             </div>
 
                             {/* Content Scroll Area */}
-                            <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar bg-[#f8fafc]">
+                            <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar bg-[#001f3f]">
 
                                 {/* Images Preview Section */}
                                 {(result.featuredImage || result.coverImage) && (
@@ -224,11 +224,11 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Featured Image</label>
-                                                    <button onClick={() => copyToClipboard(result.featuredImage, 'img1')} className="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Copy URL">
+                                                    <button onClick={() => copyToClipboard(result.featuredImage, 'img1')} className="text-slate-400 hover:text-blue-400 transition-colors p-1" title="Copy URL">
                                                         {copied === 'img1' ? <Check size={14} /> : <Copy size={14} />}
                                                     </button>
                                                 </div>
-                                                <div className="relative group overflow-hidden rounded-xl border border-slate-200 aspect-video bg-slate-100">
+                                                <div className="relative group overflow-hidden rounded-xl border border-white/10 aspect-video bg-[#002747]">
                                                     <img src={result.featuredImage} alt="Featured" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                                 </div>
                                             </div>
@@ -237,11 +237,11 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Post Cover</label>
-                                                    <button onClick={() => copyToClipboard(result.coverImage, 'img2')} className="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Copy URL">
+                                                    <button onClick={() => copyToClipboard(result.coverImage, 'img2')} className="text-slate-400 hover:text-blue-400 transition-colors p-1" title="Copy URL">
                                                         {copied === 'img2' ? <Check size={14} /> : <Copy size={14} />}
                                                     </button>
                                                 </div>
-                                                <div className="relative group overflow-hidden rounded-xl border border-slate-200 aspect-video bg-slate-100">
+                                                <div className="relative group overflow-hidden rounded-xl border border-white/10 aspect-video bg-[#002747]">
                                                     <img src={result.coverImage} alt="Cover" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                                 </div>
                                             </div>
@@ -253,17 +253,17 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
                                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Title</label>
-                                        <button onClick={() => copyToClipboard(result.title, 'title')} className="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Copy">
+                                        <button onClick={() => copyToClipboard(result.title, 'title')} className="text-slate-400 hover:text-blue-400 transition-colors p-1" title="Copy">
                                             {copied === 'title' ? <Check size={14} /> : <Copy size={14} />}
                                         </button>
                                     </div>
-                                    <h1 className="text-2xl font-bold text-slate-900 leading-tight">
+                                    <h1 className="text-2xl font-bold text-white leading-tight">
                                         {result.title}
                                     </h1>
                                     {result.categories && result.categories.length > 0 && (
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {result.categories.map((cat, i) => (
-                                                <span key={i} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-md border border-blue-100">
+                                                <span key={i} className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs font-semibold rounded-md border border-blue-500/30">
                                                     {cat}
                                                 </span>
                                             ))}
@@ -272,14 +272,14 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                                 </div>
 
                                 {/* Excerpt Section */}
-                                <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                                <div className="bg-[#002747] rounded-xl p-5 border border-white/10 shadow-sm">
                                     <div className="flex items-center justify-between mb-2">
                                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Meta Description</label>
-                                        <button onClick={() => copyToClipboard(result.excerpt, 'excerpt')} className="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Copy">
+                                        <button onClick={() => copyToClipboard(result.excerpt, 'excerpt')} className="text-slate-400 hover:text-blue-400 transition-colors p-1" title="Copy">
                                             {copied === 'excerpt' ? <Check size={14} /> : <Copy size={14} />}
                                         </button>
                                     </div>
-                                    <p className="text-slate-600 leading-relaxed text-sm">
+                                    <p className="text-blue-100/80 leading-relaxed text-sm">
                                         {result.excerpt}
                                     </p>
                                 </div>
@@ -287,19 +287,19 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                                 {/* SEO Preview */}
                                 <div>
                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Target Search Result</label>
-                                    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow cursor-default">
-                                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-1.5">
-                                            <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+                                    <div className="bg-[#002747] rounded-xl border border-white/10 p-5 shadow-sm hover:shadow-md transition-shadow cursor-default">
+                                        <div className="flex items-center gap-2 text-xs text-blue-200/50 mb-1.5">
+                                            <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center">
                                                 <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                                             </div>
                                             <span>example.com</span>
-                                            <span className="text-slate-300">•</span>
+                                            <span className="text-slate-500">•</span>
                                             <span>blog</span>
                                         </div>
-                                        <div className="text-[#1a0dab] text-lg font-medium hover:underline truncate cursor-pointer mb-1">
+                                        <div className="text-blue-400 text-lg font-medium hover:underline truncate cursor-pointer mb-1">
                                             {result.seo?.metaTitle || result.title}
                                         </div>
-                                        <div className="text-slate-600 text-sm line-clamp-2">
+                                        <div className="text-blue-100/70 text-sm line-clamp-2">
                                             {result.seo?.metaDescription || result.excerpt}
                                         </div>
                                     </div>
@@ -309,11 +309,11 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
                                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Article Content</label>
-                                        <button onClick={() => copyToClipboard(result.content, 'content')} className="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Copy">
+                                        <button onClick={() => copyToClipboard(result.content, 'content')} className="text-slate-400 hover:text-blue-400 transition-colors p-1" title="Copy">
                                             {copied === 'content' ? <Check size={14} /> : <Copy size={14} />}
                                         </button>
                                     </div>
-                                    <div className="prose prose-slate max-w-none bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                    <div className="prose prose-invert max-w-none bg-[#002747] p-6 rounded-2xl border border-white/10 shadow-sm text-blue-50/90 prose-headings:text-white prose-a:text-blue-400">
                                         <div dangerouslySetInnerHTML={{ __html: result.content }} />
                                     </div>
                                 </div>
