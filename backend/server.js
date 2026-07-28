@@ -383,14 +383,29 @@ try {
 // SETTINGS & AI ROUTES
 // ========================================
 
+let settingsError = null;
 try {
   console.log('⚡ Loading settings routes...');
   const settingsRoutes = require('./routes/settingsRoutes');
   app.use('/api/settings', settingsRoutes);
   console.log('  ✅ Settings routes loaded');
 } catch (error) {
+  settingsError = error.message + '\n' + error.stack;
   console.error('  ❌ Settings routes error:', error.message);
 }
+
+app.get('/api/debug-settings-error', (req, res) => {
+  res.send(settingsError || "No error occurred");
+});
+
+app.get('/api/debug-env', (req, res) => {
+  res.json({
+    node_env: process.env.NODE_ENV,
+    vercel: process.env.VERCEL,
+    pwd: process.cwd(),
+    dirname: __dirname,
+  });
+});
 
 try {
   console.log('🤖 Loading AI routes...');
