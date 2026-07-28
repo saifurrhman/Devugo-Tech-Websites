@@ -238,7 +238,19 @@ class AIService {
 
   // 8. Blog Post Generation
   async generateBlog({ topic, keywords, tone, agentId }) {
-    return this.generateContent(PROMPTS.BLOG_POST, { topic, keywords, tone }, 'blog', agentId);
+    const result = await this.generateContent(PROMPTS.BLOG_POST, { topic, keywords, tone }, 'blog', agentId);
+    
+    // Auto-generate free images using Pollinations AI if missing
+    if (result && typeof result === 'object') {
+        if (!result.featuredImage || result.featuredImage.trim() === '') {
+            const safeTopic = encodeURIComponent(`Professional high quality modern blog cover image for: ${topic || 'technology'}. Minimalist, digital art.`);
+            const randomSeed = Math.floor(Math.random() * 100000);
+            result.featuredImage = `https://image.pollinations.ai/prompt/${safeTopic}?width=800&height=450&nologo=true&seed=${randomSeed}`;
+            result.coverImage = `https://image.pollinations.ai/prompt/${safeTopic}?width=1200&height=630&nologo=true&seed=${randomSeed}`;
+        }
+    }
+    
+    return result;
   }
 
   // Legacy method support (mapped to Campaign)
