@@ -246,10 +246,10 @@ export default function AdminBlogCreate() {
               setAiPrompt(form.title || '');
               setGeneratorOpen(true);
             }}
-            className="btn-secondary flex items-center gap-2"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)', color: 'white', border: 'none' }}
+            className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/30 rounded-xl transition-all border border-blue-500/50 hover:shadow-blue-500/50 active:scale-95"
           >
-            <span>✨ Auto-Generate with AI</span>
+            <span className="text-base">✨</span> 
+            <span>Auto-Generate with AI</span>
           </button>
         </div>
 

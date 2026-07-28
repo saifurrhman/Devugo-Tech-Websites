@@ -69,12 +69,23 @@ class BlogAutomationJob {
     logger.info(`🤖 Triggering Blog Automation for time: ${currentTime}`);
 
     try {
-      // Pick a random topic if topics exist
+      // Pick topics sequentially from the schedule (one per line)
       let selectedTopic = '';
+      let nextIndex = 0;
       if (config.topics && config.topics.length > 0) {
-        const topicArray = config.topics.split(',').map(t => t.trim()).filter(Boolean);
+        // Support both comma separated (legacy) and newline separated
+        const separator = config.topics.includes('\n') ? '\n' : ',';
+        const topicArray = config.topics.split(separator).map(t => t.trim()).filter(Boolean);
+        
         if (topicArray.length > 0) {
-          selectedTopic = topicArray[Math.floor(Math.random() * topicArray.length)];
+          const currentIndex = typeof config.lastTopicIndex === 'number' ? config.lastTopicIndex : 0;
+          
+          // Ensure we don't go out of bounds if topics were removed
+          const safeIndex = currentIndex >= topicArray.length ? 0 : currentIndex;
+          selectedTopic = topicArray[safeIndex];
+          
+          // Calculate next index for the next run (loop back to 0 if at end)
+          nextIndex = (safeIndex + 1) % topicArray.length;
         }
       }
 
@@ -156,8 +167,9 @@ class BlogAutomationJob {
       await newPost.save();
       logger.info(`✅ Auto-generated blog post saved: ${title}`);
 
-      // Update last run time in settings
+      // Update last run time and topic index in settings
       config[lastRunKey] = todayStr;
+      config.lastTopicIndex = nextIndex;
       await Setting.findOneAndUpdate(
         { key: 'blogAutomation' },
         { $set: { value: config, updatedAt: Date.now() } }

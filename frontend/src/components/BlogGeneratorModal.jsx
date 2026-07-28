@@ -53,12 +53,18 @@ export default function BlogGeneratorModal({ isOpen, onClose, onAccept, initialT
             if (!parsedResult.excerpt) parsedResult.excerpt = parsedResult.content?.substring(0, 150) + '...' || 'No summary available.';
 
             setResult(parsedResult);
+            
+            // Auto-publish/accept immediately after generation
+            setTimeout(() => {
+                if (onAccept) onAccept(parsedResult);
+            }, 1500); // 1.5 second delay to let user see the success checkmark
+            
         } catch (err) {
             console.error('Error:', err);
             notifyError('Failed to generate content. Check your AI Integrations settings.');
-        } finally {
             setLoading(false);
         }
+        // Removed finally { setLoading(false) } so it stays in loading/success state until modal closes
     };
 
     const copyToClipboard = (text, type) => {
