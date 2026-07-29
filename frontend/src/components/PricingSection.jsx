@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './PricingSection.css';
 import PricingQuoteModal from './PricingQuoteModal';
@@ -11,6 +11,7 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const gridRef = useRef(null);
 
   // Fetch pricing plans from API
   useEffect(()=>{
