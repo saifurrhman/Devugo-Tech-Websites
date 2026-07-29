@@ -35,34 +35,26 @@ export default function ServicesSection({ variant }){
       try{
         console.log('🔍 Fetching services from API...');
         
-        const fetchPromise = ServiceAPI.list();
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
+        const fetchPromise = ServiceAPI.listPublic();
         const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
         
         const [response] = await Promise.all([
-          Promise.race([fetchPromise, timeoutPromise]),
+          fetchPromise,
           minTimePromise
         ]);
 
         console.log('✅ API Response received');
-        console.log('✅ Response type:', typeof response);
-        console.log('✅ Is Array?:', Array.isArray(response));
         
-        // Handle different response formats
         let items = [];
         if (Array.isArray(response)) {
           items = response;
         } else if (response && typeof response === 'object') {
           items = response.items || response.data || response.services || [];
         }
-        
-        console.log('📦 Extracted items:', items);
-        console.log('📊 Items length:', items.length);
-        
+
         if(mounted && Array.isArray(items) && items.length > 0){
           const mapped = items
             .filter(s => {
-              console.log('🔍 Checking service:', s.title, 'Published:', s.published);
               // Accept all services if published field doesn't exist
               if (s.published === undefined || s.published === null) return true;
               if (typeof s.published === 'boolean') return s.published === true;
@@ -81,14 +73,12 @@ export default function ServicesSection({ variant }){
           setServices(mapped);
         } else {
           console.warn('⚠️ No services found or empty array');
-          console.log('Items received:', items);
           setServices([]);
         }
       } catch(err) { 
         console.error('❌ Failed to load services:', err);
-        console.error('❌ Error details:', err.message, err.stack);
         if(mounted) {
-          setError(err.message === 'TIMEOUT' ? 'Unable to load content, please refresh.' : 'Failed to load services. Please try again later.');
+          setError('Failed to load services. Please try again later.');
           setServices([]);
         }
       } finally { 
@@ -102,30 +92,36 @@ export default function ServicesSection({ variant }){
   useEffect(()=>{
     if (loading) return;
 
-    const els = Array.from(gridRef.current?.querySelectorAll('.service-card') || []);
-    const vh = window.innerHeight || 800;
-    
-    els.forEach((el, index)=>{
-      const rect = el.getBoundingClientRect();
-      if (rect.top < vh * 0.9){
-        setTimeout(()=>{ el.classList.add('show'); }, Math.min(index, 8) * 90);
-      }
-    });
-
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(entry=>{
-        if(entry.isIntersecting){
-          const index = els.indexOf(entry.target);
-          setTimeout(()=>{ entry.target.classList.add('show'); }, Math.min(index, 8) * 90);
-          io.unobserve(entry.target);
+    let io = null;
+    const timer = setTimeout(() => {
+      const els = Array.from(gridRef.current?.querySelectorAll('.service-card') || []);
+      const vh = window.innerHeight || 800;
+      
+      els.forEach((el, index)=>{
+        const rect = el.getBoundingClientRect();
+        if (rect.top < vh * 0.9){
+          setTimeout(()=>{ el.classList.add('show'); }, Math.min(index, 8) * 90);
         }
       });
-    }, { rootMargin: '0px 0px -20% 0px', threshold: 0.1 });
+
+      io = new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            const index = els.indexOf(entry.target);
+            setTimeout(()=>{ entry.target.classList.add('show'); }, Math.min(index, 8) * 90);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -20% 0px', threshold: 0.1 });
+      
+      els.forEach(el=> io.observe(el));
+    }, 400); // Wait for AnimatePresence exit transition
     
-    els.forEach(el=> io.observe(el));
-    
-    return ()=> io.disconnect();
-  }, [visibleCount, loading]);
+    return () => {
+      clearTimeout(timer);
+      if (io) io.disconnect();
+    };
+  }, [visibleCount, loading, services]);
 
   function loadMore(){
     const step = window.innerWidth <= 640 ? 3 : 6;

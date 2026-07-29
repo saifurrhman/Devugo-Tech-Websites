@@ -19,13 +19,19 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
       setLoading(true);
       try{
         const fetchPromise = PricingAPI.list();
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
         const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
 
-        const [{ items }] = await Promise.all([
-          Promise.race([fetchPromise, timeoutPromise]),
+        const [response] = await Promise.all([
+          fetchPromise,
           minTimePromise
         ]);
+
+        let items = [];
+        if (Array.isArray(response)) {
+          items = response;
+        } else if (response && typeof response === 'object') {
+          items = response.items || response.data || [];
+        }
 
         if(mounted && Array.isArray(items) && items.length){
           const published = items
@@ -36,10 +42,7 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
         }
       }catch(err){ 
         console.error('Failed to load pricing:', err);
-        if (mounted && err.message === 'TIMEOUT') {
-          // Can set an error state if needed, but currently no error state exists in PricingSection, 
-          // wait, let me check if there's an error state. It only has loading and plans.
-          // Let's just clear plans so it shows empty state.
+        if (mounted) {
           setPlans([]);
         }
       }
@@ -52,18 +55,27 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
 
   // Animate cards on scroll
   useEffect(()=>{
-    const cards = Array.from(document.querySelectorAll('.pricing-home .price-card'));
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){
-          e.target.classList.add('show');
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    cards.forEach(c=> io.observe(c));
-    return ()=> io.disconnect();
-  }, [plans]);
+    if (loading) return;
+    
+    let io = null;
+    const timer = setTimeout(() => {
+      const cards = Array.from(document.querySelectorAll('.pricing-home .price-card'));
+      io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            e.target.classList.add('show');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      cards.forEach(c=> io.observe(c));
+    }, 400);
+
+    return () => {
+      clearTimeout(timer);
+      if (io) io.disconnect();
+    };
+  }, [plans, loading]);
 
   function formatPrice(plan) {
     if (plan.planType === 'custom') {

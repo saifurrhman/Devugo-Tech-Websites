@@ -32,20 +32,26 @@ export default function ReviewsSection({
       try {
         const params = featuredOnly ? { featured: true } : {};
         const fetchPromise = ClientReviewAPI.list(params);
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
         const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
 
-        const [{ items }] = await Promise.all([
-          Promise.race([fetchPromise, timeoutPromise]),
+        const [response] = await Promise.all([
+          fetchPromise,
           minTimePromise
         ]);
+
+        let items = [];
+        if (Array.isArray(response)) {
+          items = response;
+        } else if (response && typeof response === 'object') {
+          items = response.items || response.data || [];
+        }
 
         if (!mounted) return;
         // Shuffle items before distributing to columns
         const shuffledItems = shuffleArray((items || []).slice(0, limit));
         setItems(shuffledItems);
       } catch (err) {
-        if (mounted) setError(err.message === 'TIMEOUT' ? 'Unable to load content, please refresh.' : (err.message || 'Failed to load reviews'));
+        if (mounted) setError(err.message || 'Failed to load reviews');
       } finally {
         if (mounted) setLoading(false);
       }

@@ -16,13 +16,19 @@ export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCatego
       setError('');
       try {
         const fetchPromise = PortfolioAPI.list();
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
         const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
 
-        const [{ items }] = await Promise.all([
-          Promise.race([fetchPromise, timeoutPromise]),
+        const [response] = await Promise.all([
+          fetchPromise,
           minTimePromise
         ]);
+        
+        let items = [];
+        if (Array.isArray(response)) {
+          items = response;
+        } else if (response && typeof response === 'object') {
+          items = response.items || response.data || [];
+        }
         
         if (!mounted) return;
         
@@ -84,7 +90,7 @@ export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCatego
                 <p className="services-sub">Latest work we shipped</p>
               </div>
               <p style={{ color: '#ef4444', textAlign: 'center' }}>
-                {error === 'TIMEOUT' ? 'Unable to load content, please refresh.' : error}
+                {error}
               </p>
             </div>
           </motion.div>

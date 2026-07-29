@@ -30,16 +30,23 @@ export default function Blog() {
     (async () => {
       try {
         const fetchPromise = BlogAPI.list();
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
         const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
 
-        const [{ posts: fetchedPosts }] = await Promise.all([
-          Promise.race([fetchPromise, timeoutPromise]),
+        const [response] = await Promise.all([
+          fetchPromise,
           minTimePromise
         ]);
+        
+        let fetchedPosts = [];
+        if (Array.isArray(response)) {
+          fetchedPosts = response;
+        } else if (response && typeof response === 'object') {
+          fetchedPosts = response.posts || response.items || response.data || [];
+        }
+        
         if (mounted) setPosts(fetchedPosts || []);
       } catch (err) {
-        if (mounted) setError(err.message === 'TIMEOUT' ? 'Unable to load content, please refresh.' : (err.message || 'Failed to load posts'));
+        if (mounted) setError(err.message || 'Failed to load posts');
       } finally {
         if (mounted) setLoading(false);
       }
