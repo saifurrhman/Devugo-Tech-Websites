@@ -110,6 +110,29 @@ export default function JobApplications() {
     }
   };
 
+  const handleDownloadCV = async (fileUrl, applicantName) => {
+    try {
+      const response = await fetch(fileUrl);
+      if (!response.ok) throw new Error('File not found');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Extract extension from fileUrl or default to pdf
+      const ext = fileUrl.split('.').pop().split(/#|\?/)[0] || 'pdf';
+      link.download = `${applicantName.replace(/\s+/g, '_')}_CV.${ext}`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download failed:', err);
+      notifyError('Failed to download CV. It might be unavailable.');
+    }
+  };
+
   if (loading) return (
     <div className="admin-layout">
       <AdminSidebar />
@@ -219,9 +242,14 @@ export default function JobApplications() {
                       </a>
                     )}
                     {app.resume && (
-                      <a href={`${API_BASE}${app.resume}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.8rem', color: '#34d399', textDecoration: 'none', background: 'rgba(52,211,153,0.1)', padding: '.4rem .8rem', borderRadius: '6px' }}>
-                        <FileDown size={13} /> Download CV
-                      </a>
+                      <>
+                        <a href={`${API_BASE}${app.resume}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.8rem', color: '#60a5fa', textDecoration: 'none', background: 'rgba(96,165,250,0.1)', padding: '.4rem .8rem', borderRadius: '6px' }}>
+                          <ExternalLink size={13} /> Preview CV
+                        </a>
+                        <button onClick={() => handleDownloadCV(`${API_BASE}${app.resume}`, app.fullName)} style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.8rem', color: '#34d399', textDecoration: 'none', background: 'rgba(52,211,153,0.1)', padding: '.4rem .8rem', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>
+                          <FileDown size={13} /> Download
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
