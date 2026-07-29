@@ -171,9 +171,11 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
                     </div>
                   )}
                   
-                  <h3 className="price-title">{plan.name}</h3>
-                  <p className="price-blurb">{plan.description || ''}</p>
-                  <div className="price-amount">{formatPrice(plan)}</div>
+                  <div className="price-header">
+                    <h3 className="price-title">{plan.name}</h3>
+                    <p className="price-blurb">{plan.description || ''}</p>
+                    <div className="price-amount">{formatPrice(plan)}</div>
+                  </div>
                   
                   {plan.features && plan.features.length > 0 && (
                     <ul className="price-features">

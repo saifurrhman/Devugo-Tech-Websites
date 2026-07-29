@@ -8,9 +8,10 @@
 .price-card{ background:transparent; border:1px solid rgba(255,255,255,0.24); border-radius:14px; padding:1rem; color:#e6f0ff; display:flex; flex-direction:column; transition: box-shadow .2s ease, border-color .2s ease, background .2s ease }
 .price-card.highlight{ border-color:#5aa0ea; box-shadow:0 12px 30px rgba(67,133,205,.18) }
 .price-card:hover{ box-shadow:0 12px 30px rgba(67,133,205,.20); border-color:#8ab8ff; background:rgba(255,255,255,0.04) }
+.price-header { min-height: 140px; display: flex; flex-direction: column; }
 .price-title{ margin:0 0 .35rem; font-size:1.2rem; font-weight:900; color:#ffffff }
 .price-blurb{ margin:0 0 .6rem; color:#cfe3ff }
-.price-amount{ font-size:1.6rem; font-weight:900; color:#ffffff; margin:.15rem 0 .5rem }
+.price-amount{ font-size:1.4rem; font-weight:900; color:#ffffff; margin-top: auto; margin-bottom: .5rem; line-height: 1.2; letter-spacing: -0.01em; }
 .price-features{ list-style:none; padding:0; margin:0 0 .8rem; display:grid; gap:.35rem; color:#cfe3ff }
 .price-features li::before{ content:"✓"; margin-right:.4rem; color:#56a1f0 }
 .price-card .btn,
