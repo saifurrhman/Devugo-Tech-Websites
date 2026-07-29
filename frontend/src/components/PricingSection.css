@@ -5,8 +5,7 @@
 .pricing-head .muted{ color:var(--color-muted) }
 
 .pricing-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem }
-.price-card{ background:transparent; border:1px solid rgba(255,255,255,0.24); border-radius:14px; padding:1rem; color:#e6f0ff; display:flex; flex-direction:column; opacity:0; transform:translateY(14px) scale(.98); transition: opacity .45s ease, transform .45s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease }
-.price-card.show{ opacity:1; transform:translateY(0) scale(1) }
+.price-card{ background:transparent; border:1px solid rgba(255,255,255,0.24); border-radius:14px; padding:1rem; color:#e6f0ff; display:flex; flex-direction:column; transition: box-shadow .2s ease, border-color .2s ease, background .2s ease }
 .price-card.highlight{ border-color:#5aa0ea; box-shadow:0 12px 30px rgba(67,133,205,.18) }
 .price-card:hover{ box-shadow:0 12px 30px rgba(67,133,205,.20); border-color:#8ab8ff; background:rgba(255,255,255,0.04) }
 .price-title{ margin:0 0 .35rem; font-size:1.2rem; font-weight:900; color:#ffffff }

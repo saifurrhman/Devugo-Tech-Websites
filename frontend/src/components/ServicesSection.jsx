@@ -89,38 +89,11 @@ export default function ServicesSection({ variant }){
     return ()=>{ mounted = false };
   }, []);
 
-  useEffect(()=>{
-    if (loading) return;
-
-    let io = null;
-    const timer = setTimeout(() => {
-      const els = Array.from(gridRef.current?.querySelectorAll('.service-card') || []);
-      const vh = window.innerHeight || 800;
-      
-      els.forEach((el, index)=>{
-        const rect = el.getBoundingClientRect();
-        if (rect.top < vh * 0.9){
-          setTimeout(()=>{ el.classList.add('show'); }, Math.min(index, 8) * 90);
-        }
-      });
-
-      io = new IntersectionObserver((entries)=>{
-        entries.forEach(entry=>{
-          if(entry.isIntersecting){
-            const index = els.indexOf(entry.target);
-            setTimeout(()=>{ entry.target.classList.add('show'); }, Math.min(index, 8) * 90);
-            io.unobserve(entry.target);
-          }
-        });
-      }, { rootMargin: '0px 0px -20% 0px', threshold: 0.1 });
-      
-      els.forEach(el=> io.observe(el));
-    }, 400); // Wait for AnimatePresence exit transition
-    
-    return () => {
-      clearTimeout(timer);
-      if (io) io.disconnect();
-    };
+  // Note: We've removed IntersectionObserver in favor of Framer Motion variants
+  // to perfectly sync the stagger entrance with AnimatePresence.
+  useEffect(() => {
+    // If there is any explicit DOM-based stuff needed, do it here. 
+    // Otherwise, Framer Motion handles the reveal.
   }, [visibleCount, loading, services]);
 
   function loadMore(){
@@ -139,13 +112,23 @@ export default function ServicesSection({ variant }){
   
   function showLess(){
     setVisibleCount(initialCount);
-    const els = Array.from(gridRef.current?.querySelectorAll('.service-card') || []);
-    els.forEach((el, idx)=>{ 
-      if (idx >= initialCount) el.classList.remove('show'); 
-    });
   }
 
   const isHome = variant === 'home';
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    },
+    exit: { opacity: 0 }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  };
 
   return (
     <section id="services" className="services-section" aria-labelledby="services-title">
@@ -209,14 +192,15 @@ export default function ServicesSection({ variant }){
           ) : (
             <motion.div 
               key="content"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.35 }}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="services-grid"
             >
-              <div ref={gridRef} className="services-grid">
               {(isHome ? services.slice(0,6) : services.slice(0, visibleCount)).map((s, i) => (
-                <article
+                <motion.article
+                  variants={itemVariants}
                   className="service-card flex flex-col"
                   key={`${s.slug || s.title}-${i}`}
                   role="article"
@@ -316,9 +300,8 @@ export default function ServicesSection({ variant }){
                       </button>
                     </div>
                   )}
-                </article>
+                </motion.article>
               ))}
-            </div>
 
             {/* View All Services - Home Page Only */}
             {isHome && services.length > 6 && (

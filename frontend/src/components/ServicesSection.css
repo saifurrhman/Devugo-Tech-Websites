@@ -1,7 +1,5 @@
-/* Reveal animation for Services cards */
+/* Reveal animation for Services cards - Handled by Framer Motion */
 .services-section .services-grid{ position:relative }
-.service-card{ opacity:0; transform:translateY(16px) scale(.98); will-change: transform, opacity; transition: opacity .45s cubic-bezier(.22,.61,.36,1), transform .45s cubic-bezier(.22,.61,.36,1) }
-.service-card.show{ opacity:1; transform:translateY(0) scale(1) }
 
 /* Slight stagger handled inline via style or JS; this CSS keeps hover effects intact */
 

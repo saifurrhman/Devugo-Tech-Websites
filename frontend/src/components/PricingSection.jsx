@@ -53,28 +53,8 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
     return ()=>{ mounted=false };
   },[limit]);
 
-  // Animate cards on scroll
+  // Animate cards on scroll: handled by Framer Motion variants below
   useEffect(()=>{
-    if (loading) return;
-    
-    let io = null;
-    const timer = setTimeout(() => {
-      const cards = Array.from(document.querySelectorAll('.pricing-home .price-card'));
-      io = new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{
-          if(e.isIntersecting){
-            e.target.classList.add('show');
-            io.unobserve(e.target);
-          }
-        });
-      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-      cards.forEach(c=> io.observe(c));
-    }, 400);
-
-    return () => {
-      clearTimeout(timer);
-      if (io) io.disconnect();
-    };
   }, [plans, loading]);
 
   function formatPrice(plan) {
@@ -101,9 +81,22 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
 
   function handleCloseQuote() {
     setOpen(false);
-    // Clear selected plan after modal closes
     setTimeout(() => setSelectedPlan(null), 300);
   }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.15 }
+    },
+    exit: { opacity: 0 }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  };
 
   return (
     <section className="pricing-home" aria-labelledby="pricing-home-title">
@@ -129,41 +122,38 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
                 ))}
               </motion.div>
             ) : plans.length === 0 ? (
-              <motion.div 
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35 }}
-                style={{
-                  gridColumn: '1 / -1',
-                  textAlign: 'center',
-                  padding: '3rem 2rem'
-                }}
-              >
-                <h3 style={{marginBottom: '.5rem'}}>No Plans Available</h3>
-                <p style={{color: '#6b7280', marginBottom: '1.5rem'}}>
-                  No pricing plans are currently available.
-                </p>
-                <button className="btn" onClick={() => handleOpenQuote(null)}>
-                  Request Custom Quote
-                </button>
-              </motion.div>
-            ) : (
-              <motion.div 
-                key="content"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35 }}
-                style={{ display: 'contents' }}
-              >
+            <motion.div 
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+              className="text-center py-12"
+            >
+              <h3 style={{marginBottom: '.5rem'}}>No Plans Available</h3>
+              <p className="text-slate-600 mb-6" style={{maxWidth: '400px', margin: '0 auto 1.5rem'}}>
+                We're currently updating our pricing. Please contact us directly for a custom quote.
+              </p>
+              <button onClick={() => handleOpenQuote(null)} className="btn primary">
+                Request Custom Quote
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="content"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="pricing-grid-wrapper"
+            >
+              <div ref={gridRef} className="pricing-grid">
                 {plans.map((plan, i)=> (
-                <article 
-                  key={plan._id || i} 
-                  className={`price-card ${plan.recommended ? 'highlight' : ''}`} 
-                  style={{ transitionDelay: `${i*60}ms` }}
-                >
+                  <motion.article 
+                    variants={itemVariants}
+                    key={plan._id || i} 
+                    className={`price-card ${plan.recommended ? 'highlight' : ''}`}
+                  > 
                   {plan.recommended && (
                     <div className="recommended-badge" style={{
                       position: 'absolute',
@@ -193,21 +183,22 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
                   <button className="btn cta-dark" onClick={() => handleOpenQuote(plan)}>
                     {plan.planType === 'custom' ? 'Get Quote' : 'Get started'}
                   </button>
-                </article>
+                </motion.article>
               ))}
 
               {/* Custom quote card */}
               {showCustom && (
-                <article className="price-card custom" style={{ transitionDelay: `${plans.length*60}ms` }}>
+                <motion.article variants={itemVariants} className="price-card custom">
                   <div className="custom-graphic" aria-hidden="true" />
                   <h3 className="price-title">Need a custom quote?</h3>
                   <p className="price-blurb">Tell us what you want to build — we'll tailor a plan to your scope.</p>
                   <button className="btn cta-dark" onClick={() => handleOpenQuote(null)}>Get started →</button>
-                </article>
+                </motion.article>
               )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         </div>
 
         {!loading && plans.length > 0 && (
