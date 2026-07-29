@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ClientReviewAPI } from '../lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import SkeletonCard from './SkeletonCard';
 
 export default function ReviewsSection({ 
   title = 'WHAT CLIENTS SAY', 
@@ -29,13 +31,21 @@ export default function ReviewsSection({
       setError('');
       try {
         const params = featuredOnly ? { featured: true } : {};
-        const { items } = await ClientReviewAPI.list(params);
+        const fetchPromise = ClientReviewAPI.list(params);
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
+        const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
+
+        const [{ items }] = await Promise.all([
+          Promise.race([fetchPromise, timeoutPromise]),
+          minTimePromise
+        ]);
+
         if (!mounted) return;
         // Shuffle items before distributing to columns
         const shuffledItems = shuffleArray((items || []).slice(0, limit));
         setItems(shuffledItems);
       } catch (err) {
-        if (mounted) setError(err.message || 'Failed to load reviews');
+        if (mounted) setError(err.message === 'TIMEOUT' ? 'Unable to load content, please refresh.' : (err.message || 'Failed to load reviews'));
       } finally {
         if (mounted) setLoading(false);
       }
@@ -54,47 +64,6 @@ export default function ReviewsSection({
       columnRefs.current[index].style.animationPlayState = 'running';
     }
   };
-
-  // Loading State
-  if (loading) {
-    return (
-      <section className="py-20" aria-label="Client reviews">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center mb-16">
-            <h3 className="text-xl md:text-2xl font-bold uppercase tracking-tight text-white mb-4">
-              {title}
-            </h3>
-            <p className="text-base text-gray-300">{subtitle}</p>
-          </div>
-          <div className="bg-white/10 border border-white/20 rounded-2xl p-10 text-center">
-            <div className="inline-block w-10 h-10 border-3 border-white/20 border-t-blue-400 rounded-full animate-spin mb-4"></div>
-            <p className="text-white text-lg">Loading reviews…</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  // Empty State
-  if (error || !items.length) {
-    return (
-      <section className="py-20" aria-label="Client reviews">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center mb-16">
-            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tight text-white mb-4">
-              {title}
-            </h2>
-            <p className="text-base text-gray-300">{subtitle}</p>
-          </div>
-          <div className="bg-white/10 border border-white/20 rounded-2xl p-10 text-center">
-            <p className="text-white text-lg">
-              {error || 'Reviews are being prepared. Check back soon!'}
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   // Create 4 columns with randomized distribution
   const columns = [[], [], [], []];
@@ -118,7 +87,62 @@ export default function ReviewsSection({
           </p>
         </div>
 
-        {/* Mobile Single Column - WITH Animation */}
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div 
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <div className="md:hidden">
+                <div className="flex flex-col gap-6 overflow-hidden max-h-[600px]">
+                  {[1, 2].map(i => (
+                    <SkeletonCard key={i} variant="review" />
+                  ))}
+                </div>
+              </div>
+              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="flex flex-col gap-6 overflow-hidden mobile-column">
+                    <SkeletonCard variant="review" />
+                    <SkeletonCard variant="review" />
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          ) : error || !items.length ? (
+            <motion.div 
+              key="error-or-empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <div className="bg-white/10 border border-white/20 rounded-2xl p-10 text-center">
+                <p className="text-white text-lg">
+                  {error || 'Reviews are being prepared. Check back soon!'}
+                </p>
+                {error && (
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Retry
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              {/* Mobile Single Column - WITH Animation */}
         <div className="md:hidden">
           <div className="flex flex-col gap-6 overflow-hidden max-h-[600px]">
             <div
@@ -280,6 +304,9 @@ export default function ReviewsSection({
             </div>
           ))}
         </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
 
         {/* CSS for vertical scrolling animation */}
         <style jsx>{`

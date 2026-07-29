@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import './PricingSection.css';
 import PricingQuoteModal from './PricingQuoteModal';
 import { PricingAPI } from '../lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import SkeletonCard from './SkeletonCard';
 
 export default function PricingSection({ showCustom = true, limit = 6 }){
   const [open, setOpen] = useState(false);
@@ -16,7 +18,15 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
     (async()=>{
       setLoading(true);
       try{
-        const { items } = await PricingAPI.list();
+        const fetchPromise = PricingAPI.list();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
+        const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
+
+        const [{ items }] = await Promise.all([
+          Promise.race([fetchPromise, timeoutPromise]),
+          minTimePromise
+        ]);
+
         if(mounted && Array.isArray(items) && items.length){
           const published = items
             .filter(p => p.published !== false)
@@ -26,6 +36,12 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
         }
       }catch(err){ 
         console.error('Failed to load pricing:', err);
+        if (mounted && err.message === 'TIMEOUT') {
+          // Can set an error state if needed, but currently no error state exists in PricingSection, 
+          // wait, let me check if there's an error state. It only has loading and plans.
+          // Let's just clear plans so it shows empty state.
+          setPlans([]);
+        }
       }
       finally{ 
         if(mounted) setLoading(false); 
@@ -86,33 +102,51 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
         </header>
 
         <div className="pricing-grid">
-          {loading ? (
-            <div style={{
-              gridColumn: '1 / -1',
-              textAlign: 'center',
-              padding: '3rem 2rem',
-              color: '#6b7280'
-            }}>
-              <div style={{fontSize: '2rem', marginBottom: '1rem'}}>⏳</div>
-              <p>Loading pricing plans...</p>
-            </div>
-          ) : plans.length === 0 ? (
-            <div style={{
-              gridColumn: '1 / -1',
-              textAlign: 'center',
-              padding: '3rem 2rem'
-            }}>
-              <h3 style={{marginBottom: '.5rem'}}>No Plans Available</h3>
-              <p style={{color: '#6b7280', marginBottom: '1.5rem'}}>
-                No pricing plans are currently available.
-              </p>
-              <button className="btn" onClick={() => handleOpenQuote(null)}>
-                Request Custom Quote
-              </button>
-            </div>
-          ) : (
-            <>
-              {plans.map((plan, i)=> (
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div 
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35 }}
+                style={{ display: 'contents' }} // Allow grid layout to work through the motion wrapper
+              >
+                {[1, 2, 3].map(i => (
+                  <SkeletonCard key={i} variant="pricing" />
+                ))}
+              </motion.div>
+            ) : plans.length === 0 ? (
+              <motion.div 
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35 }}
+                style={{
+                  gridColumn: '1 / -1',
+                  textAlign: 'center',
+                  padding: '3rem 2rem'
+                }}
+              >
+                <h3 style={{marginBottom: '.5rem'}}>No Plans Available</h3>
+                <p style={{color: '#6b7280', marginBottom: '1.5rem'}}>
+                  No pricing plans are currently available.
+                </p>
+                <button className="btn" onClick={() => handleOpenQuote(null)}>
+                  Request Custom Quote
+                </button>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35 }}
+                style={{ display: 'contents' }}
+              >
+                {plans.map((plan, i)=> (
                 <article 
                   key={plan._id || i} 
                   className={`price-card ${plan.recommended ? 'highlight' : ''}`} 
@@ -159,8 +193,9 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
                   <button className="btn cta-dark" onClick={() => handleOpenQuote(null)}>Get started →</button>
                 </article>
               )}
-            </>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {!loading && plans.length > 0 && (

@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import ServiceInquiryModal from './ServiceInquiryModal';
 import './ServicesSection.css';
 import { ServiceAPI } from '../lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import SkeletonCard from './SkeletonCard';
 
 export default function ServicesSection({ variant }){
   const [open, setOpen] = useState(false);
@@ -33,8 +35,16 @@ export default function ServicesSection({ variant }){
       try{
         console.log('🔍 Fetching services from API...');
         
-        const response = await ServiceAPI.list();
-        console.log('✅ Raw API Response:', response);
+        const fetchPromise = ServiceAPI.list();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
+        const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
+        
+        const [response] = await Promise.all([
+          Promise.race([fetchPromise, timeoutPromise]),
+          minTimePromise
+        ]);
+
+        console.log('✅ API Response received');
         console.log('✅ Response type:', typeof response);
         console.log('✅ Is Array?:', Array.isArray(response));
         
@@ -78,7 +88,7 @@ export default function ServicesSection({ variant }){
         console.error('❌ Failed to load services:', err);
         console.error('❌ Error details:', err.message, err.stack);
         if(mounted) {
-          setError('Failed to load services. Please try again later.');
+          setError(err.message === 'TIMEOUT' ? 'Unable to load content, please refresh.' : 'Failed to load services. Please try again later.');
           setServices([]);
         }
       } finally { 
@@ -152,33 +162,63 @@ export default function ServicesSection({ variant }){
           </p>
         </div>
 
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-slate-600">Loading services...</p>
-          </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-red-500 mb-4">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div 
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+              className="services-grid"
             >
-              Retry
-            </button>
-          </div>
-        ) : services.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-slate-600 mb-4">No services available yet.</p>
-            <a 
-              href="/admin/services" 
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-block no-underline"
+              {Array.from({ length: initialCount }).map((_, i) => (
+                <SkeletonCard key={i} variant="services" />
+              ))}
+            </motion.div>
+          ) : error ? (
+            <motion.div 
+              key="error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+              className="text-center py-12"
             >
-              Add Services in Admin
-            </a>
-          </div>
-        ) : (
-          <>
-            <div ref={gridRef} className="services-grid">
+              <p className="text-red-500 mb-4">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Retry
+              </button>
+            </motion.div>
+          ) : services.length === 0 ? (
+            <motion.div 
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+              className="text-center py-12"
+            >
+              <p className="text-slate-600 mb-4">No services available yet.</p>
+              <a 
+                href="/admin/services" 
+                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-block no-underline"
+              >
+                Add Services in Admin
+              </a>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <div ref={gridRef} className="services-grid">
               {(isHome ? services.slice(0,6) : services.slice(0, visibleCount)).map((s, i) => (
                 <article
                   className="service-card flex flex-col"
@@ -350,8 +390,9 @@ export default function ServicesSection({ variant }){
                 </div>
               </div>
             ) : null}
-          </>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       {!isHome && (
         <ServiceInquiryModal 

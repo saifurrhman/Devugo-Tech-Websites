@@ -5,6 +5,8 @@ import BlogHeroSection from '../components/BlogHeroSection';
 import Footer from '../components/Footer';
 import { BlogAPI } from '../lib/api';
 import SEO from '../components/SEO';
+import { motion, AnimatePresence } from 'framer-motion';
+import SkeletonCard from '../components/SkeletonCard';
 
 export default function Blog() {
   const navigate = useNavigate();
@@ -27,10 +29,17 @@ export default function Blog() {
     
     (async () => {
       try {
-        const { posts: fetchedPosts } = await BlogAPI.list();
+        const fetchPromise = BlogAPI.list();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
+        const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
+
+        const [{ posts: fetchedPosts }] = await Promise.all([
+          Promise.race([fetchPromise, timeoutPromise]),
+          minTimePromise
+        ]);
         if (mounted) setPosts(fetchedPosts || []);
       } catch (err) {
-        if (mounted) setError(err.message || 'Failed to load posts');
+        if (mounted) setError(err.message === 'TIMEOUT' ? 'Unable to load content, please refresh.' : (err.message || 'Failed to load posts'));
       } finally {
         if (mounted) setLoading(false);
       }
@@ -562,76 +571,83 @@ export default function Blog() {
               </div>
             )}
 
-            {/* Loading State */}
-            {loading && (
-              <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                <div className="spinner" style={{ 
-                  width: '50px', 
-                  height: '50px', 
-                  border: '4px solid rgba(255,255,255,0.2)', 
-                  borderTop: '4px solid #fff',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto 1rem'
-                }}></div>
-                <p style={{ color: '#fff' }}>Loading posts...</p>
-              </div>
-            )}
-
-            {/* Error State */}
-            {error && (
-              <div style={{ color: '#ef4444', textAlign: 'center', padding: '2rem' }}>
-                {error}
-              </div>
-            )}
-
-            {/* Blog Posts Grid */}
-            {!loading && !error && (
-              <>
-                {currentPosts.length > 0 ? (
-                  <div className="blog-grid">
-                    {currentPosts.map(post => (
-                      <article
-                        key={post._id}
-                        className="blog-card"
-                        onClick={() => handleBlogClick(post._id)}
-                      >
-                        {post.coverImage && (
-                          <img 
-                            src={post.coverImage} 
-                            alt={post.title}
-                            className="blog-card-image"
-                          />
-                        )}
-                        
-                        <div className="blog-card-content">
-                          {post.categories && post.categories.length > 0 && (
-                            <span className="blog-card-category">
-                              {post.categories[0].name || post.categories[0]}
-                            </span>
+            <AnimatePresence mode="wait">
+              {loading ? (
+                <motion.div 
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="blog-grid"
+                >
+                  {[1, 2, 3, 4].map(i => (
+                    <SkeletonCard key={i} variant="blog" />
+                  ))}
+                </motion.div>
+              ) : error ? (
+                <motion.div 
+                  key="error"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  style={{ color: '#ef4444', textAlign: 'center', padding: '2rem' }}
+                >
+                  {error}
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="content"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                >
+                  {currentPosts.length > 0 ? (
+                    <div className="blog-grid">
+                      {currentPosts.map(post => (
+                        <article
+                          key={post._id}
+                          className="blog-card"
+                          onClick={() => handleBlogClick(post._id)}
+                        >
+                          {post.coverImage && (
+                            <img 
+                              src={post.coverImage} 
+                              alt={post.title}
+                              className="blog-card-image"
+                            />
                           )}
                           
-                          <h3 className="blog-card-title">{post.title}</h3>
-                          
-                          {post.excerpt && (
-                            <p className="blog-card-excerpt">
-                              {post.excerpt.length > 120 
-                                ? post.excerpt.substring(0, 120) + '...' 
-                                : post.excerpt}
-                            </p>
-                          )}
-                          
-                          <div className="blog-card-meta">
-                            <span>{formatDate(post.publishedAt)}</span>
-                            <span className="blog-card-readmore">
-                              Read more →
-                            </span>
+                          <div className="blog-card-content">
+                            {post.categories && post.categories.length > 0 && (
+                              <span className="blog-card-category">
+                                {post.categories[0].name || post.categories[0]}
+                              </span>
+                            )}
+                            
+                            <h3 className="blog-card-title">{post.title}</h3>
+                            
+                            {post.excerpt && (
+                              <p className="blog-card-excerpt">
+                                {post.excerpt.length > 120 
+                                  ? post.excerpt.substring(0, 120) + '...' 
+                                  : post.excerpt}
+                              </p>
+                            )}
+                            
+                            <div className="blog-card-meta">
+                              <span>{formatDate(post.publishedAt)}</span>
+                              <span className="blog-card-readmore">
+                                Read more →
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                ) : (
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
                   <div className="no-results">
                     <h3>No posts found</h3>
                     <p>
@@ -700,8 +716,9 @@ export default function Blog() {
                     </button>
                   </div>
                 )}
-              </>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Sidebar */}

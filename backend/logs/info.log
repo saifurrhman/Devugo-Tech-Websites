@@ -6268,3 +6268,10 @@
 {"timestamp":"2026-07-29T14:20:00.265Z","level":"INFO","message":"No pending AI personalization requests"}
 {"timestamp":"2026-07-29T14:20:00.356Z","level":"INFO","message":"Updated stats for 1 campaigns"}
 {"timestamp":"2026-07-29T14:20:00.439Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-07-29T14:25:00.052Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-07-29T14:25:00.151Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-07-29T14:30:01.764Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-07-29T14:30:17.125Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-07-29T14:30:29.701Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-07-29T14:30:30.698Z","level":"INFO","message":"Updated stats for 1 campaigns"}
+{"timestamp":"2026-07-29T14:30:33.061Z","level":"INFO","message":"Updated stats for 0 recipients"}

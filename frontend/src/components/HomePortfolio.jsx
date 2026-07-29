@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PortfolioAPI } from '../lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import SkeletonCard from './SkeletonCard';
 
 export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCategory = null }) {
   const [items, setItems] = useState([]);
@@ -13,7 +15,15 @@ export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCatego
       setLoading(true);
       setError('');
       try {
-        const { items } = await PortfolioAPI.list();
+        const fetchPromise = PortfolioAPI.list();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 6000));
+        const minTimePromise = new Promise(resolve => setTimeout(resolve, 500));
+
+        const [{ items }] = await Promise.all([
+          Promise.race([fetchPromise, timeoutPromise]),
+          minTimePromise
+        ]);
+        
         if (!mounted) return;
         
         let filtered = items || [];
@@ -41,48 +51,70 @@ export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCatego
     return () => { mounted = false };
   }, [limit, selectedCategory]);
 
-  if (loading) {
-    return (
-      <section className="services-section">
-        <div className="container">
-          <div className="services-head">
-            <p className="services-sub">Loading projects...</p>
-          </div>
-          <p style={{ textAlign: 'center', color: 'var(--color-muted)' }}>Loading…</p>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="services-section">
-        <div className="container">
-          <div className="services-head">
-            <h2 className="services-title">Recent Projects</h2>
-            <p className="services-sub">Latest work we shipped</p>
-          </div>
-          <p style={{ color: '#ef4444', textAlign: 'center' }}>{error}</p>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="services-section" style={{ overflow: 'hidden' }}>
-      {items.length === 0 ? (
-        <div className="container">
-          <div className="card" style={{ marginTop: '1rem', textAlign: 'center' }}>
-            {selectedCategory 
-              ? `No projects found in "${selectedCategory}" category.`
-              : 'No projects yet.'
-            }
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* FULL WIDTH Horizontal Scrolling Container */}
-          <div className="horizontal-scroll-wrapper-clean" style={{ marginTop: '1rem' }}>
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div 
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <div className="horizontal-scroll-wrapper-clean" style={{ marginTop: '1rem' }}>
+              <div className="horizontal-scroll-track" style={{ animation: 'none' }}>
+                {[1, 2, 3, 4].map((i) => (
+                  <SkeletonCard key={i} variant="portfolio" />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        ) : error ? (
+          <motion.div 
+            key="error"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <div className="container">
+              <div className="services-head">
+                <h2 className="services-title">Recent Projects</h2>
+                <p className="services-sub">Latest work we shipped</p>
+              </div>
+              <p style={{ color: '#ef4444', textAlign: 'center' }}>
+                {error === 'TIMEOUT' ? 'Unable to load content, please refresh.' : error}
+              </p>
+            </div>
+          </motion.div>
+        ) : items.length === 0 ? (
+          <motion.div 
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <div className="container">
+              <div className="card" style={{ marginTop: '1rem', textAlign: 'center' }}>
+                {selectedCategory 
+                  ? `No projects found in "${selectedCategory}" category.`
+                  : 'No projects yet.'
+                }
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="content"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            {/* FULL WIDTH Horizontal Scrolling Container */}
+            <div className="horizontal-scroll-wrapper-clean" style={{ marginTop: '1rem' }}>
             <div className="horizontal-scroll-track">
               {/* First set of cards */}
               {items.map((p) => (
@@ -210,8 +242,9 @@ export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCatego
               </Link>
             </div>
           </div>
-        </>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Horizontal Scrolling CSS */}
       <style jsx>{`
