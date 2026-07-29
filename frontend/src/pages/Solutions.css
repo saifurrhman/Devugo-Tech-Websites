@@ -52,7 +52,7 @@
 .sol-module .actions.center{ display:flex; justify-content:center; gap:.6rem; margin-top:.5rem; flex-wrap:wrap }
 
 /* Reveal utility */
-.sol-module.reveal{ opacity:0; transform:translateY(14px) scale(.98); transition: opacity .45s ease, transform .45s ease }
+html.js-enabled .sol-module.reveal:not(.show) { opacity: 0; transform: translateY(14px) scale(.98);  transition: opacity .45s ease, transform .45s ease }
 .sol-module.reveal.show{ opacity:1; transform:translateY(0) scale(1) }
 
 @media (max-width: 1024px){

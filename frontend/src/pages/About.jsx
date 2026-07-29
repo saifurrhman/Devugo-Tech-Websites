@@ -13,7 +13,7 @@ export default function About() {
     const els = Array.from(document.querySelectorAll('.about-page .reveal'));
     const io = new IntersectionObserver((entries)=>{
       entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); } });
-    }, { threshold:.12, rootMargin:'0px 0px -10% 0px' });
+    }, { threshold: 0.1, rootMargin: "0px" });
     els.forEach(el=> io.observe(el));
     return ()=> io.disconnect();
   }, []);

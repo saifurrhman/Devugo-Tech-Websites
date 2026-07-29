@@ -54,7 +54,7 @@
 .about-cta .sub{ color:var(--color-muted); margin:0 0 .8rem }
 
 /* Reveal utility */
-.reveal{ opacity:0; transform:translateY(14px) scale(.98); transition: opacity .45s ease, transform .45s ease }
+html.js-enabled .reveal:not(.show) { opacity: 0; transform: translateY(14px) scale(.98);  transition: opacity .45s ease, transform .45s ease }
 .reveal.show{ opacity:1; transform:translateY(0) scale(1) }
 
 @media (max-width: 1024px){

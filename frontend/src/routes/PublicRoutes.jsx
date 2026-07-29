@@ -91,6 +91,7 @@ import DynamicTitle from '../components/DynamicTitle';
 import Integrations from '../admin/pages/settings/Integrations';
 
 import ChatWidget from '../components/ChatWidget';
+import PageLoader from '../components/PageLoader';
 
 export default function PublicRoutes() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -100,7 +101,8 @@ export default function PublicRoutes() {
       <DynamicTitle />
       <NotificationProvider>
         <ConfirmProvider>
-        <Routes>
+          <PageLoader />
+          <Routes>
           {/* Public Pages */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />

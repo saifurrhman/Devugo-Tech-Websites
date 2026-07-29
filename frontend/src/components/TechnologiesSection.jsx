@@ -95,7 +95,7 @@ export default function TechnologiesSection() {
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-white"
           >
             Tools & Technologies We Use
@@ -103,7 +103,7 @@ export default function TechnologiesSection() {
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ delay: 0.1 }}
             className="text-gray-400 text-lg"
           >
@@ -115,7 +115,7 @@ export default function TechnologiesSection() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ delay: 0.2 }}
             className="flex flex-wrap justify-center items-center gap-2 mb-12"
           >
@@ -143,7 +143,7 @@ export default function TechnologiesSection() {
                 layout
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, amount: 0.1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 href={tech.websiteUrl || '#'}
