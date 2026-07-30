@@ -17,6 +17,10 @@ const JobApplicationSchema = new mongoose.Schema(
     resume:      { type: String }, // path to uploaded file
     coverLetter: { type: String },
     experience:  { type: String }, // years of experience
+    customFields: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
     status: {
       type: String,
       enum: ['new', 'reviewing', 'shortlisted', 'rejected', 'hired'],

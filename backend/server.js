@@ -426,10 +426,13 @@ try {
 
 try {
   console.log('⚡ Loading n8n automation routes...');
-  app.use('/api/n8n', require('./routes/n8nRoutes'));
-  console.log('  ✅ n8n routes loaded');
+  const n8nRouter = require('./routes/n8nRoutes');
+  app.use('/api/n8n', n8nRouter);
+  console.log('  ✅ n8n routes loaded successfully');
 } catch (error) {
-  console.error('  ❌ n8n routes error:', error.message);
+  console.error('  ❌ n8n routes FAILED to load — /api/n8n will return 404');
+  console.error('     Error:', error.message);
+  console.error('     Stack:', error.stack);
 }
 
 try {

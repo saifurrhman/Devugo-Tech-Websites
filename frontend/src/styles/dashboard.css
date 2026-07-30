@@ -3,21 +3,33 @@
 /* ========================= */
 
 /* ===== Base Layout ===== */
+/* Base rules (no grid columns) — apply at all sizes */
 .admin-layout {
     display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: 1rem;
     min-height: 100vh;
     background: var(--admin-bg);
     overflow-x: hidden;
   }
-  .admin-content {
+
+/* Desktop only: 260px sidebar + content column.
+   Mobile/tablet use 1fr (sidebar is fixed off-canvas).
+   This MUST be min-width so it doesn't override the
+   @media (max-width:1024px) 1fr rules in globals.css. */
+@media (min-width: 1025px) {
+  .admin-layout {
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+.admin-content {
     min-width: 0;
     padding: 1.5rem;
     overflow-y: auto;
     box-sizing: border-box;
     width: 100%;
   }
+
   
   /* ===== Segmented Navigation Buttons ===== */
   .seg{ display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; justify-content: center; margin-bottom: 1rem; }
@@ -56,59 +68,97 @@
     }
   }
   
-  @media (max-width: 1100px) {
+  @media (max-width: 1100px) and (min-width: 1025px) {
     .admin-layout {
       grid-template-columns: 220px minmax(0, 1fr);
     }
   }
-  @media (max-width: 920px) {
+  /* ────────────────────────────────────────
+     PHONE + TABLET OFF-CANVAS DRAWER
+     Covers: 375px (phone) through 1024px (tablet landscape)
+     Desktop (>1024px) keeps its sticky pinned sidebar.
+     ──────────────────────────────────────── */
+  @media (max-width: 1024px) {
+  /* Layout: block on mobile — sidebar is fixed (out of flow), content fills width */
     .admin-layout {
-      grid-template-columns: 1fr;
+      display: block;
       padding: 0;
     }
+
+    /* ── Off-Canvas Drawer ── */
     .admin-sidebar {
       position: fixed;
       top: 0;
       left: 0;
-      height: 100vh;
-      width: 85%;
-      max-width: 280px;
-      z-index: 1000;
-      background: #0b1e36;
+      height: 100dvh;             /* dynamic viewport height — avoids mobile-chrome jump */
+      width: min(85vw, 320px);    /* phone default width */
+      z-index: 100;               /* above all page content, below modals (z:200) */
+      background: var(--admin-bg, #0b1e36);
       border: none;
       border-radius: 0;
       padding: 0;
-      overflow-y: auto;
-      transform: translateX(0);
-      -webkit-transform: translateX(0);
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s ease-out;
-    }
-    .admin-sidebar.collapsed {
+      overflow-y: auto;           /* drawer scrolls internally, never expands page height */
+      /* ✅ START OFF-SCREEN — only .open class slides it in */
       transform: translateX(-100%);
       -webkit-transform: translateX(-100%);
-      transition: transform 0.3s ease-in;
+      transition: transform 0.25s ease;
+      -webkit-transition: transform 0.25s ease;
+      box-shadow: 4px 0 28px rgba(0, 0, 0, 0.45);
+      will-change: transform;     /* hint GPU layer for smooth animation */
     }
+
+    /* Open state — slides in from left */
     .admin-sidebar.open {
       transform: translateX(0);
       -webkit-transform: translateX(0);
-      transition: transform 0.3s ease-out;
     }
+
+    /* Tablet (768–1024px): slightly wider drawer to make better use of space */
+    @media (min-width: 768px) {
+      .admin-sidebar {
+        width: min(40vw, 360px);
+      }
+    }
+
+    /* ── Backdrop overlay ── */
     .admin-backdrop {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 999;
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-      transition: opacity 0.3s ease;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 99;                /* just below drawer (100), above all content */
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      opacity: 1;
+      animation: backdropFadeIn 0.25s ease forwards;
     }
+
+    @keyframes backdropFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Nav links: 44px min height for touch accuracy (WCAG 2.5.5) */
+    .admin-sidebar .admin-link {
+      min-height: 44px;
+      padding: .6rem .75rem;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Sidebar footer actions: also touch-friendly */
+    .admin-sidebar__footer .sidebar-action {
+      min-height: 44px;
+    }
+
+    /* ── Content area: full viewport width when drawer is closed ── */
     .admin-content {
+      width: 100%;
+      box-sizing: border-box;
       padding: 0.75rem;
+      /* No max-width or margin: auto — tables must get the full width */
     }
+
     .admin-content > .toolbar:first-of-type {
       position: sticky;
       top: 0;
@@ -121,5 +171,32 @@
       border: none;
       margin: -0.75rem -0.75rem 0.75rem -0.75rem;
       border-radius: 0;
+    }
+  }
+
+  /* ── Phone-only refinements (<640px) ── */
+  @media (max-width: 640px) {
+    .admin-content {
+      padding: 0.5rem;
+    }
+    .admin-sidebar .admin-sidebar__header {
+      padding: 0.75rem;
+    }
+    .admin-sidebar .admin-sidebar__nav {
+      padding: 0.5rem;
+    }
+    .seg {
+      width: 100%;
+      overflow-x: auto;
+      justify-content: flex-start;
+      padding-bottom: 0.5rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .seg::-webkit-scrollbar {
+      display: none;
+    }
+    .seg-btn {
+      white-space: nowrap;
     }
   }

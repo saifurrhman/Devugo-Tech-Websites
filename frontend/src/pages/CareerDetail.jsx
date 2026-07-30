@@ -22,6 +22,7 @@ export default function CareerDetail() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [form, setForm] = useState({ fullName:'', email:'', phone:'', linkedin:'', portfolio:'', experience:'', coverLetter:'', resume: null });
+  const [customFields, setCustomFields] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
@@ -46,6 +47,9 @@ export default function CareerDetail() {
           formData.append(k, form[k]);
         }
       });
+      if (Object.keys(customFields).length > 0) {
+        formData.append('customFields', JSON.stringify(customFields));
+      }
       await JobApplicationAPI.create(formData);
       setSubmitted(true);
     } catch (err) { setFormError(err.message || 'Something went wrong. Please try again.'); }
@@ -59,6 +63,18 @@ export default function CareerDetail() {
     color: '#fff', fontSize: '.92rem', boxSizing: 'border-box', outline: 'none',
     fontFamily: 'inherit', transition: 'all .2s', lineHeight: 1.5,
   });
+
+  const DEFAULT_APP_FIELDS = [
+    { key: 'phone', label: 'Phone Number', type: 'text', required: false, enabled: true, isCustom: false },
+    { key: 'experience', label: 'Experience', type: 'select', options: ['0-1 year', '1-2 years', '3-5 years', '5+ years'], required: false, enabled: true, isCustom: false },
+    { key: 'linkedin', label: 'LinkedIn URL', type: 'text', required: false, enabled: true, isCustom: false },
+    { key: 'portfolio', label: 'Portfolio / GitHub URL', type: 'text', required: false, enabled: true, isCustom: false },
+    { key: 'resume', label: 'Resume / CV Upload', type: 'file', required: false, enabled: true, isCustom: false },
+    { key: 'coverLetter', label: 'Cover Letter', type: 'textarea', required: false, enabled: true, isCustom: false },
+  ];
+
+  const appFields = job?.applicationFields?.length > 0 ? job.applicationFields : DEFAULT_APP_FIELDS;
+  const enabledFields = appFields.filter(f => f.enabled);
 
   if (loading) return (
     <>
@@ -279,68 +295,60 @@ export default function CareerDetail() {
                     </div>
                   ))}
 
-                  {/* Phone + Experience (2 col) */}
-                  <div className="form-row" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'.75rem' }}>
-                    <div>
-                      <label style={{ display:'flex', alignItems:'center', gap:'.35rem', marginBottom:'.4rem', fontSize:'.78rem', fontWeight:700, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.05em' }}>
-                        <Phone size={13} /> Phone
-                      </label>
-                      <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)}
-                        placeholder="+92 300…" style={inputStyle('phone')} disabled={!job.isActive}
-                        onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)} />
-                    </div>
-                    <div>
-                      <label style={{ display:'flex', alignItems:'center', gap:'.35rem', marginBottom:'.4rem', fontSize:'.78rem', fontWeight:700, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.05em' }}>
-                        <Calendar size={13} /> Experience
-                      </label>
-                      <select value={form.experience} onChange={e => set('experience', e.target.value)}
-                        style={{ ...inputStyle('experience'), cursor:'pointer', background: focused === 'experience' ? 'rgba(67,133,205,0.06)' : 'rgba(6,28,57,0.8)' }}
-                        disabled={!job.isActive} onFocus={() => setFocused('experience')} onBlur={() => setFocused(null)}>
-                        <option value="">Select…</option>
-                        {EXP_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                      </select>
-                    </div>
-                  </div>
+                  {/* Dynamic Fields mapping */}
+                  {enabledFields.map(field => {
+                    const isFile = field.type === 'file' || field.key === 'resume';
+                    const isSelect = field.type === 'select' || field.key === 'experience';
+                    const isTextarea = field.type === 'textarea' || field.key === 'coverLetter';
+                    const isCheckbox = field.type === 'checkbox';
+                    
+                    const value = field.isCustom ? customFields[field.key] || (isCheckbox ? false : '') : form[field.key];
+                    const setValue = val => field.isCustom ? setCustomFields(p => ({ ...p, [field.key]: val })) : set(field.key, val);
 
-                  {/* LinkedIn + Portfolio */}
-                  {[
-                    { k:'linkedin', label:'LinkedIn', placeholder:'linkedin.com/in/yourprofile', icon:<Linkedin size={13} /> },
-                    { k:'portfolio', label:'Portfolio / GitHub', placeholder:'github.com/yourprofile', icon:<LinkIcon size={13} /> },
-                  ].map(({ k, label, placeholder, icon }) => (
-                    <div key={k}>
-                      <label style={{ display:'flex', alignItems:'center', gap:'.35rem', marginBottom:'.4rem', fontSize:'.78rem', fontWeight:700, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.05em' }}>
-                        {icon} {label}
-                      </label>
-                      <input type="url" value={form[k]} onChange={e => set(k, e.target.value)}
-                        placeholder={placeholder} style={inputStyle(k)} disabled={!job.isActive}
-                        onFocus={() => setFocused(k)} onBlur={() => setFocused(null)} />
-                    </div>
-                  ))}
+                    let icon = <FileText size={13} />;
+                    if (field.key === 'phone') icon = <Phone size={13} />;
+                    if (field.key === 'linkedin') icon = <Linkedin size={13} />;
+                    if (field.key === 'portfolio') icon = <LinkIcon size={13} />;
+                    if (field.key === 'experience') icon = <Calendar size={13} />;
 
-                  {/* Resume Upload */}
-                  <div>
-                    <label style={{ display:'flex', alignItems:'center', gap:'.35rem', marginBottom:'.4rem', fontSize:'.78rem', fontWeight:700, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.05em' }}>
-                      <FileText size={13} /> Resume / CV (PDF, DOCX)
-                    </label>
-                    <input type="file" accept=".pdf,.doc,.docx" onChange={e => set('resume', e.target.files[0])}
-                      style={{ ...inputStyle('resume'), padding: '.5rem', cursor: 'pointer' }} disabled={!job.isActive}
-                      onFocus={() => setFocused('resume')} onBlur={() => setFocused(null)} />
-                  </div>
-
-                  {/* Cover Letter */}
-                  <div>
-                    <label style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'.4rem' }}>
-                      <span style={{ fontSize:'.78rem', fontWeight:700, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.05em', display:'flex', alignItems:'center', gap:'.35rem' }}>
-                        <FileText size={13} /> Cover Letter
-                      </span>
-                      <span style={{ fontSize:'.72rem', color:'rgba(255,255,255,0.25)' }}>{form.coverLetter.length}/2000</span>
-                    </label>
-                    <textarea rows={5} value={form.coverLetter} onChange={e => set('coverLetter', e.target.value)}
-                      placeholder="Tell us why you are a great fit for this role, your key strengths, and what excites you about this opportunity…"
-                      maxLength={2000}
-                      style={{ ...inputStyle('coverLetter'), resize:'vertical', lineHeight:1.7 }}
-                      disabled={!job.isActive} onFocus={() => setFocused('coverLetter')} onBlur={() => setFocused(null)} />
-                  </div>
+                    return (
+                      <div key={field.key} style={{ marginBottom: isCheckbox ? '.25rem' : '0' }}>
+                        {!isCheckbox && (
+                          <label style={{ display:'flex', alignItems:'center', gap:'.35rem', marginBottom:'.4rem', fontSize:'.78rem', fontWeight:700, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.05em' }}>
+                            {icon} {field.label} {field.required && <span style={{ color:'#f87171', fontWeight:400, textTransform:'none' }}>*</span>}
+                            {field.key === 'coverLetter' && <span style={{ marginLeft:'auto', fontSize:'.72rem', color:'rgba(255,255,255,0.25)' }}>{(value||'').length}/2000</span>}
+                          </label>
+                        )}
+                        
+                        {isTextarea ? (
+                          <textarea rows={5} required={field.required} value={value} onChange={e => setValue(e.target.value)}
+                            style={{ ...inputStyle(field.key), resize:'vertical', lineHeight:1.7 }}
+                            disabled={!job.isActive} onFocus={() => setFocused(field.key)} onBlur={() => setFocused(null)} />
+                        ) : isSelect ? (
+                          <select required={field.required} value={value} onChange={e => setValue(e.target.value)}
+                            style={{ ...inputStyle(field.key), cursor:'pointer', background: focused === field.key ? 'rgba(67,133,205,0.06)' : 'rgba(6,28,57,0.8)' }}
+                            disabled={!job.isActive} onFocus={() => setFocused(field.key)} onBlur={() => setFocused(null)}>
+                            <option value="">Select…</option>
+                            {(field.options || (field.key === 'experience' ? ['0-1 year', '1-2 years', '3-5 years', '5+ years'] : [])).map(o => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        ) : isFile ? (
+                          <input type="file" required={field.required} accept={field.key === 'resume' ? '.pdf,.doc,.docx' : '*'} onChange={e => setValue(e.target.files[0])}
+                            style={{ ...inputStyle(field.key), padding: '.5rem', cursor: 'pointer' }} disabled={!job.isActive}
+                            onFocus={() => setFocused(field.key)} onBlur={() => setFocused(null)} />
+                        ) : isCheckbox ? (
+                          <label style={{ display:'flex', alignItems:'center', gap:'.5rem', fontSize:'.85rem', color:'rgba(255,255,255,0.8)', cursor: job.isActive ? 'pointer' : 'not-allowed' }}>
+                            <input type="checkbox" required={field.required} checked={!!value} onChange={e => setValue(e.target.checked)} disabled={!job.isActive} />
+                            {field.label} {field.required && <span style={{ color:'#f87171' }}>*</span>}
+                          </label>
+                        ) : (
+                          <input type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : (field.key === 'phone' ? 'tel' : 'text')} 
+                            required={field.required} value={value} onChange={e => setValue(e.target.value)}
+                            style={inputStyle(field.key)} disabled={!job.isActive}
+                            onFocus={() => setFocused(field.key)} onBlur={() => setFocused(null)} />
+                        )}
+                      </div>
+                    );
+                  })}
 
                   {formError && (
                     <div style={{ padding:'.75rem 1rem', borderRadius:'10px', background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.3)', color:'#f87171', fontSize:'.85rem', display:'flex', alignItems:'center', gap:'.5rem' }}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Briefcase, MapPin, Users, Clock, FileText, CheckSquare, ChevronDown, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Briefcase, MapPin, Users, Clock, FileText, CheckSquare, ChevronDown, Calendar, List, Plus, Trash2 } from 'lucide-react';
 import { CareerAPI } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import AdminSidebar from '../../components/AdminSidebar';
@@ -10,6 +10,15 @@ import LoadingState from '../components/LoadingState';
 import Spinner from '../../components/Spinner';
 
 const JOB_TYPES = ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'];
+
+const DEFAULT_FIELDS = [
+  { key: 'phone', label: 'Phone Number', type: 'text', required: false, enabled: true },
+  { key: 'experience', label: 'Experience', type: 'select', options: ['0-1 year', '1-2 years', '3-5 years', '5+ years'], required: false, enabled: true },
+  { key: 'linkedin', label: 'LinkedIn URL', type: 'text', required: false, enabled: true },
+  { key: 'portfolio', label: 'Portfolio / GitHub URL', type: 'text', required: false, enabled: true },
+  { key: 'resume', label: 'Resume / CV Upload', type: 'file', required: false, enabled: true },
+  { key: 'coverLetter', label: 'Cover Letter', type: 'textarea', required: false, enabled: true },
+];
 
 // All using the admin's own blue palette
 const TYPE_META = {
@@ -84,6 +93,7 @@ export default function CareerEdit() {
     description: '',
     requirementsText: '',
     deadline: '',
+    applicationFields: DEFAULT_FIELDS,
     isActive: true
   });
   useEffect(() => { if (!isNew) fetchCareer(); }, [id]);
@@ -98,6 +108,7 @@ export default function CareerEdit() {
         description: data.description || '',
         requirementsText: data.requirements ? data.requirements.join('\n') : '',
         deadline: data.deadline ? new Date(data.deadline).toISOString().split('T')[0] : '',
+        applicationFields: data.applicationFields?.length ? data.applicationFields : DEFAULT_FIELDS,
         isActive: data.isActive !== false,
       });
     } catch (err) {
@@ -253,6 +264,129 @@ export default function CareerEdit() {
                   </p>
                 )}
               </div>
+
+              {/* Application Form Fields */}
+              <div style={cardStyle}>
+                <div style={sectionHead}>
+                  <List size={14} style={{ color: '#4385cd' }} />
+                  Application Form Fields
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {/* Standard Locked Fields */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ fontSize: '.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '.05em' }}>Standard Fields (Always Required)</div>
+                    {['Full Name', 'Email Address'].map(lbl => (
+                      <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '.6rem .85rem', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                         <div style={{ width: 34, height: 18, borderRadius: '999px', background: '#4385cd', position: 'relative', opacity: 0.5 }}>
+                           <div style={{ position: 'absolute', top: 2, left: 18, width: 14, height: 14, borderRadius: '50%', background: '#fff' }} />
+                         </div>
+                         <div style={{ flex: 1, fontSize: '.9rem', color: 'rgba(255,255,255,0.6)' }}>{lbl}</div>
+                         <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,0.4)' }}>Required</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Configurable Fields */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+                    <div style={{ fontSize: '.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '.05em' }}>Optional & Custom Fields</div>
+                    {form.applicationFields.map((field, idx) => (
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '.5rem', padding: '.85rem', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          {/* Toggle */}
+                          <div onClick={() => {
+                            const newFields = [...form.applicationFields];
+                            newFields[idx].enabled = !newFields[idx].enabled;
+                            set('applicationFields', newFields);
+                          }} style={{ width: 36, height: 20, borderRadius: '999px', background: field.enabled ? '#4385cd' : 'rgba(255,255,255,0.15)', position: 'relative', transition: 'background .2s', cursor: 'pointer', flexShrink: 0 }}>
+                            <div style={{ position: 'absolute', top: 2, left: field.enabled ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left .2s', boxShadow: '0 1px 4px rgba(0,0,0,0.3)' }} />
+                          </div>
+
+                          {/* Label & Type Edit */}
+                          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                            {field.isCustom ? (
+                              <>
+                                <input type="text" value={field.label} onChange={e => {
+                                  const newFields = [...form.applicationFields];
+                                  newFields[idx].label = e.target.value;
+                                  newFields[idx].key = e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                                  set('applicationFields', newFields);
+                                }} placeholder="Field Label" style={{ ...inp, padding: '.4rem .6rem', width: '200px' }} />
+                                
+                                <div style={{ width: '140px' }}>
+                                  <CustomSelect
+                                    value={field.type}
+                                    onChange={val => {
+                                      const newFields = [...form.applicationFields];
+                                      newFields[idx].type = val;
+                                      set('applicationFields', newFields);
+                                    }}
+                                    options={[
+                                      { value: 'text', label: 'Short Text' },
+                                      { value: 'textarea', label: 'Long Text' },
+                                      { value: 'number', label: 'Number' },
+                                      { value: 'date', label: 'Date' },
+                                      { value: 'select', label: 'Dropdown' },
+                                      { value: 'checkbox', label: 'Yes-No' },
+                                      { value: 'file', label: 'File Upload' }
+                                    ]}
+                                  />
+                                </div>
+                              </>
+                            ) : (
+                              <span style={{ fontSize: '.9rem', color: field.enabled ? '#fff' : 'rgba(255,255,255,0.4)', fontWeight: 500 }}>{field.label}</span>
+                            )}
+                          </div>
+
+                          {/* Required Checkbox */}
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.8rem', color: field.enabled ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)', cursor: field.enabled ? 'pointer' : 'default' }}>
+                            <input type="checkbox" checked={field.required} onChange={e => {
+                              const newFields = [...form.applicationFields];
+                              newFields[idx].required = e.target.checked;
+                              set('applicationFields', newFields);
+                            }} disabled={!field.enabled} style={{ cursor: field.enabled ? 'pointer' : 'default' }} />
+                            Required?
+                          </label>
+
+                          {/* Delete */}
+                          {field.isCustom && (
+                            <button type="button" onClick={() => {
+                              const newFields = form.applicationFields.filter((_, i) => i !== idx);
+                              set('applicationFields', newFields);
+                            }} style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', padding: '.2rem' }}>
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Dropdown Options */}
+                        {field.isCustom && field.type === 'select' && (
+                          <div style={{ paddingLeft: '3.25rem', paddingTop: '.25rem' }}>
+                            <input type="text" placeholder="Comma separated options (e.g. Remote, On-site)" value={(field.options || []).join(', ')} onChange={e => {
+                              const newFields = [...form.applicationFields];
+                              newFields[idx].options = e.target.value.split(',').map(s => s.trim());
+                              set('applicationFields', newFields);
+                            }} style={{ ...inp, padding: '.4rem .6rem', fontSize: '.8rem' }} />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <button type="button" onClick={() => {
+                      set('applicationFields', [...form.applicationFields, {
+                        key: `custom_${Date.now()}`,
+                        label: 'New Custom Field',
+                        type: 'text',
+                        required: false,
+                        enabled: true,
+                        isCustom: true
+                      }]);
+                    }} style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', alignSelf: 'flex-start', padding: '.5rem .85rem', borderRadius: '8px', background: 'rgba(67,133,205,0.1)', border: '1px solid rgba(67,133,205,0.3)', color: '#60a5fa', fontSize: '.85rem', fontWeight: 600, cursor: 'pointer' }}>
+                      <Plus size={14} /> Add Custom Field
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* ──── RIGHT ──── */}
@@ -314,8 +448,8 @@ export default function CareerEdit() {
             </div>
           </div>
           
-          <div className="admin-sticky-footer">
-            <Link to="/admin/careers" className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors text-sm text-gray-300 inline-block text-center">
+          <div className="admin-sticky-footer" style={{ background: 'rgba(6,28,57, 0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <Link to="/admin/careers" style={{ padding: '.5rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '.85rem', transition: 'all .2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#fff'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}>
               Cancel
             </Link>
             {!isNew && (
@@ -326,15 +460,14 @@ export default function CareerEdit() {
                   variant: 'danger',
                   confirmText: 'Delete',
                   action: async () => {
-                    // Assuming delete API exists, this is a placeholder if not
                     navigate('/admin/careers');
                   }
                 });
-              }} className="px-4 py-2 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors text-sm">
+              }} style={{ padding: '.5rem 1rem', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#ef4444', fontSize: '.85rem', cursor: 'pointer', transition: 'all .2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.1)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 Delete
               </button>
             )}
-            <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors text-sm font-medium" disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', opacity: saving ? 0.7 : 1 }}>
+            <button type="submit" disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.5rem 1.25rem', borderRadius: '8px', border: 'none', background: '#4385cd', color: '#fff', fontSize: '.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, transition: 'all .2s', boxShadow: '0 2px 10px rgba(67,133,205,0.3)' }} onMouseEnter={e => !saving && (e.currentTarget.style.background = '#3273b5')} onMouseLeave={e => !saving && (e.currentTarget.style.background = '#4385cd')}>
               {saving && <Spinner size="sm" />}
               <span>{saving ? 'Saving...' : isNew ? 'Publish Job' : 'Save Changes'}</span>
             </button>

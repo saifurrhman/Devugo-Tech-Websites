@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
+import AdminErrorBoundary from '../components/ErrorBoundary';
 import { AnalyticsAPI, ContactAPI, ServiceAPI, PricingAPI, PortfolioAPI, TeamAPI, BlogAPI, N8nAPI } from '../../lib/api';
 
 // Compact number formatter
@@ -182,25 +183,41 @@ function AreaChart({ data = [], labels = [], height = 180, color = '#7aa8ff', sh
 function TrafficWidget({ range }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     async function load() {
       try {
         setLoading(true);
+        setUnavailable(false);
         const res = await N8nAPI.getMetrics('traffic', 30);
-        if (res.success) {
-          setData(res.data.map(d => d.value));
+
+        if (!mounted) return;
+
+        // null → silent 404 (backend route missing / not ready)
+        if (res === null) {
+          setUnavailable(true);
+          return;
+        }
+
+        if (res && res.success && Array.isArray(res.data)) {
+          setData(res.data.map(d => Number(d.value ?? 0)));
         }
       } catch (e) {
-        console.error(e);
+        // Catch any unexpected error so the widget never crashes its parent
+        console.warn('[TrafficWidget] n8n metrics unavailable:', e.message);
+        if (mounted) setUnavailable(true);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
     load();
+    return () => { mounted = false; };
   }, [range]);
 
-  if (!data.length && !loading) return null;
+  // Don't render anything if endpoint is missing or returned no data
+  if (unavailable || (!data.length && !loading)) return null;
 
   return (
     <div className="charts-grid grid grid-cols-1 gap-3 sm:gap-4 mb-3 sm:mb-4 md:mb-6">
@@ -413,7 +430,10 @@ export default function Dashboard() {
       <AdminSidebar />
       <main className="admin-content w-full px-3 sm:px-4 md:px-6 lg:px-8">
         <AdminTopbar />
-        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold mt-2 sm:mt-3 mb-3 sm:mb-4 md:mb-6">
+        {/* ErrorBoundary wraps page content only — sidebar/topbar are outside
+            so navigation always renders even if a widget throws */}
+        <AdminErrorBoundary>
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold mt-2 sm:mt-3 mb-3 sm:mb-4 md:mb-6">
           {role === 'email_marketing' ? 'Email Marketing Dashboard' : role === 'crm' ? 'CRM Dashboard' : 'Admin Dashboard'}
         </h1>
 
@@ -607,6 +627,7 @@ export default function Dashboard() {
           <TrafficWidget range={range} />
         )}
 
+        </AdminErrorBoundary>
       </main>
     </div>
   );

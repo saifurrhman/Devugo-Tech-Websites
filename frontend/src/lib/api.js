@@ -11,6 +11,20 @@ export const API_BASE = process.env.REACT_APP_API_URL ||
 console.log('🌐 API_BASE:', API_BASE);
 console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
 
+// Helper to reliably construct file URLs (for avatars, resumes, portfolios)
+// If the path is already a full URL (e.g., Cloudinary), returns it as-is.
+// Otherwise, prepends the backend API_BASE.
+export const getFileUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  // Ensure we don't duplicate the / if API_BASE already ends with /
+  const base = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+  return `${base}${cleanPath}`;
+};
+
 export const api = apiWithRefresh;
 
 function buildQuery(params = {}) {
@@ -550,7 +564,10 @@ export const ApiKeyAPI = {
 // N8N INTEGRATION API
 // ============================================
 export const N8nAPI = {
-  getMetrics: (metric = 'traffic', limit = 30) => api('/api/n8n/metrics' + buildQuery({ metric, limit })),
+  // silent404:true → a 404 (missing route / backend not ready) returns null
+  // instead of throwing, so the dashboard widget degrades gracefully.
+  getMetrics: (metric = 'traffic', limit = 30) =>
+    api('/api/n8n/metrics' + buildQuery({ metric, limit }), { silent404: true }),
 };
 
 // ============================================

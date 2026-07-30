@@ -7,7 +7,7 @@ const Notification = require('../models/Notification');
 // @access Public
 exports.submitApplication = async (req, res) => {
   try {
-    const { careerId, fullName, email, phone, linkedin, portfolio, coverLetter, experience } = req.body;
+    const { careerId, fullName, email, phone, linkedin, portfolio, coverLetter, experience, customFields } = req.body;
 
     if (!careerId || !fullName || !email) {
       return res.status(400).json({ message: 'Career ID, full name and email are required.' });
@@ -49,10 +49,20 @@ exports.submitApplication = async (req, res) => {
       resume = uploadResult.secure_url;
     }
 
+    let parsedCustomFields = {};
+    if (customFields) {
+      try {
+        parsedCustomFields = typeof customFields === 'string' ? JSON.parse(customFields) : customFields;
+      } catch (e) {
+        console.error('Failed to parse customFields:', e);
+      }
+    }
+
     const application = await JobApplication.create({
       career: careerId,
       jobTitle: career.title,
-      fullName, email, phone, linkedin, portfolio, coverLetter, experience, resume
+      fullName, email, phone, linkedin, portfolio, coverLetter, experience, resume,
+      customFields: parsedCustomFields
     });
 
     // Send notification email to admin (fire and forget)

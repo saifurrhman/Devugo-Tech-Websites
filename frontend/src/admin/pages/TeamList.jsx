@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import AdminTopbar from '../../components/AdminTopbar';
-import { TeamAPI } from '../../lib/api';
+import { TeamAPI, getFileUrl } from '../../lib/api';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { useNotification } from '../../contexts/NotificationContext';
 import CustomSelect from '../../components/CustomSelect';
@@ -245,7 +245,7 @@ export default function TeamList(){
                     <div style={{width:56,height:56,borderRadius:'50%',overflow:'hidden',flexShrink:0}}>
                       {m.avatar && !brokenImages.has(m._id) ? (
                         <img 
-                          src={m.avatar} 
+                          src={getFileUrl(m.avatar)} 
                           alt={m.name || 'Avatar'} 
                           onError={() => handleImageError(m._id)}
                           style={{width:'100%',height:'100%',objectFit:'cover'}} 

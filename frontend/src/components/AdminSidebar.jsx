@@ -4,12 +4,15 @@ import { AuthAPI } from '../lib/api';
 import {
   LayoutDashboard, Briefcase, CreditCard, Image, Star, HelpCircle, FileText,
   Share2, Edit, Users, UserCheck, Send, UserPlus, Inbox, Layout, BarChart,
-  GitMerge, Folder, Calendar, PieChart, Settings, User, LogOut, Menu, Shield, Wrench
+  GitMerge, Folder, Calendar, PieChart, Settings, User, LogOut, Menu, Shield, Wrench, X
 } from 'lucide-react';
 
 export default function AdminSidebar() {
-  const [open, setOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  // Start closed — useEffect will open it on desktop after media query check.
+  // Starting with true caused the sidebar to flash open (covering content)
+  // on every mobile/tablet load before the matchMedia useEffect fired.
+  const [open, setOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // assume mobile until proven otherwise
   const toggle = () => setOpen(v => !v);
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +34,8 @@ export default function AdminSidebar() {
   const isWebsiteManager = role === 'website_manager' || isSuperAdmin;
 
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 920px)');
+    // Matches both phone (<768px) and tablet (768–1024px) — both use the drawer
+    const mq = window.matchMedia('(max-width: 1024px)');
     const apply = () => {
       const mobile = mq.matches;
       setIsMobile(mobile);
@@ -65,9 +69,23 @@ export default function AdminSidebar() {
     navigate('/admin/login');
   }
 
+  // Close drawer helper — used by X button, backdrop, and nav links
+  const closeDrawer = () => setOpen(false);
+
+  // Lock body scroll while mobile drawer is open
+  useEffect(() => {
+    if (isMobile && open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    // Cleanup on unmount
+    return () => { document.body.style.overflow = ''; };
+  }, [isMobile, open]);
+
   return (
     <>
-      {isMobile && open && <div className="admin-backdrop" onClick={() => setOpen(false)} aria-hidden="true"></div>}
+      {isMobile && open && <div className="admin-backdrop" onClick={closeDrawer} aria-hidden="true"></div>}
       <aside className={`admin-sidebar ${open ? 'open' : 'collapsed'}`} aria-label="Admin sidebar navigation">
         <div className="admin-sidebar__header">
           <NavLink to="/admin" className="brand" aria-label="Go to Admin dashboard" title="Devugo Tech">
@@ -77,14 +95,34 @@ export default function AdminSidebar() {
               <small className="sub">Tech Solutions</small>
             </div>
           </NavLink>
-          <div style={{ display: 'flex', gap: '.35rem' }}>
-            <button className="admin-sidebar__toggle" onClick={toggle} aria-expanded={open} aria-label="Toggle sidebar" style={{ padding: '4px' }}>
-              <Menu size={24} />
-            </button>
+          <div style={{ display: 'flex', gap: '.35rem', alignItems: 'center' }}>
+            {/* X close button — only meaningful on mobile */}
+            {isMobile && (
+              <button
+                className="admin-sidebar__toggle"
+                onClick={closeDrawer}
+                aria-label="Close sidebar"
+                style={{ padding: '4px' }}
+              >
+                <X size={22} />
+              </button>
+            )}
+            {/* Menu toggle — only shown on desktop */}
+            {!isMobile && (
+              <button className="admin-sidebar__toggle" onClick={toggle} aria-expanded={open} aria-label="Toggle sidebar" style={{ padding: '4px' }}>
+                <Menu size={24} />
+              </button>
+            )}
           </div>
         </div>
 
-        <nav className="admin-sidebar__nav">
+        <nav
+          className="admin-sidebar__nav"
+          onClick={(e) => {
+            // Close drawer on mobile when any nav link is tapped
+            if (isMobile && e.target.closest('a')) closeDrawer();
+          }}
+        >
           <NavLink to="/admin" end className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
             <span className="icon"><LayoutDashboard size={20} /></span>
             <span className="label">Dashboard</span>

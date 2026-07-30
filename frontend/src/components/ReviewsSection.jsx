@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ClientReviewAPI } from '../lib/api';
+import { ClientReviewAPI, getFileUrl } from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import SkeletonCard from './SkeletonCard';
 
@@ -169,7 +169,7 @@ export default function ReviewsSection({
                   <div className="flex items-start gap-3 mb-4">
                     {r.avatar ? (
                       <img 
-                        src={r.avatar} 
+                        src={getFileUrl(r.avatar)} 
                         alt={r.name}
                         loading="lazy"
                         className="w-12 h-12 rounded-full object-cover flex-shrink-0 border-2 border-blue-400/30" 
@@ -254,7 +254,7 @@ export default function ReviewsSection({
                     <div className="flex items-start gap-3 mb-4">
                       {r.avatar ? (
                         <img 
-                          src={r.avatar} 
+                          src={getFileUrl(r.avatar)} 
                           alt={r.name}
                           loading="lazy"
                           className="w-12 h-12 rounded-full object-cover flex-shrink-0 border-2 border-blue-400/30" 

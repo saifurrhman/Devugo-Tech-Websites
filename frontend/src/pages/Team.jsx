@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { TeamAPI } from '../lib/api';
+import { TeamAPI, getFileUrl } from '../lib/api';
 import PageHero from '../components/PageHero';
 import SEO from '../components/SEO';
 
@@ -58,7 +58,7 @@ export default function Team() {
                       borderRadius: '12px'
                     }}>
                       <img
-                        src={m.avatar}
+                        src={getFileUrl(m.avatar)}
                         alt={m.name}
                         style={{
                           width: '100%',

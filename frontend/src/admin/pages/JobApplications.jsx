@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Mail, Phone, ExternalLink, Calendar, Trash2, CheckCircle, XCircle, FileDown } from 'lucide-react';
-import { JobApplicationAPI, CareerAPI } from '../../lib/api';
-import { API_BASE } from '../../lib/api';
+import { JobApplicationAPI, CareerAPI, getFileUrl } from '../../lib/api';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import AdminSidebar from '../../components/AdminSidebar';
@@ -27,6 +26,7 @@ const badgeColors = {
 export default function JobApplications() {
   const { id } = useParams();
   const [applications, setApplications] = useState([]);
+  const [filterStatus, setFilterStatus] = useState('all');
   const [career, setCareer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -110,26 +110,33 @@ export default function JobApplications() {
     }
   };
 
-  const handleDownloadCV = async (fileUrl, applicantName) => {
+  const handleDownloadCV = (fileUrl, applicantName) => {
     try {
-      const response = await fetch(fileUrl);
-      if (!response.ok) throw new Error('File not found');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      let downloadUrl = fileUrl;
+      // If it's a Cloudinary URL, force download by adding fl_attachment
+      if (fileUrl.includes('res.cloudinary.com')) {
+        downloadUrl = fileUrl.replace('/upload/', '/upload/fl_attachment/');
+      }
+
       const link = document.createElement('a');
-      link.href = url;
+      link.href = downloadUrl;
       
-      // Extract extension from fileUrl or default to pdf
-      const ext = fileUrl.split('.').pop().split(/#|\?/)[0] || 'pdf';
+      // Attempt to extract a clean extension (if any exists at the end of the URL path)
+      const urlPath = fileUrl.split('?')[0].split('#')[0];
+      const match = urlPath.match(/\.([a-zA-Z0-9]+)$/);
+      const ext = match ? match[1] : 'pdf';
       link.download = `${applicantName.replace(/\s+/g, '_')}_CV.${ext}`;
+      
+      // Set target _blank so cross-origin URLs safely open in a new tab if download fails
+      link.target = '_blank';
+      link.rel = 'noreferrer';
       
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Download failed:', err);
-      notifyError('Failed to download CV. It might be unavailable.');
+      notifyError('Failed to open CV.');
     }
   };
 
@@ -150,7 +157,9 @@ export default function JobApplications() {
         <AdminTopbar />
 
         {/* ── Header ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '.85rem', marginBottom: '1.4rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.4rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '.85rem' }}>
+
           <Link to="/admin/careers"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'background .15s, color .15s', flexShrink: 0 }}
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.09)'; e.currentTarget.style.color = '#fff'; }}
@@ -164,12 +173,37 @@ export default function JobApplications() {
                 Job Applications
               </h1>
               <span style={{ padding: '.18rem .6rem', borderRadius: '999px', fontSize: '.72rem', fontWeight: 700, background: 'rgba(67,133,205,0.15)', border: '1px solid rgba(67,133,205,0.4)', color: '#60a5fa' }}>
-                {applications.length} Total
+                {filterStatus === 'all' ? applications.length : applications.filter(app => app.status === filterStatus).length} {filterStatus === 'all' ? 'Total' : filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
               </span>
             </div>
             <p style={{ margin: '.1rem 0 0', fontSize: '.85rem', color: 'rgba(255,255,255,0.5)' }}>
               {career ? `Applicants for ${career.title} (${career.type})` : 'Viewing job applications'}
             </p>
+          </div>
+          </div>
+          
+          {/* Status Filters */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', background: '#00284d', padding: '.4rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {['all', 'new', 'shortlisted', 'hired', 'rejected'].map(status => (
+              <button 
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                style={{
+                  padding: '.35rem .85rem',
+                  borderRadius: '6px',
+                  border: 'none',
+                  fontSize: '.8rem',
+                  fontWeight: 600,
+                  textTransform: 'capitalize',
+                  cursor: 'pointer',
+                  transition: 'all .2s',
+                  background: filterStatus === status ? 'rgba(67,133,205,0.2)' : 'transparent',
+                  color: filterStatus === status ? '#60a5fa' : 'rgba(255,255,255,0.5)'
+                }}
+              >
+                {status}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -183,7 +217,7 @@ export default function JobApplications() {
 
         {/* ── Applications List ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {applications.map(app => {
+          {applications.filter(app => filterStatus === 'all' || app.status === filterStatus).map(app => {
             const isComposing = emailComposeId === app._id;
             return (
               <div key={app._id} style={{ ...cardStyle, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -243,15 +277,34 @@ export default function JobApplications() {
                     )}
                     {app.resume && (
                       <>
-                        <a href={`${API_BASE}${app.resume}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.8rem', color: '#60a5fa', textDecoration: 'none', background: 'rgba(96,165,250,0.1)', padding: '.4rem .8rem', borderRadius: '6px' }}>
+                        <a href={getFileUrl(app.resume)} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.8rem', color: '#60a5fa', textDecoration: 'none', background: 'rgba(96,165,250,0.1)', padding: '.4rem .8rem', borderRadius: '6px' }}>
                           <ExternalLink size={13} /> Preview CV
                         </a>
-                        <button onClick={() => handleDownloadCV(`${API_BASE}${app.resume}`, app.fullName)} style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.8rem', color: '#34d399', textDecoration: 'none', background: 'rgba(52,211,153,0.1)', padding: '.4rem .8rem', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>
+                        <button onClick={() => handleDownloadCV(getFileUrl(app.resume), app.fullName)} style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.8rem', color: '#34d399', textDecoration: 'none', background: 'rgba(52,211,153,0.1)', padding: '.4rem .8rem', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>
                           <FileDown size={13} /> Download
                         </button>
                       </>
                     )}
                   </div>
+
+                  {app.customFields && Object.keys(app.customFields).length > 0 && (
+                    <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: '.5rem', marginTop: '.75rem', paddingTop: '.75rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ fontSize: '.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Custom Fields</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '.75rem' }}>
+                        {Object.entries(app.customFields).map(([key, val]) => (
+                          <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '.2rem' }}>
+                            <span style={{ fontSize: '.75rem', color: 'rgba(255,255,255,0.5)', textTransform: 'capitalize' }}>
+                              {key.replace(/custom_/g, '').replace(/_/g, ' ')}
+                            </span>
+                            <span style={{ fontSize: '.85rem', color: '#fff' }}>
+                              {typeof val === 'boolean' ? (val ? 'Yes' : 'No') : (val || '-')}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                 </div>
 
                 {/* Cover Letter & Actions */}

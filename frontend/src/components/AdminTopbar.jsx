@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthAPI, NotificationAPI } from '../lib/api';
+import { AuthAPI, NotificationAPI, getFileUrl } from '../lib/api';
 import { ChevronDown, Mail, Check, Bell } from 'lucide-react';
 
 const SENDERS = [
@@ -14,7 +14,7 @@ export default function AdminTopbar() {
   let adminUser = null;
   try { adminUser = JSON.parse(localStorage.getItem('adminUser')); } catch (e) { adminUser = null; }
   const initials = adminUser?.name ? adminUser.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : '';
-  const avatarUrl = adminUser?.avatar;
+  const avatarUrl = adminUser?.avatar ? getFileUrl(adminUser.avatar) : null;
 
   // Theme state (admin-light | admin-dark)
   const [theme, setTheme] = useState(() => localStorage.getItem('adminTheme') || 'admin-light');

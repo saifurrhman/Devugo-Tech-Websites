@@ -395,10 +395,9 @@ body.admin-dark .badge {
 /* ========================= */
 /* Admin layout responsiveness*/
 /* ========================= */
+/* Base: grid container at all sizes — columns defined by breakpoint rules below */
 .admin-layout {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 1rem;
   background: var(--admin-bg);
   min-height: 100vh;
 }
@@ -447,29 +446,42 @@ body.admin-dark .badge {
   min-width: 0
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (min-width: 1025px) {
   .admin-layout {
     grid-template-columns: 220px minmax(0, 1fr);
   }
 }
 
-@media (max-width: 920px) {
-  /* Collapse sidebar */
+@media (max-width: 1024px) {
+  /* Switch to block layout on mobile/tablet.
+     display:grid would reserve a row for the sidebar even when it is
+     position:fixed (due to browser quirks). display:block means the
+     fixed sidebar has zero impact on document flow — no ghost rows,
+     no blank space above the content. */
   .admin-layout {
-    grid-template-columns: 1fr;
+    display: block;
   }
 
-  /* Sidebar Drawer on Mobile */
+  /* Off-canvas drawer — out of document flow entirely */
   .admin-sidebar {
-    position: fixed;
+    position: fixed !important; /* !important guards against any bare rule override */
     top: 0;
     left: 0;
-    width: 280px;
-    height: 100vh;
-    z-index: 50;
+    width: min(85vw, 320px);
+    height: 100dvh;
+    z-index: 100;
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 28px rgba(0,0,0,0.5);
+    overflow-y: auto;
+    will-change: transform;
+  }
+
+  /* Tablet: slightly wider drawer */
+  @media (min-width: 768px) {
+    .admin-sidebar {
+      width: min(40vw, 360px);
+    }
   }
 
   .admin-sidebar.open {
@@ -479,21 +491,28 @@ body.admin-dark .badge {
   .admin-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 40;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 99;
     backdrop-filter: blur(2px);
+    animation: backdropFadeIn 0.25s ease forwards;
   }
 
+  /* Touch-friendly nav links (min 44px per WCAG 2.5.5) */
   .admin-sidebar .admin-link {
-    padding: .55rem .6rem;
+    min-height: 44px;
+    padding: .6rem .75rem;
     border-radius: 10px;
+    display: flex;
+    align-items: center;
   }
 
   .admin-content {
+    width: 100%;
     min-width: 0;
+    box-sizing: border-box;
   }
 
-  /* Make top bar stick to top for mobile */
+  /* Make top bar stick to top */
   .admin-content > .toolbar:first-of-type {
     position: sticky;
     top: 8px;
@@ -505,6 +524,11 @@ body.admin-dark .badge {
     border-radius: 12px;
     padding: .5rem .6rem;
   }
+}
+
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* KPI grid and colorful cards */
@@ -4671,29 +4695,35 @@ body.admin-dark .admin-layout .card {
     gap: .8rem
   }
 
-  .admin-layout {
-    padding: .75rem
-  }
+  /* Layout padding handled by .admin-content at this breakpoint */
 
-  /* Remove capsule styling and search on mobile to avoid the highlighted bar */
+  /* Mobile topbar: centered pill layout */
   .admin-topbar {
     display: flex;
-    justify-content: center
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 1.5rem;
   }
 
   .admin-topbar__inner {
-    padding: 0;
-    border-radius: 0;
-    background: transparent;
-    border: 0;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    box-shadow: none;
-    justify-content: center
+    display: flex;
+    justify-content: center;
+    padding: .35rem .5rem;
+    border-radius: 12px;
+    background: var(--admin-surface-strong);
+    border: 1px solid var(--admin-border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   .admin-topbar__actions {
-    margin: 0 auto
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin: 0;
   }
 
   .admin-search {
@@ -4716,8 +4746,10 @@ body.admin-dark .admin-layout .card {
 
   .admin-content {
     padding: .5rem;
-    max-width: 560px;
-    margin: 0 auto
+    /* Removed max-width: 560px — on tablet the sidebar is a drawer, so
+       the full viewport width is available for content (tables, grids). */
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* Ensure grid cards stretch within their columns */
@@ -4765,16 +4797,20 @@ body.admin-dark .admin-layout .card {
   }
 }
 
-.admin-layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 1rem;
-  min-height: calc(100vh - 120px);
-  padding: 1rem
-}
+/* Desktop-only: pin the 260px sidebar column.
+   Tablet and phone use 1fr (drawer is fixed-positioned) */
+@media (min-width: 1025px) {
+  .admin-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 1rem;
+    min-height: calc(100vh - 120px);
+    padding: 1rem
+  }
 
-.admin-content {
-  padding: 1rem
+  .admin-content {
+    padding: 1rem
+  }
 }
 
 /* Expand content width when sidebar is collapsed (desktop) */
@@ -4796,21 +4832,24 @@ body.admin-dark .admin-layout .card {
   padding: 1.15rem
 }
 
-.admin-sidebar {
-  position: sticky;
-  top: .5rem;
-  align-self: start;
-  height: calc(100vh - 1rem);
-  border-radius: 16px;
-  overflow: hidden;
-  background: var(--admin-bg);
-  /* Match main background */
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1px solid var(--admin-border);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, .20);
-  display: flex;
-  flex-direction: column;
+/* Desktop-only sidebar styling (sticky, rounded card appearance).
+   On tablet/phone, the off-canvas @media (max-width:1024px) rules override this. */
+@media (min-width: 1025px) {
+  .admin-sidebar {
+    position: sticky;
+    top: .5rem;
+    align-self: start;
+    height: calc(100vh - 1rem);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--admin-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .20);
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .admin-sidebar__header {
@@ -4994,45 +5033,60 @@ body.admin-dark .admin-layout .card {
   justify-content: center
 }
 
-/* Responsive: off-canvas on small screens */
+/* ── Phone + Tablet: off-canvas drawer ──
+   Both phone (<768px) and tablet (768px–1024px) use a drawer.
+   The layout collapses to block so the sidebar is out of document flow. */
 @media (max-width: 1024px) {
   .admin-layout {
-    grid-template-columns: 1fr
+    display: block
   }
 
-  /* Centered modal-style sidebar on mobile */
   .admin-sidebar {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    width: min(420px, calc(100vw - 2rem));
-    height: auto;
-    max-height: 80vh;
-    z-index: 60;
-    transition: transform .22s ease, opacity .22s ease
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: min(85vw, 320px);
+    height: 100dvh;
+    z-index: 100;
+    transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    -webkit-transition: transform 0.25s ease;
+    box-shadow: 4px 0 28px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+    will-change: transform;
+    /* Reset any desktop-only positioning */
+    top: 0;
+    align-self: auto;
   }
 
   .admin-sidebar.open {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
   }
 
+  /* .collapsed class is not used on mobile/tablet — only .open toggles */
   .admin-sidebar.collapsed {
-    transform: translate(-50%, -60%) scale(.98);
-    opacity: 0;
-    pointer-events: none
+    transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
+    opacity: 1;
+    pointer-events: auto;
+    width: min(85vw, 320px);
   }
 }
 
-/* Backdrop when sidebar is open on mobile */
+/* Backdrop when sidebar is open on mobile/tablet */
+/* NOTE: The live rule is in the @media (max-width: 1024px) block above.
+   This bare rule is kept only for desktop-targeted stacking contexts
+   but must not override our z-index: 99 set in the media query. */
 .admin-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.55);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
-  z-index: 50
+  z-index: 99;
+  animation: backdropFadeIn 0.25s ease forwards;
 }
 
 .admin-topbar {
@@ -5908,20 +5962,26 @@ body.site-light .page-hero .btn.outline:hover {
 /* FIX: Admin Sidebar Scroll & Sticky Footer    */
 /* ============================================= */
 
+/* Base properties for sidebar layout */
 .admin-sidebar {
-  position: sticky;
-  top: 0.5rem;
-  align-self: start;
-  max-height: calc(100vh - 1rem);
-  border-radius: 16px;
-  overflow: hidden;
-  background: var(--admin-bg);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1px solid var(--admin-border);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.20);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+@media (min-width: 1025px) {
+  .admin-sidebar {
+    position: sticky;
+    top: 0.5rem;
+    align-self: start;
+    max-height: calc(100vh - 1rem);
+    border-radius: 16px;
+    background: var(--admin-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.20);
+  }
 }
 
 /* Header: Fixed at top */
@@ -5991,29 +6051,12 @@ body.site-light .page-hero .btn.outline:hover {
   flex-shrink: 0;
 }
 
-/* Mobile: Full height overlay */
+/* ── Second off-canvas override for phone range ──
+   This block previously had a centered-modal transform. Fixed to match
+   the correct off-canvas pattern already defined above for <=1024px. */
 @media (max-width: 920px) {
   .admin-sidebar {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    width: min(420px, calc(100vw - 2rem));
-    max-height: 85vh;
-    height: auto;
-    z-index: 60;
-    transition: transform 0.22s ease, opacity 0.22s ease;
-  }
-
-  .admin-sidebar.open {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-
-  .admin-sidebar.collapsed {
-    transform: translate(-50%, -60%) scale(0.98);
-    opacity: 0;
-    pointer-events: none;
+    width: min(85vw, 320px); /* Phone: slightly narrower drawer */
   }
 }
 

@@ -43,6 +43,17 @@ const CareerSchema = new mongoose.Schema(
     deadline: {
       type: Date,
     },
+    applicationFields: [
+      {
+        key: { type: String, required: true },
+        label: { type: String, required: true },
+        type: { type: String, enum: ['text', 'textarea', 'number', 'date', 'select', 'checkbox', 'file'], required: true },
+        required: { type: Boolean, default: false },
+        enabled: { type: Boolean, default: true },
+        options: [String],
+        isCustom: { type: Boolean, default: false }
+      }
+    ],
     isActive: {
       type: Boolean,
       default: true,

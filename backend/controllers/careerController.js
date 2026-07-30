@@ -48,7 +48,7 @@ exports.getCareerById = async (req, res) => {
 // @access  Private (Admin / Website Manager)
 exports.createCareer = async (req, res) => {
   try {
-    const { title, department, location, type, experience, description, requirements, deadline, isActive } = req.body;
+    const { title, department, location, type, experience, description, requirements, deadline, isActive, applicationFields } = req.body;
     
     let slug = slugify(title, { lower: true, strict: true });
     
@@ -68,7 +68,8 @@ exports.createCareer = async (req, res) => {
       description,
       requirements: requirements || [],
       deadline: deadline || null,
-      isActive: isActive !== undefined ? isActive : true
+      isActive: isActive !== undefined ? isActive : true,
+      applicationFields: applicationFields || []
     });
 
     const createdCareer = await career.save();
@@ -84,7 +85,7 @@ exports.createCareer = async (req, res) => {
 // @access  Private (Admin / Website Manager)
 exports.updateCareer = async (req, res) => {
   try {
-    const { title, department, location, type, experience, description, requirements, deadline, isActive } = req.body;
+    const { title, department, location, type, experience, description, requirements, deadline, isActive, applicationFields } = req.body;
     
     const career = await Career.findById(req.params.id);
 
@@ -100,9 +101,10 @@ exports.updateCareer = async (req, res) => {
     career.type = type || career.type;
     career.experience = experience !== undefined ? experience : career.experience;
     career.description = description || career.description;
-    career.requirements = requirements || career.requirements;
-    if (deadline !== undefined) career.deadline = deadline;
+    career.requirements = requirements !== undefined ? requirements : career.requirements;
+    career.deadline = deadline !== undefined ? deadline : career.deadline;
     career.isActive = isActive !== undefined ? isActive : career.isActive;
+    career.applicationFields = applicationFields !== undefined ? applicationFields : career.applicationFields;
 
     if ((title && title !== originalTitle) || !career.slug) {
       let slug = slugify(career.title, { lower: true, strict: true });

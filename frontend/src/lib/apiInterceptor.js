@@ -166,8 +166,8 @@ export async function fetchWithAuth(url, options = {}) {
   }
 }
 
-// Wrapper for api function
-export async function apiWithRefresh(path, { method = 'GET', body, token } = {}) {
+// Enhanced wrapper with auto token refresh and optional silent 404
+export async function apiWithRefresh(path, { method = 'GET', body, token, silent404 = false } = {}) {
   const url = `${API_BASE}${path}`;
 
   const isFormData = body instanceof FormData || (body && typeof body.append === 'function');
@@ -177,8 +177,6 @@ export async function apiWithRefresh(path, { method = 'GET', body, token } = {})
   };
 
   if (token) {
-    // We create headers object only if token is passed,
-    // otherwise fetchWithAuth will handle it.
     options.headers = { 'Authorization': `Bearer ${token}` };
   }
 
@@ -190,16 +188,24 @@ export async function apiWithRefresh(path, { method = 'GET', body, token } = {})
     return {};
   }
 
+  // ─── SILENT 404 ─────────────────────────────────────────────────────────────
+  // Optional widgets (e.g. n8n traffic metrics) call endpoints that may not
+  // exist yet. When silent404:true, return null instead of throwing so the
+  // caller can render a graceful empty/fallback state.
+  if (response.status === 404 && silent404) {
+    console.warn(`⚠️ ${method} ${path} - 404 (silent, returning null)`);
+    return null;
+  }
+
   // Parse JSON
   let data;
   try {
     data = await response.json();
   } catch (e) {
-    // Handle cases where response is not JSON but still OK
     if (response.ok) {
-      return {}; // Or response.text() if needed
+      return {};
     }
-    data = {}; // Error case, not JSON
+    data = {};
   }
 
   // Handle errors
