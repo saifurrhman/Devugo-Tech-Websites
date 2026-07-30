@@ -164,9 +164,10 @@ export default function AdminTopbar() {
             )}
           </button>
 
-          <div className="relative" ref={notifRef}>
+          <div style={{ position: 'relative' }} ref={notifRef}>
             <button 
-              className="icon-btn relative" 
+              className="icon-btn" 
+              style={{ position: 'relative' }}
               title="Notifications" 
               aria-label="Notifications"
               onClick={() => setNotificationsOpen(!notificationsOpen)}
@@ -176,12 +177,12 @@ export default function AdminTopbar() {
                 <path d="M9.5 18a2.5 2.5 0 0 0 5 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
               </svg>
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[var(--admin-surface-strong)]"></span>
+                <span style={{ position: 'absolute', top: '4px', right: '4px', width: '10px', height: '10px', backgroundColor: '#ef4444', borderRadius: '50%', border: '2px solid var(--admin-surface-strong)' }}></span>
               )}
             </button>
 
             {notificationsOpen && (
-              <div className="admin-dropdown" style={{ right: 0, width: '320px', padding: 0 }} role="menu">
+              <div className="admin-dropdown" style={{ right: '-10px', width: '320px', maxWidth: '85vw', padding: 0, top: 'calc(100% + 10px)' }} role="menu">
                 <div className="admin-dropdown__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid var(--admin-border)' }}>
                   <strong style={{ fontSize: '14px' }}>Notifications</strong>
                   {unreadCount > 0 && (
