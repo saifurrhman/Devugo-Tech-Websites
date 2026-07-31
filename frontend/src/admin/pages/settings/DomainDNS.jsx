@@ -151,52 +151,33 @@ const DomainDNS = () => {
 
                             {/* Records Card */}
                             <div className="bg-[#002747] p-8 rounded-2xl border border-white/5 shadow-xl">
-                                {dnsRecords?.dns_records?.brevo_code && (
-                                    <DNSRecordItem
-                                        title="Brevo code"
-                                        type={dnsRecords.dns_records.brevo_code.type}
-                                        name={dnsRecords.dns_records.brevo_code.host_name || '@'}
-                                        value={dnsRecords.dns_records.brevo_code.value}
-                                        verified={dnsRecords.authenticated}
-                                    />
-                                )}
-
-                                {dnsRecords?.dns_records?.dkim1Record && (
-                                    <DNSRecordItem
-                                        title="DKIM 1 record"
-                                        type={dnsRecords.dns_records.dkim1Record.type}
-                                        name={dnsRecords.dns_records.dkim1Record.host_name}
-                                        value={dnsRecords.dns_records.dkim1Record.value}
-                                        verified={dnsRecords.authenticated}
-                                    />
-                                )}
-
-                                {dnsRecords?.dns_records?.dkim2Record && (
-                                    <DNSRecordItem
-                                        title="DKIM 2 record"
-                                        type={dnsRecords.dns_records.dkim2Record.type}
-                                        name={dnsRecords.dns_records.dkim2Record.host_name}
-                                        value={dnsRecords.dns_records.dkim2Record.value}
-                                        verified={dnsRecords.authenticated}
-                                    />
-                                )}
-
-                                {/* Fallbacks */}
-                                {dnsRecords?.dns_records?.dkim_record && (
+                                {dnsRecords?.dns_records?.dkim && (
                                     <DNSRecordItem
                                         title="DKIM record"
-                                        type="TXT"
-                                        name={dnsRecords.dns_records.dkim_record.key || 'mail._domainkey'}
-                                        value={dnsRecords.dns_records.dkim_record.value}
+                                        type={dnsRecords.dns_records.dkim.type}
+                                        name={dnsRecords.dns_records.dkim.host}
+                                        value={dnsRecords.dns_records.dkim.value}
+                                        verified={dnsRecords.dns_records.dkim.status}
                                     />
                                 )}
 
-                                {dnsRecords?.dns_records?.spf_record && (
+                                {dnsRecords?.dns_records?.spf && (
                                     <DNSRecordItem
                                         title="SPF record"
-                                        type="TXT"
-                                        name="@"
-                                        value={dnsRecords.dns_records.spf_record.value}
+                                        type={dnsRecords.dns_records.spf.type}
+                                        name={dnsRecords.dns_records.spf.host}
+                                        value={dnsRecords.dns_records.spf.value}
+                                        verified={dnsRecords.dns_records.spf.status}
+                                    />
+                                )}
+
+                                {dnsRecords?.dns_records?.dmarc && (
+                                    <DNSRecordItem
+                                        title="DMARC record"
+                                        type={dnsRecords.dns_records.dmarc.type}
+                                        name={dnsRecords.dns_records.dmarc.host}
+                                        value={dnsRecords.dns_records.dmarc.value}
+                                        verified={dnsRecords.dns_records.dmarc.status}
                                     />
                                 )}
                             </div>

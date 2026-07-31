@@ -39,6 +39,8 @@ export default function AIPanel({
             let textContent = '';
             if (typeof data === 'string') {
                 textContent = data;
+            } else if (data?.reply) {
+                textContent = data.reply; // Handles AI reply object { reply: "..." }
             } else if (data?.body) {
                 textContent = data.body; // Assuming the structure { subject, body } or similar
             } else {

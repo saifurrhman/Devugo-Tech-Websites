@@ -194,10 +194,7 @@ class AIService {
 
     } catch (error) {
       logger.error('AI Service Error:', error.message);
-      return {
-        reply: `Sorry, I encountered an error. Please contact us at support@devugotechsolution.store`,
-        isMock: true
-      };
+      throw new Error(`AI Service failed: ${error.message}`);
     }
   }
 

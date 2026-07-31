@@ -21,6 +21,10 @@ const emailCampaignSchema = new mongoose.Schema({
     ref: 'EmailTemplate',
     required: false
   },
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Sender'
+  },
   senderName: String,
   senderEmail: String,
   replyTo: String,

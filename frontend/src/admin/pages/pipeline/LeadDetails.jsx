@@ -80,7 +80,7 @@ export default function LeadDetails() {
 
         try {
             setSaving(true);
-            await PipelineAPI.deleteDeal(id);
+            await PipelineAPI.removeDeal(id);
             success('Deal deleted successfully');
             navigate('/admin/pipeline');
         } catch (err) {

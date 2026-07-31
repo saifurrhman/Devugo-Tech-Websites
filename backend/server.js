@@ -553,6 +553,10 @@ if (process.env.ENABLE_JOBS !== 'false' && process.env.NODE_ENV !== 'test') {
     require('./jobs/followUpAutomation');
     console.log('✅ Follow-up Automation job started');
 
+    // Start IMAP Poller Job
+    require('./jobs/imapPoller');
+    console.log('✅ IMAP Poller job started');
+
     // Start Blog Automation Job
     require('./jobs/blogAutomation');
     console.log('✅ Blog Automation job started');

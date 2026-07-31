@@ -50,6 +50,10 @@ const campaignSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'EmailTemplate'
   },
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Sender'
+  },
   senderName: String,
   senderEmail: String,
   replyTo: String,

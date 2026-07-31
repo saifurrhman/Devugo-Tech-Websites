@@ -6,6 +6,9 @@ const { auth } = require('../middlewares/auth');
 // Specific routes first to avoid ID collision
 router.get('/stages', auth, pipelineController.getStages);
 router.get('/deals', auth, pipelineController.getLeads);
+router.post('/deals', auth, pipelineController.createDeal);
+router.put('/deals/:id', auth, pipelineController.updateDeal);
+router.delete('/deals/:id', auth, pipelineController.deleteDeal);
 
 router.get('/', auth, pipelineController.getAllPipelines);
 router.get('/:id', auth, pipelineController.getPipelineById);

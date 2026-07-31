@@ -1,13 +1,14 @@
 const nodemailer = require('nodemailer');
 const smtpConfig = require('../config/smtp');
 const logger = require('../utils/logger');
+const gmailService = require('./gmailService');
+const { decrypt } = require('../utils/encryption');
 
-let transporter = null;
+let defaultTransporter = null;
 
-// Create transporter only if SMTP is enabled and credentials exist
-function createTransporter() {
+// Create default transporter only if SMTP is enabled and credentials exist
+function createDefaultTransporter() {
   try {
-    // Check if SMTP is enabled and has credentials (PRIORITY)
     if (smtpConfig.smtp.enabled && smtpConfig.smtp.auth.user && smtpConfig.smtp.auth.pass) {
       const transporter = nodemailer.createTransport({
         host: smtpConfig.smtp.host,
@@ -15,52 +16,62 @@ function createTransporter() {
         secure: smtpConfig.smtp.secure,
         auth: smtpConfig.smtp.auth
       });
-
-      // Verify connection
-      transporter.verify((error, success) => {
-        if (error) {
-          logger.error('Email transporter error:', error);
-        } else {
-          logger.info('✅ Email server is ready to send messages (SMTP/Gmail)');
-        }
-      });
-
       return transporter;
     }
 
-    // Check Brevo Configuration (Fallback)
-    if (smtpConfig.brevo && smtpConfig.brevo.enabled) {
-      if (smtpConfig.brevo.apiKey) {
-        logger.info('✅ Brevo Email Service is active');
-        return { type: 'brevo' };
-      }
-      logger.warn('Brevo enabled but API Key is missing');
+    if (smtpConfig.brevo && smtpConfig.brevo.enabled && smtpConfig.brevo.apiKey) {
+      return { type: 'brevo' };
     }
 
-    // Verify connection
-    transporter.verify((error, success) => {
-      if (error) {
-        logger.error('Email transporter error:', error);
-      } else {
-        logger.info('✅ Email server is ready to send messages');
-      }
-    });
-
-    return transporter;
+    return null;
   } catch (error) {
-    logger.error('Failed to create email transporter:', error.message);
+    logger.error('Failed to create default email transporter:', error.message);
     return null;
   }
 }
 
-// Initialize transporter
-transporter = createTransporter();
+defaultTransporter = createDefaultTransporter();
 
 class EmailService {
-  async sendEmail(emailData) {
+  async sendEmail(emailData, customSender = null) {
     try {
+      let transporterToUse = defaultTransporter;
+      let fromAddress = `${smtpConfig.smtp.from.name} <${smtpConfig.smtp.from.email}>`;
+
+      // Handle custom sender configurations
+      if (customSender) {
+        if (customSender.type === 'gmail_oauth') {
+          // Use Gmail Service
+          const rawMessage = gmailService.createRawMessage({
+            to: emailData.to,
+            from: `${customSender.displayName} <${customSender.emailAddress}>`,
+            subject: emailData.subject,
+            html: emailData.html
+          });
+
+          await gmailService.sendGmail(customSender, rawMessage);
+
+          return { success: true, messageId: 'gmail_' + Date.now() };
+        } else if (customSender.type === 'smtp') {
+          // Create custom SMTP transporter
+          transporterToUse = nodemailer.createTransport({
+            host: customSender.smtpHost,
+            port: customSender.smtpPort,
+            secure: customSender.smtpSecure,
+            auth: {
+              user: customSender.smtpUser,
+              pass: decrypt(customSender.smtpPass)
+            }
+          });
+          fromAddress = `${customSender.displayName} <${customSender.emailAddress}>`;
+        } else if (customSender.type === 'domain') {
+          // For domains, we use default SMTP but change the From address
+          fromAddress = `${customSender.displayName} <${customSender.emailAddress}>`;
+        }
+      }
+
       // Check if transporter is available
-      if (!transporter) {
+      if (!transporterToUse) {
         logger.warn('Email transporter not available - email not sent');
         return {
           success: false,
@@ -69,17 +80,17 @@ class EmailService {
       }
 
       // Handle Brevo Sending
-      if (transporter.type === 'brevo') {
+      if (transporterToUse.type === 'brevo') {
         const recipients = Array.isArray(emailData.to)
           ? emailData.to.map(email => ({ email: typeof email === 'string' ? email : email.email }))
           : [{ email: emailData.to }];
 
         const sender = {
-          name: smtpConfig.brevo.senderName,
-          email: smtpConfig.brevo.senderEmail
+          name: customSender ? customSender.displayName : smtpConfig.brevo.senderName,
+          email: customSender ? customSender.emailAddress : smtpConfig.brevo.senderEmail
         };
 
-        const axios = require('axios'); // Ensure axios is imported or require it here if not at top
+        const axios = require('axios'); 
 
         const payload = {
           sender,
@@ -115,7 +126,7 @@ class EmailService {
 
       // Handle standard SMTP Sending
       const mailOptions = {
-        from: `${smtpConfig.smtp.from.name} <${smtpConfig.smtp.from.email}>`,
+        from: fromAddress,
         to: emailData.to,
         subject: emailData.subject,
         html: emailData.html,
@@ -123,7 +134,7 @@ class EmailService {
         attachments: emailData.attachments || []
       };
 
-      const result = await transporter.sendMail(mailOptions);
+      const result = await transporterToUse.sendMail(mailOptions);
 
       logger.info('Email sent successfully', {
         to: emailData.to,

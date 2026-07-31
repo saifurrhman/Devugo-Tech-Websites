@@ -107,7 +107,7 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
           <p className="muted">Transparent pricing to get you moving fast. See full options on the Pricing page.</p>
         </header>
 
-        <div className="pricing-grid">
+        <div className="pricing-wrapper">
           <AnimatePresence mode="wait">
             {loading ? (
               <motion.div 

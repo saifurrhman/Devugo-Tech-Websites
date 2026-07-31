@@ -586,8 +586,110 @@ class PipelineController {
     }
   }
   /**
+   * Create new deal (lead)
+   * Mapped to POST /api/pipeline/deals
+   */
+  async createDeal(req, res) {
+    try {
+      const { title, value, contact, stageId } = req.body;
+      
+      // We store leads as EmailRecipients in this system
+      const newLead = new EmailRecipient({
+        email: contact.toLowerCase().replace(/\s+/g, '') + '@example.com', // Dummy email if none provided
+        name: contact,
+        company: title,
+        pipelineStage: stageId,
+        leadStatus: 'new',
+        customFields: { value },
+        addedBy: req.user._id,
+        source: 'manual'
+      });
+      
+      // If contact looks like an email, use it
+      if (contact.includes('@')) {
+        newLead.email = contact;
+        newLead.name = title;
+      }
+      
+      await newLead.save();
+      
+      res.status(201).json({
+        success: true,
+        data: {
+          id: newLead._id,
+          title: newLead.company || newLead.name,
+          value: newLead.customFields?.value || '$0',
+          stageId: newLead.pipelineStage,
+          contact: newLead.name
+        }
+      });
+    } catch (error) {
+      console.error('Create deal error:', error);
+      res.status(500).json({ error: 'Failed to create deal' });
+    }
+  }
+
+  /**
+   * Update deal (lead)
+   * Mapped to PUT /api/pipeline/deals/:id
+   */
+  async updateDeal(req, res) {
+    try {
+      const { id } = req.params;
+      const { stageId, title, value, contact } = req.body;
+      
+      const lead = await EmailRecipient.findById(id);
+      if (!lead) {
+        return res.status(404).json({ error: 'Deal not found' });
+      }
+      
+      if (stageId) lead.pipelineStage = stageId;
+      if (title) lead.company = title;
+      if (contact) lead.name = contact;
+      if (value !== undefined) {
+        if (!lead.customFields) lead.customFields = {};
+        lead.customFields.value = value;
+      }
+      
+      await lead.save();
+      
+      res.json({
+        success: true,
+        data: lead
+      });
+    } catch (error) {
+      console.error('Update deal error:', error);
+      res.status(500).json({ error: 'Failed to update deal' });
+    }
+  }
+
+  /**
+   * Delete deal (lead)
+   * Mapped to DELETE /api/pipeline/deals/:id
+   */
+  async deleteDeal(req, res) {
+    try {
+      const { id } = req.params;
+      const lead = await EmailRecipient.findById(id);
+      if (!lead) {
+        return res.status(404).json({ error: 'Deal not found' });
+      }
+      
+      await lead.deleteOne();
+      
+      res.json({
+        success: true,
+        message: 'Deal deleted successfully'
+      });
+    } catch (error) {
+      console.error('Delete deal error:', error);
+      res.status(500).json({ error: 'Failed to delete deal' });
+    }
+  }
+
+  /**
    * Get all deals (leads) with stages
-   * Mapped to /api/pipeline/deals
+   * Mapped to GET /api/pipeline/deals
    */
   async getLeads(req, res) {
     try {

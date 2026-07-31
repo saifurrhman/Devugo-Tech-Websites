@@ -83,6 +83,7 @@ import CreateProject from '../admin/pages/projects/CreateProject';
 import ContactsUpload from '../admin/pages/contacts/ContactsUpload';
 import CreateInvoice from '../admin/pages/invoices/CreateInvoice';
 import MeetingScheduler from '../admin/pages/meetings/MeetingScheduler';
+import MeetingsCalendar from '../admin/pages/meetings/MeetingsCalendar';
 import PipelineSettings from '../admin/pages/pipeline/PipelineSettings';
 import LeadDetails from '../admin/pages/pipeline/LeadDetails';
 
@@ -213,8 +214,9 @@ export default function PublicRoutes() {
           <Route path="/admin/invoices/create" element={<ProtectedRoute allowedRoles={['crm']}><CreateInvoice /></ProtectedRoute>} />
           <Route path="/admin/proposals" element={<ProtectedRoute allowedRoles={['crm']}><ProposalsList /></ProtectedRoute>} />
           <Route path="/admin/proposals/:id" element={<ProtectedRoute allowedRoles={['crm']}><ProposalEdit /></ProtectedRoute>} />
-          <Route path="/admin/meetings" element={<ProtectedRoute allowedRoles={['crm']}><MeetingsList /></ProtectedRoute>} />
-          <Route path="/admin/meetings/schedule" element={<ProtectedRoute allowedRoles={['crm']}><MeetingScheduler /></ProtectedRoute>} />
+          <Route path="/admin/meetings" element={<ProtectedRoute allowedRoles={['crm', 'website_manager', 'admin']}><MeetingsList /></ProtectedRoute>} />
+          <Route path="/admin/meetings/schedule" element={<ProtectedRoute allowedRoles={['crm', 'website_manager', 'admin']}><MeetingScheduler /></ProtectedRoute>} />
+          <Route path="/admin/meetings/calendar" element={<ProtectedRoute allowedRoles={['crm', 'website_manager', 'admin']}><MeetingsCalendar /></ProtectedRoute>} />
         </Routes>
 
         {/* Floating Widgets */}

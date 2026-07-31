@@ -60,6 +60,12 @@ const messageSchema = new mongoose.Schema({
     name: String
   }],
 
+  // Multi-Sender Selection
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Sender'
+  },
+
   // Message Content
   subject: {
     type: String,
@@ -379,8 +385,8 @@ messageSchema.statics.getConversationThread = async function(conversationId) {
     .exec();
 };
 
-// Pre-save hook
-messageSchema.pre('save', function(next) {
+// Pre-validate hook to generate conversationId before validation runs
+messageSchema.pre('validate', function(next) {
   // Generate snippet if not provided
   if (!this.snippet && this.body && this.body.text) {
     this.snippet = this.body.text.substring(0, 150);

@@ -283,13 +283,16 @@ export default function AdminSidebar() {
                 <span className="label">Proposals</span>
                 <span className="badge badge--new">New</span>
               </NavLink>
-
-              <NavLink to="/admin/meetings" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
-                <span className="icon"><Calendar size={20} /></span>
-                <span className="label">Meetings</span>
-                <span className="badge badge--new">New</span>
-              </NavLink>
             </>
+          )}
+
+          {/* MEETINGS SECTION - Visible to Website Manager and CRM */}
+          {(isCrmAdmin || isWebsiteManager) && (
+            <NavLink to="/admin/meetings" className={({ isActive }) => `admin-link ${isActive || location.pathname.includes('/admin/meetings') ? 'active' : ''}`}>
+              <span className="icon"><Calendar size={20} /></span>
+              <span className="label">Meetings & Calendar</span>
+              <span className="badge badge--new">New</span>
+            </NavLink>
           )}
 
           {/* GENERAL ANALYTICS - Hidden for CRM Role */}

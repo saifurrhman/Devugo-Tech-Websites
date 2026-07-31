@@ -30,7 +30,8 @@ export default function CreateCampaign() {
     subject: '',
     previewText: '', // preheader
     senderName: '',
-    senderEmail: '', // Let user select or default to first loaded
+    senderEmail: '', // Keep for backward compatibility or display
+    senderId: '', // Added for Multi-Tenant Sender Selection
     replyTo: '',
     audienceList: [], // List IDs
     audienceCsv: null,
@@ -74,8 +75,14 @@ export default function CreateCampaign() {
       setCustomLists(loadedLists);
 
       // Auto-select first sender if none selected
-      if (loadedSenders.length > 0 && !formData.senderEmail) {
-        setFormData(prev => ({ ...prev, senderEmail: loadedSenders[0].email }));
+      if (loadedSenders.length > 0 && !formData.senderId) {
+        const firstSender = loadedSenders[0];
+        setFormData(prev => ({ 
+          ...prev, 
+          senderId: firstSender.id,
+          senderEmail: firstSender.email,
+          senderName: firstSender.name
+        }));
       }
 
       const rawContacts = Array.isArray(contactData) ? contactData : (contactData.data || []);
@@ -283,11 +290,22 @@ export default function CreateCampaign() {
                     <label className="block text-sm font-medium text-gray-300 mb-2">Sender Email</label>
                     {senders.filter(s => s.status === 'verified').length > 0 ? (
                       <CustomSelect
-                        value={formData.senderEmail}
-                        onChange={(val) => setFormData(prev => ({ ...prev, senderEmail: val }))}
+                        value={formData.senderId}
+                        onChange={(val) => {
+                          const selectedSender = senders.find(s => s.id === val);
+                          setFormData(prev => ({ 
+                            ...prev, 
+                            senderId: val,
+                            senderEmail: selectedSender?.email || selectedSender?.emailAddress,
+                            senderName: selectedSender?.name || selectedSender?.displayName
+                          }));
+                        }}
                         options={senders
                           .filter(s => s.status === 'verified')
-                          .map(sender => ({ value: sender.email, label: sender.email }))
+                          .map(sender => ({ 
+                            value: sender.id, 
+                            label: `${sender.name || sender.displayName} <${sender.email || sender.emailAddress}>` 
+                          }))
                         }
                         placeholder="Select a verified sender..."
                       />

@@ -57,7 +57,21 @@ const emailRecipientSchema = new mongoose.Schema({
   addedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  pipelineStage: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Pipeline.stages'
+  },
+  leadStatus: {
+    type: String,
+    enum: ['new', 'contacted', 'qualified', 'proposal', 'negotiation', 'converted', 'not_interested'],
+    default: 'new'
+  },
+  notes: [{
+    text: String,
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    createdAt: { type: Date, default: Date.now }
+  }]
 }, { 
   timestamps: true 
 });

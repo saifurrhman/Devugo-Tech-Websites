@@ -22,6 +22,18 @@ const settingsSchema = new mongoose.Schema({
     },
     calendly: {
         personalToken: String
+    },
+    
+    // INBOX SETTINGS
+    inbox: {
+        filterSystemEmails: { type: Boolean, default: true },
+        systemEmailPatterns: { 
+            type: [String], 
+            default: [
+                'mailer-daemon@', 'postmaster@', 'mail-delivery-subsystem@', 
+                'no-reply@', 'noreply@', 'bounce@', 'system@'
+            ] 
+        }
     }
 
 }, { timestamps: true });

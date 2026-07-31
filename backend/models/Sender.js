@@ -1,54 +1,57 @@
 const mongoose = require('mongoose');
 
 const senderSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: [true, 'Sender name is required'],
-        trim: true
-    },
-    email: {
-        type: String,
-        required: [true, 'Sender email is required'],
-        unique: true,
-        lowercase: true,
-        trim: true,
-        match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address']
-    },
-    status: {
-        type: String,
-        enum: ['verified', 'unverified'],
-        default: 'unverified'
-    },
-    domain: {
-        type: String,
-        required: true
-    },
-    ip: {
-        type: String,
-        default: 'Shared IP'
-    },
-    verificationToken: String,
-    verificationTokenExpires: Date,
-    dkimVerified: {
-        type: Boolean,
-        default: false
-    },
-    spfVerified: {
-        type: Boolean,
-        default: false
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+  type: { 
+    type: String, 
+    enum: ['gmail_oauth', 'smtp', 'domain'], 
+    required: true 
+  },
+  emailAddress: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
+  displayName: { 
+    type: String, 
+    required: true 
+  },
+  isDefault: { 
+    type: Boolean, 
+    default: false 
+  },
+  isVerified: { 
+    type: Boolean, 
+    default: false 
+  },
+  
+  // Gmail OAuth fields
+  oauthRefreshToken: { type: String }, // Encrypted
+  oauthAccessToken: { type: String },
+  oauthTokenExpiry: { type: Date },
+  
+  // Custom SMTP fields
+  smtpHost: { type: String },
+  smtpPort: { type: Number },
+  smtpUser: { type: String },
+  smtpPass: { type: String }, // Encrypted
+  smtpSecure: { type: Boolean, default: true },
+  
+  // Custom Domain relation
+  domainId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Domain' 
+  }
+}, { timestamps: true });
 
-// Pre-save hook to extract domain if not present
-senderSchema.pre('save', function (next) {
-    if (this.email && !this.domain) {
-        this.domain = this.email.split('@')[1];
-    }
-    next();
+// Prevent multiple defaults
+senderSchema.pre('save', async function (next) {
+  if (this.isDefault) {
+    await this.constructor.updateMany(
+      { _id: { $ne: this._id } },
+      { $set: { isDefault: false } }
+    );
+  }
+  next();
 });
 
 module.exports = mongoose.model('Sender', senderSchema);

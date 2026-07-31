@@ -27,9 +27,9 @@ export default function InboxList() {
         loadInbox();
     }, [debouncedSearch]);
 
-    const loadInbox = async () => {
+    const loadInbox = async (silent = false) => {
         try {
-            setLoading(true);
+            if (!silent) setLoading(true);
             const params = {};
             if (debouncedSearch) params.search = debouncedSearch;
 
@@ -40,9 +40,17 @@ export default function InboxList() {
             console.error('Failed to load inbox:', err);
             setError('Failed to load inbox');
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
+
+    // Auto-refresh every 15 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            loadInbox(true);
+        }, 15000);
+        return () => clearInterval(interval);
+    }, [debouncedSearch]);
 
     const filteredConversations = filter === 'all' ? conversations :
         filter === 'unread' ? conversations.filter(c => (c.status || 'unread') === 'unread') :
@@ -125,25 +133,47 @@ export default function InboxList() {
                                     No conversations found.
                                 </div>
                             ) : (
-                                filteredConversations.map((conv) => (
-                                    <div
-                                        key={conv.id || conv._id}
-                                        onClick={() => navigate(`/admin/inbox/${conv.id || conv._id}`)}
-                                        className={`p-4 border-b border-gray-800 cursor-pointer hover:bg-gray-800/50 transition-colors ${conv.status === 'unread' ? 'bg-blue-900/10 border-l-4 border-l-blue-500' : 'border-l-4 border-l-transparent'} ${(id === (conv.id || conv._id)) ? 'bg-gray-800' : ''}`}
-                                    >
-                                        <div className="flex justify-between items-start mb-1">
-                                            <span className={`font-medium text-sm ${conv.status === 'unread' ? 'text-white' : 'text-gray-300'}`}>{conv.user || 'Unknown User'}</span>
-                                            <span className="text-xs text-gray-500">{conv.time || 'Recently'}</span>
+                                filteredConversations.map((conv) => {
+                                    // Calculate relative time
+                                    const date = new Date(conv.time);
+                                    const diff = Math.floor((new Date() - date) / 1000);
+                                    let timeStr = 'Just now';
+                                    if (diff > 86400) timeStr = Math.floor(diff / 86400) + 'd ago';
+                                    else if (diff > 3600) timeStr = Math.floor(diff / 3600) + 'h ago';
+                                    else if (diff > 60) timeStr = Math.floor(diff / 60) + 'm ago';
+
+                                    const isSelected = id === (conv.id || conv._id);
+                                    const isUnread = conv.status === 'unread';
+
+                                    return (
+                                        <div
+                                            key={conv.id || conv._id}
+                                            onClick={() => navigate(`/admin/inbox/${conv.id || conv._id}`)}
+                                            className={`p-4 border-b border-gray-800 cursor-pointer transition-all flex flex-col gap-1
+                                                ${isSelected ? 'bg-blue-900/20 border-l-4 border-l-blue-500' : 'hover:bg-gray-800/50 border-l-4 border-l-transparent'}`}
+                                        >
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex items-center gap-2">
+                                                    {isUnread && <div className="w-2 h-2 rounded-full bg-blue-500"></div>}
+                                                    <span className={`font-semibold text-[15px] ${isUnread ? 'text-white' : 'text-gray-300'}`}>
+                                                        {conv.user}
+                                                    </span>
+                                                </div>
+                                                <span className="text-[11px] font-medium text-gray-500">{timeStr}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center mt-0.5">
+                                                <div className={`text-sm truncate pr-4 ${isUnread ? 'text-gray-200 font-medium' : 'text-gray-400'}`}>
+                                                    {conv.preview || conv.subject || 'No preview available'}
+                                                </div>
+                                            </div>
+                                            <div className="mt-1 flex items-center justify-between">
+                                                <span className="text-[10px] uppercase font-bold tracking-wider text-gray-500 bg-gray-800 px-1.5 py-0.5 rounded">
+                                                    #{String(conv.id || conv._id).substr(-4)}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className={`text-sm mb-1 truncate ${conv.status === 'unread' ? 'text-gray-200 font-medium' : 'text-gray-400'}`}>{conv.subject || '(No Subject)'}</div>
-                                        <div className="text-xs text-gray-500 truncate">{conv.preview || ''}</div>
-                                        <div className="mt-2 flex gap-1">
-                                            {(conv.tags || []).map(tag => (
-                                                <span key={tag} className="px-1.5 py-0.5 bg-gray-700 rounded text-[10px] text-gray-300">{tag}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))
+                                    );
+                                })
                             )}
                         </div>
                     </div>

@@ -13,6 +13,7 @@ exports.getAllCampaigns = async (req, res) => {
     const campaigns = await EmailCampaign.find(filter)
       .populate('template', 'name subject')
       .populate('createdBy', 'name email')
+      .populate('senderId')
       .sort('-createdAt')
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -39,7 +40,8 @@ exports.getCampaignById = async (req, res) => {
   try {
     const campaign = await EmailCampaign.findById(req.params.id)
       .populate('template')
-      .populate('createdBy', 'name email');
+      .populate('createdBy', 'name email')
+      .populate('senderId');
 
     if (!campaign) {
       return res.status(404).json({
@@ -61,11 +63,28 @@ exports.getCampaignById = async (req, res) => {
 };
 
 const emailService = require('../services/emailService');
+const Sender = require('../models/Sender');
 
 exports.createCampaign = async (req, res) => {
   try {
+    let { senderId, ...rest } = req.body;
+    let senderDetails = {};
+
+    if (senderId) {
+      const sender = await Sender.findById(senderId);
+      if (!sender) {
+        return res.status(404).json({ success: false, message: 'Sender not found' });
+      }
+      senderDetails = {
+        senderId,
+        senderName: sender.displayName,
+        senderEmail: sender.emailAddress
+      };
+    }
+
     const campaign = new EmailCampaign({
-      ...req.body,
+      ...rest,
+      ...senderDetails,
       createdBy: req.user._id
     });
 

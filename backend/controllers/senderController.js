@@ -1,44 +1,27 @@
-const smtpConfig = require('../config/smtp');
+const Sender = require('../models/Sender');
+const { encrypt } = require('../utils/encryption');
 const logger = require('../utils/logger');
-
-// Helper to get Brevo Headers
-const getHeaders = () => ({
-    'accept': 'application/json',
-    'api-key': smtpConfig.brevo.apiKey,
-    'content-type': 'application/json'
-});
+// We will still keep smtpConfig for reference if needed, but not for Brevo anymore
+const smtpConfig = require('../config/smtp');
 
 exports.listSenders = async (req, res) => {
     try {
-        if (!smtpConfig.brevo.enabled || !smtpConfig.brevo.apiKey) {
-            return res.status(503).json({ message: 'Brevo service is not configured.' });
-        }
-
-        const response = await fetch('https://api.brevo.com/v3/senders', {
-            method: 'GET',
-            headers: getHeaders()
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to fetch senders from Brevo');
-        }
-
-        const data = await response.json();
-
-        // Transform Brevo data to match our frontend expectation
-        // Brevo returns: { senders: [{ id, name, email, active, ips: [] }] }
-        const senders = (data.senders || []).map(sender => ({
-            id: sender.id,
-            _id: sender.id, // Keep _id for compatibility if frontend uses it
-            name: sender.name,
-            email: sender.email,
-            status: sender.active ? 'verified' : 'unverified',
-            domain: sender.email.split('@')[1],
-            ip: sender.ips && sender.ips.length > 0 ? sender.ips[0].ip : 'Shared IP'
+        const senders = await Sender.find().sort({ createdAt: -1 });
+        
+        // Map to match frontend expectations
+        const mappedSenders = senders.map(s => ({
+            _id: s._id,
+            id: s._id,
+            name: s.displayName,
+            email: s.emailAddress,
+            type: s.type,
+            isDefault: s.isDefault,
+            status: s.isVerified ? 'verified' : 'unverified',
+            isVerified: s.isVerified,
+            ip: s.type === 'smtp' ? s.smtpHost : 'Google IP'
         }));
 
-        res.json(senders);
+        res.json(mappedSenders);
     } catch (error) {
         console.error('List senders error:', error);
         res.status(500).json({ message: 'Error fetching senders', error: error.message });
@@ -47,34 +30,48 @@ exports.listSenders = async (req, res) => {
 
 exports.createSender = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { type, name, email, smtpHost, smtpPort, smtpUser, smtpPass, smtpSecure } = req.body;
 
-        const response = await fetch('https://api.brevo.com/v3/senders', {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({ name, email })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Failed to create sender in Brevo');
+        if (!type || !name || !email) {
+            return res.status(400).json({ message: 'Type, name, and email are required' });
         }
 
-        // Brevo sends a verification email automatically for new senders on their side
-        // We just return success.
+        let senderData = {
+            type,
+            displayName: name,
+            emailAddress: email,
+            isVerified: type === 'smtp' ? true : false, // Assume true for SMTP for now, could add validation later
+        };
+
+        if (type === 'smtp') {
+            if (!smtpHost || !smtpPort || !smtpUser || !smtpPass) {
+                return res.status(400).json({ message: 'SMTP credentials are required for SMTP type' });
+            }
+            senderData.smtpHost = smtpHost;
+            senderData.smtpPort = smtpPort;
+            senderData.smtpUser = smtpUser;
+            senderData.smtpPass = encrypt(smtpPass);
+            senderData.smtpSecure = smtpSecure || true;
+        }
+
+        const sender = await Sender.create(senderData);
+
         res.status(201).json({
-            message: 'Sender created in Brevo. Please check your email inbox for the verification link via Brevo.',
+            message: 'Sender added successfully.',
             sender: {
-                id: data.id,
-                name,
-                email,
-                status: 'unverified' // Initially unverified until they click the link
+                id: sender._id,
+                name: sender.displayName,
+                email: sender.emailAddress,
+                status: sender.isVerified ? 'verified' : 'unverified',
+                type: sender.type
             }
         });
 
     } catch (error) {
         console.error('Create sender error:', error);
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'Sender email already exists' });
+        }
         res.status(500).json({ message: 'Error adding sender', error: error.message });
     }
 };
@@ -82,19 +79,10 @@ exports.createSender = async (req, res) => {
 exports.deleteSender = async (req, res) => {
     try {
         const { id } = req.params;
-
-        const response = await fetch(`https://api.brevo.com/v3/senders/${id}`, {
-            method: 'DELETE',
-            headers: getHeaders()
-        });
-
-        if (!response.ok) {
-            // If 404, consider it deleted
-            if (response.status === 404) {
-                return res.json({ message: 'Sender deleted successfully' });
-            }
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to delete sender from Brevo');
+        const sender = await Sender.findByIdAndDelete(id);
+        
+        if (!sender) {
+            return res.status(404).json({ message: 'Sender not found' });
         }
 
         res.json({ message: 'Sender deleted successfully' });
@@ -120,22 +108,24 @@ exports.resendVerification = async (req, res) => {
 // ==========================================
 // DOMAIN MANAGEMENT
 // ==========================================
+const Domain = require('../models/Domain');
+const crypto = require('crypto');
+const dns = require('dns').promises;
 
 exports.listDomains = async (req, res) => {
     try {
-        const response = await fetch('https://api.brevo.com/v3/senders/domains', {
-            method: 'GET',
-            headers: getHeaders()
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to fetch domains from Brevo');
-        }
-
-        const data = await response.json();
-        // Brevo returns: { domains: [{ id, domain_name, authenticated, verified }] }
-        res.json(data.domains || []);
+        const domains = await Domain.find().sort({ createdAt: -1 });
+        
+        const mappedDomains = domains.map(d => ({
+            id: d._id,
+            domain_name: d.domainName,
+            authenticated: d.dkimVerified && d.spfVerified,
+            dkim_status: d.dkimVerified,
+            spf_status: d.spfVerified,
+            dmarc_status: d.dmarcVerified
+        }));
+        
+        res.json(mappedDomains);
     } catch (error) {
         console.error('List domains error:', error);
         res.status(500).json({ message: 'Error fetching domains', error: error.message });
@@ -144,38 +134,57 @@ exports.listDomains = async (req, res) => {
 
 exports.createDomain = async (req, res) => {
     try {
-        const { domain } = req.body; // Brevo expects { name: "domain.com" }
+        const { domain } = req.body; 
 
-        const response = await fetch('https://api.brevo.com/v3/senders/domains', {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({ name: domain })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Failed to create domain in Brevo');
+        if (!domain) {
+            return res.status(400).json({ message: 'Domain name is required' });
         }
 
-        res.status(201).json(data);
+        // Generate 2048-bit RSA keys for DKIM
+        const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+            modulusLength: 2048,
+            publicKeyEncoding: { type: 'spki', format: 'pem' },
+            privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+        });
+
+        // Clean public key for DNS (remove PEM headers and newlines)
+        const cleanPublicKey = publicKey
+            .replace('-----BEGIN PUBLIC KEY-----', '')
+            .replace('-----END PUBLIC KEY-----', '')
+            .replace(/\n/g, '');
+
+        const dkimSelector = 'devugo';
+
+        const newDomain = await Domain.create({
+            domainName: domain,
+            dkimSelector,
+            dkimPublicKey: cleanPublicKey,
+            dkimPrivateKey: encrypt(privateKey), // Encrypt private key before saving
+            spfVerified: false,
+            dkimVerified: false,
+            dmarcVerified: false
+        });
+
+        res.status(201).json({
+            id: newDomain._id,
+            domain_name: newDomain.domainName
+        });
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'Domain already exists' });
+        }
         res.status(500).json({ message: 'Error adding domain', error: error.message });
     }
 };
 
 exports.deleteDomain = async (req, res) => {
     try {
-        const { domain } = req.params;
+        const { domain } = req.params; // Currently domain is passed by name from frontend
 
-        const response = await fetch(`https://api.brevo.com/v3/senders/domains/${domain}`, {
-            method: 'DELETE',
-            headers: getHeaders()
-        });
-
-        if (!response.ok && response.status !== 404) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to delete domain from Brevo');
+        const deletedDomain = await Domain.findOneAndDelete({ domainName: domain });
+        
+        if (!deletedDomain) {
+            return res.status(404).json({ message: 'Domain not found' });
         }
 
         res.json({ message: 'Domain deleted successfully' });
@@ -188,18 +197,42 @@ exports.getDomain = async (req, res) => {
     try {
         const { domain } = req.params;
 
-        const response = await fetch(`https://api.brevo.com/v3/senders/domains/${domain}`, {
-            method: 'GET',
-            headers: getHeaders()
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to get domain details');
+        const d = await Domain.findOne({ domainName: domain });
+        
+        if (!d) {
+            return res.status(404).json({ message: 'Domain not found' });
         }
 
-        const data = await response.json();
-        res.json(data);
+        // Construct DNS records that the frontend needs to show
+        const dnsRecords = {
+            domain_name: d.domainName,
+            authenticated: d.dkimVerified && d.spfVerified,
+            dkim_status: d.dkimVerified,
+            spf_status: d.spfVerified,
+            dmarc_status: d.dmarcVerified,
+            dns_records: {
+                dkim: {
+                    host: `${d.dkimSelector}._domainkey.${d.domainName}`,
+                    type: 'TXT',
+                    value: `v=DKIM1; k=rsa; p=${d.dkimPublicKey}`,
+                    status: d.dkimVerified
+                },
+                spf: {
+                    host: d.domainName,
+                    type: 'TXT',
+                    value: `v=spf1 include:_spf.devugo.tech ~all`, // Example SPF, adjust as needed
+                    status: d.spfVerified
+                },
+                dmarc: {
+                    host: `_dmarc.${d.domainName}`,
+                    type: 'TXT',
+                    value: `v=DMARC1; p=none; rua=mailto:dmarc@devugo.tech`,
+                    status: d.dmarcVerified
+                }
+            }
+        };
+
+        res.json(dnsRecords);
     } catch (error) {
         res.status(500).json({ message: 'Error getting domain details', error: error.message });
     }
@@ -208,32 +241,46 @@ exports.getDomain = async (req, res) => {
 exports.verifyDomain = async (req, res) => {
     try {
         const { domain } = req.params;
+        const d = await Domain.findOne({ domainName: domain });
 
-        // Brevo usually verifies automatically if records exist, but we can trigger a check or re-fetch status
-        // The "authenticate" endpoint is what we usually trigger
-        const response = await fetch(`https://api.brevo.com/v3/senders/domains/${domain}/verify`, {
-            method: 'POST',
-            headers: getHeaders()
-        });
+        if (!d) return res.status(404).json({ message: 'Domain not found' });
 
-        // Note: Brevo V3 API docs for /verify might differ, usually fetching the domain again checks status.
-        // If specific verify endpoint doesn't exist, we just return the current status.
-        // However, for this implementation, let's assume we re-fetch the domain to get latest status.
+        let spfVerified = false;
+        let dkimVerified = false;
+        let dmarcVerified = false;
 
-        // Actually, simply calling GET /domains/:domain updates the status in some integrations.
-        // But let's try the verify endpoint if documented, otherwise fallback to GET.
+        // 1. Verify SPF
+        try {
+            const spfRecords = await dns.resolveTxt(domain);
+            const hasSpf = spfRecords.some(r => r.join('').includes('v=spf1') && r.join('').includes('include:_spf.devugo.tech'));
+            if (hasSpf) spfVerified = true;
+        } catch (e) { /* ignore */ }
 
-        if (!response.ok) {
-            // If 404/405, fallback to just getting details
-            return exports.getDomain(req, res);
+        // 2. Verify DKIM
+        try {
+            const dkimRecords = await dns.resolveTxt(`${d.dkimSelector}._domainkey.${domain}`);
+            const hasDkim = dkimRecords.some(r => r.join('').includes(`p=${d.dkimPublicKey}`));
+            if (hasDkim) dkimVerified = true;
+        } catch (e) { /* ignore */ }
+
+        // 3. Verify DMARC
+        try {
+            const dmarcRecords = await dns.resolveTxt(`_dmarc.${domain}`);
+            const hasDmarc = dmarcRecords.some(r => r.join('').includes('v=DMARC1'));
+            if (hasDmarc) dmarcVerified = true;
+        } catch (e) { /* ignore */ }
+
+        // Update DB
+        d.spfVerified = spfVerified;
+        d.dkimVerified = dkimVerified;
+        d.dmarcVerified = dmarcVerified;
+        if (spfVerified && dkimVerified && dmarcVerified && !d.verifiedAt) {
+            d.verifiedAt = new Date();
         }
+        await d.save();
 
-        // If it returns something
-        const data = await response.json();
-        res.json(data);
-
+        res.json({ message: 'Verification complete', result: { spfVerified, dkimVerified, dmarcVerified } });
     } catch (error) {
-        // Fallback to getDomain
-        return exports.getDomain(req, res);
+        res.status(500).json({ message: 'Error verifying domain', error: error.message });
     }
 };
