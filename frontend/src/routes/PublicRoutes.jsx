@@ -35,7 +35,6 @@ import UserProfile from '../admin/pages/UserProfile';
 import Contacts from '../admin/pages/Contacts';
 import Analytics from '../admin/pages/Analytics';
 import Login from '../admin/pages/Login';
-import Signup from '../admin/pages/Signup';
 import ResetPassword from '../admin/pages/ResetPassword';
 import AcceptInvitation from '../admin/pages/AcceptInvitation';
 import ProtectedRoute from './ProtectedRoute';
@@ -126,7 +125,7 @@ export default function PublicRoutes() {
 
           {/* Admin Authentication */}
           <Route path="/admin/login" element={<Login />} />
-          <Route path="/admin/signup" element={<Signup />} />
+          <Route path="/admin/signup" element={<Navigate to="/admin/login" replace />} />
           <Route path="/admin/reset-password" element={<ResetPassword />} />
           <Route path="/admin/invite/:token" element={<AcceptInvitation />} />
           <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />

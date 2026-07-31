@@ -10,13 +10,28 @@ console.log('📋 Loading auth routes...');
 // ============================================
 
 // @route   POST /api/auth/signup
-// @desc    Register new user
-// @access  Public
-router.post('/signup', ctrl.signup);
-router.post('/verify-signup', ctrl.verifySignup);
+// @desc    DISABLED - Signup is not allowed. Admin-only system.
+// @access  Blocked
+router.post('/signup', (req, res) => {
+  return res.status(403).json({
+    success: false,
+    message: 'Signup is disabled. This is an admin-only system. Contact the system administrator.'
+  });
+});
+router.post('/verify-signup', (req, res) => {
+  return res.status(403).json({
+    success: false,
+    message: 'Signup is disabled.'
+  });
+});
 
-// @route   POST /api/auth/register (alias)
-router.post('/register', ctrl.signup);
+// @route   POST /api/auth/register (alias) - ALSO DISABLED
+router.post('/register', (req, res) => {
+  return res.status(403).json({
+    success: false,
+    message: 'Registration is disabled. Contact the system administrator.'
+  });
+});
 
 // @route   POST /api/auth/login
 // @desc    Login with email and password

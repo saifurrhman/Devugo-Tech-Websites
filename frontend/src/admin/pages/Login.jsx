@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthAPI } from '../../lib/api';
 import { useNavigate } from 'react-router-dom';
+import { ShieldAlert } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -289,13 +290,15 @@ export default function Login() {
                 </div>
                 */}
 
-                {/* Sign Up Link */}
-                <p className="text-center text-xs text-gray-600 mt-4 pt-3 border-t border-gray-200">
-                  Don't have an account?{' '}
-                  <a href="/admin/signup" className="text-blue-600 hover:text-blue-800 font-medium transition-colors hover:underline">
-                    Sign Up Now
-                  </a>
-                </p>
+                {/* Login Only System - No Signup */}
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <div className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F0F4FF 100%)', border: '1px solid #BFDBFE' }}>
+                    <ShieldAlert size={13} style={{ color: '#1D4ED8', flexShrink: 0 }} />
+                    <span style={{ fontSize: '11px', color: '#1E40AF', fontWeight: 600, letterSpacing: '0.02em' }}>
+                      Admin access is restricted &mdash; contact your administrator
+                    </span>
+                  </div>
+                </div>
               </form>
             </div>
           </div>
