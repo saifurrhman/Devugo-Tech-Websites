@@ -4,6 +4,11 @@ const Contact = require('../models/Contact');
 const Message = require('../models/Message');
 const EmailRecipient = require('../models/EmailRecipient');
 const EmailList = require('../models/EmailList');
+const searchController = require('../controllers/searchController');
+
+// Lead Search
+router.post('/search', searchController.createSearch);
+router.get('/search-logs', searchController.getSearchLogs);
 
 // Create contact submission
 router.post('/', async (req, res) => {

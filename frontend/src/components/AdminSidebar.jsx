@@ -4,7 +4,7 @@ import { AuthAPI } from '../lib/api';
 import {
   LayoutDashboard, Briefcase, CreditCard, Image, Star, HelpCircle, FileText,
   Share2, Edit, Users, UserCheck, Send, UserPlus, Inbox, Layout, BarChart,
-  GitMerge, Folder, Calendar, PieChart, Settings, User, LogOut, Menu, Shield, Wrench, X
+  GitMerge, Folder, Calendar, PieChart, Settings, User, LogOut, Menu, Shield, Wrench, X, Target, MapPin, History, List
 } from 'lucide-react';
 
 export default function AdminSidebar() {
@@ -213,6 +213,41 @@ export default function AdminSidebar() {
               <span className="icon"><UserCheck size={20} /></span>
               <span className="label">Contacts</span>
             </NavLink>
+          )}
+
+          {/* 🔥 LEAD GENERATION SECTION 🔥 */}
+          {isEmailAdmin && (
+            <>
+              <div className="nav-divider">
+                <span className="nav-divider__label">Lead Generation</span>
+              </div>
+
+              <NavLink to="/admin/leads" end className={({ isActive }) => `admin-link ${isActive && !location.search ? 'active' : ''}`}>
+                <span className="icon"><Users size={20} /></span>
+                <span className="label">All Leads</span>
+                <span className="badge badge--new">New</span>
+              </NavLink>
+
+              <NavLink to="/admin/leads?group=industry" end className={({ isActive }) => `admin-link ${location.search.includes('group=industry') ? 'active' : ''}`}>
+                <span className="icon"><Briefcase size={20} /></span>
+                <span className="label">By Industry</span>
+              </NavLink>
+
+              <NavLink to="/admin/leads?group=source" end className={({ isActive }) => `admin-link ${location.search.includes('group=source') ? 'active' : ''}`}>
+                <span className="icon"><MapPin size={20} /></span>
+                <span className="label">By Source</span>
+              </NavLink>
+
+              <NavLink to="/admin/leads?sort=score" end className={({ isActive }) => `admin-link ${location.search.includes('sort=score') ? 'active' : ''}`}>
+                <span className="icon"><Target size={20} /></span>
+                <span className="label">Lead Score</span>
+              </NavLink>
+
+              <NavLink to="/admin/leads/import-logs" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><History size={20} /></span>
+                <span className="label">Import Logs</span>
+              </NavLink>
+            </>
           )}
 
           {/* 🔥 EMAIL MARKETING SECTION 🔥 */}

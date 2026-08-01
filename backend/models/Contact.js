@@ -14,9 +14,19 @@ const ContactSchema = new mongoose.Schema({
   // CRM Fields
   status: {
     type: String,
-    enum: ['New', 'Verified', 'Unverified', 'Bounced', 'Unsubscribed'],
+    enum: ['New', 'Verified', 'Unverified', 'Bounced', 'Unsubscribed', 'Contacted', 'Interested', 'Not Interested', 'Closed'],
     default: 'New'
   },
+  
+  // Lead Generation specific
+  source_platform: { type: String, trim: true, default: 'manual' }, // google_maps, linkedin, etc.
+  industry_tag: { type: String, trim: true },
+  lead_score: { type: Number, min: 0, max: 100, default: 0 },
+  imported_via: { type: String, trim: true },
+  imported_at: { type: Date },
+  last_contacted_at: { type: Date },
+  ai_classification: { type: String, trim: true }, // interested, not_interested, question
+
   tags: [{ type: String, trim: true }],
   stats: {
     emailsSent: { type: Number, default: 0 },

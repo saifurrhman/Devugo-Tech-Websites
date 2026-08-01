@@ -1,6 +1,7 @@
 const Sender = require('../models/Sender');
 const { encrypt } = require('../utils/encryption');
 const logger = require('../utils/logger');
+const nodemailer = require('nodemailer');
 // We will still keep smtpConfig for reference if needed, but not for Brevo anymore
 const smtpConfig = require('../config/smtp');
 
@@ -47,11 +48,42 @@ exports.createSender = async (req, res) => {
             if (!smtpHost || !smtpPort || !smtpUser || !smtpPass) {
                 return res.status(400).json({ message: 'SMTP credentials are required for SMTP type' });
             }
+
+            // Verify SMTP connection before saving
+            try {
+                const transporter = nodemailer.createTransport({
+                    host: smtpHost,
+                    port: parseInt(smtpPort),
+                    secure: smtpSecure === undefined ? true : smtpSecure,
+                    auth: {
+                        user: smtpUser,
+                        pass: smtpPass
+                    },
+                    tls: {
+                        rejectUnauthorized: false
+                    }
+                });
+                
+                await transporter.verify();
+            } catch (smtpError) {
+                console.error('SMTP Verification Failed:', smtpError);
+                let errorMessage = 'SMTP Connection failed: Authentication error or invalid details.';
+                
+                // Gmail specific hint for App Passwords
+                if (smtpHost.includes('gmail.com') && smtpError.response && smtpError.response.includes('Username and Password not accepted')) {
+                    errorMessage = 'Gmail SMTP Verification Failed: Google blocked this request. You MUST use a 16-digit Gmail App Password instead of your normal password. Go to Google Account > Security > 2-Step Verification > App Passwords.';
+                } else if (smtpError.message) {
+                    errorMessage = `SMTP Verification Failed: ${smtpError.message}`;
+                }
+                
+                return res.status(400).json({ error: errorMessage });
+            }
+
             senderData.smtpHost = smtpHost;
             senderData.smtpPort = smtpPort;
             senderData.smtpUser = smtpUser;
             senderData.smtpPass = encrypt(smtpPass);
-            senderData.smtpSecure = smtpSecure || true;
+            senderData.smtpSecure = smtpSecure === undefined ? true : smtpSecure;
         }
 
         const sender = await Sender.create(senderData);

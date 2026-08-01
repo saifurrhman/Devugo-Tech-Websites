@@ -44,6 +44,8 @@ import ServiceEdit from '../admin/pages/ServiceEdit';
 import PricingPlans from '../admin/pages/PricingPlans';
 import Leads from '../admin/pages/Leads';
 import LeadEdit from '../admin/pages/LeadEdit';
+import LeadSearch from '../admin/pages/LeadSearch';
+import LeadImportLogs from '../admin/pages/LeadImportLogs';
 import PortfolioCategories from '../admin/pages/PortfolioCategories';
 import BlogCategories from '../admin/pages/BlogCategories';
 import TechStack from '../admin/pages/TechStack';
@@ -159,6 +161,8 @@ export default function PublicRoutes() {
           <Route path="/admin/contacts/upload" element={<ProtectedRoute><ContactsUpload /></ProtectedRoute>} />
           <Route path="/admin/recipients/upload" element={<ProtectedRoute><ContactsUpload /></ProtectedRoute>} />
           <Route path="/admin/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
+          <Route path="/admin/leads/search" element={<ProtectedRoute><LeadSearch /></ProtectedRoute>} />
+          <Route path="/admin/leads/import-logs" element={<ProtectedRoute><LeadImportLogs /></ProtectedRoute>} />
           <Route path="/admin/leads/:id" element={<ProtectedRoute><LeadEdit /></ProtectedRoute>} />
           <Route path="/admin/forms" element={<ProtectedRoute><Forms /></ProtectedRoute>} />
 

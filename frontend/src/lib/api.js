@@ -125,6 +125,8 @@ export const ContactAPI = {
   import: (payload) => api('/api/contact/import', { method: 'POST', body: payload }),
   verify: (id) => api(`/api/contact/${id}/verify`, { method: 'POST' }),
   verifyBatch: (emails) => api('/api/contact/verify-batch', { method: 'POST', body: { emails } }),
+  search: (payload) => api('/api/contact/search', { method: 'POST', body: payload }),
+  getSearchLogs: () => api('/api/contact/search-logs'),
 };
 
 export const ListAPI = {

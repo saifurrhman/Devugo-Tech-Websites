@@ -3,7 +3,7 @@ const Notification = require('../models/Notification');
 
 exports.list = async (req, res) => {
     try {
-        const { status, search, sort, days } = req.query;
+        const { status, search, sort, days, source_platform, industry_tag, min_score, max_score } = req.query;
         const filter = {};
 
         // Status Filter
@@ -17,6 +17,19 @@ exports.list = async (req, res) => {
                 { name: { $regex: search, $options: 'i' } },
                 { email: { $regex: search, $options: 'i' } }
             ];
+        }
+
+        // Lead Generation Filters
+        if (source_platform && source_platform !== 'all') {
+            filter.source_platform = source_platform;
+        }
+        if (industry_tag && industry_tag !== 'all') {
+            filter.industry_tag = industry_tag;
+        }
+        if (min_score || max_score) {
+            filter.lead_score = {};
+            if (min_score) filter.lead_score.$gte = Number(min_score);
+            if (max_score) filter.lead_score.$lte = Number(max_score);
         }
 
         // Date Range (for "Added in last X days")
@@ -54,10 +67,26 @@ exports.create = async (req, res) => {
             return res.status(400).json({ error: 'Contact with this email already exists' });
         }
 
+        // Format Status
+        let finalStatus = 'New';
+        if (req.body.status) {
+            const s = req.body.status.toLowerCase();
+            if (s === 'not_interested' || s === 'not interested') finalStatus = 'Not Interested';
+            else if (s === 'contacted') finalStatus = 'Contacted';
+            else if (s === 'interested') finalStatus = 'Interested';
+            else if (s === 'closed') finalStatus = 'Closed';
+            else finalStatus = req.body.status.charAt(0).toUpperCase() + req.body.status.slice(1);
+        }
+
         const contact = new Contact({
             ...req.body,
-            status: 'New'
+            status: finalStatus
         });
+
+        // Set imported_at if imported via agent
+        if (contact.imported_via && !contact.imported_at) {
+            contact.imported_at = new Date();
+        }
 
         await contact.save();
         res.status(201).json(contact);

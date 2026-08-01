@@ -62,6 +62,8 @@ export default function Integrations() {
     const [apiKeys, setApiKeys] = useState([]);
     const [creatingKey, setCreatingKey] = useState(false);
     const [newKey, setNewKey] = useState(null);
+    const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
+    const [newKeyName, setNewKeyName] = useState('');
 
     // ===========================
     // EMAIL LOGIC
@@ -516,13 +518,17 @@ export default function Integrations() {
         } catch (e) { console.error('Keys load error', e); }
     };
 
-    const handleCreateKey = async () => {
+    const handleCreateKey = async (e) => {
+        if (e) e.preventDefault();
         setCreatingKey(true);
         try {
-            const res = await ApiKeyAPI.create({ name: 'n8n Integration', scopes: ['metrics:write', 'blog:write', 'contacts:write'] });
+            const keyName = newKeyName.trim() || 'n8n Integration';
+            const res = await ApiKeyAPI.create({ name: keyName, scopes: ['metrics:write', 'blog:write', 'contacts:write'] });
             setNewKey(res);
             success('API Key Generated');
             loadApiKeys();
+            setIsKeyModalOpen(false);
+            setNewKeyName('');
         } catch (err) { notifyError(err.message); } finally { setCreatingKey(false); }
     };
 
@@ -970,8 +976,8 @@ export default function Integrations() {
                                             <h2 className="text-xl font-bold flex items-center gap-2">
                                                 <Key className="text-emerald-500" /> API Access (n8n & External Tools)
                                             </h2>
-                                            <button onClick={handleCreateKey} disabled={creatingKey} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-sm font-bold flex items-center gap-2">
-                                                {creatingKey ? 'Generating...' : <><Plus size={16} /> Generate Key</>}
+                                            <button onClick={() => setIsKeyModalOpen(true)} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-sm font-bold flex items-center gap-2">
+                                                <Plus size={16} /> Generate Key
                                             </button>
                                         </div>
 
@@ -1004,7 +1010,7 @@ export default function Integrations() {
                                                                     title="No active keys"
                                                                     description="Generate an API key to allow external tools to access data."
                                                                     actionLabel="Generate Key"
-                                                                    onAction={handleCreateKey}
+                                                                    onAction={() => setIsKeyModalOpen(true)}
                                                                 />
                                                             </td>
                                                         </tr>
@@ -1029,6 +1035,35 @@ export default function Integrations() {
                         )}
                     </div>
                 </div>
+
+                {/* API KEY MODAL */}
+                {isKeyModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                        <div className="bg-[#003560] rounded-2xl border border-white/10 w-full max-w-md shadow-2xl">
+                            <div className="p-6 border-b border-white/10">
+                                <h3 className="text-xl font-bold text-white">Generate API Key</h3>
+                                <p className="text-blue-200/60 text-sm mt-1">Create a new key to allow external tools to access your data.</p>
+                            </div>
+                            <form onSubmit={handleCreateKey} className="p-6">
+                                <div className="mb-4">
+                                    <label className="block text-xs font-semibold text-blue-200/80 mb-1 uppercase tracking-wider">Key Name</label>
+                                    <input 
+                                        autoFocus
+                                        value={newKeyName} 
+                                        onChange={e => setNewKeyName(e.target.value)} 
+                                        type="text" 
+                                        placeholder="e.g. Make.com Integration" 
+                                        className="w-full bg-[#002747] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20" 
+                                    />
+                                </div>
+                                <div className="flex justify-end gap-3 mt-6">
+                                    <button type="button" onClick={() => setIsKeyModalOpen(false)} className="px-4 py-2 text-sm text-blue-200/60 hover:text-white">Cancel</button>
+                                    <button disabled={creatingKey} type="submit" className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-semibold">{creatingKey ? 'Generating...' : 'Generate'}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
