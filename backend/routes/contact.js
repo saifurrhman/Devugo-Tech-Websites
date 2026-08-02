@@ -136,12 +136,16 @@ router.post('/import', async (req, res) => {
   try {
     let contacts = [];
     let listId = null;
+    let searchId = null;
 
     // Handle single object from n8n webhook
     if (req.body && !Array.isArray(req.body) && !req.body.contacts) {
       contacts = [req.body];
+      searchId = req.body.search_id;
     } else if (Array.isArray(req.body)) {
       contacts = req.body;
+      // In array format from n8n, search_id might be inside the first object
+      if (contacts.length > 0) searchId = contacts[0].search_id;
     } else if (req.body.contacts && Array.isArray(req.body.contacts)) {
       contacts = req.body.contacts;
       listId = req.body.listId;
@@ -196,7 +200,16 @@ router.post('/import', async (req, res) => {
       await ContactList.findByIdAndUpdate(listId, { count: listCount });
     }
 
-    return res.json({ success: true, count, errors });
+    // Update SearchRequest Log if searchId was provided
+    if (searchId) {
+       const SearchRequest = require('../models/SearchRequest');
+       await SearchRequest.findByIdAndUpdate(searchId, {
+           status: 'Completed',
+           leads_found: count
+       });
+    }
+
+    return res.json({ success: true, imported: count, message: `Successfully imported ${count} contacts.` });
   } catch (err) {
     console.error('Import error:', err.message);
     return res.status(500).json({ success: false, message: 'Import failed: ' + err.message });
