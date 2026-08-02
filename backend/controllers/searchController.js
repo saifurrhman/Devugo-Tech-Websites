@@ -21,8 +21,12 @@ exports.createSearch = async (req, res) => {
         let aiSetting = await Setting.findOne({ key: 'ai' });
         let webhookUrl = null;
         if (aiSetting && aiSetting.value && aiSetting.value.agents) {
-            const agent = aiSetting.value.agents.find(a => a.scope === 'leads' || a.name.includes('Lead Hunter'));
-            if (agent && agent.webhook) {
+            // Find the first agent that has the correct scope/name AND has a non-empty webhook
+            const agent = aiSetting.value.agents.find(a => 
+                (a.scope === 'leads' || a.name.includes('Lead Hunter') || a.name.includes('Leads')) && 
+                a.webhook && a.webhook.trim() !== ''
+            );
+            if (agent) {
                 webhookUrl = agent.webhook;
             }
         }
