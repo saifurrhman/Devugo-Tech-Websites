@@ -37,26 +37,32 @@ exports.createSearch = async (req, res) => {
         }
 
         if (webhookUrl) {
-            // 3. Trigger webhook asynchronously
-            fetch(webhookUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    search_id: searchRequest._id,
-                    industry,
-                    location,
-                    sources,
-                    max_results
-                })
-            }).then(resp => {
+            // 3. Trigger webhook
+            try {
+                const resp = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        search_id: searchRequest._id,
+                        industry,
+                        location,
+                        sources,
+                        max_results
+                    })
+                });
+                
                 if (!resp.ok) {
                     console.error('Webhook returned error status:', resp.status);
-                    SearchRequest.findByIdAndUpdate(searchRequest._id, { status: 'Failed', error_message: 'Webhook error: ' + resp.status }).exec();
+                    searchRequest.status = 'Failed';
+                    searchRequest.error_message = 'Webhook error: ' + resp.status;
+                    await searchRequest.save();
                 }
-            }).catch(err => {
+            } catch (err) {
                 console.error('Failed to trigger n8n webhook:', err);
-                SearchRequest.findByIdAndUpdate(searchRequest._id, { status: 'Failed', error_message: err.message }).exec();
-            });
+                searchRequest.status = 'Failed';
+                searchRequest.error_message = err.message;
+                await searchRequest.save();
+            }
         } else {
             console.warn('No webhook URL found for Lead Hunter agent.');
             // We might still keep it as 'Running' or mark as Failed.
