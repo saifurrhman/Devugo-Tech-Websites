@@ -6951,3 +6951,21 @@
 {"timestamp":"2026-08-01T10:30:00.409Z","level":"INFO","message":"Updated stats for 0 recipients"}
 {"timestamp":"2026-08-01T10:35:00.058Z","level":"INFO","message":"AI Personalizer job started"}
 {"timestamp":"2026-08-01T10:35:00.160Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-02T16:00:58.145Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-02T16:00:58.204Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-02T16:00:58.262Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-02T16:00:58.290Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-02T16:00:58.298Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-02T16:00:58.389Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-02T16:00:58.390Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-02T16:00:58.393Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-02T16:00:58.397Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-02T16:00:58.402Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-02T16:01:28.607Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-02T16:05:00.072Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-02T16:05:00.148Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-02T16:10:00.070Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-02T16:10:00.180Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-02T16:10:00.278Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-02T16:10:00.337Z","level":"INFO","message":"Updated stats for 1 campaigns"}
+{"timestamp":"2026-08-02T16:10:00.430Z","level":"INFO","message":"Updated stats for 0 recipients"}

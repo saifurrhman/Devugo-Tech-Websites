@@ -137,14 +137,16 @@ router.post('/import', async (req, res) => {
     let contacts = [];
     let listId = null;
 
-    // Handle both array (legacy) and object with listId
-    if (Array.isArray(req.body)) {
+    // Handle single object from n8n webhook
+    if (req.body && !Array.isArray(req.body) && !req.body.contacts) {
+      contacts = [req.body];
+    } else if (Array.isArray(req.body)) {
       contacts = req.body;
     } else if (req.body.contacts && Array.isArray(req.body.contacts)) {
       contacts = req.body.contacts;
       listId = req.body.listId;
     } else {
-      return res.status(400).json({ success: false, message: 'Invalid data format. Expected array or { contacts, listId }.' });
+      return res.status(400).json({ success: false, message: 'Invalid data format. Expected array, { contacts, listId }, or single object.' });
     }
 
     let count = 0;
@@ -153,7 +155,13 @@ router.post('/import', async (req, res) => {
 
     for (const c of contacts) {
       try {
-        if (!c.email) continue;
+        // Map full_name to name (n8n compatibility)
+        if (c.full_name && !c.name) c.name = c.full_name;
+        
+        // Handle missing emails for scraped leads
+        if (!c.email) {
+          c.email = `lead_${Date.now()}_${Math.random().toString(36).substring(7)}@no-email.local`;
+        }
 
         // Check duplicate
         const exists = await Contact.findOne({ email: c.email });

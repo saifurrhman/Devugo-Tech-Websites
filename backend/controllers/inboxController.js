@@ -298,7 +298,52 @@ exports.sendMessage = async (req, res) => {
 
         res.json({ success: true, data: message });
     } catch (error) {
-        console.error('Send message error:', error);
-        res.status(500).json({ success: false, message: error.message });
+    console.error('Error sending reply:', error);
+    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+  }
+};
+
+exports.classifyMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { sentiment, topics, priority, requiresAction, internalNotes } = req.body;
+
+    const message = await Message.findById(id);
+    if (!message) {
+      return res.status(404).json({ success: false, message: 'Message not found' });
     }
+
+    message.aiAnalysis = {
+      sentiment: sentiment || message.aiAnalysis.sentiment,
+      topics: topics || message.aiAnalysis.topics,
+      priority: priority || message.aiAnalysis.priority,
+      requiresAction: requiresAction !== undefined ? requiresAction : message.aiAnalysis.requiresAction
+    };
+
+    if (internalNotes) {
+      message.internalNotes = message.internalNotes || [];
+      message.internalNotes.push({
+        text: internalNotes,
+        createdBy: 'n8n AI Agent',
+        createdAt: new Date()
+      });
+    }
+
+    // Also update the sender Contact's AI classification if applicable
+    if (message.from && message.from.email) {
+       const Contact = require('../models/Contact');
+       await Contact.findOneAndUpdate(
+         { email: message.from.email.toLowerCase() },
+         { ai_classification: sentiment },
+         { new: true }
+       );
+    }
+
+    await message.save();
+
+    res.status(200).json({ success: true, message: 'Message classified successfully', data: message });
+  } catch (error) {
+    console.error('Error classifying message:', error);
+    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+  }
 };
