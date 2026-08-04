@@ -162,6 +162,11 @@ router.post('/import', async (req, res) => {
         // Map full_name to name (n8n compatibility)
         if (c.full_name && !c.name) c.name = c.full_name;
         
+        // Fallback for name if still missing (required by Contact model)
+        if (!c.name) {
+          c.name = c.company || c.title || `Unknown Lead ${Math.floor(Math.random() * 1000)}`;
+        }
+
         // Handle missing emails for scraped leads
         if (!c.email) {
           c.email = `lead_${Date.now()}_${Math.random().toString(36).substring(7)}@no-email.local`;
