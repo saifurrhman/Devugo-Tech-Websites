@@ -537,6 +537,15 @@ console.log('🎯 CRM routes loading complete\n');
 // BACKGROUND JOBS
 // ========================================
 
+try {
+  console.log('📱 Loading SocialSuite routes...');
+  const socialRoutes = require('./routes/socialRoutes');
+  app.use('/api/social', socialRoutes);
+  console.log('  ✅ SocialSuite routes loaded');
+} catch (error) {
+  console.error('  ❌ SocialSuite routes error:', error.message);
+}
+
 if (process.env.ENABLE_JOBS !== 'false' && process.env.NODE_ENV !== 'test') {
   console.log('⚙️  Starting background jobs...');
 
@@ -560,6 +569,10 @@ if (process.env.ENABLE_JOBS !== 'false' && process.env.NODE_ENV !== 'test') {
     // Start Blog Automation Job
     require('./jobs/blogAutomation');
     console.log('✅ Blog Automation job started');
+
+    // Start Social Scheduler Job
+    require('./jobs/socialScheduler');
+    console.log('✅ Social Scheduler job started');
 
     console.log('🎉 All background jobs started successfully!');
   } catch (error) {

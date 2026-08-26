@@ -170,6 +170,12 @@ export default function AdminSidebar() {
                 <span className="label">Forms</span>
               </NavLink>
 
+              <NavLink to="/admin/social" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
+                <span className="icon"><Share2 size={20} /></span>
+                <span className="label">SocialSuite</span>
+                <span className="badge badge--new">New</span>
+              </NavLink>
+
               <NavLink to="/admin/social-links" className={({ isActive }) => `admin-link ${isActive ? 'active' : ''}`}>
                 <span className="icon"><Share2 size={20} /></span>
                 <span className="label">Social Links</span>

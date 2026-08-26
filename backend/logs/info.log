@@ -7017,3 +7017,254 @@
 {"timestamp":"2026-08-02T17:20:00.370Z","level":"INFO","message":"Updated stats for 0 campaigns"}
 {"timestamp":"2026-08-02T17:20:00.420Z","level":"INFO","message":"No pending AI personalization requests"}
 {"timestamp":"2026-08-02T17:20:00.511Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T10:55:24.963Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T10:55:24.982Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-04T10:55:25.018Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T10:55:25.018Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T10:55:25.019Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-04T10:55:25.058Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T10:55:25.059Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-04T10:55:25.061Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-04T10:55:25.062Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-04T10:55:25.064Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-04T10:55:36.701Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-04T11:00:00.075Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T11:00:00.095Z","level":"INFO","message":"Follow-up Automation job started"}
+{"timestamp":"2026-08-04T11:00:00.102Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T11:00:00.171Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T11:00:00.181Z","level":"INFO","message":"No-open follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T11:00:00.185Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T11:00:00.261Z","level":"INFO","message":"No-click follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T11:00:00.269Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T11:00:00.342Z","level":"INFO","message":"No-reply follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T11:00:00.932Z","level":"INFO","message":"Re-engagement emails sent","data":{"count":0}}
+{"timestamp":"2026-08-04T11:00:00.934Z","level":"INFO","message":"Follow-up automation completed"}
+{"timestamp":"2026-08-04T11:05:00.040Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T11:05:00.130Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T11:10:00.082Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T11:10:00.088Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T11:10:00.167Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T11:10:00.171Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T11:10:00.253Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T11:15:00.069Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T11:15:00.160Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T11:20:00.050Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T11:20:00.053Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T11:20:00.149Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T11:20:00.463Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T11:20:00.644Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T11:25:00.048Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T11:25:00.127Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T11:30:00.067Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T11:30:00.070Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T11:30:00.146Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T11:30:00.517Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T11:30:00.598Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T12:38:18.892Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:38:18.924Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-04T12:38:18.893Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:38:18.925Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-04T12:38:18.951Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:38:18.952Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:38:18.952Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-04T12:38:18.951Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:38:18.956Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:38:18.957Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-04T12:38:18.979Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:38:18.979Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-04T12:38:18.980Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-04T12:38:18.980Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-04T12:38:18.981Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-04T12:38:18.980Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:38:18.984Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-04T12:38:18.986Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-04T12:38:18.991Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-04T12:38:18.992Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-04T12:38:27.400Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-04T12:38:27.404Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-04T12:40:00.056Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T12:40:00.057Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T12:40:00.091Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T12:40:00.095Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T12:40:54.547Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:40:54.634Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-04T12:40:54.885Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:40:54.932Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:40:55.001Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-04T12:40:55.146Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:40:55.159Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-04T12:40:55.166Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-04T12:40:55.177Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-04T12:40:55.195Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-04T12:40:57.347Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-04T12:48:29.562Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:48:29.563Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-04T12:48:29.584Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:48:29.585Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:48:29.585Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-04T12:48:29.598Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:48:29.598Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-04T12:48:29.599Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-04T12:48:29.599Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-04T12:48:29.600Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-04T12:48:31.537Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-04T12:48:47.638Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:48:47.639Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-04T12:48:47.653Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:48:47.653Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:48:47.654Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-04T12:48:47.662Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T12:48:47.663Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-04T12:48:47.664Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-04T12:48:47.665Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-04T12:48:47.666Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-04T12:48:48.141Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-04T12:50:00.107Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T12:50:00.119Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T12:50:00.119Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T12:50:00.125Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T12:50:00.320Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T12:50:00.326Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T12:50:00.323Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T12:50:00.342Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T12:50:00.494Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T12:50:00.494Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T12:55:00.057Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T12:55:00.075Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T12:55:00.229Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T12:55:00.764Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:00:00.298Z","level":"INFO","message":"Follow-up Automation job started"}
+{"timestamp":"2026-08-04T13:00:00.395Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:00:00.569Z","level":"INFO","message":"Follow-up Automation job started"}
+{"timestamp":"2026-08-04T13:00:01.047Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:00:01.112Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:00:01.368Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:00:01.878Z","level":"INFO","message":"No-open follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T13:00:01.984Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:00:02.031Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:00:01.992Z","level":"INFO","message":"No-open follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T13:00:02.100Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:00:02.246Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:00:02.282Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:00:02.285Z","level":"INFO","message":"No-click follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T13:00:02.384Z","level":"INFO","message":"No-reply follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T13:00:02.564Z","level":"INFO","message":"No-click follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T13:00:02.700Z","level":"INFO","message":"Re-engagement emails sent","data":{"count":0}}
+{"timestamp":"2026-08-04T13:00:02.700Z","level":"INFO","message":"Follow-up automation completed"}
+{"timestamp":"2026-08-04T13:00:02.998Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:00:03.071Z","level":"INFO","message":"No-reply follow-ups sent","data":{"count":0}}
+{"timestamp":"2026-08-04T13:00:04.044Z","level":"INFO","message":"Re-engagement emails sent","data":{"count":0}}
+{"timestamp":"2026-08-04T13:00:04.045Z","level":"INFO","message":"Follow-up automation completed"}
+{"timestamp":"2026-08-04T13:05:00.057Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:05:00.068Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:05:00.152Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:05:00.185Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:10:00.075Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:10:00.084Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:10:00.097Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:10:00.098Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:10:00.174Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:10:00.178Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:10:00.174Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:10:00.251Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:10:00.267Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:10:00.346Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:15:00.054Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:15:00.084Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:15:00.138Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:15:00.181Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:20:00.067Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:20:00.067Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:20:00.070Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:20:00.072Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:20:00.176Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:20:00.175Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:20:00.178Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:20:00.180Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:20:00.255Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:20:00.255Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:25:00.066Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:25:00.072Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:25:00.581Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:25:00.586Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:26:24.395Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T13:26:24.396Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-04T13:26:24.894Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T13:26:24.895Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T13:26:24.897Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-04T13:26:24.915Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-04T13:26:24.916Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-04T13:26:24.917Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-04T13:26:24.918Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-04T13:26:24.919Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-04T13:26:27.234Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-04T13:30:00.082Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:30:00.091Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:30:00.098Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:30:00.105Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:30:00.164Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:30:00.176Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:30:00.183Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:30:00.184Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:30:00.258Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:30:00.264Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:35:00.060Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:35:00.076Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:35:00.146Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:35:00.156Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:40:00.044Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:40:00.051Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:40:00.070Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-04T13:40:00.064Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:40:00.161Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:40:00.160Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:40:00.164Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:40:00.166Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-04T13:40:00.243Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:40:00.245Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-04T13:45:00.077Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:45:00.079Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-04T13:45:00.154Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-04T13:45:00.157Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-26T09:43:07.805Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T09:43:07.867Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-26T09:43:07.987Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T09:43:07.989Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T09:43:07.991Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-26T09:43:08.103Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T09:43:08.108Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-26T09:43:08.111Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-26T09:43:08.116Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-26T09:43:08.120Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-26T09:43:19.602Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-26T09:45:00.083Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-26T09:45:00.233Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-26T10:00:06.295Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T10:00:06.317Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-26T10:00:06.369Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T10:00:06.369Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T10:00:06.370Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-26T10:00:06.418Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T10:00:06.433Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-26T10:00:06.434Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-26T10:00:06.435Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-26T10:00:06.436Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-26T10:00:20.773Z","level":"INFO","message":"✅ Blog Automation job initialized"}
+{"timestamp":"2026-08-26T10:05:02.238Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-26T10:05:04.143Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-26T10:10:01.192Z","level":"INFO","message":"Email Tracker job started"}
+{"timestamp":"2026-08-26T10:10:01.200Z","level":"INFO","message":"AI Personalizer job started"}
+{"timestamp":"2026-08-26T10:10:01.931Z","level":"INFO","message":"No pending AI personalization requests"}
+{"timestamp":"2026-08-26T10:10:01.938Z","level":"INFO","message":"Updated stats for 0 campaigns"}
+{"timestamp":"2026-08-26T10:10:02.191Z","level":"INFO","message":"Updated stats for 0 recipients"}
+{"timestamp":"2026-08-26T10:36:25.298Z","level":"INFO","message":"✅ AI Personalizer job scheduled: */5 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T10:36:25.420Z","level":"INFO","message":"   Batch size: 10 requests per run"}
+{"timestamp":"2026-08-26T10:36:25.484Z","level":"INFO","message":"✅ Email Tracker job scheduled: */10 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T10:36:25.485Z","level":"INFO","message":"✅ Cleanup scheduled: 0 2 * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T10:36:25.486Z","level":"INFO","message":"   Cleanup after: 90 days"}
+{"timestamp":"2026-08-26T10:36:25.700Z","level":"INFO","message":"✅ Follow-up Automation scheduled: 0 * * * * (Asia/Karachi)"}
+{"timestamp":"2026-08-26T10:36:25.700Z","level":"INFO","message":"   No-open follow-up after: 3 days"}
+{"timestamp":"2026-08-26T10:36:25.701Z","level":"INFO","message":"   No-click follow-up after: 2 days"}
+{"timestamp":"2026-08-26T10:36:25.703Z","level":"INFO","message":"   No-reply follow-up after: 5 days"}
+{"timestamp":"2026-08-26T10:36:25.706Z","level":"INFO","message":"   Re-engagement after: 30 days"}
+{"timestamp":"2026-08-26T10:39:48.110Z","level":"INFO","message":"✅ Blog Automation job initialized"}

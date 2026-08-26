@@ -58,6 +58,7 @@ import FAQEdit from '../admin/pages/FAQEdit';
 import Forms from '../admin/pages/Forms';
 import Faq from '../pages/Faq';
 import SocialLinks from '../admin/pages/SocialLinks';
+import SocialSuite from '../admin/pages/SocialSuite';
 import Settings from '../admin/pages/Settings';
 import WhatsAppFloat from '../components/WhatsAppFloat';
 import { NotificationProvider } from '../contexts/NotificationContext';
@@ -190,6 +191,7 @@ export default function PublicRoutes() {
 
           {/* Admin Settings */}
           <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+          <Route path="/admin/social" element={<ProtectedRoute><SocialSuite /></ProtectedRoute>} />
           <Route path="/admin/social-links" element={<ProtectedRoute><SocialLinks /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 

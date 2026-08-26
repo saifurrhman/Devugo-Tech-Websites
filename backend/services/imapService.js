@@ -27,6 +27,15 @@ class ImapService {
             logger: false
         });
 
+        // Handle background errors (like ECONNRESET) so they don't crash the server
+        this.client.on('error', (err) => {
+            console.error('[IMAP] Client background error:', err.message);
+        });
+        
+        this.client.on('close', () => {
+            console.log('[IMAP] Connection closed');
+        });
+
         try {
             await this.client.connect();
             console.log('[IMAP] Connected to Gmail IMAP successfully');

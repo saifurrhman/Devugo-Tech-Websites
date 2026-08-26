@@ -176,7 +176,12 @@ router.post('/import', async (req, res) => {
         const exists = await Contact.findOne({ email: c.email });
         if (!exists) {
           // Defaults
-          if (!c.status) c.status = 'Unverified';
+          if (!c.status) {
+            c.status = 'Unverified';
+          } else {
+            // Ensure proper casing for Mongoose enum (e.g. 'new' -> 'New', 'not interested' -> 'Not Interested')
+            c.status = c.status.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+          }
           if (!c.source) c.source = 'Import';
 
           if (listId) {
@@ -210,7 +215,7 @@ router.post('/import', async (req, res) => {
        const SearchRequest = require('../models/SearchRequest');
        await SearchRequest.findByIdAndUpdate(searchId, {
            status: 'Completed',
-           leads_found: count
+           $inc: { leads_found_count: count }
        });
     }
 
