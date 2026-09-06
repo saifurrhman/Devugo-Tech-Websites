@@ -8,6 +8,7 @@ export default function TechnologiesSection() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [isPaused, setIsPaused] = useState(false);
   const scrollTrackRef = useRef(null);
 
   useEffect(() => {
@@ -40,6 +41,26 @@ export default function TechnologiesSection() {
     if (activeCategory === 'All') return technologies;
     return technologies.filter(t => t.category === activeCategory);
   }, [technologies, activeCategory]);
+
+  // Smooth continuous auto-scroll loop
+  useEffect(() => {
+    if (isPaused || filteredTech.length <= 1) return;
+    const track = scrollTrackRef.current;
+    if (!track) return;
+
+    const interval = setInterval(() => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      if (maxScroll <= 0) return;
+      
+      if (track.scrollLeft >= maxScroll - 2) {
+        track.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        track.scrollLeft += 1;
+      }
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, [isPaused, filteredTech]);
 
   const scrollLeft = () => {
     if (scrollTrackRef.current) {
@@ -128,7 +149,11 @@ export default function TechnologiesSection() {
 
         {/* Carousel Container with Vertically-Centered Arrow Buttons */}
         {filteredTech.length > 0 && (
-          <div className="relative group/carousel px-2 md:px-12">
+          <div 
+            className="relative group/carousel px-2 md:px-12"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
             
             {/* Left Circular Arrow Button */}
             <button
@@ -167,7 +192,7 @@ export default function TechnologiesSection() {
                   rel={tech.websiteUrl ? "noopener noreferrer" : ""}
                   className={`group relative flex flex-col items-center justify-between pt-7 pb-5 px-5 w-40 h-52 md:w-48 md:h-56 rounded-2xl flex-shrink-0 snap-start transition-all duration-300 overflow-hidden box-border ${
                     tech.featured 
-                      ? 'bg-gradient-to-b from-[#1f1810] to-[#0d0b08] border border-amber-500/45 hover:border-amber-400 shadow-[0_0_25px_rgba(255,193,7,0.18)] hover:shadow-[0_0_35px_rgba(255,193,7,0.3)]' 
+                      ? 'bg-gradient-to-b from-[#241c10] via-[#16120b] to-[#0c0906] border border-amber-400/60 hover:border-amber-400 shadow-[0_0_25px_rgba(255,193,7,0.22)] hover:shadow-[0_0_35px_rgba(255,193,7,0.4)]' 
                       : 'bg-gradient-to-b from-[#161b26] to-[#0b0e15] border border-white/10 hover:border-blue-500/60 shadow-[0_4px_16px_rgba(0,0,0,0.35)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.5)]'
                   } hover:-translate-y-2`}
                   style={{
@@ -175,40 +200,40 @@ export default function TechnologiesSection() {
                     WebkitMaskImage: '-webkit-radial-gradient(white, black)'
                   }}
                 >
-                  {/* Subtle Top Inner Radial Glow */}
+                  {/* Top Inner Radial Glow */}
                   <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none ${
-                    tech.featured ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,193,7,0.25),transparent_70%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.2),transparent_70%)]'
+                    tech.featured ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,193,7,0.3),transparent_70%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.25),transparent_70%)]'
                   }`}></div>
 
-                  {/* Ribbon Corner Clipping */}
+                  {/* Vibrant Ribbon Corner Clipping for Featured */}
                   {tech.featured && (
                     <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-tr-2xl pointer-events-none z-20">
-                      <div className="absolute top-3 -right-6 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[9px] font-extrabold py-0.5 px-8 transform rotate-45 shadow-md uppercase tracking-wider">
+                      <div className="absolute top-3 -right-6 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-slate-950 text-[9px] font-black py-0.5 px-8 transform rotate-45 shadow-[0_2px_8px_rgba(255,193,7,0.5)] uppercase tracking-wider">
                         FEATURED
                       </div>
                     </div>
                   )}
                   
-                  {/* Icon Box with Soft Contrast & 14px Rounded Corners (Fix #3 & #5) */}
-                  <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-gray-200 group-hover:text-white transition-all duration-300 transform group-hover:scale-105 relative z-10 shrink-0">
+                  {/* Logo Container Style with Micro-Animations */}
+                  <div className="w-13 h-13 md:w-15 md:h-15 flex items-center justify-center text-gray-200 group-hover:text-white transition-all duration-300 transform group-hover:scale-110 group-hover:-rotate-2 relative z-10 shrink-0">
                     {tech.icon ? (
                       tech.icon.startsWith('http') || tech.icon.startsWith('/') || tech.icon.includes('base64') ? (
-                        <div className="w-full h-full p-2.5 rounded-[14px] bg-white/95 border border-white/20 shadow-[0_6px_16px_rgba(0,0,0,0.3)] flex items-center justify-center backdrop-blur-sm overflow-hidden">
-                          <img src={tech.icon} alt={tech.name} className="w-full h-full object-contain filter drop-shadow-sm rounded-lg" loading="lazy" />
+                        <div className="w-full h-full p-2.5 rounded-[16px] bg-white/95 border border-white/30 shadow-[0_8px_20px_rgba(0,0,0,0.35)] flex items-center justify-center backdrop-blur-md overflow-hidden group-hover:shadow-[0_10px_25px_rgba(0,0,0,0.45)] transition-all">
+                          <img src={tech.icon} alt={tech.name} className="w-full h-full object-contain filter drop-shadow-sm rounded-lg transform group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                         </div>
                       ) : (
-                        <div className="w-full h-full p-2 rounded-[14px] bg-white/[0.06] border border-white/10 shadow-[0_6px_16px_rgba(0,0,0,0.3)] flex items-center justify-center backdrop-blur-sm overflow-hidden [&>svg]:w-full [&>svg]:h-full [&>img]:w-full [&>img]:h-full [&>img]:object-contain [&>img]:rounded-lg [&>div]:w-full [&>div]:h-full [&>div]:rounded-lg [&>div]:overflow-hidden">
+                        <div className="w-full h-full p-2 rounded-[16px] bg-white/[0.08] border border-white/20 shadow-[0_8px_20px_rgba(0,0,0,0.35)] flex items-center justify-center backdrop-blur-md overflow-hidden group-hover:border-white/40 group-hover:bg-white/[0.14] transition-all [&>svg]:w-full [&>svg]:h-full [&>img]:w-full [&>img]:h-full [&>img]:object-contain [&>img]:rounded-lg [&>div]:w-full [&>div]:h-full [&>div]:rounded-lg [&>div]:overflow-hidden">
                           <span className="w-full h-full flex items-center justify-center" dangerouslySetInnerHTML={{ __html: tech.icon }}></span>
                         </div>
                       )
                     ) : (
-                      <div className="w-full h-full rounded-[14px] bg-slate-800/90 flex items-center justify-center border border-slate-700 shadow-[0_6px_16px_rgba(0,0,0,0.3)]">
+                      <div className="w-full h-full rounded-[16px] bg-slate-800/90 flex items-center justify-center border border-slate-700 shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
                         <span className="text-xl font-bold text-slate-300 group-hover:text-white">{tech.name.charAt(0)}</span>
                       </div>
                     )}
                   </div>
                   
-                  {/* Tool Title - Strict single line truncation */}
+                  {/* Tool Title */}
                   <h3 
                     className="w-full text-xs md:text-sm font-bold text-center text-slate-200 group-hover:text-white transition-colors px-1 truncate relative z-10 my-auto"
                     title={tech.name}
@@ -216,7 +241,7 @@ export default function TechnologiesSection() {
                     {tech.name}
                   </h3>
 
-                  {/* Glassy Badge Upgrade (Fix #6) */}
+                  {/* Glassy Badge Pill */}
                   <div className="relative z-10 w-full flex justify-center mt-auto">
                     <span className="px-3 py-1 text-[10px] font-semibold tracking-wider uppercase rounded-full bg-white/[0.06] backdrop-blur-md border border-white/[0.12] text-slate-300 group-hover:text-white group-hover:border-white/25 group-hover:bg-white/[0.12] transition-colors truncate max-w-full">
                       {tech.category}
