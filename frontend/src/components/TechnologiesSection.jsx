@@ -55,7 +55,7 @@ export default function TechnologiesSection() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-transparent text-white border-t border-gray-800">
+      <section className="py-16 bg-[#061c39] text-white border-t border-gray-800">
         <div className="container mx-auto px-4 text-center">
           <div className="animate-pulse space-y-4">
             <div className="h-10 bg-gray-800/60 rounded w-1/3 mx-auto"></div>
@@ -77,7 +77,7 @@ export default function TechnologiesSection() {
   if (technologies.length === 0) return null;
 
   return (
-    <section className="py-16 text-white relative border-t border-gray-800/50 overflow-hidden bg-transparent">
+    <section className="py-16 text-white relative border-t border-gray-800/50 overflow-hidden bg-[#061c39]">
       <div className="container mx-auto px-6 md:px-12 max-w-7xl relative z-10">
         
         {/* Section Header: Tightly grouped Title & Subtitle */}
