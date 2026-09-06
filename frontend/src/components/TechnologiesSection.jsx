@@ -55,17 +55,17 @@ export default function TechnologiesSection() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-[#0f1729] text-white border-t border-gray-800">
+      <section className="py-16 bg-[radial-gradient(circle_at_30%_20%,#0d2847_0%,#071426_60%,#050e1c_100%)] text-white border-t border-gray-800">
         <div className="container mx-auto px-4 text-center">
           <div className="animate-pulse space-y-4">
-            <div className="h-10 bg-gray-800 rounded w-1/3 mx-auto"></div>
-            <div className="h-4 bg-gray-800 rounded w-1/2 mx-auto"></div>
+            <div className="h-10 bg-gray-800/60 rounded w-1/3 mx-auto"></div>
+            <div className="h-4 bg-gray-800/60 rounded w-1/2 mx-auto"></div>
             <div className="flex justify-center gap-2 mt-6">
-               {[...Array(5)].map((_, i) => <div key={i} className="h-8 w-24 bg-gray-800 rounded-full"></div>)}
+               {[...Array(5)].map((_, i) => <div key={i} className="h-8 w-24 bg-gray-800/60 rounded-full"></div>)}
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-8">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-48 bg-gray-800 rounded-xl"></div>
+                <div key={i} className="h-48 bg-gray-800/60 rounded-xl"></div>
               ))}
             </div>
           </div>
@@ -77,8 +77,12 @@ export default function TechnologiesSection() {
   if (technologies.length === 0) return null;
 
   return (
-    <section className="py-16 text-white relative border-t border-gray-800/50 overflow-hidden">
+    <section className="py-16 text-white relative border-t border-gray-800/50 overflow-hidden bg-[radial-gradient(circle_at_30%_20%,#0d2847_0%,#071426_60%,#050e1c_100%)]">
       
+      {/* Background Ambient Glow */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+
       <div className="container mx-auto px-6 md:px-12 max-w-7xl relative z-10">
         
         {/* Section Header: Tightly grouped Title & Subtitle */}
@@ -102,7 +106,7 @@ export default function TechnologiesSection() {
           </motion.p>
         </div>
 
-        {/* Filter Pills: High Contrast & Tight Spacing to Heading */}
+        {/* Filter Pills: High Contrast & Glassy Effect */}
         {categories.length > 1 && (
           <motion.div 
             initial={{ opacity: 0, y: 15 }}
@@ -127,7 +131,7 @@ export default function TechnologiesSection() {
           </motion.div>
         )}
 
-        {/* Carousel Container with Vertically-Centered Left/Right Circular Arrow Buttons */}
+        {/* Carousel Container with Vertically-Centered Arrow Buttons */}
         {filteredTech.length > 0 && (
           <div className="relative group/carousel px-2 md:px-12">
             
@@ -168,44 +172,46 @@ export default function TechnologiesSection() {
                   rel={tech.websiteUrl ? "noopener noreferrer" : ""}
                   className={`group relative flex flex-col items-center justify-between p-5 w-40 h-52 md:w-48 md:h-56 rounded-2xl flex-shrink-0 snap-start transition-all duration-300 overflow-hidden box-border ${
                     tech.featured 
-                      ? 'bg-gradient-to-b from-[#1c1803] to-[#0d1322] border border-amber-500/40 hover:border-amber-400 shadow-[0_4px_20px_rgba(245,158,11,0.12)] hover:shadow-[0_8px_30px_rgba(245,158,11,0.25)]' 
-                      : 'bg-gradient-to-b from-[#131b2e] to-[#0a0f1e] border border-slate-700/60 hover:border-blue-500/60 shadow-md hover:shadow-[0_8px_25px_rgba(59,130,246,0.18)]'
-                  } hover:-translate-y-1.5`}
+                      ? 'bg-gradient-to-b from-[#1a1408] to-[#0f0d08] border border-amber-500/40 hover:border-amber-400 shadow-[0_0_20px_rgba(255,193,7,0.12)] hover:shadow-[0_0_30px_rgba(255,193,7,0.25)]' 
+                      : 'bg-gradient-to-b from-[#12161f] to-[#0a0d14] border border-slate-700/60 hover:border-blue-500/60 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.5)]'
+                  } hover:-translate-y-2`}
                   style={{
                     isolation: 'isolate',
                     WebkitMaskImage: '-webkit-radial-gradient(white, black)'
                   }}
                 >
-                  {/* Subtle Top Glow */}
+                  {/* Subtle Top Inner Radial Glow */}
                   <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none ${
-                    tech.featured ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,0.18),transparent_70%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.18),transparent_70%)]'
+                    tech.featured ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,193,7,0.2),transparent_70%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.2),transparent_70%)]'
                   }`}></div>
 
-                  {/* Ribbon Corner Clipping Fix */}
+                  {/* Ribbon Corner Clipping */}
                   {tech.featured && (
                     <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-tr-2xl pointer-events-none z-20">
-                      <div className="absolute top-3 -right-6 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[9px] font-extrabold py-0.5 px-8 transform rotate-45 shadow-sm uppercase tracking-wider">
+                      <div className="absolute top-3 -right-6 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[9px] font-extrabold py-0.5 px-8 transform rotate-45 shadow-md uppercase tracking-wider">
                         FEATURED
                       </div>
                     </div>
                   )}
                   
-                  {/* Icon */}
+                  {/* Icon Box with Soft Contrast Glow (Fix #5) */}
                   <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center mt-1 text-gray-200 group-hover:text-white transition-all duration-300 transform group-hover:scale-105 relative z-10 shrink-0">
                     {tech.icon ? (
                       tech.icon.startsWith('http') || tech.icon.startsWith('/') || tech.icon.includes('base64') ? (
-                        <img src={tech.icon} alt={tech.name} className="w-full h-full object-contain filter drop-shadow-md" loading="lazy" />
+                        <div className="w-full h-full p-2.5 rounded-xl bg-white/95 border border-white/20 shadow-[0_4px_12px_rgba(255,255,255,0.1)] flex items-center justify-center backdrop-blur-sm">
+                          <img src={tech.icon} alt={tech.name} className="w-full h-full object-contain filter drop-shadow-sm" loading="lazy" />
+                        </div>
                       ) : (
                         <span className="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full drop-shadow-md" dangerouslySetInnerHTML={{ __html: tech.icon }}></span>
                       )
                     ) : (
-                      <div className="w-full h-full rounded-xl bg-slate-800 flex items-center justify-center border border-slate-700 shadow-inner">
+                      <div className="w-full h-full rounded-xl bg-slate-800/90 flex items-center justify-center border border-slate-700 shadow-inner">
                         <span className="text-xl font-bold text-slate-300 group-hover:text-white">{tech.name.charAt(0)}</span>
                       </div>
                     )}
                   </div>
                   
-                  {/* Tool Title - Strict single line truncation with tooltip */}
+                  {/* Tool Title - Strict single line truncation */}
                   <h3 
                     className="w-full text-xs md:text-sm font-bold text-center text-slate-200 group-hover:text-white transition-colors px-1 truncate relative z-10 my-auto"
                     title={tech.name}
@@ -213,9 +219,9 @@ export default function TechnologiesSection() {
                     {tech.name}
                   </h3>
 
-                  {/* Badge */}
+                  {/* Glassy Badge Upgrade (Fix #6) */}
                   <div className="relative z-10 w-full flex justify-center mt-auto">
-                    <span className="px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase rounded-full bg-slate-950/70 border border-slate-700/80 text-slate-300 group-hover:text-white group-hover:border-slate-500 transition-colors backdrop-blur-md truncate max-w-full">
+                    <span className="px-3 py-1 text-[10px] font-semibold tracking-wider uppercase rounded-full bg-white/[0.06] backdrop-blur-md border border-white/[0.12] text-slate-300 group-hover:text-white group-hover:border-white/25 group-hover:bg-white/[0.12] transition-colors truncate max-w-full">
                       {tech.category}
                     </span>
                   </div>
