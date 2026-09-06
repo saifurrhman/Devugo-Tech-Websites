@@ -6691,4 +6691,34 @@ html, body {
   box-shadow: 0 0 20px rgba(255, 193, 7, 0.12);
 }
 
+/* Smooth Continuous Marquee Animation */
+@keyframes techMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.tech-marquee-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  padding: 10px 0 20px;
+}
+
+.tech-marquee-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: techMarquee 22s linear infinite;
+  will-change: transform;
+}
+
+.tech-marquee-container:hover .tech-marquee-track {
+  animation-play-state: paused;
+}
+
+
 

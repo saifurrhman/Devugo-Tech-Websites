@@ -42,25 +42,12 @@ export default function TechnologiesSection() {
     return technologies.filter(t => t.category === activeCategory);
   }, [technologies, activeCategory]);
 
-  // Smooth continuous auto-scroll loop
-  useEffect(() => {
-    if (isPaused || filteredTech.length <= 1) return;
-    const track = scrollTrackRef.current;
-    if (!track) return;
-
-    const interval = setInterval(() => {
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      if (maxScroll <= 0) return;
-      
-      if (track.scrollLeft >= maxScroll - 2) {
-        track.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        track.scrollLeft += 1;
-      }
-    }, 30);
-
-    return () => clearInterval(interval);
-  }, [isPaused, filteredTech]);
+  // Multiply items for seamless continuous looping marquee track
+  const marqueeTech = useMemo(() => {
+    if (filteredTech.length === 0) return [];
+    if (filteredTech.length >= 6) return [...filteredTech, ...filteredTech];
+    return [...filteredTech, ...filteredTech, ...filteredTech, ...filteredTech];
+  }, [filteredTech]);
 
   const scrollLeft = () => {
     if (scrollTrackRef.current) {
@@ -149,11 +136,7 @@ export default function TechnologiesSection() {
 
         {/* Carousel Container with Vertically-Centered Arrow Buttons */}
         {filteredTech.length > 0 && (
-          <div 
-            className="relative group/carousel px-2 md:px-12"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-          >
+          <div className="relative group/carousel px-2 md:px-12">
             
             {/* Left Circular Arrow Button */}
             <button
@@ -175,62 +158,57 @@ export default function TechnologiesSection() {
               <ChevronRight size={22} />
             </button>
 
-            {/* Scrollable Cards Track */}
-            <div 
-              ref={scrollTrackRef}
-              className="flex gap-4 md:gap-5 overflow-x-auto pb-4 pt-1 px-3 md:px-4 scroll-smooth snap-x snap-mandatory scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent"
-              style={{
-                WebkitOverflowScrolling: 'touch',
-                scrollbarWidth: 'thin'
-              }}
-            >
-              {filteredTech.map((tech, index) => (
-                <a
-                  key={`${tech._id || tech.name}-${index}`}
-                  href={tech.websiteUrl || '#'}
-                  target={tech.websiteUrl ? "_blank" : "_self"}
-                  rel={tech.websiteUrl ? "noopener noreferrer" : ""}
-                  className={`tool-card ${tech.featured ? 'featured' : ''} group relative flex-shrink-0 snap-start transition-all duration-300 overflow-hidden box-border hover:-translate-y-2`}
-                  style={{
-                    isolation: 'isolate',
-                    WebkitMaskImage: '-webkit-radial-gradient(white, black)'
-                  }}
-                >
-                  {/* Vibrant Ribbon Corner Clipping for Featured */}
-                  {tech.featured && (
-                    <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-tr-2xl pointer-events-none z-20">
-                      <div className="absolute top-3 -right-6 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-slate-950 text-[9px] font-black py-0.5 px-8 transform rotate-45 shadow-[0_2px_8px_rgba(255,193,7,0.5)] uppercase tracking-wider">
-                        FEATURED
+            {/* Marquee Continuous Infinite Auto-Scroll Container */}
+            <div className="tech-marquee-container overflow-x-auto scrollbar-none" ref={scrollTrackRef}>
+              <div className="tech-marquee-track">
+                {marqueeTech.map((tech, index) => (
+                  <a
+                    key={`${tech._id || tech.name}-${index}`}
+                    href={tech.websiteUrl || '#'}
+                    target={tech.websiteUrl ? "_blank" : "_self"}
+                    rel={tech.websiteUrl ? "noopener noreferrer" : ""}
+                    className={`tool-card ${tech.featured ? 'featured' : ''} group relative flex-shrink-0 transition-all duration-300 overflow-hidden box-border hover:-translate-y-2`}
+                    style={{
+                      isolation: 'isolate',
+                      WebkitMaskImage: '-webkit-radial-gradient(white, black)'
+                    }}
+                  >
+                    {/* Vibrant Ribbon Corner Clipping for Featured */}
+                    {tech.featured && (
+                      <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-tr-2xl pointer-events-none z-20">
+                        <div className="absolute top-3 -right-6 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-slate-950 text-[9px] font-black py-0.5 px-8 transform rotate-45 shadow-[0_2px_8px_rgba(255,193,7,0.5)] uppercase tracking-wider">
+                          FEATURED
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  
-                  {/* Icon box - white background jo har icon/logo ke peeche aayega */}
-                  <div className="icon-box relative z-10 shrink-0 group-hover:scale-105 transition-transform duration-300">
-                    {tech.icon ? (
-                      tech.icon.startsWith('http') || tech.icon.startsWith('/') || tech.icon.includes('base64') ? (
-                        <img src={tech.icon} alt={tech.name} loading="lazy" />
-                      ) : (
-                        <span dangerouslySetInnerHTML={{ __html: tech.icon }}></span>
-                      )
-                    ) : (
-                      <span className="text-2xl font-bold text-slate-800">{tech.name.charAt(0)}</span>
                     )}
-                  </div>
-                  
-                  {/* Tool Name */}
-                  <h3 className="tool-name relative z-10" title={tech.name}>
-                    {tech.name}
-                  </h3>
+                    
+                    {/* Icon box - white background jo har icon/logo ke peeche aayega */}
+                    <div className="icon-box relative z-10 shrink-0 group-hover:scale-105 transition-transform duration-300">
+                      {tech.icon ? (
+                        tech.icon.startsWith('http') || tech.icon.startsWith('/') || tech.icon.includes('base64') ? (
+                          <img src={tech.icon} alt={tech.name} loading="lazy" />
+                        ) : (
+                          <span dangerouslySetInnerHTML={{ __html: tech.icon }}></span>
+                        )
+                      ) : (
+                        <span className="text-2xl font-bold text-slate-800">{tech.name.charAt(0)}</span>
+                      )}
+                    </div>
+                    
+                    {/* Tool Name */}
+                    <h3 className="tool-name relative z-10" title={tech.name}>
+                      {tech.name}
+                    </h3>
 
-                  {/* Category Badge */}
-                  <div className="relative z-10 w-full flex justify-center mt-auto">
-                    <span className="badge">
-                      {tech.category}
-                    </span>
-                  </div>
-                </a>
-              ))}
+                    {/* Category Badge */}
+                    <div className="relative z-10 w-full flex justify-center mt-auto">
+                      <span className="badge">
+                        {tech.category}
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         )}
