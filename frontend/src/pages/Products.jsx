@@ -4,7 +4,10 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import { ProductAPI, getFileUrl } from '../lib/api';
-import { Search, Package, ExternalLink, ArrowRight, CheckCircle2, Star, Sparkles, Code2, Zap } from 'lucide-react';
+import { 
+  Search, Package, ExternalLink, ArrowRight, CheckCircle2, Star, Sparkles, 
+  Zap, MessageSquare, Phone, Trophy, Cpu, Check
+} from 'lucide-react';
 
 const DEFAULT_PRODUCTS = [
   {
@@ -15,10 +18,10 @@ const DEFAULT_PRODUCTS = [
     price: 49,
     originalPrice: 99,
     currency: 'USD',
-    badge: 'Popular',
+    badge: 'PROPRIETARY ECOSYSTEM',
     tagline: 'AI-powered social media management & automated posting platform.',
     description: 'A complete SaaS web app for scheduling, AI content creation, auto-replying, and multi-platform social media analytics.',
-    features: ['AI Copywriting & Image Generation', 'Multi-Account Scheduling (LinkedIn, Twitter, FB)', 'Real-time Engagement Analytics'],
+    features: ['Voice & WhatsApp Access', 'Native AI Content Engine', 'Live Engagement Telemetry', 'Auto-Reply Algorithms', 'Multi-Platform Database', 'Zero App Installation Required'],
     techStack: ['React', 'Node.js', 'OpenAI', 'MongoDB'],
     demoUrl: 'https://demo.devugo.tech',
     buyUrl: '/contact',
@@ -35,10 +38,10 @@ const DEFAULT_PRODUCTS = [
     price: 99,
     originalPrice: 199,
     currency: 'USD',
-    badge: 'Featured',
+    badge: 'LIVE PRODUCT DEPLOYMENT',
     tagline: 'Conversion rate optimization suite for e-commerce & high-ticket landing pages.',
     description: 'Analyze landing pages, run automated CRO audits, and deploy high-converting sales funnels in minutes.',
-    features: ['Instant CRO Score & Bottleneck Report', 'Heatmap & Click Tracking Integration', 'A/B Testing Funnel Templates'],
+    features: ['Instant CRO Score & Bottleneck Report', 'Heatmap & Click Tracking', 'A/B Testing Funnel Templates', 'Real-Time Telemetry', 'Conversion Rate Analytics', 'Zero Setup Delay'],
     techStack: ['React', 'Tailwind', 'Node.js', 'PostgreSQL'],
     demoUrl: 'https://demo.devugo.tech',
     buyUrl: '/contact',
@@ -55,10 +58,10 @@ const DEFAULT_PRODUCTS = [
     price: 29,
     originalPrice: 59,
     currency: 'USD',
-    badge: 'New',
+    badge: 'ENTERPRISE SOLUTION',
     tagline: 'B2B lead generation & email verification automation web app.',
     description: 'Find verified corporate contacts, validate deliverability in real-time, and export structured CSV lead lists.',
-    features: ['Real-time SMTP Email Verification', 'Industry & Location Lead Filters', 'Automated Lead Scoring System'],
+    features: ['Real-time SMTP Email Verification', 'Industry & Location Lead Filters', 'Automated Lead Scoring System', 'API Webhook Integration', 'High Deliverability SLA', 'CSV Export Engine'],
     techStack: ['Node.js', 'Express', 'Python', 'Tailwind'],
     demoUrl: 'https://demo.devugo.tech',
     buyUrl: '/contact',
@@ -108,82 +111,56 @@ export default function Products() {
     return result;
   }, [products, activeCategory, q]);
 
+  const whatsappMessage = (title) => encodeURIComponent(`Hello Devugo Tech! I would like to inquire about ${title || 'your products'}.`);
+
   return (
     <>
       <SEO
-        title="Digital Products & Software Solutions | Devugo Tech"
-        description="Explore our suite of ready-to-deploy digital products, SaaS tools, AI applications, and enterprise software solutions."
+        title="Digital Products & Software Ecosystem | Devugo Tech"
+        description="Explore our core technology stack and proprietary digital products built for scale."
         url="/products"
       />
       <Navbar />
 
-      <div className="bg-[#061c39] text-white min-h-screen pt-28 pb-16">
+      <div className="bg-[#061c39] text-white min-h-screen pt-28 pb-20 selection:bg-blue-600 selection:text-white">
 
-        {/* ─── HERO SECTION ─── */}
-        <section className="relative overflow-hidden pt-8 pb-12 text-center px-4 flex flex-col items-center justify-center">
+        {/* ─── HERO HEADER SECTION ─── */}
+        <section className="relative overflow-hidden pt-6 pb-12 text-center px-4 flex flex-col items-center justify-center">
           <div className="relative max-w-4xl w-full mx-auto z-10 flex flex-col items-center text-center">
             
             {/* Top Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-[#0f2444] mb-6 shadow-md mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-[#0c2436] mb-6 shadow-md mx-auto">
               <Sparkles size={14} className="text-blue-400" />
               <span className="text-[11px] font-extrabold text-blue-400 tracking-wider uppercase">
-                • Ready-To-Deploy Digital Products
+                PROPRIETARY ECOSYSTEM
               </span>
             </div>
 
             {/* Main Heading */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-4 leading-tight text-center">
-              Next-Gen Software &<br />
+              Our Core <br />
               <span className="text-[#4f8ef7]">
-                Digital Products
+                Technologies.
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed font-normal text-center">
-              Explore our suite of production-ready SaaS tools, AI applications, automation systems, and high-performance digital products.
+            <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed text-center">
+              Intelligent products built by Devugo Tech — engineering global software solutions.
             </p>
 
-            {/* Stat Cards Row */}
-            <div className="flex justify-center items-center gap-4 sm:gap-6 flex-wrap w-full max-w-2xl mx-auto mb-8">
-              <div className="bg-[#0f223f] border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg hover:border-blue-500/40 transition-all">
-                <div className="text-3xl md:text-4xl font-black text-white">
-                  {products.length}
-                </div>
-                <div className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mt-1">
-                  Active Products
-                </div>
-              </div>
-              <div className="bg-[#0f223f] border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg hover:border-blue-500/40 transition-all">
-                <div className="text-3xl md:text-4xl font-black text-white">
-                  99.9%
-                </div>
-                <div className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mt-1">
-                  Uptime Guarantee
-                </div>
-              </div>
-              <div className="bg-[#0f223f] border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg hover:border-blue-500/40 transition-all">
-                <div className="text-3xl md:text-4xl font-black text-white">
-                  24/7
-                </div>
-                <div className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mt-1">
-                  Expert Support
-                </div>
-              </div>
-            </div>
-
-            {/* Search Input Bar */}
+            {/* Search Bar */}
             <div className="relative w-full max-w-lg mx-auto">
               <Search size={18} strokeWidth={1.5} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <input 
                 value={q} 
                 onChange={e => setQ(e.target.value)}
-                placeholder="Search products, tools, SaaS apps..."
-                className="w-full pl-11 pr-24 py-3.5 rounded-xl bg-[#0f223f] border border-slate-700/60 text-white placeholder-slate-400 text-sm md:text-base outline-none focus:border-blue-500 transition-all shadow-xl"
+                placeholder="Search products, AI tools, SaaS apps..."
+                className="w-full pl-11 pr-24 py-3.5 rounded-xl bg-[#0f223f] border border-slate-700/60 text-white placeholder-slate-400 text-sm outline-none focus:border-blue-500 transition-all shadow-xl"
               />
               <button 
                 type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#3b5fe2] hover:bg-blue-600 text-white text-xs font-extrabold px-3.5 py-2 rounded-lg transition-all shadow-md"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#3b5fe2] hover:bg-blue-600 text-white text-xs font-extrabold px-4 py-2 rounded-lg transition-all shadow-md"
               >
                 Search
               </button>
@@ -192,11 +169,11 @@ export default function Products() {
           </div>
         </section>
 
-        {/* ─── CATALOG SECTION ─── */}
-        <section className="max-w-6xl mx-auto px-4 md:px-8 py-8">
-          
+        {/* ─── SEPARATED DETAILED PRODUCTS SHOWCASE LIST (OmniSolve Layout) ─── */}
+        <section className="max-w-6xl mx-auto px-4 md:px-8 space-y-16 py-6">
+
           {/* Filter Pills Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 px-1">
+          <div className="flex flex-wrap items-center justify-between gap-4 px-1 pb-4 border-b border-slate-800">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider mr-2">
                 CATEGORIES:
@@ -207,10 +184,10 @@ export default function Products() {
                   <button 
                     key={cat} 
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
                       active 
-                        ? 'bg-[#3b5fe2] text-white border border-blue-400/50 shadow-blue-600/30' 
-                        : 'bg-[#1c2333] border border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+                        ? 'bg-[#3b5fe2] text-white border border-blue-400/50' 
+                        : 'bg-[#162a4a] border border-slate-700/60 text-slate-300 hover:bg-slate-800'
                     }`}
                   >
                     {cat}
@@ -219,163 +196,198 @@ export default function Products() {
               })}
             </div>
             <span className="text-xs font-semibold text-slate-400">
-              Showing {filtered.length} of {products.length} products
+              Showing {filtered.length} products
             </span>
           </div>
 
-          {/* Loading Indicator */}
           {loading && (
-            <div className="text-center py-16">
+            <div className="text-center py-20 bg-[#0f223f] border border-slate-700/60 rounded-3xl">
               <div className="w-10 h-10 border-3 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-slate-400 text-sm">Loading products catalog...</p>
+              <p className="text-slate-400 text-sm">Loading product showcase...</p>
             </div>
           )}
 
-          {/* Products Grid */}
-          {!loading && filtered.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {filtered.map(product => (
-                <div
-                  key={product._id}
-                  className="bg-[#0f223f] border border-slate-700/60 hover:border-blue-500/60 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 group"
-                >
-                  <div>
-                    {/* Thumbnail Header */}
-                    <div className="relative h-48 bg-[#1a2942] overflow-hidden flex items-center justify-center border-b border-slate-700/60">
-                      {product.image ? (
-                        <img
-                          src={getFileUrl(product.image)}
-                          alt={product.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
+          {/* Products List - Full OmniSolve AI Card Layout for Every Product */}
+          {!loading && filtered.length > 0 && filtered.map((prod, index) => {
+            const featuresList = (Array.isArray(prod.features) && prod.features.length > 0)
+              ? prod.features
+              : ['Voice & WhatsApp Access', 'Native Urdu Processing', 'Live Weather Telemetry', 'Pest Control Algorithms', 'Market Price Database', 'Zero App Installation'];
+
+            const waLink = `https://wa.me/923000000000?text=${whatsappMessage(prod.title)}`;
+
+            return (
+              <div key={prod._id || index} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                
+                {/* Left Card: White/Light Card with Product Icon & Quick Actions */}
+                <div className="lg:col-span-5 bg-[#ffffff] text-slate-900 rounded-3xl p-8 shadow-2xl flex flex-col justify-between items-center text-center relative border border-slate-200">
+                  <div className="w-full flex flex-col items-center">
+                    
+                    {/* Icon Box */}
+                    <div className="w-24 h-24 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-5 shadow-inner">
+                      {prod.image ? (
+                        <img src={getFileUrl(prod.image)} alt={prod.title} className="w-14 h-14 object-contain" />
                       ) : (
-                        <div className="w-16 h-16 rounded-2xl bg-[#1e2536] border border-slate-700/60 flex items-center justify-center shadow-inner">
-                          <Package size={32} className="text-blue-400" />
+                        <div className="w-14 h-14 rounded-2xl bg-[#25D366] text-white flex items-center justify-center shadow-md">
+                          <Zap size={28} />
                         </div>
                       )}
-
-                      {/* Badge Tag */}
-                      {product.badge && (
-                        <span className="absolute top-3 left-3 bg-[#3b5fe2] text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">
-                          {product.badge}
-                        </span>
-                      )}
-
-                      {/* Category Pill */}
-                      <span className="absolute top-3 right-3 bg-[#09121f]/90 backdrop-blur-md text-slate-300 text-xs font-bold px-3 py-1 rounded-full border border-slate-700/60">
-                        {product.category || 'SaaS'}
-                      </span>
                     </div>
 
-                    {/* Content Body */}
-                    <div className="p-6">
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <h3 className="text-xl font-extrabold text-white group-hover:text-blue-400 transition-colors">
-                          {product.title}
-                        </h3>
-                        {product.rating && (
-                          <div className="flex items-center gap-1 text-amber-400 text-xs font-bold shrink-0">
-                            <Star size={14} fill="currentColor" />
-                            <span>{product.rating.toFixed(1)}</span>
-                          </div>
-                        )}
+                    {/* Title */}
+                    <h3 className="text-2xl font-black text-slate-900 mb-2">
+                      {prod.title}
+                    </h3>
+
+                    {/* Tagline */}
+                    <p className="text-slate-600 text-xs md:text-sm leading-relaxed max-w-xs mb-6">
+                      {prod.tagline || prod.description}
+                    </p>
+                  </div>
+
+                  {/* Dual Action Buttons Inside Card */}
+                  <div className="w-full grid grid-cols-2 gap-3 pt-6 border-t border-slate-100 mt-auto">
+                    {prod.demoUrl ? (
+                      <a
+                        href={prod.demoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition-all font-bold text-[11px]"
+                      >
+                        <ExternalLink size={16} className="text-slate-700 mb-1" />
+                        <span>LIVE DEMO</span>
+                      </a>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-100 text-slate-800 font-bold text-[11px]">
+                        <Phone size={16} className="text-slate-700 mb-1" />
+                        <span>VOICE LINE</span>
                       </div>
+                    )}
 
-                      <p className="text-slate-300 text-xs leading-relaxed mb-4 line-clamp-2">
-                        {product.tagline || product.description}
-                      </p>
+                    <a
+                      href={waLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex flex-col items-center justify-center p-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all font-bold text-[11px] border border-emerald-200"
+                    >
+                      <MessageSquare size={16} className="text-[#25D366] mb-1" />
+                      <span>WHATSAPP API</span>
+                    </a>
+                  </div>
+                </div>
 
-                      {/* Key Features Bullet List */}
-                      {Array.isArray(product.features) && product.features.length > 0 && (
-                        <div className="space-y-2 mb-5">
-                          {product.features.slice(0, 3).map((feat, idx) => (
-                            <div key={idx} className="flex items-start gap-2 text-xs text-slate-300">
-                              <CheckCircle2 size={14} className="text-emerald-400 shrink-0 mt-0.5" />
-                              <span className="truncate">{feat}</span>
-                            </div>
-                          ))}
+                {/* Right Column: Detailed Title, Description, Checkmark Grid & Actions */}
+                <div className="lg:col-span-7 bg-[#0f223f] border border-slate-700/60 rounded-3xl p-8 md:p-10 flex flex-col justify-between shadow-2xl">
+                  <div>
+                    {/* Green Deployment Badge */}
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      {prod.badge || 'LIVE PRODUCT DEPLOYMENT'}
+                    </div>
+
+                    {/* Headline */}
+                    <h3 className="text-2xl md:text-3xl font-black text-white mb-3 leading-snug">
+                      {prod.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-slate-300 text-xs md:text-sm leading-relaxed mb-6">
+                      {prod.description || prod.tagline}
+                    </p>
+
+                    {/* 2-Column Checkmark Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                      {featuresList.slice(0, 6).map((feat, i) => (
+                        <div key={i} className="flex items-center gap-2.5 bg-[#172b49] px-3.5 py-2.5 rounded-xl border border-slate-700/50">
+                          <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                            <Check size={12} strokeWidth={3} />
+                          </div>
+                          <span className="text-xs font-bold text-slate-200 truncate">{feat}</span>
                         </div>
-                      )}
+                      ))}
+                    </div>
 
-                      {/* Tech Stack Badges */}
-                      {Array.isArray(product.techStack) && product.techStack.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-5 pt-3 border-t border-slate-800">
-                          {product.techStack.slice(0, 4).map((tech, idx) => (
-                            <span
-                              key={idx}
-                              className="px-2.5 py-0.5 rounded-md bg-[#1e2536] border border-slate-700/60 text-[11px] font-semibold text-blue-300"
-                            >
-                              {tech}
-                            </span>
-                          ))}
+                    {/* Strategic Partnership Callout Box */}
+                    <div className="bg-[#162a4a] border border-slate-700/80 rounded-2xl p-4 flex items-start gap-3 mb-6">
+                      <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+                        <Trophy size={18} />
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest mb-0.5">
+                          STRATEGIC ARCHITECTURE PARTNERS
                         </div>
-                      )}
+                        <div className="text-xs font-bold text-white">
+                          Verified Enterprise Infrastructure & High Reliability SLA
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Card Footer: Price & CTA */}
-                  <div className="p-6 pt-0 border-t border-slate-800/80 mt-auto flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Pricing</div>
-                      <div className="flex items-baseline gap-1.5">
-                        {product.price > 0 ? (
-                          <>
-                            <span className="text-2xl font-black text-white">${product.price}</span>
-                            {product.originalPrice > product.price && (
-                              <span className="text-slate-500 line-through text-xs">${product.originalPrice}</span>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-lg font-black text-blue-400">Free / Custom</span>
-                        )}
-                      </div>
-                    </div>
+                  {/* Direct Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-slate-800">
+                    <Link
+                      to={`/products/${prod.slug || prod._id}`}
+                      className="inline-flex items-center justify-center gap-2 bg-[#3b5fe2] hover:bg-blue-600 text-white font-extrabold text-xs px-5 py-3 rounded-xl shadow-lg transition-all"
+                    >
+                      Request Engineering Demo <ArrowRight size={14} />
+                    </Link>
 
-                    <div className="flex items-center gap-2">
-                      {product.demoUrl && (
-                        <a
-                          href={product.demoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-2.5 rounded-xl bg-[#1e2536] border border-slate-700/60 text-slate-300 hover:text-white hover:border-slate-500 transition-all"
-                          title="Live Demo"
-                        >
-                          <ExternalLink size={16} />
-                        </a>
-                      )}
-                      <Link
-                        to={`/products/${product.slug || product._id}`}
-                        className="inline-flex items-center gap-1.5 bg-[#3b5fe2] hover:bg-blue-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md transition-all"
-                      >
-                        View Details <ArrowRight size={14} />
-                      </Link>
-                    </div>
+                    <a
+                      href={waLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-emerald-600 text-white font-extrabold text-xs px-5 py-3 rounded-xl shadow-lg transition-all"
+                    >
+                      <MessageSquare size={14} /> Connect on WhatsApp
+                    </a>
                   </div>
 
                 </div>
-              ))}
-            </div>
-          )}
 
-          {/* Bottom CTA Banner */}
-          {!loading && (
-            <div className="bg-[#0f223f] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center shadow-2xl mt-16 relative overflow-hidden">
-              <div className="relative z-10 max-w-xl mx-auto">
-                <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
-                  Need a Custom Product or SaaS App?
-                </h3>
-                <p className="text-slate-300 text-sm md:text-base leading-relaxed mb-6">
-                  We build custom software, AI automation systems, and SaaS platforms tailored to your business specs.
-                </p>
-                <Link 
-                  to="/contact" 
-                  className="inline-flex items-center gap-2 bg-[#3b5fe2] hover:bg-blue-600 text-white font-extrabold px-8 py-3.5 rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-105"
-                >
-                  Get In Touch <ArrowRight size={18} strokeWidth={1.5} />
-                </Link>
               </div>
+            );
+          })}
+
+          {/* ─── SECTION: R&D LAB CLASSIFIED TEASER ─── */}
+          <div className="bg-[#0b182b] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden my-12">
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center mx-auto mb-4">
+              <Cpu size={24} />
             </div>
-          )}
+
+            <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
+              R&D Lab: <span className="text-slate-400">Classified</span>
+            </h3>
+
+            <p className="text-slate-300 text-xs md:text-sm max-w-xl mx-auto leading-relaxed mb-6">
+              Our engineering team is currently architecting the next generation of enterprise AI software. Synchronize with our comms channel to receive classified release intel.
+            </p>
+
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 bg-[#1c2e4a] hover:bg-slate-700 border border-slate-600 text-white font-extrabold text-xs px-6 py-3 rounded-full transition-all"
+            >
+              Establish Partnership Link <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          {/* ─── SECTION: BOTTOM CTA BANNER ─── */}
+          <div className="bg-[#0f223f] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center shadow-2xl relative overflow-hidden">
+            <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-3">
+              Ready to Transform Your Business with AI & Tech?
+            </h3>
+
+            <div className="flex items-center justify-center gap-3 flex-wrap text-[11px] font-bold text-slate-300 mb-8">
+              <span className="px-3 py-1 rounded-full bg-[#182c49] border border-slate-700/60">• Free Consultation</span>
+              <span className="px-3 py-1 rounded-full bg-[#182c49] border border-slate-700/60">• Custom Solutions</span>
+              <span className="px-3 py-1 rounded-full bg-[#182c49] border border-slate-700/60">• Proven Results</span>
+            </div>
+
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 bg-[#3b5fe2] hover:bg-blue-600 text-white font-extrabold px-8 py-3.5 rounded-xl shadow-lg transition-all"
+            >
+              Book Consultation <ArrowRight size={18} />
+            </Link>
+          </div>
 
         </section>
 

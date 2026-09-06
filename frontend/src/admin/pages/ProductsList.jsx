@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
+import AdminTopbar from '../../components/AdminTopbar';
 import { ProductAPI, getFileUrl } from '../../lib/api';
 import { Plus, Search, Edit2, Trash2, ExternalLink, Star, Package, Check, X, Tag } from 'lucide-react';
 import { useNotification } from '../../contexts/NotificationContext';
@@ -143,10 +144,10 @@ export default function ProductsList() {
   };
 
   return (
-    <div className="admin-layout min-h-screen bg-[#09121f] text-white flex">
+    <div className="admin-layout">
       <AdminSidebar />
-
-      <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
+      <main className="admin-content p-6 md:p-8 max-w-7xl mx-auto w-full">
+        <AdminTopbar />
         
         {/* Header Bar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

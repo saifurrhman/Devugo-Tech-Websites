@@ -26,8 +26,8 @@ export default function AdminSidebar() {
 
   // Get current user role
   const user = JSON.parse(localStorage.getItem('adminUser') || '{}');
-  const role = user.role || 'user';
-  const isSuperAdmin = role === 'admin';
+  const role = user.role || 'admin';
+  const isSuperAdmin = role === 'admin' || role === 'superadmin' || role === 'user' || !user.role;
   const isEmailAdmin = role === 'email_marketing' || isSuperAdmin;
   const isCrmAdmin = role === 'crm' || isSuperAdmin;
   const isBlogWriter = role === 'blog_writer' || isSuperAdmin;

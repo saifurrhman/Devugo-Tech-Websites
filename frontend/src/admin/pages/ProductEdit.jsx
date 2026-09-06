@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
+import AdminTopbar from '../../components/AdminTopbar';
 import { ProductAPI, UploadAPI, getFileUrl } from '../../lib/api';
 import { ArrowLeft, Save, Upload, Plus, X, Package, Star, Link as LinkIcon, DollarSign, Tag, Globe } from 'lucide-react';
 import { useNotification } from '../../contexts/NotificationContext';
@@ -152,10 +153,10 @@ export default function ProductEdit() {
   };
 
   return (
-    <div className="admin-layout min-h-screen bg-[#09121f] text-white flex">
+    <div className="admin-layout">
       <AdminSidebar />
-
-      <main className="flex-1 p-6 md:p-8 max-w-5xl mx-auto w-full">
+      <main className="admin-content p-6 md:p-8 max-w-5xl mx-auto w-full">
+        <AdminTopbar />
         
         {/* Header */}
         <div className="flex items-center justify-between gap-4 mb-8">
