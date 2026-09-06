@@ -7,6 +7,7 @@ import ReviewsSection from '../components/ReviewsSection';
 import PortfolioCategories from '../components/PortfolioCategories';
 import PageHero from '../components/PageHero';
 import SEO from '../components/SEO';
+import PortfolioCard from '../components/PortfolioCard';
 
 export default function Portfolio() {
   const [items, setItems] = useState([]);
@@ -71,65 +72,7 @@ export default function Portfolio() {
           filtered.length ? (
             <div className="services-grid" style={{ marginTop: '1rem' }}>
               {filtered.map(p => (
-                <article key={p._id} className="service-card show">
-                  {p.thumbnails?.[0] && (
-                    <img
-                      src={p.thumbnails[0]}
-                      alt={p.title}
-                      style={{
-                        width: '100%',
-                        borderRadius: '12px',
-                        marginBottom: '.6rem',
-                        aspectRatio: '16/9',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  )}
-                  <h3 className="service-title">{p.title}</h3>
-                  {p.client && (
-                    <small className="muted" style={{ display: 'block', marginTop: '0.25rem' }}>
-                      Client: {p.client}
-                    </small>
-                  )}
-                  {p.description && (
-                    <p className="service-desc" style={{ marginTop: '.5rem' }}>
-                      {p.description}
-                    </p>
-                  )}
-                  {!!(p.techStack || []).length && (
-                    <div className="tech-badges" style={{ marginTop: '0.75rem', display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
-                      {(p.techStack || []).map((t, idx) => (
-                        <span key={idx} className="badge" style={{ fontSize: '.75rem', background: '#e0f2fe', color: '#000', border: '1px solid #bae6fd' }}>{String(t)}</span>
-                      ))}
-                    </div>
-                  )}
-
-                  <div style={{ marginTop: '1.25rem', display: 'flex', gap: '.75rem', alignItems: 'center' }}>
-                    <Link
-                      to={`/portfolio/${p.slug || p._id}`}
-                      className="btn"
-                      style={{
-                        padding: '.4rem .8rem',
-                        fontSize: '.9rem',
-                        minWidth: 'auto'
-                      }}
-                    >
-                      View Details
-                    </Link>
-
-                    {p.url && (
-                      <a
-                        className="service-link"
-                        href={p.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ fontSize: '.9rem' }}
-                      >
-                        Visit Project →
-                      </a>
-                    )}
-                  </div>
-                </article>
+                <PortfolioCard key={p._id} project={p} className="show" />
               ))}
             </div>
           ) : (

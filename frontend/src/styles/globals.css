@@ -6362,4 +6362,195 @@ html, body {
 .table-responsive table {
   min-width: 800px; /* Forces horizontal scroll on mobile */
   width: 100%;
-}
+}
+
+/* ==========================================================================
+   PORTFOLIO PROJECT CARDS (Clean White Card Layout matching reference design)
+   ========================================================================== */
+.portfolio-project-card {
+  background: #ffffff !important;
+  border-radius: 20px !important;
+  padding: 1.35rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+  box-sizing: border-box !important;
+  color: #0f172a !important;
+  text-align: left !important;
+}
+
+.portfolio-project-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.14), 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(203, 213, 225, 1) !important;
+  background: #ffffff !important;
+}
+
+.portfolio-card-image-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.portfolio-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  display: block;
+}
+
+.portfolio-project-card:hover .portfolio-card-image {
+  transform: scale(1.03);
+}
+
+.portfolio-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.portfolio-card-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a !important;
+  line-height: 1.25;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.015em;
+  text-align: left;
+}
+
+.portfolio-project-card:hover .portfolio-card-title {
+  color: #0f172a !important;
+}
+
+.portfolio-card-client {
+  display: block;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-bottom: 0.65rem;
+  text-align: left;
+}
+
+.portfolio-card-desc {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #475569 !important;
+  margin: 0 0 0.9rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: left;
+}
+
+.portfolio-project-card:hover .portfolio-card-desc {
+  color: #475569 !important;
+}
+
+.portfolio-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.portfolio-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.portfolio-card-actions {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.portfolio-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.15rem 0.45rem 0.6rem;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a !important;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none !important;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.portfolio-pill-btn .btn-arrow-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f172a;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.portfolio-pill-btn .btn-arrow-text {
+  font-weight: 700;
+  transition: transform 0.25s ease;
+}
+
+.portfolio-pill-btn:hover {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+}
+
+.portfolio-pill-btn:hover .btn-arrow-circle {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.portfolio-pill-btn:hover .btn-arrow-text {
+  transform: translateX(3px);
+}
+
+.portfolio-link-out {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+
+.portfolio-link-out:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+

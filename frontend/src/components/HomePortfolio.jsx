@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { PortfolioAPI } from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import SkeletonCard from './SkeletonCard';
+import PortfolioCard from './PortfolioCard';
 
 export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCategory = null }) {
   const [items, setItems] = useState([]);
@@ -124,110 +125,12 @@ export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCatego
             <div className="horizontal-scroll-track">
               {/* First set of cards */}
               {items.map((p) => (
-                <article key={`first-${p._id}`} className="service-card-horizontal">
-                  {p.thumbnails?.[0] && (
-                    <img
-                      src={p.thumbnails[0]}
-                      alt={p.title}
-                      style={{
-                        width: '100%',
-                        borderRadius: '12px',
-                        marginBottom: '0.6rem',
-                        aspectRatio: '16/9',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  )}
-                  <h3 className="service-title">{p.title}</h3>
-                  {p.client && (
-                    <small className="muted" style={{ display: 'block', marginTop: '0.25rem' }}>
-                      Client: {p.client}
-                    </small>
-                  )}
-                  {p.description && (
-                    <p className="service-desc" style={{ 
-                      marginTop: '0.5rem',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
-                    }}>
-                      {p.description}
-                    </p>
-                  )}
-                  {!!(p.techStack || []).length && (
-                    <div className="tech-badges" style={{ marginTop: '0.75rem' }}>
-                      {(p.techStack || []).slice(0, 3).map((t, idx) => (
-                        <span key={idx} className="tech-badge">{String(t)}</span>
-                      ))}
-                    </div>
-                  )}
-                  <Link
-                    to={`/portfolio/${p._id}`}
-                    className="service-link"
-                  >
-                    <span className="icon" aria-hidden>
-                      <svg viewBox="0 0 24 24">
-                        <path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                    View project →
-                  </Link>
-                </article>
+                <PortfolioCard key={`first-${p._id}`} project={p} className="service-card-horizontal" />
               ))}
               
               {/* Duplicate set for seamless loop - only if enough items */}
               {items.length >= 3 && items.map((p) => (
-                <article key={`second-${p._id}`} className="service-card-horizontal">
-                  {p.thumbnails?.[0] && (
-                    <img
-                      src={p.thumbnails[0]}
-                      alt={p.title}
-                      style={{
-                        width: '100%',
-                        borderRadius: '12px',
-                        marginBottom: '0.6rem',
-                        aspectRatio: '16/9',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  )}
-                  <h3 className="service-title">{p.title}</h3>
-                  {p.client && (
-                    <small className="muted" style={{ display: 'block', marginTop: '0.25rem' }}>
-                      Client: {p.client}
-                    </small>
-                  )}
-                  {p.description && (
-                    <p className="service-desc" style={{ 
-                      marginTop: '0.5rem',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
-                    }}>
-                      {p.description}
-                    </p>
-                  )}
-                  {!!(p.techStack || []).length && (
-                    <div className="tech-badges" style={{ marginTop: '0.75rem' }}>
-                      {(p.techStack || []).slice(0, 3).map((t, idx) => (
-                        <span key={idx} className="tech-badge">{String(t)}</span>
-                      ))}
-                    </div>
-                  )}
-                  <Link
-                    to={`/portfolio/${p._id}`}
-                    className="service-link"
-                  >
-                    <span className="icon" aria-hidden>
-                      <svg viewBox="0 0 24 24">
-                        <path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                    View project →
-                  </Link>
-                </article>
+                <PortfolioCard key={`second-${p._id}`} project={p} className="service-card-horizontal" />
               ))}
             </div>
           </div>
