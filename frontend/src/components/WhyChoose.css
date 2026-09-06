@@ -1,10 +1,10 @@
-.why-wrap{ position:relative; padding:0; margin:0 }
-/* Stage is tall to allow scroll growth */
-.why-stage{ height:160vh; position:relative }
-/* Sticky card that grows as you scroll */
-.why-sticky{ position:sticky; top:8px; background:linear-gradient(180deg, rgba(67,133,205,.18), rgba(67,133,205,.12)); border:1px solid rgba(255,255,255,.14); border-radius:28px; transform:scale(.94); transition: border-radius .2s ease; will-change:transform }
+.why-wrap{ position:relative; padding:0; margin:0 0 1rem 0 }
+/* Compact stage without 160vh gap */
+.why-stage{ height:auto; position:relative }
+/* Clean card layout */
+.why-sticky{ position:relative; top:0; background:linear-gradient(180deg, rgba(67,133,205,.18), rgba(67,133,205,.12)); border:1px solid rgba(255,255,255,.14); border-radius:24px; transform:none !important; }
 .why-sticky::after{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; box-shadow:inset 0 1px 0 rgba(255,255,255,.06) }
-.why-sticky .container{ max-width:1140px; margin:0 auto; padding:2rem 1rem 2.2rem }
+.why-sticky .container{ max-width:1140px; margin:0 auto; padding:1.5rem 1rem 1.75rem }
 
 /* Header */
 .why-head h2{ color:#fff; font-weight:900; font-size:2.1rem; margin:0 0 .35rem }

@@ -70,12 +70,7 @@ export default function WhyChoose(){
   return (
     <section className="why-wrap" aria-labelledby="why-title">
       <div className="why-stage">
-        <div className="why-sticky" ref={stickyRef} style={{
-          transform: `translateY(${translateY}px) scale(${scale})`,
-          borderRadius: `${radius}px`,
-          boxShadow: `0 20px 60px rgba(0,0,0,${shadowOpacity})`,
-          opacity
-        }}>
+        <div className="why-sticky">
           <div className="container">
             <header className="why-head">
               <h2 id="why-title">Why Choose Us?</h2>
