@@ -62,7 +62,6 @@ export default function PortfolioCard({ project, className = '' }) {
               </svg>
             </span>
             <span>View project</span>
-            <span className="btn-arrow-text">→</span>
           </Link>
 
           {url && (
