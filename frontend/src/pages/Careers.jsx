@@ -164,22 +164,10 @@ export default function Careers() {
               </span>
             </div>
 
-            {/* Hero Main Heading with Explicit White and Gradient Lines */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-4 leading-tight text-center">
-              <span style={{ color: '#FFFFFF', display: 'inline-block' }}>
-                Shape the Future
-              </span>
-              <br />
-              <span 
-                style={{
-                  background: 'linear-gradient(90deg, #60A5FA 0%, #818CF8 50%, #C084FC 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  color: 'transparent',
-                  display: 'inline-block',
-                  paddingBottom: '4px'
-                }}
-              >
+            {/* Hero Main Heading with Clean Solid Theme Colors (No Gradient) */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-4 leading-tight text-center">
+              Shape the Future<br />
+              <span className="text-blue-400">
                 of Technology
               </span>
             </h1>
@@ -350,7 +338,7 @@ export default function Careers() {
 
           {/* ─── BOTTOM CTA BANNER ─── */}
           {!loading && (
-            <div className="bg-gradient-to-r from-[#0d1e38] via-[#142848] to-[#0d1e38] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center shadow-2xl backdrop-blur-md mt-16 relative overflow-hidden">
+            <div className="bg-[#0f223f] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center shadow-2xl backdrop-blur-md mt-16 relative overflow-hidden">
               <div className="relative z-10 max-w-xl mx-auto">
                 <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
                   Don't see the perfect role?
@@ -360,10 +348,7 @@ export default function Careers() {
                 </p>
                 <Link 
                   to="/contact" 
-                  className="inline-flex items-center gap-2 text-white font-extrabold px-8 py-3.5 rounded-full shadow-lg shadow-blue-500/20 transition-all hover:scale-105"
-                  style={{
-                    background: 'linear-gradient(90deg, #60A5FA 0%, #6366F1 50%, #A855F7 100%)'
-                  }}
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-extrabold px-8 py-3.5 rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-105"
                 >
                   Get In Touch <ArrowRight size={18} />
                 </Link>
