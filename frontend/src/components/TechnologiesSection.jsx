@@ -55,7 +55,7 @@ export default function TechnologiesSection() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-[radial-gradient(circle_at_30%_20%,#0d2847_0%,#071426_60%,#050e1c_100%)] text-white border-t border-gray-800">
+      <section className="py-16 bg-[#071426] text-white border-t border-gray-800">
         <div className="container mx-auto px-4 text-center">
           <div className="animate-pulse space-y-4">
             <div className="h-10 bg-gray-800/60 rounded w-1/3 mx-auto"></div>
@@ -77,12 +77,7 @@ export default function TechnologiesSection() {
   if (technologies.length === 0) return null;
 
   return (
-    <section className="py-16 text-white relative border-t border-gray-800/50 overflow-hidden bg-[radial-gradient(circle_at_30%_20%,#0d2847_0%,#071426_60%,#050e1c_100%)]">
-      
-      {/* Background Ambient Glow */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-
+    <section className="py-16 text-white relative border-t border-gray-800/50 overflow-hidden bg-[#071426]">
       <div className="container mx-auto px-6 md:px-12 max-w-7xl relative z-10">
         
         {/* Section Header: Tightly grouped Title & Subtitle */}
