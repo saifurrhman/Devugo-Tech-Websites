@@ -190,21 +190,12 @@ export default function TechnologiesSection() {
                   href={tech.websiteUrl || '#'}
                   target={tech.websiteUrl ? "_blank" : "_self"}
                   rel={tech.websiteUrl ? "noopener noreferrer" : ""}
-                  className={`group relative flex flex-col items-center justify-between pt-6 pb-5 px-4 w-40 h-52 md:w-48 md:h-56 rounded-2xl flex-shrink-0 snap-start transition-all duration-300 overflow-hidden box-border ${
-                    tech.featured 
-                      ? 'bg-gradient-to-b from-[#241c10] via-[#16120b] to-[#0c0906] border border-amber-400/60 hover:border-amber-400 shadow-[0_0_25px_rgba(255,193,7,0.22)] hover:shadow-[0_0_35px_rgba(255,193,7,0.4)]' 
-                      : 'bg-gradient-to-b from-[#141b27] via-[#0f141e] to-[#0a0d14] border border-white/10 hover:border-blue-500/60 shadow-[0_4px_16px_rgba(0,0,0,0.35)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.5)]'
-                  } hover:-translate-y-2`}
+                  className={`tool-card ${tech.featured ? 'featured' : ''} group relative flex-shrink-0 snap-start transition-all duration-300 overflow-hidden box-border hover:-translate-y-2`}
                   style={{
                     isolation: 'isolate',
                     WebkitMaskImage: '-webkit-radial-gradient(white, black)'
                   }}
                 >
-                  {/* Top Inner Radial Glow */}
-                  <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none ${
-                    tech.featured ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,193,7,0.3),transparent_70%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.25),transparent_70%)]'
-                  }`}></div>
-
                   {/* Vibrant Ribbon Corner Clipping for Featured */}
                   {tech.featured && (
                     <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-tr-2xl pointer-events-none z-20">
@@ -214,30 +205,27 @@ export default function TechnologiesSection() {
                     </div>
                   )}
                   
-                  {/* Sleek Uniform Glassy Icon Container (Fix for oversized box & harsh contrast) */}
-                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/[0.08] border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.35)] flex items-center justify-center p-2.5 backdrop-blur-md group-hover:border-white/30 group-hover:bg-white/[0.14] group-hover:scale-110 transition-all duration-300 shrink-0 relative z-10 mt-1">
+                  {/* Icon box - white background jo har icon/logo ke peeche aayega */}
+                  <div className="icon-box relative z-10 shrink-0 group-hover:scale-105 transition-transform duration-300">
                     {tech.icon ? (
                       tech.icon.startsWith('http') || tech.icon.startsWith('/') || tech.icon.includes('base64') ? (
-                        <img src={tech.icon} alt={tech.name} className="w-full h-full object-contain filter drop-shadow-sm rounded-lg" loading="lazy" />
+                        <img src={tech.icon} alt={tech.name} loading="lazy" />
                       ) : (
-                        <span className="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>img]:w-full [&>img]:h-full [&>img]:object-contain [&>img]:rounded-lg [&>div]:w-full [&>div]:h-full [&>div]:rounded-lg [&>div]:overflow-hidden" dangerouslySetInnerHTML={{ __html: tech.icon }}></span>
+                        <span dangerouslySetInnerHTML={{ __html: tech.icon }}></span>
                       )
                     ) : (
-                      <span className="text-xl font-bold text-slate-200 group-hover:text-white">{tech.name.charAt(0)}</span>
+                      <span className="text-2xl font-bold text-slate-800">{tech.name.charAt(0)}</span>
                     )}
                   </div>
                   
-                  {/* Tool Title - Clean typography & proper vertical spacing */}
-                  <h3 
-                    className="w-full text-xs md:text-sm font-extrabold text-center text-slate-100 group-hover:text-white transition-colors px-1 truncate relative z-10 my-auto tracking-wide"
-                    title={tech.name}
-                  >
+                  {/* Tool Name */}
+                  <h3 className="tool-name relative z-10" title={tech.name}>
                     {tech.name}
                   </h3>
 
-                  {/* Glassy Badge Pill */}
+                  {/* Category Badge */}
                   <div className="relative z-10 w-full flex justify-center mt-auto">
-                    <span className="px-3 py-1 text-[10px] font-bold tracking-wider uppercase rounded-full bg-white/[0.07] backdrop-blur-md border border-white/15 text-slate-300 group-hover:text-white group-hover:border-white/30 transition-colors truncate max-w-full">
+                    <span className="badge">
                       {tech.category}
                     </span>
                   </div>
