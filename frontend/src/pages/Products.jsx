@@ -169,7 +169,7 @@ export default function Products() {
           </div>
         </section>
 
-        {/* ─── SEPARATED DETAILED PRODUCTS SHOWCASE LIST (OmniSolve Layout) ─── */}
+        {/* ─── SEPARATED DETAILED PRODUCTS SHOWCASE LIST (Admin Dark Navy Aesthetic) ─── */}
         <section className="max-w-6xl mx-auto px-4 md:px-8 space-y-16 py-6">
 
           {/* Filter Pills Bar */}
@@ -207,7 +207,7 @@ export default function Products() {
             </div>
           )}
 
-          {/* Products List - Full OmniSolve AI Card Layout for Every Product */}
+          {/* Products List - Admin Dark Navy Layout */}
           {!loading && filtered.length > 0 && filtered.map((prod, index) => {
             const featuresList = (Array.isArray(prod.features) && prod.features.length > 0)
               ? prod.features
@@ -218,12 +218,12 @@ export default function Products() {
             return (
               <div key={prod._id || index} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                 
-                {/* Left Card: White/Light Card with Product Icon & Quick Actions */}
-                <div className="lg:col-span-5 bg-[#ffffff] text-slate-900 rounded-3xl p-8 shadow-2xl flex flex-col justify-between items-center text-center relative border border-slate-200">
+                {/* Left Card: Dark Navy Card matching Admin theme */}
+                <div className="lg:col-span-5 bg-[#0f223f] border border-slate-700/60 text-white rounded-3xl p-8 shadow-2xl flex flex-col justify-between items-center text-center relative">
                   <div className="w-full flex flex-col items-center">
                     
                     {/* Icon Box */}
-                    <div className="w-24 h-24 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-5 shadow-inner">
+                    <div className="w-24 h-24 rounded-3xl bg-[#162a4a] border border-emerald-500/30 flex items-center justify-center mb-5 shadow-inner">
                       {prod.image ? (
                         <img src={getFileUrl(prod.image)} alt={prod.title} className="w-14 h-14 object-contain" />
                       ) : (
@@ -234,31 +234,31 @@ export default function Products() {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-2xl font-black text-slate-900 mb-2">
+                    <h3 className="text-2xl font-black text-white mb-2">
                       {prod.title}
                     </h3>
 
                     {/* Tagline */}
-                    <p className="text-slate-600 text-xs md:text-sm leading-relaxed max-w-xs mb-6">
+                    <p className="text-slate-300 text-xs md:text-sm leading-relaxed max-w-xs mb-6">
                       {prod.tagline || prod.description}
                     </p>
                   </div>
 
                   {/* Dual Action Buttons Inside Card */}
-                  <div className="w-full grid grid-cols-2 gap-3 pt-6 border-t border-slate-100 mt-auto">
+                  <div className="w-full grid grid-cols-2 gap-3 pt-6 border-t border-slate-800 mt-auto">
                     {prod.demoUrl ? (
                       <a
                         href={prod.demoUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition-all font-bold text-[11px]"
+                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1e2536] hover:bg-slate-700 text-white transition-all font-bold text-[11px] border border-slate-700/60"
                       >
-                        <ExternalLink size={16} className="text-slate-700 mb-1" />
+                        <ExternalLink size={16} className="text-blue-400 mb-1" />
                         <span>LIVE DEMO</span>
                       </a>
                     ) : (
-                      <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-100 text-slate-800 font-bold text-[11px]">
-                        <Phone size={16} className="text-slate-700 mb-1" />
+                      <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1e2536] text-white font-bold text-[11px] border border-slate-700/60">
+                        <Phone size={16} className="text-blue-400 mb-1" />
                         <span>VOICE LINE</span>
                       </div>
                     )}
@@ -267,7 +267,7 @@ export default function Products() {
                       href={waLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex flex-col items-center justify-center p-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all font-bold text-[11px] border border-emerald-200"
+                      className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#0c2436] hover:bg-[#123048] text-emerald-400 transition-all font-bold text-[11px] border border-emerald-500/40"
                     >
                       <MessageSquare size={16} className="text-[#25D366] mb-1" />
                       <span>WHATSAPP API</span>

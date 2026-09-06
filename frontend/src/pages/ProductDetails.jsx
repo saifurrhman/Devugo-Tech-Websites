@@ -58,7 +58,7 @@ export default function ProductDetails() {
           <div className="flex items-center justify-between gap-4 mb-8">
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-xs font-extrabold text-slate-400 hover:text-white transition-colors bg-[#0f223f] border border-slate-700/60 px-4 py-2 rounded-full"
+              className="inline-flex items-center gap-2 text-xs font-extrabold text-slate-300 hover:text-white transition-colors bg-[#0f223f] border border-slate-700/60 px-4 py-2 rounded-full"
             >
               <ArrowLeft size={16} /> Back to Products Catalog
             </Link>
@@ -107,15 +107,15 @@ export default function ProductDetails() {
                 </p>
               </div>
 
-              {/* ─── SECTION 2: SEPARATED DETAILED PRODUCT SHOWCASE CARD (OmniSolve Layout) ─── */}
+              {/* ─── SECTION 2: SEPARATED DETAILED PRODUCT SHOWCASE CARD (Dark Navy Theme) ─── */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                 
-                {/* Left Card: Showcase Box */}
-                <div className="lg:col-span-5 bg-[#ffffff] text-slate-900 rounded-3xl p-8 shadow-2xl flex flex-col justify-between items-center text-center relative overflow-hidden border border-slate-200">
+                {/* Left Card: Dark Navy Showcase Box */}
+                <div className="lg:col-span-5 bg-[#0f223f] border border-slate-700/60 text-white rounded-3xl p-8 shadow-2xl flex flex-col justify-between items-center text-center relative overflow-hidden">
                   <div className="w-full flex flex-col items-center">
                     
                     {/* Rounded Green/Blue Icon Box */}
-                    <div className="w-28 h-28 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-6 shadow-inner">
+                    <div className="w-28 h-28 rounded-3xl bg-[#162a4a] border border-emerald-500/30 flex items-center justify-center mb-6 shadow-inner">
                       {product.image ? (
                         <img src={getFileUrl(product.image)} alt={product.title} className="w-16 h-16 object-contain" />
                       ) : (
@@ -126,12 +126,12 @@ export default function ProductDetails() {
                     </div>
 
                     {/* Product Name */}
-                    <h2 className="text-2xl font-black text-slate-900 mb-2">
+                    <h2 className="text-2xl font-black text-white mb-2">
                       {product.title}
                     </h2>
 
                     {/* Short Tagline / Voice Description */}
-                    <p className="text-slate-600 text-xs md:text-sm leading-relaxed max-w-xs mb-8">
+                    <p className="text-slate-300 text-xs md:text-sm leading-relaxed max-w-xs mb-8">
                       {product.tagline || 'Voice-first intelligence & automated ecosystem. No complex apps needed.'}
                     </p>
 
@@ -139,27 +139,27 @@ export default function ProductDetails() {
                     {Array.isArray(product.gallery) && product.gallery.length > 0 && (
                       <div className="w-full grid grid-cols-2 gap-2 mb-6">
                         {product.gallery.slice(0, 2).map((img, i) => (
-                          <img key={i} src={getFileUrl(img)} alt="Product preview" className="w-full h-24 object-cover rounded-xl border border-slate-200" />
+                          <img key={i} src={getFileUrl(img)} alt="Product preview" className="w-full h-24 object-cover rounded-xl border border-slate-700/60" />
                         ))}
                       </div>
                     )}
                   </div>
 
                   {/* Dual Action Buttons Inside Left Card */}
-                  <div className="w-full grid grid-cols-2 gap-3 pt-6 border-t border-slate-100 mt-auto">
+                  <div className="w-full grid grid-cols-2 gap-3 pt-6 border-t border-slate-800 mt-auto">
                     {product.demoUrl ? (
                       <a
                         href={product.demoUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition-all font-bold text-[11px]"
+                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1e2536] hover:bg-slate-700 text-white transition-all font-bold text-[11px] border border-slate-700/60"
                       >
-                        <ExternalLink size={18} className="text-slate-700 mb-1" />
+                        <ExternalLink size={18} className="text-blue-400 mb-1" />
                         <span>LIVE DEMO</span>
                       </a>
                     ) : (
-                      <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-100 text-slate-800 font-bold text-[11px]">
-                        <Phone size={18} className="text-slate-700 mb-1" />
+                      <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1e2536] text-white font-bold text-[11px] border border-slate-700/60">
+                        <Phone size={18} className="text-blue-400 mb-1" />
                         <span>VOICE LINE</span>
                       </div>
                     )}
@@ -168,7 +168,7 @@ export default function ProductDetails() {
                       href={whatsappUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex flex-col items-center justify-center p-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all font-bold text-[11px] border border-emerald-200"
+                      className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#0c2436] hover:bg-[#123048] text-emerald-400 transition-all font-bold text-[11px] border border-emerald-500/40"
                     >
                       <MessageSquare size={18} className="text-[#25D366] mb-1" />
                       <span>WHATSAPP API</span>
@@ -298,7 +298,7 @@ export default function ProductDetails() {
 
               </div>
 
-              {/* ─── SECTION 4: R&D LAB CLASSIFIED TEASER BOX (From Screenshot) ─── */}
+              {/* ─── SECTION 4: R&D LAB CLASSIFIED TEASER BOX ─── */}
               <div className="bg-[#0b182b] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
                 <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center mx-auto mb-4">
                   <Cpu size={24} />
