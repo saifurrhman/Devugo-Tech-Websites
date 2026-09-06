@@ -113,182 +113,194 @@ ${form.additionalDetails}
     }
   }
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
     <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-fadeIn overflow-y-auto"
       onClick={(e)=>{ if(e.target === e.currentTarget) onClose?.(); }}
     >
       <div 
-        className="relative w-full max-w-[800px] max-h-[90vh] overflow-auto bg-[#1a2332] rounded-2xl shadow-2xl animate-slideUp"
+        className="relative w-full max-w-[760px] max-h-[85vh] sm:max-h-[88vh] flex flex-col bg-[#111927] border border-slate-700/60 rounded-2xl shadow-2xl animate-slideUp my-auto overflow-hidden"
         role="dialog" 
         aria-modal="true" 
         aria-labelledby="inq-title" 
         tabIndex={-1} 
         ref={dialogRef}
       >
-        <header className="px-8 py-6 border-b border-slate-700/50 flex items-center justify-between">
+        <header className="shrink-0 px-6 sm:px-8 py-4 sm:py-5 border-b border-slate-700/60 flex items-center justify-between bg-[#111927] z-10">
           <h3 
             id="inq-title"
-            className="text-2xl font-bold text-white"
+            className="text-xl sm:text-2xl font-extrabold text-white"
           >
             Custom Quote
           </h3>
           <button 
             onClick={onClose} 
             aria-label="Close"
-            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white transition-colors text-3xl font-light leading-none"
+            className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors text-2xl font-light leading-none"
           >
             ×
           </button>
         </header>
 
-        {success ? (
-          <div className="px-8 py-12 text-center">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-scaleIn">
-              <svg 
-                width="32" 
-                height="32" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="white" 
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          {success ? (
+            <div className="py-8 text-center">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-scaleIn">
+                <svg 
+                  width="32" 
+                  height="32" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="white" 
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                Request Sent!
+              </h3>
+              <p className="text-slate-400">
+                We'll get back to you within 1 business day.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">
-              Request Sent!
-            </h3>
-            <p className="text-slate-400">
-              We'll get back to you within 1 business day.
-            </p>
-          </div>
-        ) : (
-          <form 
-            onSubmit={onSubmit}
-            className="px-8 py-6"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block mb-2 text-sm font-semibold text-white">
-                  Name
-                </label>
-                <input 
-                  name="name" 
-                  value={form.name} 
-                  onChange={onChange} 
-                  placeholder="Your name" 
-                  required 
-                  className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-semibold text-white">
-                  Email
-                </label>
-                <input 
-                  name="email" 
-                  type="email" 
-                  value={form.email} 
-                  onChange={onChange} 
-                  placeholder="Email address" 
-                  required 
-                  className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block mb-2 text-sm font-semibold text-white">
-                  Project type
-                </label>
-                <input 
-                  name="projectType" 
-                  value={form.projectType} 
-                  onChange={onChange} 
-                  placeholder={service ? service.title : "e.g., Custom Web Application"}
-                  required 
-                  className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                />
-                {service && (
-                  <p className="mt-1 text-xs text-slate-400">
-                    Selected service: {service.title}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-semibold text-white">
-                  Estimated budget
-                </label>
-                <div className="relative">
-                  <select 
-                    name="budget" 
-                    value={form.budget} 
+          ) : (
+            <form 
+              onSubmit={onSubmit}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                <div>
+                  <label className="block mb-2 text-sm font-semibold text-white">
+                    Name
+                  </label>
+                  <input 
+                    name="name" 
+                    value={form.name} 
                     onChange={onChange} 
-                    required
-                    className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 appearance-none cursor-pointer pr-10"
-                  >
-                    {budgetOptions.map(opt => (
-                      <option key={opt.value} value={opt.value} className="bg-[#0f1621]">
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                    <svg width="12" height="8" viewBox="0 0 12 8" fill="currentColor">
-                      <path d="M6 8L0 0h12L6 8z"/>
-                    </svg>
+                    placeholder="Your name" 
+                    required 
+                    className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-semibold text-white">
+                    Email
+                  </label>
+                  <input 
+                    name="email" 
+                    type="email" 
+                    value={form.email} 
+                    onChange={onChange} 
+                    placeholder="Email address" 
+                    required 
+                    className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                <div>
+                  <label className="block mb-2 text-sm font-semibold text-white">
+                    Project type
+                  </label>
+                  <input 
+                    name="projectType" 
+                    value={form.projectType} 
+                    onChange={onChange} 
+                    placeholder={service ? service.title : "e.g., Custom Web Application"}
+                    required 
+                    className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  />
+                  {service && (
+                    <p className="mt-1 text-xs text-slate-400">
+                      Selected service: {service.title}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-semibold text-white">
+                    Estimated budget
+                  </label>
+                  <div className="relative">
+                    <select 
+                      name="budget" 
+                      value={form.budget} 
+                      onChange={onChange} 
+                      required
+                      className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 appearance-none cursor-pointer pr-10"
+                    >
+                      {budgetOptions.map(opt => (
+                        <option key={opt.value} value={opt.value} className="bg-[#0f1621]">
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                      <svg width="12" height="8" viewBox="0 0 12 8" fill="currentColor">
+                        <path d="M6 8L0 0h12L6 8z"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mb-6">
-              <label className="block mb-2 text-sm font-semibold text-white">
-                Additional details
-              </label>
-              <textarea 
-                name="additionalDetails" 
-                rows="4" 
-                value={form.additionalDetails} 
-                onChange={onChange} 
-                placeholder="Tell us about your specific requirements, timeline, or any questions..." 
-                required 
-                className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-vertical"
-              />
-            </div>
+              <div className="mb-6">
+                <label className="block mb-2 text-sm font-semibold text-white">
+                  Additional details
+                </label>
+                <textarea 
+                  name="additionalDetails" 
+                  rows="3" 
+                  value={form.additionalDetails} 
+                  onChange={onChange} 
+                  placeholder="Tell us about your specific requirements, timeline, or any questions..." 
+                  required 
+                  className="w-full px-4 py-3 bg-[#0f1621] border border-slate-700/50 rounded-lg text-white placeholder-slate-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-vertical min-h-[100px]"
+                />
+              </div>
 
-            <div className="flex gap-3 justify-end">
-              <button 
-                type="button"
-                onClick={onClose}
-                className="px-6 py-3 bg-transparent border border-slate-600 text-slate-300 rounded-lg font-semibold hover:bg-slate-800 hover:border-slate-500 transition-all duration-200"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all duration-200 flex items-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.25"/>
-                      <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                    </svg>
-                    Sending...
-                  </>
-                ) : 'Request Quote'}
-              </button>
-            </div>
-          </form>
-        )}
+              <div className="flex gap-3 justify-end pt-2 border-t border-slate-700/40">
+                <button 
+                  type="button"
+                  onClick={onClose}
+                  className="px-6 py-2.5 bg-transparent border border-slate-600 text-slate-300 rounded-lg font-semibold hover:bg-slate-800 hover:border-slate-500 transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all duration-200 flex items-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.25"/>
+                        <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                      </svg>
+                      Sending...
+                    </>
+                  ) : 'Request Quote'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
 
       <style>{`

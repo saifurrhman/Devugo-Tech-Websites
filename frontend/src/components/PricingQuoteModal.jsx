@@ -166,6 +166,17 @@ ${form.message}
     }
   }
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
   if(!open) return null;
 
   return (
@@ -173,13 +184,14 @@ ${form.message}
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'rgba(0, 0, 0, 0.8)',
         backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 9999,
-        padding: '1rem'
+        padding: '0.75rem',
+        overflowY: 'auto'
       }}
       onClick={(e)=>{ if(e.target===e.currentTarget) onClose?.(); }}
     >
@@ -192,25 +204,31 @@ ${form.message}
         style={{
           background: '#0a1929',
           borderRadius: '1.25rem',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          maxWidth: '820px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          maxWidth: '760px',
           width: '100%',
-          maxHeight: '92vh',
-          overflow: 'auto',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
+          maxHeight: '88vh',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+          margin: 'auto',
+          overflow: 'hidden'
         }}
       >
         <header style={{
-          padding: '1.75rem 2rem 1.5rem',
+          padding: '1.25rem 1.75rem',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start'
+          alignItems: 'center',
+          flexShrink: 0,
+          background: '#0a1929',
+          zIndex: 10
         }}>
           <h3 id="pq-title" style={{
             margin: 0, 
             color: '#ffffff',
-            fontSize: '1.75rem',
+            fontSize: '1.5rem',
             fontWeight: '700',
             letterSpacing: '-0.01em'
           }}>
@@ -248,7 +266,7 @@ ${form.message}
           </button>
         </header>
 
-        <div style={{padding: '2rem'}}>
+        <div style={{padding: '1.5rem 1.75rem', flex: 1, overflowY: 'auto'}}>
           <div style={{
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr', 
