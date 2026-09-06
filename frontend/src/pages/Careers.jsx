@@ -7,18 +7,38 @@ import { Rocket, Globe, DollarSign, Target, Search, Briefcase, MapPin, ArrowRigh
 import SEO from '../components/SEO';
 
 const TYPE_STYLE = {
-  'Full-Time':  { bg: 'bg-blue-600/20', border: 'border-blue-500/40', text: 'text-blue-400', badgeBg: 'bg-blue-600/30' },
-  'Part-Time':  { bg: 'bg-purple-600/20', border: 'border-purple-500/40', text: 'text-purple-400', badgeBg: 'bg-purple-600/30' },
-  'Contract':   { bg: 'bg-amber-600/20', border: 'border-amber-500/40', text: 'text-amber-400', badgeBg: 'bg-amber-600/30' },
-  'Internship': { bg: 'bg-emerald-600/20', border: 'border-emerald-500/40', text: 'text-emerald-400', badgeBg: 'bg-emerald-600/30' },
-  'Freelance':  { bg: 'bg-rose-600/20', border: 'border-rose-500/40', text: 'text-rose-400', badgeBg: 'bg-rose-600/30' },
+  'Full-Time':  { bg: 'bg-blue-500/15', border: 'border-blue-500/35', text: 'text-blue-400', badgeBg: 'bg-blue-500/20' },
+  'Part-Time':  { bg: 'bg-purple-500/15', border: 'border-purple-500/35', text: 'text-purple-400', badgeBg: 'bg-purple-500/20' },
+  'Contract':   { bg: 'bg-amber-500/15', border: 'border-amber-500/35', text: 'text-amber-400', badgeBg: 'bg-amber-500/20' },
+  'Internship': { bg: 'bg-emerald-500/15', border: 'border-emerald-500/35', text: 'text-emerald-400', badgeBg: 'bg-emerald-500/20' },
+  'Freelance':  { bg: 'bg-rose-500/15', border: 'border-rose-500/35', text: 'text-rose-400', badgeBg: 'bg-rose-500/20' },
 };
 
 const PERKS = [
-  { icon: <Rocket size={22} className="text-blue-400" />, title: 'Fast Growth', desc: 'Learn and grow with cutting-edge tech', border: 'border-blue-500/30' },
-  { icon: <Globe size={22} className="text-purple-400" />, title: 'Remote First', desc: 'Work from anywhere in the world', border: 'border-purple-500/30' },
-  { icon: <DollarSign size={22} className="text-amber-400" />, title: 'Competitive Pay', desc: 'Market-leading salaries & bonuses', border: 'border-amber-500/30' },
-  { icon: <Target size={22} className="text-rose-400" />, title: 'Impactful Work', desc: 'Build products used by thousands', border: 'border-rose-500/30' },
+  { 
+    icon: <Rocket size={22} className="text-blue-400" />, 
+    title: 'Fast Growth', 
+    desc: 'Learn and grow with cutting-edge tech', 
+    boxBg: 'bg-blue-500/10 border-blue-500/30' 
+  },
+  { 
+    icon: <Globe size={22} className="text-purple-400" />, 
+    title: 'Remote First', 
+    desc: 'Work from anywhere in the world', 
+    boxBg: 'bg-purple-500/10 border-purple-500/30' 
+  },
+  { 
+    icon: <DollarSign size={22} className="text-amber-400" />, 
+    title: 'Competitive Pay', 
+    desc: 'Market-leading salaries & bonuses', 
+    boxBg: 'bg-amber-500/10 border-amber-500/30' 
+  },
+  { 
+    icon: <Target size={22} className="text-rose-400" />, 
+    title: 'Impactful Work', 
+    desc: 'Build products used by thousands', 
+    boxBg: 'bg-rose-500/10 border-rose-500/30' 
+  },
 ];
 
 const DEFAULT_SAMPLE_JOBS = [
@@ -214,7 +234,7 @@ export default function Careers() {
                 key={p.title} 
                 className="bg-[#0f223f]/80 border border-slate-700/60 rounded-2xl p-6 text-center shadow-md backdrop-blur-md hover:border-blue-500/50 hover:bg-[#132747] transition-all group"
               >
-                <div className="w-12 h-12 rounded-xl bg-[#0a182e] border border-slate-700/60 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <div className={`w-12 h-12 rounded-xl ${p.boxBg} border flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md`}>
                   {p.icon}
                 </div>
                 <h3 className="text-white font-extrabold text-base mb-1.5">
