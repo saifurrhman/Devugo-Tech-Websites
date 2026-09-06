@@ -126,7 +126,12 @@ export default function Footer() {
         <section className="footer-col social">
           <h4>Follow us</h4>
           <div className="social-row">
-            {links.map(link => (
+            {(links.length > 0 ? links : [
+              { _id: 'lnk-1', platform: 'linkedin', url: 'https://linkedin.com' },
+              { _id: 'lnk-2', platform: 'twitter', url: 'https://twitter.com' },
+              { _id: 'lnk-3', platform: 'facebook', url: 'https://facebook.com' },
+              { _id: 'lnk-4', platform: 'instagram', url: 'https://instagram.com' }
+            ]).map(link => (
               <a
                 key={link._id}
                 href={link.url}
@@ -139,9 +144,10 @@ export default function Footer() {
               </a>
             ))}
           </div>
+          <h4 style={{ marginTop: '1rem' }}>Quick Actions</h4>
           <div className="app-badges">
-            <a className="badge ghost" href="#">Get a quote</a>
-            <a className="badge ghost" href="#">Support</a>
+            <a className="badge ghost" href="/contact">Get a quote</a>
+            <a className="badge ghost" href="/contact">Support</a>
           </div>
         </section>
       </div>

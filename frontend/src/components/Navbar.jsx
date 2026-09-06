@@ -97,7 +97,7 @@ export default function Navbar() {
             <NavLink to="/contact" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Contact</NavLink>
           </div>
           <div className="nav-right">
-            <Link to="/contact" className="btn cta-dark" onClick={close}>FREE CRO AUDIT</Link>
+            <Link to="/contact" className="btn cta-primary" onClick={close} style={{ background: '#2563eb', color: '#ffffff', border: 'none', fontWeight: 800 }}>FREE CRO AUDIT</Link>
             <button
               className={`mobile-toggle ${open ? 'open' : ''}`}
               aria-label="Toggle menu"

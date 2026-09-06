@@ -93,6 +93,20 @@ const DEFAULT_SAMPLE_JOBS = [
   }
 ];
 
+function getCategoryStyle(department = '', type = '') {
+  const d = (department || '').toLowerCase();
+  if (d.includes('design') || d.includes('product') || d.includes('ui/ux')) {
+    return { bg: 'bg-purple-500/15', border: 'border-purple-500/35', text: 'text-purple-400', badgeBg: 'bg-purple-500/20' };
+  }
+  if (d.includes('quality') || d.includes('sqa') || d.includes('testing')) {
+    return { bg: 'bg-emerald-500/15', border: 'border-emerald-500/35', text: 'text-emerald-400', badgeBg: 'bg-emerald-500/20' };
+  }
+  if (d.includes('sales') || d.includes('business') || d.includes('outbound')) {
+    return { bg: 'bg-amber-500/15', border: 'border-amber-500/35', text: 'text-amber-400', badgeBg: 'bg-amber-500/20' };
+  }
+  return { bg: 'bg-blue-500/15', border: 'border-blue-500/35', text: 'text-blue-400', badgeBg: 'bg-blue-500/20' };
+}
+
 export default function Careers() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -148,23 +162,22 @@ export default function Careers() {
       <div className="bg-[#061c39] text-white min-h-screen pt-28 pb-16">
 
         {/* ─── HERO ─── */}
-        <section className="relative overflow-hidden pt-8 pb-12 text-center px-4">
+        <section className="relative overflow-hidden pt-8 pb-12 text-center px-4 flex flex-col items-center justify-center">
           
-          {/* Ambient Radial Glows */}
+          {/* Ambient Glows */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative max-w-4xl mx-auto z-10">
+          <div className="relative max-w-4xl w-full mx-auto z-10 flex flex-col items-center text-center">
             
             {/* Top Hiring Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-[#0f2444]/80 backdrop-blur-md mb-6 shadow-md">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-[#0f2444]/80 backdrop-blur-md mb-6 shadow-md mx-auto">
               <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
               <span className="text-[11px] font-extrabold text-blue-400 tracking-wider uppercase">
                 • We're Actively Hiring
               </span>
             </div>
 
-            {/* Hero Main Heading with Clean Solid Theme Colors (No Gradient) */}
+            {/* Hero Main Heading */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-4 leading-tight text-center">
               Shape the Future<br />
               <span className="text-blue-400">
@@ -173,12 +186,12 @@ export default function Careers() {
             </h1>
 
             {/* Hero Subtitle */}
-            <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed font-normal">
+            <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed font-normal text-center">
               Join a team of brilliant minds building next-generation digital products. Work on meaningful projects, grow fast, and enjoy the journey.
             </p>
 
             {/* Stat Counters Row */}
-            <div className="flex justify-center items-center gap-4 sm:gap-6 flex-wrap max-w-2xl mx-auto mb-8">
+            <div className="flex justify-center items-center gap-4 sm:gap-6 flex-wrap w-full max-w-2xl mx-auto mb-8">
               <div className="bg-[#0f223f]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-all">
                 <div className="text-3xl md:text-4xl font-black text-white">
                   {jobs.length}
@@ -205,15 +218,21 @@ export default function Careers() {
               </div>
             </div>
 
-            {/* Search Input Bar */}
-            <div className="relative max-w-lg mx-auto">
+            {/* Search Input Bar with Icon and Search Button */}
+            <div className="relative w-full max-w-lg mx-auto">
               <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <input 
                 value={q} 
                 onChange={e => setQ(e.target.value)}
                 placeholder="Search roles, departments, locations..."
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-[#0f223f]/90 border border-slate-700/60 text-white placeholder-slate-400 text-sm md:text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-xl backdrop-blur-md"
+                className="w-full pl-11 pr-24 py-3.5 rounded-xl bg-[#0f223f]/90 border border-slate-700/60 text-white placeholder-slate-400 text-sm md:text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-xl backdrop-blur-md"
               />
+              <button 
+                type="button"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-lg transition-all shadow-md"
+              >
+                Search
+              </button>
             </div>
 
           </div>
@@ -264,7 +283,7 @@ export default function Careers() {
               })}
             </div>
             <span className="text-xs font-semibold text-slate-400">
-              {filtered.length} position{filtered.length !== 1 ? 's' : ''}
+              Showing {filtered.length} of {jobs.length} open roles
             </span>
           </div>
 
@@ -280,7 +299,8 @@ export default function Careers() {
           {!loading && filtered.length > 0 && (
             <div className="space-y-3.5">
               {filtered.map((job, i) => {
-                const st = TYPE_STYLE[job.type] || TYPE_STYLE['Full-Time'];
+                const catStyle = getCategoryStyle(job.department, job.type);
+                const typeStyle = TYPE_STYLE[job.type] || TYPE_STYLE['Full-Time'];
                 return (
                   <Link 
                     key={job._id || i} 
@@ -290,14 +310,17 @@ export default function Careers() {
                     <div className="bg-[#0f223f]/80 border border-slate-700/60 hover:border-blue-500/60 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-200 hover:bg-[#132747] hover:shadow-xl backdrop-blur-md">
                       
                       <div className="flex items-start md:items-center gap-4 flex-1">
-                        <div className={`w-12 h-12 rounded-xl ${st.bg} ${st.border} border flex items-center justify-center shrink-0`}>
-                          <Briefcase size={22} className={st.text} />
+                        {/* Distinct Icon Color according to Category */}
+                        <div className={`w-12 h-12 rounded-xl ${catStyle.bg} ${catStyle.border} border flex items-center justify-center shrink-0 shadow-sm`}>
+                          <Briefcase size={22} className={catStyle.text} />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="text-base md:text-lg font-extrabold text-white group-hover:text-blue-400 transition-colors mb-1.5">
+                          {/* Strong Visual Hierarchy: Bold Prominent Title */}
+                          <h3 className="text-lg md:text-xl font-extrabold text-white group-hover:text-blue-400 transition-colors mb-1.5">
                             {job.title}
                           </h3>
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+                          {/* Muted Compact Details */}
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 font-normal">
                             {job.department && (
                               <span className="flex items-center gap-1.5">
                                 <Briefcase size={13} className="text-slate-500" />
@@ -321,11 +344,13 @@ export default function Careers() {
                       </div>
 
                       <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-700/40">
-                        <span className={`px-3.5 py-1 rounded-full text-xs font-bold border ${st.bg} ${st.border} ${st.text}`}>
+                        {/* Synchronized Job Badges */}
+                        <span className={`px-3.5 py-1 rounded-full text-xs font-bold border ${typeStyle.bg} ${typeStyle.border} ${typeStyle.text}`}>
                           {job.type}
                         </span>
-                        <div className="w-8 h-8 rounded-lg bg-[#0a182e] border border-slate-700/60 text-slate-400 group-hover:text-blue-400 group-hover:bg-blue-600/20 group-hover:border-blue-500/50 flex items-center justify-center transition-all">
-                          <ArrowRight size={16} />
+                        {/* High Contrast Prominent Action Arrow Button */}
+                        <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 flex items-center justify-center transition-all shadow-md shrink-0">
+                          <ArrowRight size={18} />
                         </div>
                       </div>
 
