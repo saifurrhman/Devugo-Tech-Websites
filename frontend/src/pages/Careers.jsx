@@ -164,17 +164,24 @@ export default function Careers() {
               </span>
             </div>
 
-            {/* Hero Main Heading with Unified Seamless Gradient Text */}
-            <h1 
-              className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-4 leading-tight text-center bg-clip-text text-transparent inline-block pb-1"
-              style={{
-                backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 35%, #60A5FA 70%, #C084FC 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}
-            >
-              Shape the Future<br />
-              of Technology
+            {/* Hero Main Heading with Explicit White and Gradient Lines */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-4 leading-tight text-center">
+              <span style={{ color: '#FFFFFF', display: 'inline-block' }}>
+                Shape the Future
+              </span>
+              <br />
+              <span 
+                style={{
+                  background: 'linear-gradient(90deg, #60A5FA 0%, #818CF8 50%, #C084FC 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  color: 'transparent',
+                  display: 'inline-block',
+                  paddingBottom: '4px'
+                }}
+              >
+                of Technology
+              </span>
             </h1>
 
             {/* Hero Subtitle */}
