@@ -130,55 +130,63 @@ export default function Careers() {
         {/* ─── HERO ─── */}
         <section className="relative overflow-hidden pt-8 pb-12 text-center px-4">
           
-          {/* Ambient Glows */}
+          {/* Ambient Radial Glows */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative max-w-4xl mx-auto z-10">
             
             {/* Top Hiring Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-600/15 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-[#0f2444]/80 backdrop-blur-md mb-6 shadow-md">
               <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
               <span className="text-[11px] font-extrabold text-blue-400 tracking-wider uppercase">
-                We're Actively Hiring
+                • We're Actively Hiring
               </span>
             </div>
 
-            {/* Hero Main Heading */}
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-4 leading-tight">
+            {/* Hero Main Heading with Vibrant Gradient Text */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-4 leading-tight">
               Shape the Future<br />
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 bg-clip-text text-transparent">
+              <span 
+                className="inline-block pb-1 bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: 'linear-gradient(90deg, #60A5FA 0%, #818CF8 50%, #C084FC 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}
+              >
                 of Technology
               </span>
             </h1>
 
             {/* Hero Subtitle */}
-            <p className="text-slate-300 text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+            <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed font-normal">
               Join a team of brilliant minds building next-generation digital products. Work on meaningful projects, grow fast, and enjoy the journey.
             </p>
 
             {/* Stat Counters Row */}
             <div className="flex justify-center items-center gap-4 sm:gap-6 flex-wrap max-w-2xl mx-auto mb-8">
-              <div className="bg-[#0f1b2e]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md">
+              <div className="bg-[#0f223f]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-all">
                 <div className="text-3xl md:text-4xl font-black text-white">
                   {jobs.length}
                 </div>
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">
+                <div className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mt-1">
                   Open Roles
                 </div>
               </div>
-              <div className="bg-[#0f1b2e]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md">
+              <div className="bg-[#0f223f]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-all">
                 <div className="text-3xl md:text-4xl font-black text-white">
                   {teamCount}
                 </div>
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">
+                <div className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mt-1">
                   Team Members
                 </div>
               </div>
-              <div className="bg-[#0f1b2e]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md">
+              <div className="bg-[#0f223f]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-all">
                 <div className="text-3xl md:text-4xl font-black text-white">
                   {countriesCount}
                 </div>
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">
+                <div className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mt-1">
                   Countries
                 </div>
               </div>
@@ -191,7 +199,7 @@ export default function Careers() {
                 value={q} 
                 onChange={e => setQ(e.target.value)}
                 placeholder="Search roles, departments, locations..."
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-[#0f1b2e]/90 border border-slate-700/60 text-white placeholder-slate-400 text-sm md:text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-xl backdrop-blur-md"
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-[#0f223f]/90 border border-slate-700/60 text-white placeholder-slate-400 text-sm md:text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-xl backdrop-blur-md"
               />
             </div>
 
@@ -204,12 +212,12 @@ export default function Careers() {
             {PERKS.map(p => (
               <div 
                 key={p.title} 
-                className="bg-[#0f1b2e]/80 border border-slate-700/60 rounded-2xl p-5 text-center shadow-md backdrop-blur-md hover:border-blue-500/50 hover:bg-[#132238] transition-all group"
+                className="bg-[#0f223f]/80 border border-slate-700/60 rounded-2xl p-6 text-center shadow-md backdrop-blur-md hover:border-blue-500/50 hover:bg-[#132747] transition-all group"
               >
-                <div className="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center mx-auto mb-3.5 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-[#0a182e] border border-slate-700/60 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                   {p.icon}
                 </div>
-                <h3 className="text-white font-extrabold text-base mb-1">
+                <h3 className="text-white font-extrabold text-base mb-1.5">
                   {p.title}
                 </h3>
                 <p className="text-slate-400 text-xs leading-relaxed">
@@ -234,7 +242,7 @@ export default function Careers() {
                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
                       active 
                         ? 'bg-blue-600 text-white border border-blue-400/50 shadow-blue-600/30' 
-                        : 'bg-[#0f1b2e]/80 border border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+                        : 'bg-[#0f223f]/80 border border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
                     {t}
@@ -266,7 +274,7 @@ export default function Careers() {
                     to={`/careers/${job.slug || job._id}`} 
                     className="block group"
                   >
-                    <div className="bg-[#0f1b2e]/80 border border-slate-700/60 hover:border-blue-500/60 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-200 hover:bg-[#132238] hover:shadow-xl backdrop-blur-md">
+                    <div className="bg-[#0f223f]/80 border border-slate-700/60 hover:border-blue-500/60 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-200 hover:bg-[#132747] hover:shadow-xl backdrop-blur-md">
                       
                       <div className="flex items-start md:items-center gap-4 flex-1">
                         <div className={`w-12 h-12 rounded-xl ${st.bg} ${st.border} border flex items-center justify-center shrink-0`}>
@@ -303,7 +311,7 @@ export default function Careers() {
                         <span className={`px-3.5 py-1 rounded-full text-xs font-bold border ${st.bg} ${st.border} ${st.text}`}>
                           {job.type}
                         </span>
-                        <div className="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700/60 text-slate-400 group-hover:text-blue-400 group-hover:bg-blue-600/20 group-hover:border-blue-500/50 flex items-center justify-center transition-all">
+                        <div className="w-8 h-8 rounded-lg bg-[#0a182e] border border-slate-700/60 text-slate-400 group-hover:text-blue-400 group-hover:bg-blue-600/20 group-hover:border-blue-500/50 flex items-center justify-center transition-all">
                           <ArrowRight size={16} />
                         </div>
                       </div>
@@ -317,7 +325,7 @@ export default function Careers() {
 
           {/* ─── BOTTOM CTA BANNER ─── */}
           {!loading && (
-            <div className="bg-gradient-to-r from-[#0f1b2e] via-[#15233c] to-[#0f1b2e] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center shadow-2xl backdrop-blur-md mt-16 relative overflow-hidden">
+            <div className="bg-gradient-to-r from-[#0d1e38] via-[#142848] to-[#0d1e38] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center shadow-2xl backdrop-blur-md mt-16 relative overflow-hidden">
               <div className="relative z-10 max-w-xl mx-auto">
                 <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
                   Don't see the perfect role?
@@ -327,7 +335,10 @@ export default function Careers() {
                 </p>
                 <Link 
                   to="/contact" 
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-blue-500/25 transition-all hover:scale-105"
+                  className="inline-flex items-center gap-2 text-white font-extrabold px-8 py-3.5 rounded-full shadow-lg shadow-blue-500/20 transition-all hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(90deg, #60A5FA 0%, #6366F1 50%, #A855F7 100%)'
+                  }}
                 >
                   Get In Touch <ArrowRight size={18} />
                 </Link>
