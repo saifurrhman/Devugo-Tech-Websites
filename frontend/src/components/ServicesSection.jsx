@@ -300,76 +300,75 @@ export default function ServicesSection({ variant }){
                       </button>
                     </div>
                   )}
-                </motion.article>
-              ))}
+              </motion.div>
 
-            {/* View All Services - Home Page Only */}
-            {isHome && services.length > 6 && (
-              <div className="load-more-wrap mt-8">
-                <a 
-                  href="/services#services" 
-                  className="btn cta-dark load-more-btn no-underline inline-block"
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
-                      <path 
-                        d="M5 12h14M12 5l7 7-7 7" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    View All Services
-                  </span>
-                </a>
-              </div>
-            )}
+              {/* View All Services - Home Page Only */}
+              {isHome && (
+                <div className="load-more-wrap mt-8" style={{ width: '100%', display: 'flex', justifyContent: 'center', textAlign: 'center', marginTop: '2.5rem' }}>
+                  <a 
+                    href="/services#services" 
+                    className="btn cta-dark load-more-btn no-underline inline-block"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
+                        <path 
+                          d="M5 12h14M12 5l7 7-7 7" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      View All Services
+                    </span>
+                  </a>
+                </div>
+              )}
 
-            {/* Load More/Show Less - Services Page Only */}
-            {!isHome && services.length > visibleCount ? (
-              <div className="load-more-wrap">
-                <button className="btn cta-dark load-more-btn" onClick={loadMore}>
-                  <span className="inline-flex items-center gap-2">
-                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
-                      <path 
-                        d="M12 5v14M5 12h14" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                      />
-                    </svg>
-                    Load more…
-                  </span>
-                </button>
-                <div className="progress-hint">
-                  {`${visibleCount} of ${services.length} shown`}
+              {/* Load More/Show Less - Services Page Only */}
+              {!isHome && services.length > visibleCount ? (
+                <div className="load-more-wrap" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginTop: '2rem' }}>
+                  <button className="btn cta-dark load-more-btn" onClick={loadMore}>
+                    <span className="inline-flex items-center gap-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
+                        <path 
+                          d="M12 5v14M5 12h14" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                        />
+                      </svg>
+                      Load more…
+                    </span>
+                  </button>
+                  <div className="progress-hint">
+                    {`${visibleCount} of ${services.length} shown`}
+                  </div>
                 </div>
-              </div>
-            ) : !isHome && services.length > initialCount ? (
-              <div className="load-more-wrap">
-                <button className="btn cta-dark load-more-btn" onClick={showLess}>
-                  <span className="inline-flex items-center gap-2">
-                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
-                      <path 
-                        d="M5 12h14" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                      />
-                    </svg>
-                    Show less
-                  </span>
-                </button>
-                <div className="progress-hint">
-                  {`${visibleCount} of ${services.length} shown`}
+              ) : !isHome && services.length > initialCount ? (
+                <div className="load-more-wrap" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginTop: '2rem' }}>
+                  <button className="btn cta-dark load-more-btn" onClick={showLess}>
+                    <span className="inline-flex items-center gap-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
+                        <path 
+                          d="M5 12h14" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                        />
+                      </svg>
+                      Show less
+                    </span>
+                  </button>
+                  <div className="progress-hint">
+                    {`${visibleCount} of ${services.length} shown`}
+                  </div>
                 </div>
-              </div>
-            ) : null}
-            </motion.div>
+              ) : null}
+            </React.Fragment>
           )}
         </AnimatePresence>
       </div>

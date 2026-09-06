@@ -8,7 +8,7 @@
 @keyframes servicesIntro{ from{ opacity:0; transform:translateY(6px) } to{ opacity:1; transform:translateY(0) } }
 
 /* Load more button appearance */
-.load-more-wrap{ display:flex; align-items:center; justify-content:center; gap:.75rem; flex-wrap:wrap; margin-top:1rem }
+.load-more-wrap{ display:flex; align-items:center; justify-content:center; gap:.75rem; flex-wrap:wrap; margin-top:2.5rem; width:100%; text-align:center; }
 .load-more-btn{ animation: lmPop .28s ease-out both }
 @keyframes lmPop{ from{ opacity:0; transform:translateY(10px) scale(.98) } to{ opacity:1; transform:translateY(0) scale(1) } }
 
