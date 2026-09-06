@@ -79,59 +79,37 @@ export default function TechnologiesSection() {
   return (
     <section className="py-16 text-white relative border-t border-gray-800/50 overflow-hidden">
       
-      <div className="container mx-auto px-4 md:px-8 max-w-7xl relative z-10">
+      <div className="container mx-auto px-6 md:px-12 max-w-7xl relative z-10">
         
-        {/* Section Header with Navigation Controls */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-          <div className="text-left max-w-2xl">
-            <motion.h2 
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2"
-            >
-              Tools & Technologies We Use
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: 0.1 }}
-              className="text-gray-400 text-base md:text-lg"
-            >
-              The modern stack powering our projects
-            </motion.p>
-          </div>
-
-          {/* Carousel Arrows for Desktop */}
-          <div className="hidden md:flex items-center gap-2.5 shrink-0 mb-1">
-            <button 
-              onClick={scrollLeft}
-              className="w-10 h-10 rounded-full bg-slate-800/90 border border-slate-700 text-white flex items-center justify-center hover:bg-blue-600 hover:border-blue-500 transition-all shadow-md active:scale-95"
-              aria-label="Scroll Left"
-              title="Previous technologies"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button 
-              onClick={scrollRight}
-              className="w-10 h-10 rounded-full bg-slate-800/90 border border-slate-700 text-white flex items-center justify-center hover:bg-blue-600 hover:border-blue-500 transition-all shadow-md active:scale-95"
-              aria-label="Scroll Right"
-              title="Next technologies"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+        {/* Section Header: Tightly grouped Title & Subtitle */}
+        <div className="text-center max-w-3xl mx-auto mb-4 md:mb-5">
+          <motion.h2 
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2"
+          >
+            Tools & Technologies We Use
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-400 text-base md:text-lg"
+          >
+            The modern stack powering our projects
+          </motion.p>
         </div>
 
-        {/* High-Contrast Category Filter Pills */}
+        {/* Filter Pills: High Contrast & Tight Spacing to Heading */}
         {categories.length > 1 && (
           <motion.div 
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ delay: 0.15 }}
-            className="flex flex-wrap justify-start items-center gap-2.5 mb-8"
+            className="flex flex-wrap justify-center items-center gap-2.5 mb-6 md:mb-8"
           >
             {categories.map(cat => (
               <button
@@ -140,7 +118,7 @@ export default function TechnologiesSection() {
                 className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all shadow-sm ${
                   activeCategory === cat 
                     ? 'bg-blue-600 text-white border border-blue-400/50 shadow-md shadow-blue-600/30' 
-                    : 'bg-slate-800/90 text-slate-300 border border-slate-700/70 hover:bg-slate-700 hover:text-white hover:border-slate-500'
+                    : 'bg-white/[0.08] text-slate-300 border border-white/15 hover:bg-white/[0.16] hover:text-white hover:border-white/30 backdrop-blur-sm'
                 }`}
               >
                 {cat}
@@ -149,30 +127,34 @@ export default function TechnologiesSection() {
           </motion.div>
         )}
 
-        {/* Interactive Scroll Container */}
+        {/* Carousel Container with Vertically-Centered Left/Right Circular Arrow Buttons */}
         {filteredTech.length > 0 && (
-          <div className="relative group/carousel">
+          <div className="relative group/carousel px-2 md:px-12">
             
-            {/* Floating Mobile Arrows */}
+            {/* Left Circular Arrow Button */}
             <button
               onClick={scrollLeft}
-              className="md:hidden absolute left-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-slate-900/90 border border-slate-700 text-white flex items-center justify-center shadow-lg active:scale-95"
+              className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-slate-900/85 border border-slate-700/80 text-white flex items-center justify-center backdrop-blur-md shadow-xl hover:bg-blue-600 hover:border-blue-500 transition-all duration-200 active:scale-95"
               aria-label="Scroll Left"
+              title="Scroll left"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={22} />
             </button>
+
+            {/* Right Circular Arrow Button */}
             <button
               onClick={scrollRight}
-              className="md:hidden absolute right-1 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-slate-900/90 border border-slate-700 text-white flex items-center justify-center shadow-lg active:scale-95"
+              className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-slate-900/85 border border-slate-700/80 text-white flex items-center justify-center backdrop-blur-md shadow-xl hover:bg-blue-600 hover:border-blue-500 transition-all duration-200 active:scale-95"
               aria-label="Scroll Right"
+              title="Scroll right"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={22} />
             </button>
 
             {/* Scrollable Cards Track */}
             <div 
               ref={scrollTrackRef}
-              className="flex gap-4 md:gap-5 overflow-x-auto pb-4 pt-1 px-1 scroll-smooth snap-x snap-mandatory scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent"
+              className="flex gap-4 md:gap-5 overflow-x-auto pb-4 pt-1 px-3 md:px-4 scroll-smooth snap-x snap-mandatory scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent"
               style={{
                 WebkitOverflowScrolling: 'touch',
                 scrollbarWidth: 'thin'
@@ -199,7 +181,7 @@ export default function TechnologiesSection() {
                     tech.featured ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,0.18),transparent_70%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.18),transparent_70%)]'
                   }`}></div>
 
-                  {/* Ribbon Clipping Fix */}
+                  {/* Ribbon Corner Clipping Fix */}
                   {tech.featured && (
                     <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-tr-2xl pointer-events-none z-20">
                       <div className="absolute top-3 -right-6 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[9px] font-extrabold py-0.5 px-8 transform rotate-45 shadow-sm uppercase tracking-wider">
@@ -223,7 +205,7 @@ export default function TechnologiesSection() {
                     )}
                   </div>
                   
-                  {/* Tool Title - Strict 1 line truncation */}
+                  {/* Tool Title - Strict single line truncation with tooltip */}
                   <h3 
                     className="w-full text-xs md:text-sm font-bold text-center text-slate-200 group-hover:text-white transition-colors px-1 truncate relative z-10 my-auto"
                     title={tech.name}
