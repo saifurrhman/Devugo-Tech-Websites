@@ -190,10 +190,10 @@ export default function TechnologiesSection() {
                   href={tech.websiteUrl || '#'}
                   target={tech.websiteUrl ? "_blank" : "_self"}
                   rel={tech.websiteUrl ? "noopener noreferrer" : ""}
-                  className={`group relative flex flex-col items-center justify-between pt-7 pb-5 px-5 w-40 h-52 md:w-48 md:h-56 rounded-2xl flex-shrink-0 snap-start transition-all duration-300 overflow-hidden box-border ${
+                  className={`group relative flex flex-col items-center justify-between pt-6 pb-5 px-4 w-40 h-52 md:w-48 md:h-56 rounded-2xl flex-shrink-0 snap-start transition-all duration-300 overflow-hidden box-border ${
                     tech.featured 
                       ? 'bg-gradient-to-b from-[#241c10] via-[#16120b] to-[#0c0906] border border-amber-400/60 hover:border-amber-400 shadow-[0_0_25px_rgba(255,193,7,0.22)] hover:shadow-[0_0_35px_rgba(255,193,7,0.4)]' 
-                      : 'bg-gradient-to-b from-[#161b26] to-[#0b0e15] border border-white/10 hover:border-blue-500/60 shadow-[0_4px_16px_rgba(0,0,0,0.35)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.5)]'
+                      : 'bg-gradient-to-b from-[#141b27] via-[#0f141e] to-[#0a0d14] border border-white/10 hover:border-blue-500/60 shadow-[0_4px_16px_rgba(0,0,0,0.35)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.5)]'
                   } hover:-translate-y-2`}
                   style={{
                     isolation: 'isolate',
@@ -214,28 +214,22 @@ export default function TechnologiesSection() {
                     </div>
                   )}
                   
-                  {/* Logo Container Style with Micro-Animations */}
-                  <div className="w-13 h-13 md:w-15 md:h-15 flex items-center justify-center text-gray-200 group-hover:text-white transition-all duration-300 transform group-hover:scale-110 group-hover:-rotate-2 relative z-10 shrink-0">
+                  {/* Sleek Uniform Glassy Icon Container (Fix for oversized box & harsh contrast) */}
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/[0.08] border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.35)] flex items-center justify-center p-2.5 backdrop-blur-md group-hover:border-white/30 group-hover:bg-white/[0.14] group-hover:scale-110 transition-all duration-300 shrink-0 relative z-10 mt-1">
                     {tech.icon ? (
                       tech.icon.startsWith('http') || tech.icon.startsWith('/') || tech.icon.includes('base64') ? (
-                        <div className="w-full h-full p-2.5 rounded-[16px] bg-white/95 border border-white/30 shadow-[0_8px_20px_rgba(0,0,0,0.35)] flex items-center justify-center backdrop-blur-md overflow-hidden group-hover:shadow-[0_10px_25px_rgba(0,0,0,0.45)] transition-all">
-                          <img src={tech.icon} alt={tech.name} className="w-full h-full object-contain filter drop-shadow-sm rounded-lg transform group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                        </div>
+                        <img src={tech.icon} alt={tech.name} className="w-full h-full object-contain filter drop-shadow-sm rounded-lg" loading="lazy" />
                       ) : (
-                        <div className="w-full h-full p-2 rounded-[16px] bg-white/[0.08] border border-white/20 shadow-[0_8px_20px_rgba(0,0,0,0.35)] flex items-center justify-center backdrop-blur-md overflow-hidden group-hover:border-white/40 group-hover:bg-white/[0.14] transition-all [&>svg]:w-full [&>svg]:h-full [&>img]:w-full [&>img]:h-full [&>img]:object-contain [&>img]:rounded-lg [&>div]:w-full [&>div]:h-full [&>div]:rounded-lg [&>div]:overflow-hidden">
-                          <span className="w-full h-full flex items-center justify-center" dangerouslySetInnerHTML={{ __html: tech.icon }}></span>
-                        </div>
+                        <span className="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>img]:w-full [&>img]:h-full [&>img]:object-contain [&>img]:rounded-lg [&>div]:w-full [&>div]:h-full [&>div]:rounded-lg [&>div]:overflow-hidden" dangerouslySetInnerHTML={{ __html: tech.icon }}></span>
                       )
                     ) : (
-                      <div className="w-full h-full rounded-[16px] bg-slate-800/90 flex items-center justify-center border border-slate-700 shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
-                        <span className="text-xl font-bold text-slate-300 group-hover:text-white">{tech.name.charAt(0)}</span>
-                      </div>
+                      <span className="text-xl font-bold text-slate-200 group-hover:text-white">{tech.name.charAt(0)}</span>
                     )}
                   </div>
                   
-                  {/* Tool Title */}
+                  {/* Tool Title - Clean typography & proper vertical spacing */}
                   <h3 
-                    className="w-full text-xs md:text-sm font-bold text-center text-slate-200 group-hover:text-white transition-colors px-1 truncate relative z-10 my-auto"
+                    className="w-full text-xs md:text-sm font-extrabold text-center text-slate-100 group-hover:text-white transition-colors px-1 truncate relative z-10 my-auto tracking-wide"
                     title={tech.name}
                   >
                     {tech.name}
@@ -243,7 +237,7 @@ export default function TechnologiesSection() {
 
                   {/* Glassy Badge Pill */}
                   <div className="relative z-10 w-full flex justify-center mt-auto">
-                    <span className="px-3 py-1 text-[10px] font-semibold tracking-wider uppercase rounded-full bg-white/[0.06] backdrop-blur-md border border-white/[0.12] text-slate-300 group-hover:text-white group-hover:border-white/25 group-hover:bg-white/[0.12] transition-colors truncate max-w-full">
+                    <span className="px-3 py-1 text-[10px] font-bold tracking-wider uppercase rounded-full bg-white/[0.07] backdrop-blur-md border border-white/15 text-slate-300 group-hover:text-white group-hover:border-white/30 transition-colors truncate max-w-full">
                       {tech.category}
                     </span>
                   </div>
