@@ -4,9 +4,9 @@
 .pricing-head h2{ color:#fff; font-weight:900; font-size:1.8rem; margin:0 0 .35rem }
 .pricing-head .muted{ color:var(--color-muted) }
 
-.pricing-grid-wrapper{ display:flex; justify-content:center; width:100% }
-.pricing-grid{ display:flex; flex-wrap:wrap; justify-content:center; align-items:stretch; gap:1.25rem; width:100% }
-.price-card{ flex:1 1 300px; max-width:360px; width:100%; background:transparent; border:1px solid rgba(255,255,255,0.24); border-radius:14px; padding:1.25rem; color:#e6f0ff; display:flex; flex-direction:column; transition: box-shadow .2s ease, border-color .2s ease, background .2s ease; box-sizing:border-box }
+.pricing-grid-wrapper{ width:100% }
+.pricing-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:1.25rem; width:100% }
+.price-card{ background:transparent; border:1px solid rgba(255,255,255,0.24); border-radius:14px; padding:1.25rem; color:#e6f0ff; display:flex; flex-direction:column; transition: box-shadow .2s ease, border-color .2s ease, background .2s ease; box-sizing:border-box }
 .price-card.highlight{ border-color:#5aa0ea; box-shadow:0 12px 30px rgba(67,133,205,.18) }
 .price-card:hover{ box-shadow:0 12px 30px rgba(67,133,205,.20); border-color:#8ab8ff; background:rgba(255,255,255,0.04) }
 .price-header { min-height: 140px; display: flex; flex-direction: column; }
@@ -25,11 +25,15 @@
 .price-card .btn:focus-visible,
 .price-card .btn.cta-dark:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(67,133,205,.35) }
 
-.price-card.custom{ background:transparent; border-style:dashed; display:flex; flex-direction:column; justify-content:space-between }
+.price-card.custom{ background:transparent; border-style:dashed; display:flex; flex-direction:column; justify-content:space-between; grid-column: 1 / -1; justify-self: center; width:100%; max-width:380px }
 .price-card.custom .custom-graphic{ width:100%; height:100px; background:radial-gradient(140px 60px at 30% 10%, rgba(67,133,205,.22), rgba(0,0,0,0)); border-radius:12px; margin-bottom:.6rem }
 
 .pricing-actions{ display:flex; justify-content:center; margin-top:2rem }
 
+@media (max-width: 1024px){
+  .pricing-grid{ grid-template-columns: repeat(2, 1fr) }
+}
 @media (max-width: 640px){
-  .price-card{ max-width:100% }
+  .pricing-grid{ grid-template-columns: 1fr }
+  .price-card.custom{ grid-column: 1; max-width: 100% }
 }
