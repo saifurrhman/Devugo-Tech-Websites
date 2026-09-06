@@ -6,8 +6,64 @@ import SEO from '../components/SEO';
 import { ProductAPI, getFileUrl } from '../lib/api';
 import { 
   ArrowLeft, CheckCircle2, ExternalLink, Star, Package, Sparkles, Shield, Zap, 
-  MessageSquare, Phone, Trophy, Cpu, ArrowRight, Check
+  MessageSquare, Phone, Trophy, Cpu, ArrowRight, Check, Share2, BarChart2, Target
 } from 'lucide-react';
+
+// Helper to get distinct icons & theme colors for each product
+function getProductIconConfig(product) {
+  if (!product) return { icon: <Package size={28} className="text-blue-400" />, bg: 'bg-blue-500/15 border-blue-500/30' };
+  const title = (product.title || '').toLowerCase();
+  const cat = (product.category || '').toLowerCase();
+
+  if (title.includes('social') || cat.includes('ai')) {
+    return { icon: <Share2 size={28} className="text-blue-400" />, bg: 'bg-blue-500/15 border-blue-500/30' };
+  }
+  if (title.includes('cro') || title.includes('audit') || cat.includes('saas')) {
+    return { icon: <BarChart2 size={28} className="text-emerald-400" />, bg: 'bg-emerald-500/15 border-emerald-500/30' };
+  }
+  if (title.includes('lead') || cat.includes('automation')) {
+    return { icon: <Target size={28} className="text-amber-400" />, bg: 'bg-amber-500/15 border-amber-500/30' };
+  }
+  return { icon: <Package size={28} className="text-blue-400" />, bg: 'bg-blue-500/15 border-blue-500/30' };
+}
+
+function getTrustBadgeText(product) {
+  if (!product) return 'Verified Enterprise Infrastructure & 99.9% High Uptime SLA';
+  if (product.trustBadge) return product.trustBadge;
+
+  const title = (product.title || '').toLowerCase();
+  if (title.includes('social')) return 'Meta & LinkedIn API Verified • 10M+ Auto Posts Scheduled';
+  if (title.includes('cro') || title.includes('audit')) return 'ISO 27001 Certified • 3.2x Average Conversion Rate Lift';
+  if (title.includes('lead')) return '99.4% SMTP Verification Accuracy • Anti-Spam Compliance SLA';
+
+  return 'Verified Enterprise Infrastructure & 99.9% High Uptime SLA';
+}
+
+function getProductMetrics(product) {
+  if (!product) return [];
+  if (Array.isArray(product.metrics) && product.metrics.length > 0) return product.metrics;
+
+  const title = (product.title || '').toLowerCase();
+  if (title.includes('social')) {
+    return [
+      { label: 'Auto Posts', val: '10M+' },
+      { label: 'Uptime', val: '99.9%' },
+      { label: 'Rating', val: `${product.rating || 4.9} ★` }
+    ];
+  }
+  if (title.includes('cro')) {
+    return [
+      { label: 'Conversion Lift', val: '3.2x' },
+      { label: 'Audits Run', val: '100k+' },
+      { label: 'Rating', val: `${product.rating || 5.0} ★` }
+    ];
+  }
+  return [
+    { label: 'Accuracy', val: '99.4%' },
+    { label: 'Verified Contacts', val: '50M+' },
+    { label: 'Rating', val: `${product.rating || 4.8} ★` }
+  ];
+}
 
 export default function ProductDetails() {
   const { slug } = useParams();
@@ -41,6 +97,10 @@ export default function ProductDetails() {
 
   const whatsappMessage = encodeURIComponent(`Hello Devugo Tech! I am interested in details regarding ${product?.title || 'your product'}.`);
   const whatsappUrl = `https://wa.me/923000000000?text=${whatsappMessage}`;
+
+  const iconConfig = getProductIconConfig(product);
+  const trustText = getTrustBadgeText(product);
+  const metricsPills = getProductMetrics(product);
 
   return (
     <>
@@ -107,21 +167,19 @@ export default function ProductDetails() {
                 </p>
               </div>
 
-              {/* ─── SECTION 2: SEPARATED DETAILED PRODUCT SHOWCASE CARD (Dark Navy Theme) ─── */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+              {/* ─── SECTION 2: SEPARATED DETAILED PRODUCT SHOWCASE CARD ─── */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 {/* Left Card: Dark Navy Showcase Box */}
-                <div className="lg:col-span-5 bg-[#0f223f] border border-slate-700/60 text-white rounded-3xl p-8 shadow-2xl flex flex-col justify-between items-center text-center relative overflow-hidden">
+                <div className="lg:col-span-5 bg-[#0f223f] border border-slate-700/60 text-white rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col justify-between items-center text-center relative overflow-hidden">
                   <div className="w-full flex flex-col items-center">
                     
-                    {/* Rounded Green/Blue Icon Box */}
-                    <div className="w-28 h-28 rounded-3xl bg-[#162a4a] border border-emerald-500/30 flex items-center justify-center mb-6 shadow-inner">
+                    {/* Distinct Rounded Icon Box */}
+                    <div className={`w-28 h-28 rounded-3xl ${iconConfig.bg} border flex items-center justify-center mb-6 shadow-inner`}>
                       {product.image ? (
                         <img src={getFileUrl(product.image)} alt={product.title} className="w-16 h-16 object-contain" />
                       ) : (
-                        <div className="w-16 h-16 rounded-2xl bg-[#25D366] text-white flex items-center justify-center shadow-md">
-                          <Zap size={32} />
-                        </div>
+                        iconConfig.icon
                       )}
                     </div>
 
@@ -131,9 +189,19 @@ export default function ProductDetails() {
                     </h2>
 
                     {/* Short Tagline / Voice Description */}
-                    <p className="text-slate-300 text-xs md:text-sm leading-relaxed max-w-xs mb-8">
+                    <p className="text-slate-300 text-xs md:text-sm leading-relaxed max-w-xs mb-6">
                       {product.tagline || 'Voice-first intelligence & automated ecosystem. No complex apps needed.'}
                     </p>
+
+                    {/* Micro Stats Row (Fixes Empty Space Issue!) */}
+                    <div className="w-full grid grid-cols-3 gap-2 bg-[#162a4a] border border-slate-700/60 p-3 rounded-2xl mb-6">
+                      {metricsPills.map((m, mi) => (
+                        <div key={mi} className="text-center">
+                          <div className="text-xs font-black text-white">{m.val}</div>
+                          <div className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider mt-0.5">{m.label}</div>
+                        </div>
+                      ))}
+                    </div>
 
                     {/* Media Gallery / Preview image if available */}
                     {Array.isArray(product.gallery) && product.gallery.length > 0 && (
@@ -146,19 +214,19 @@ export default function ProductDetails() {
                   </div>
 
                   {/* Dual Action Buttons Inside Left Card */}
-                  <div className="w-full grid grid-cols-2 gap-3 pt-6 border-t border-slate-800 mt-auto">
+                  <div className="w-full grid grid-cols-2 gap-3 pt-4 border-t border-slate-800 mt-auto">
                     {product.demoUrl ? (
                       <a
                         href={product.demoUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1e2536] hover:bg-slate-700 text-white transition-all font-bold text-[11px] border border-slate-700/60"
+                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1e293b] hover:bg-slate-700 text-white transition-all font-extrabold text-[11px] border border-slate-600/80 shadow-sm"
                       >
                         <ExternalLink size={18} className="text-blue-400 mb-1" />
                         <span>LIVE DEMO</span>
                       </a>
                     ) : (
-                      <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1e2536] text-white font-bold text-[11px] border border-slate-700/60">
+                      <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1e293b] text-white font-extrabold text-[11px] border border-slate-600/80">
                         <Phone size={18} className="text-blue-400 mb-1" />
                         <span>VOICE LINE</span>
                       </div>
@@ -168,7 +236,7 @@ export default function ProductDetails() {
                       href={whatsappUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#0c2436] hover:bg-[#123048] text-emerald-400 transition-all font-bold text-[11px] border border-emerald-500/40"
+                      className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#0c2e1f] hover:bg-[#12422c] text-emerald-400 transition-all font-extrabold text-[11px] border border-emerald-500/50 shadow-sm"
                     >
                       <MessageSquare size={18} className="text-[#25D366] mb-1" />
                       <span>WHATSAPP API</span>
@@ -177,7 +245,7 @@ export default function ProductDetails() {
                 </div>
 
                 {/* Right Column: Detailed Features & Specs */}
-                <div className="lg:col-span-7 bg-[#0f223f] border border-slate-700/60 rounded-3xl p-8 md:p-10 flex flex-col justify-between shadow-2xl">
+                <div className="lg:col-span-7 bg-[#0f223f] border border-slate-700/60 rounded-3xl p-6 md:p-10 flex flex-col justify-between shadow-2xl">
                   <div>
                     {/* Live Deployment Status Pill */}
                     <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-extrabold uppercase tracking-wider mb-4">
@@ -195,16 +263,28 @@ export default function ProductDetails() {
                       {product.description || product.tagline || 'Deployed enterprise solution built for seamless digital integration, high deliverability, and real-time operational telemetry.'}
                     </p>
 
-                    {/* 2-Column Feature Checkmark Grid */}
+                    {/* 2-Column Feature Checkmark Grid with Visual Hierarchy */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-8">
-                      {displayFeatures.map((feat, idx) => (
-                        <div key={idx} className="flex items-center gap-2.5 bg-[#172b49] px-3.5 py-2.5 rounded-xl border border-slate-700/50">
-                          <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                            <Check size={12} strokeWidth={3} />
+                      {displayFeatures.map((feat, idx) => {
+                        const isHighlighted = idx < 2;
+                        return (
+                          <div 
+                            key={idx} 
+                            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border transition-all ${
+                              isHighlighted
+                                ? 'bg-[#3b5fe2]/15 border-blue-500/40 text-white font-extrabold shadow-sm'
+                                : 'bg-[#172b49] border-slate-700/50 text-slate-200 font-semibold'
+                            }`}
+                          >
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                              isHighlighted ? 'bg-blue-500 text-white' : 'bg-emerald-500/20 text-emerald-400'
+                            }`}>
+                              <Check size={12} strokeWidth={3} />
+                            </div>
+                            <span className="text-xs truncate">{feat}</span>
                           </div>
-                          <span className="text-xs font-bold text-slate-200 truncate">{feat}</span>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     {/* Strategic Architecture Partners Callout Box */}
@@ -214,10 +294,10 @@ export default function ProductDetails() {
                       </div>
                       <div>
                         <div className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest mb-0.5">
-                          STRATEGIC ARCHITECTURE GUARANTEE
+                          TRUST & ENTERPRISE SLA
                         </div>
                         <div className="text-xs md:text-sm font-bold text-white">
-                          Enterprise-Grade Security & High Uptime SLA (99.9%)
+                          {trustText}
                         </div>
                       </div>
                     </div>
@@ -316,7 +396,7 @@ export default function ProductDetails() {
                   to="/contact"
                   className="inline-flex items-center gap-2 bg-[#1c2e4a] hover:bg-slate-700 border border-slate-600 text-white font-extrabold text-xs px-6 py-3 rounded-full transition-all"
                 >
-                  Establish Partnership Link <ArrowRight size={14} />
+                  Get Early Access & Classified Intel <ArrowRight size={14} />
                 </Link>
               </div>
 
