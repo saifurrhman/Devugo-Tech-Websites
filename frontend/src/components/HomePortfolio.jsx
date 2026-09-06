@@ -188,16 +188,7 @@ export default function HomePortfolio({ limit = 6, mode = 'grid', selectedCatego
         .service-card-horizontal {
           flex: 0 0 380px;
           width: 380px;
-          background: var(--color-card, #fff);
-          border-radius: 16px;
-          padding: 1.25rem;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .service-card-horizontal:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+          height: 510px !important;
         }
 
         @media (max-width: 1024px) {

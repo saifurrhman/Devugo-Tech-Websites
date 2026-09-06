@@ -6370,17 +6370,20 @@ html, body {
 .portfolio-project-card {
   background: #ffffff !important;
   border-radius: 20px !important;
-  padding: 1.35rem !important;
+  padding: 1.25rem !important;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
   border: 1px solid rgba(226, 232, 240, 0.9) !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  height: 100% !important;
+  height: 510px !important; /* FIXED UNIFORM HEIGHT FOR ALL CARDS */
+  min-height: 510px !important;
+  max-height: 510px !important;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
   box-sizing: border-box !important;
   color: #0f172a !important;
   text-align: left !important;
+  overflow: hidden !important;
 }
 
 .portfolio-project-card:hover {
@@ -6392,10 +6395,12 @@ html, body {
 
 .portfolio-card-image-wrap {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 180px !important; /* FIXED HEIGHT FOR THUMBNAIL AREA */
+  min-height: 180px !important;
+  max-height: 180px !important;
   border-radius: 14px;
   overflow: hidden;
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
   background: #f8fafc;
   flex-shrink: 0;
 }
@@ -6408,6 +6413,18 @@ html, body {
   display: block;
 }
 
+.portfolio-card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
 .portfolio-project-card:hover .portfolio-card-image {
   transform: scale(1.03);
 }
@@ -6416,71 +6433,102 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
+  justify-content: space-between;
+  overflow: hidden;
 }
 
+/* UNIFORM HEADING STYLE WITH 2-LINE CLAMP & FIXED HEIGHT */
 .portfolio-card-title {
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
   color: #0f172a !important;
-  line-height: 1.25;
-  margin: 0 0 0.35rem 0;
-  letter-spacing: -0.015em;
-  text-align: left;
+  line-height: 1.3 !important;
+  margin: 0 0 0.3rem 0 !important;
+  letter-spacing: -0.015em !important;
+  text-align: left !important;
+  height: 3.25rem !important; /* FIXED 2-LINE HEIGHT FOR ALL HEADINGS */
+  min-height: 3.25rem !important;
+  max-height: 3.25rem !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
 }
 
 .portfolio-project-card:hover .portfolio-card-title {
   color: #0f172a !important;
 }
 
+/* CLIENT LINE - FIXED HEIGHT TO PREVENT SHIFTING */
 .portfolio-card-client {
-  display: block;
-  font-size: 0.85rem;
-  color: #94a3b8;
-  font-weight: 500;
-  margin-bottom: 0.65rem;
-  text-align: left;
+  display: block !important;
+  font-size: 0.85rem !important;
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.5rem !important;
+  text-align: left !important;
+  height: 1.2rem !important;
+  min-height: 1.2rem !important;
+  max-height: 1.2rem !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
 }
 
+/* UNIFORM DESCRIPTION WITH 3-LINE CLAMP & FIXED HEIGHT */
 .portfolio-card-desc {
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: 0.92rem !important;
+  line-height: 1.5 !important;
   color: #475569 !important;
-  margin: 0 0 0.9rem 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-align: left;
+  margin: 0 0 0.75rem 0 !important;
+  height: 4.1rem !important; /* FIXED 3-LINE HEIGHT FOR ALL DESCRIPTIONS */
+  min-height: 4.1rem !important;
+  max-height: 4.1rem !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-align: left !important;
 }
 
 .portfolio-project-card:hover .portfolio-card-desc {
   color: #475569 !important;
 }
 
+/* TECH BADGES - SINGLE ROW WITH FIXED HEIGHT */
 .portfolio-card-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 1rem;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 0.4rem !important;
+  margin-bottom: 0.75rem !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  overflow: hidden !important;
 }
 
 .portfolio-badge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #475569;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  padding: 0.2rem 0.65rem;
-  border-radius: 9999px;
-  white-space: nowrap;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.2rem 0.6rem !important;
+  border-radius: 9999px !important;
+  white-space: nowrap !important;
+}
+
+.portfolio-badge.empty-badge {
+  visibility: hidden;
+  border: none;
 }
 
 .portfolio-card-actions {
-  margin-top: auto;
-  padding-top: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+  margin-top: auto !important;
+  padding-top: 0.4rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.6rem !important;
 }
 
 .portfolio-pill-btn {

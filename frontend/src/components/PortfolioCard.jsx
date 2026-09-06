@@ -10,7 +10,7 @@ export default function PortfolioCard({ project, className = '' }) {
 
   return (
     <article className={`portfolio-project-card ${className}`}>
-      {image && (
+      {image ? (
         <div className="portfolio-card-image-wrap">
           <img
             src={image}
@@ -19,29 +19,36 @@ export default function PortfolioCard({ project, className = '' }) {
             loading="lazy"
           />
         </div>
-      )}
-      <div className="portfolio-card-body">
-        {title && <h3 className="portfolio-card-title">{title}</h3>}
-        
-        {client && (
-          <span className="portfolio-card-client">
-            Client: {client}
-          </span>
-        )}
-
-        {description && (
-          <p className="portfolio-card-desc">
-            {description}
-          </p>
-        )}
-
-        {!!badgeList.length && (
-          <div className="portfolio-card-badges">
-            {badgeList.slice(0, 3).map((t, idx) => (
-              <span key={idx} className="portfolio-badge">{String(t)}</span>
-            ))}
+      ) : (
+        <div className="portfolio-card-image-wrap fallback-wrap">
+          <div className="portfolio-card-image-placeholder">
+            <span>{title ? title.charAt(0) : 'P'}</span>
           </div>
-        )}
+        </div>
+      )}
+      
+      <div className="portfolio-card-body">
+        <h3 className="portfolio-card-title" title={title}>
+          {title || 'Untitled Project'}
+        </h3>
+        
+        <span className="portfolio-card-client">
+          {client ? `Client: ${client}` : '\u00A0'}
+        </span>
+
+        <p className="portfolio-card-desc">
+          {description || 'No description available for this project.'}
+        </p>
+
+        <div className="portfolio-card-badges">
+          {badgeList.length > 0 ? (
+            badgeList.slice(0, 3).map((t, idx) => (
+              <span key={idx} className="portfolio-badge">{String(t)}</span>
+            ))
+          ) : (
+            <span className="portfolio-badge empty-badge">&nbsp;</span>
+          )}
+        </div>
 
         <div className="portfolio-card-actions">
           <Link
