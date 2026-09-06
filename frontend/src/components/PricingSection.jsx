@@ -189,16 +189,19 @@ export default function PricingSection({ showCustom = true, limit = 6 }){
                 </motion.article>
               ))}
 
-              {/* Custom quote card */}
-              {showCustom && (
-                <motion.article variants={itemVariants} className="price-card custom">
-                  <div className="custom-graphic" aria-hidden="true" />
-                  <h3 className="price-title">Need a custom quote?</h3>
-                  <p className="price-blurb">Tell us what you want to build — we'll tailor a plan to your scope.</p>
-                  <button className="btn cta-dark" onClick={() => handleOpenQuote(null)}>Get started →</button>
-                </motion.article>
-              )}
               </div>
+
+              {/* Custom quote card - Centered below grid */}
+              {showCustom && (
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
+                  <motion.article variants={itemVariants} className="price-card custom" style={{ width: '100%', maxWidth: '360px' }}>
+                    <div className="custom-graphic" aria-hidden="true" />
+                    <h3 className="price-title">Need a custom quote?</h3>
+                    <p className="price-blurb">Tell us what you want to build — we'll tailor a plan to your scope.</p>
+                    <button className="btn cta-dark" onClick={() => handleOpenQuote(null)}>Get started →</button>
+                  </motion.article>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
