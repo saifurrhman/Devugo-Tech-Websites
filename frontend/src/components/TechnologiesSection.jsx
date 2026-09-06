@@ -159,7 +159,7 @@ export default function TechnologiesSection() {
             </button>
 
             {/* Marquee Continuous Infinite Auto-Scroll Container */}
-            <div className="tech-marquee-container overflow-x-auto scrollbar-none" ref={scrollTrackRef}>
+            <div className="tech-marquee-container" ref={scrollTrackRef}>
               <div className="tech-marquee-track">
                 {marqueeTech.map((tech, index) => (
                   <a
