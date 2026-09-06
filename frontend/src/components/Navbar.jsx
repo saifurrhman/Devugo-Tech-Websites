@@ -92,6 +92,7 @@ export default function Navbar() {
               )}
             </div>
             <NavLink to="/solutions" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Solutions</NavLink>
+            <NavLink to="/products" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Products</NavLink>
             <NavLink to="/portfolio" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Portfolio</NavLink>
             <NavLink to="/blog" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Blog</NavLink>
             <NavLink to="/contact" onClick={close} className={({isActive})=> isActive? 'active': undefined}>Contact</NavLink>

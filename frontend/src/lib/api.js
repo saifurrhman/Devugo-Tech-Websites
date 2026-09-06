@@ -275,6 +275,18 @@ export const ServiceAPI = {
 };
 
 // ============================================
+// PRODUCT API
+// ============================================
+export const ProductAPI = {
+  list: (params = {}) => api('/api/products' + buildQuery(params)),
+  getFeatured: () => api('/api/products/featured'),
+  get: (id) => api(`/api/products/${id}`),
+  create: (payload) => api('/api/products', { method: 'POST', body: payload }),
+  update: (id, payload) => api(`/api/products/${id}`, { method: 'PUT', body: payload }),
+  remove: (id) => api(`/api/products/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
 // PRICING API
 // ============================================
 export const PricingAPI = {

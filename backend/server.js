@@ -227,6 +227,10 @@ app.use('/api/images', imageRoutes);
 const serviceRoutes = require('./routes/services');
 app.use('/api/services', serviceRoutes);
 
+// Product Routes
+const productRoutes = require('./routes/products');
+app.use('/api/products', productRoutes);
+
 // Pricing Routes
 const pricingRoutes = require('./routes/pricing');
 app.use('/api/pricing', pricingRoutes);

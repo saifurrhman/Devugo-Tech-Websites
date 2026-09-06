@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { CareerAPI, TeamAPI, CompanyInfoAPI } from '../lib/api';
-import { Rocket, Globe, DollarSign, Target, Search, Briefcase, MapPin, ArrowRight, Calendar } from 'lucide-react';
+import { TrendingUp, Globe, Banknote, Award, Search, Briefcase, MapPin, ArrowRight, Calendar } from 'lucide-react';
 import SEO from '../components/SEO';
 
 const TYPE_STYLE = {
@@ -16,28 +16,28 @@ const TYPE_STYLE = {
 
 const PERKS = [
   { 
-    icon: <Rocket size={22} className="text-blue-400" />, 
+    icon: <TrendingUp size={22} strokeWidth={1.5} className="text-blue-400" />, 
     title: 'Fast Growth', 
     desc: 'Learn and grow with cutting-edge tech', 
-    boxBg: 'bg-blue-500/10 border-blue-500/30' 
+    boxBg: 'bg-[#1e2536] border border-blue-500/30' 
   },
   { 
-    icon: <Globe size={22} className="text-purple-400" />, 
+    icon: <Globe size={22} strokeWidth={1.5} className="text-purple-400" />, 
     title: 'Remote First', 
     desc: 'Work from anywhere in the world', 
-    boxBg: 'bg-purple-500/10 border-purple-500/30' 
+    boxBg: 'bg-[#1e2536] border border-purple-500/30' 
   },
   { 
-    icon: <DollarSign size={22} className="text-amber-400" />, 
+    icon: <Banknote size={22} strokeWidth={1.5} className="text-amber-400" />, 
     title: 'Competitive Pay', 
     desc: 'Market-leading salaries & bonuses', 
-    boxBg: 'bg-amber-500/10 border-amber-500/30' 
+    boxBg: 'bg-[#1e2536] border border-amber-500/30' 
   },
   { 
-    icon: <Target size={22} className="text-rose-400" />, 
+    icon: <Award size={22} strokeWidth={1.5} className="text-rose-400" />, 
     title: 'Impactful Work', 
     desc: 'Build products used by thousands', 
-    boxBg: 'bg-rose-500/10 border-rose-500/30' 
+    boxBg: 'bg-[#1e2536] border border-rose-500/30' 
   },
 ];
 
@@ -96,15 +96,15 @@ const DEFAULT_SAMPLE_JOBS = [
 function getCategoryStyle(department = '', type = '') {
   const d = (department || '').toLowerCase();
   if (d.includes('design') || d.includes('product') || d.includes('ui/ux')) {
-    return { bg: 'bg-purple-500/15', border: 'border-purple-500/35', text: 'text-purple-400', badgeBg: 'bg-purple-500/20' };
+    return { border: 'border-purple-500/40', text: 'text-purple-400' };
   }
   if (d.includes('quality') || d.includes('sqa') || d.includes('testing')) {
-    return { bg: 'bg-emerald-500/15', border: 'border-emerald-500/35', text: 'text-emerald-400', badgeBg: 'bg-emerald-500/20' };
+    return { border: 'border-emerald-500/40', text: 'text-emerald-400' };
   }
   if (d.includes('sales') || d.includes('business') || d.includes('outbound')) {
-    return { bg: 'bg-amber-500/15', border: 'border-amber-500/35', text: 'text-amber-400', badgeBg: 'bg-amber-500/20' };
+    return { border: 'border-amber-500/40', text: 'text-amber-400' };
   }
-  return { bg: 'bg-blue-500/15', border: 'border-blue-500/35', text: 'text-blue-400', badgeBg: 'bg-blue-500/20' };
+  return { border: 'border-blue-500/40', text: 'text-blue-400' };
 }
 
 export default function Careers() {
@@ -164,23 +164,20 @@ export default function Careers() {
         {/* ─── HERO ─── */}
         <section className="relative overflow-hidden pt-8 pb-12 text-center px-4 flex flex-col items-center justify-center">
           
-          {/* Ambient Glows */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-
           <div className="relative max-w-4xl w-full mx-auto z-10 flex flex-col items-center text-center">
             
             {/* Top Hiring Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-[#0f2444]/80 backdrop-blur-md mb-6 shadow-md mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-[#0f2444] mb-6 shadow-md mx-auto">
               <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
               <span className="text-[11px] font-extrabold text-blue-400 tracking-wider uppercase">
                 • We're Actively Hiring
               </span>
             </div>
 
-            {/* Hero Main Heading */}
+            {/* Hero Main Heading with Clean Solid Colors */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-4 leading-tight text-center">
               Shape the Future<br />
-              <span className="text-blue-400">
+              <span className="text-[#4f8ef7]">
                 of Technology
               </span>
             </h1>
@@ -192,7 +189,7 @@ export default function Careers() {
 
             {/* Stat Counters Row */}
             <div className="flex justify-center items-center gap-4 sm:gap-6 flex-wrap w-full max-w-2xl mx-auto mb-8">
-              <div className="bg-[#0f223f]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-all">
+              <div className="bg-[#0f223f] border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg hover:border-blue-500/40 transition-all">
                 <div className="text-3xl md:text-4xl font-black text-white">
                   {jobs.length}
                 </div>
@@ -200,7 +197,7 @@ export default function Careers() {
                   Open Roles
                 </div>
               </div>
-              <div className="bg-[#0f223f]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-all">
+              <div className="bg-[#0f223f] border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg hover:border-blue-500/40 transition-all">
                 <div className="text-3xl md:text-4xl font-black text-white">
                   {teamCount}
                 </div>
@@ -208,7 +205,7 @@ export default function Careers() {
                   Team Members
                 </div>
               </div>
-              <div className="bg-[#0f223f]/90 border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-all">
+              <div className="bg-[#0f223f] border border-slate-700/60 rounded-2xl py-4 px-6 sm:px-8 flex-1 min-w-[140px] text-center shadow-lg hover:border-blue-500/40 transition-all">
                 <div className="text-3xl md:text-4xl font-black text-white">
                   {countriesCount}
                 </div>
@@ -218,18 +215,18 @@ export default function Careers() {
               </div>
             </div>
 
-            {/* Search Input Bar with Icon and Search Button */}
+            {/* Search Input Bar */}
             <div className="relative w-full max-w-lg mx-auto">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <Search size={18} strokeWidth={1.5} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <input 
                 value={q} 
                 onChange={e => setQ(e.target.value)}
                 placeholder="Search roles, departments, locations..."
-                className="w-full pl-11 pr-24 py-3.5 rounded-xl bg-[#0f223f]/90 border border-slate-700/60 text-white placeholder-slate-400 text-sm md:text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-xl backdrop-blur-md"
+                className="w-full pl-11 pr-24 py-3.5 rounded-xl bg-[#0f223f] border border-slate-700/60 text-white placeholder-slate-400 text-sm md:text-base outline-none focus:border-blue-500 transition-all shadow-xl"
               />
               <button 
                 type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-lg transition-all shadow-md"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#3b5fe2] hover:bg-blue-600 text-white text-xs font-extrabold px-3.5 py-2 rounded-lg transition-all shadow-md"
               >
                 Search
               </button>
@@ -244,9 +241,9 @@ export default function Careers() {
             {PERKS.map(p => (
               <div 
                 key={p.title} 
-                className="bg-[#0f223f]/80 border border-slate-700/60 rounded-2xl p-6 text-center shadow-md backdrop-blur-md hover:border-blue-500/50 hover:bg-[#132747] transition-all group"
+                className="bg-[#0f223f] border border-slate-700/60 rounded-2xl p-6 text-center shadow-md hover:border-blue-500/50 hover:bg-[#132747] transition-all group"
               >
-                <div className={`w-12 h-12 rounded-xl ${p.boxBg} border flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md`}>
+                <div className="w-12 h-12 rounded-xl bg-[#1e2536] border border-slate-700/60 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md">
                   {p.icon}
                 </div>
                 <h3 className="text-white font-extrabold text-base mb-1.5">
@@ -273,8 +270,8 @@ export default function Careers() {
                     onClick={() => setActiveType(t)}
                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
                       active 
-                        ? 'bg-blue-600 text-white border border-blue-400/50 shadow-blue-600/30' 
-                        : 'bg-[#0f223f]/80 border border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+                        ? 'bg-[#3b5fe2] text-white border border-blue-400/50 shadow-blue-600/30' 
+                        : 'bg-[#1c2333] border border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
                     {t}
@@ -307,12 +304,12 @@ export default function Careers() {
                     to={`/careers/${job.slug || job._id}`} 
                     className="block group"
                   >
-                    <div className="bg-[#0f223f]/80 border border-slate-700/60 hover:border-blue-500/60 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-200 hover:bg-[#132747] hover:shadow-xl backdrop-blur-md">
+                    <div className="bg-[#0f223f] border border-slate-700/60 hover:border-blue-500/60 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-200 hover:bg-[#132747] hover:shadow-xl">
                       
                       <div className="flex items-start md:items-center gap-4 flex-1">
-                        {/* Distinct Icon Color according to Category */}
-                        <div className={`w-12 h-12 rounded-xl ${catStyle.bg} ${catStyle.border} border flex items-center justify-center shrink-0 shadow-sm`}>
-                          <Briefcase size={22} className={catStyle.text} />
+                        {/* Neutral Solid Icon Box (#1e2536) for All Jobs with Outline Briefcase Icon */}
+                        <div className={`w-12 h-12 rounded-xl bg-[#1e2536] ${catStyle.border} border flex items-center justify-center shrink-0 shadow-sm`}>
+                          <Briefcase size={20} strokeWidth={1.5} className={catStyle.text} />
                         </div>
                         <div className="min-w-0">
                           {/* Strong Visual Hierarchy: Bold Prominent Title */}
@@ -323,19 +320,19 @@ export default function Careers() {
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 font-normal">
                             {job.department && (
                               <span className="flex items-center gap-1.5">
-                                <Briefcase size={13} className="text-slate-500" />
+                                <Briefcase size={13} strokeWidth={1.5} className="text-slate-500" />
                                 {job.department}
                               </span>
                             )}
                             {job.location && (
                               <span className="flex items-center gap-1.5">
-                                <MapPin size={13} className="text-slate-500" />
+                                <MapPin size={13} strokeWidth={1.5} className="text-slate-500" />
                                 {job.location}
                               </span>
                             )}
                             {job.deadline && (
                               <span className="flex items-center gap-1.5">
-                                <Calendar size={13} className="text-slate-500" />
+                                <Calendar size={13} strokeWidth={1.5} className="text-slate-500" />
                                 Apply before: {new Date(job.deadline).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                               </span>
                             )}
@@ -348,9 +345,9 @@ export default function Careers() {
                         <span className={`px-3.5 py-1 rounded-full text-xs font-bold border ${typeStyle.bg} ${typeStyle.border} ${typeStyle.text}`}>
                           {job.type}
                         </span>
-                        {/* High Contrast Prominent Action Arrow Button */}
-                        <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 flex items-center justify-center transition-all shadow-md shrink-0">
-                          <ArrowRight size={18} />
+                        {/* Prominent Action Arrow Button */}
+                        <div className="w-10 h-10 rounded-xl bg-[#1e2536] border border-slate-700/60 text-slate-400 group-hover:bg-[#3b5fe2] group-hover:text-white group-hover:border-blue-500 flex items-center justify-center transition-all shadow-md shrink-0">
+                          <ArrowRight size={18} strokeWidth={1.5} />
                         </div>
                       </div>
 
@@ -363,7 +360,7 @@ export default function Careers() {
 
           {/* ─── BOTTOM CTA BANNER ─── */}
           {!loading && (
-            <div className="bg-[#0f223f] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center shadow-2xl backdrop-blur-md mt-16 relative overflow-hidden">
+            <div className="bg-[#0f223f] border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center shadow-2xl mt-16 relative overflow-hidden">
               <div className="relative z-10 max-w-xl mx-auto">
                 <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
                   Don't see the perfect role?
@@ -373,9 +370,9 @@ export default function Careers() {
                 </p>
                 <Link 
                   to="/contact" 
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-extrabold px-8 py-3.5 rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-105"
+                  className="inline-flex items-center gap-2 bg-[#3b5fe2] hover:bg-blue-600 text-white font-extrabold px-8 py-3.5 rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-105"
                 >
-                  Get In Touch <ArrowRight size={18} />
+                  Get In Touch <ArrowRight size={18} strokeWidth={1.5} />
                 </Link>
               </div>
             </div>

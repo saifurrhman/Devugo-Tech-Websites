@@ -15,8 +15,12 @@ import Solutions from '../pages/Solutions';
 import Pricing from '../pages/Pricing';
 import Careers from '../pages/Careers';
 import CareerDetail from '../pages/CareerDetail';
+import Products from '../pages/Products';
+import ProductDetails from '../pages/ProductDetails';
 import Dashboard from '../admin/pages/Dashboard';
 import Brands from '../admin/pages/Brands';
+import ProductsList from '../admin/pages/ProductsList';
+import ProductEdit from '../admin/pages/ProductEdit';
 import PortfolioList from '../admin/pages/PortfolioList';
 import PortfolioEdit from '../admin/pages/PortfolioEdit';
 import BlogList from '../admin/pages/BlogList';
@@ -122,6 +126,10 @@ export default function PublicRoutes() {
           <Route path="/careers" element={<Careers />} />
           <Route path="/careers/:id" element={<CareerDetail />} />
 
+          {/* Public Products Catalog */}
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:slug" element={<ProductDetails />} />
+
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/solutions" element={<Solutions />} />
@@ -136,6 +144,11 @@ export default function PublicRoutes() {
 
           {/* Admin Dashboard */}
           <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+
+          {/* Admin Products */}
+          <Route path="/admin/products" element={<ProtectedRoute><ProductsList /></ProtectedRoute>} />
+          <Route path="/admin/products/new" element={<ProtectedRoute><ProductEdit /></ProtectedRoute>} />
+          <Route path="/admin/products/edit/:id" element={<ProtectedRoute><ProductEdit /></ProtectedRoute>} />
 
           {/* Admin Portfolio */}
           <Route path="/admin/portfolio" element={<ProtectedRoute><PortfolioList /></ProtectedRoute>} />
